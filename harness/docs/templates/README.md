@@ -22,6 +22,7 @@ and code fences stay English even inside a VN fork.
 | --- | --- | --- | --- | --- |
 | [client-intake-brief.md](client-intake-brief.md) | 1.2 | PB-G1 (internal capture) | **yes** | Vendor-internal go/no-go. Red/green flags, complexity, conditional probes, decline reply. |
 | [gap-analysis.md](gap-analysis.md) | 1.4 | feeds PB-G2 | **yes** | As-Is/To-Be + 6 gap categories + MoSCoW. Mints `GAP-NNN` → `REQ-ID`. |
+| [srs-lite.md](srs-lite.md) | 1.5-lite (Lite lane) | PB-G2 owner ack (1.9-lite) | no (internal) | One-file requirements spine: modules + `REQ-ID` table + high-risk flags + feature table + NFR one-liners. Replaces 1.3–1.9 in the Lite lane (`docs/WORKFLOW.md` § Lanes). |
 | [feature-register.md](feature-register.md) | 1.9 | **PB-G2 (CLIENT)** scope frozen | **yes** | Scope baseline. Columns: scope-group, module/use-case, feature, `in-MVP`/`defer`/`needs-consult`/`out`, `REQ-ID`, `GAP` ref. RTM backward-complete on freeze. |
 | [role-permission-matrix.md](role-permission-matrix.md) | 1.11 | RPM coverage; re-checked at ACCEPTANCE | **yes** | Roles × resources × CRUD grid. Every non-`N` cell cites a `REQ-ID`. |
 | [status-flow.md](status-flow.md) | 1.11 | status-flow coverage; re-checked at ACCEPTANCE | **yes** | Per-entity Mermaid state machine + transition table. Every transition cites a `REQ-ID`. |
@@ -32,6 +33,7 @@ and code fences stay English even inside a VN fork.
 | File | Step | Gate | locale-vi fork? | Notes |
 | --- | --- | --- | --- | --- |
 | [spec-intake.md](spec-intake.md) | Build entry | DoR inputs | no (internal) | Turns the signed BA spine into ERD/stack questions. Carries conditional enterprise triggers. |
+| [build-manifest.md](build-manifest.md) | 2.3 | **DoR** (coverage: every in-scope `REQ-ID` in exactly one phase, P0 defined) | no (internal) | Ordered executable phases P0..PN — the spec→code conversion layer `/build-phase` executes. Playbook: `build-manifest-compilation.md`. |
 | [story.md](story.md) | 2.6 | verify-gate / DoD | no (internal) | FLAT `<module>-NN-<slug>.md`. Realises `REQ-ID`s; commits cite ≥1 token; tests mint `TC-NNN`. Implementation guardrails. |
 | [validation-report.md](validation-report.md) | 2.8 → 2.10 | DoD | no (internal) | `REQ-ID` × `TC-NNN` coverage + layer results. Feeds the verification register the verify-gate parses. |
 | [release-note.md](release-note.md) | 2.13 | release smoke | **yes** | Every released `REQ-ID` appears; each cites the `TC-NNN` that proved it. Pre/post-deploy smoke + rollback + client update. |

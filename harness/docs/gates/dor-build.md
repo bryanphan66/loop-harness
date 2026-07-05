@@ -1,24 +1,24 @@
 # Gate DoR — Definition of Ready (Enter Build)
 
 > **Type:** internal. The entry gate to Macro-Stage 2 (Build & Go-live).
-> **Step:** 2.3 (`docs/WORKFLOW.md`). Cannot be reached before **PB-G4**.
-> *Detailed Build goal text is built in the next macro-stage increment; this gate
-> checklist ships now so the Pre-Build → Build boundary is enforceable.*
+> **Step:** 2.3 (`docs/WORKFLOW.md`). Cannot be reached before **PB-G4** (Full
+> lane) / the PB-G3 freeze + recorded 1.14/1.15 N/A-by-decision (Lite lane).
 
 DoR confirms the project is genuinely ready to build — not just signed. Every item
 below must hold before the first build phase starts.
 
 ## Checklist
 
-- [ ] **PB-G4 cleared** — contract signed + deposit received (`docs/gates/pb-g4-contract-deposit.md`).
-- [ ] Requirements **baselined** — SRS + REQ-IDs frozen at PB-G2; the RTM is backward-complete.
-- [ ] Scope **signed** — feature-register frozen and client-confirmed (PB-G2).
+- [ ] **PB-G4 cleared** — contract signed + deposit received (`docs/gates/pb-g4-contract-deposit.md`). **Lite lane:** PB-G3 frozen + `1.14/1.15 — N/A by decision` recorded in STAGE.md.
+- [ ] Requirements **baselined** — SRS + REQ-IDs frozen at PB-G2; the RTM is backward-complete (Lite: srs-lite table frozen).
+- [ ] Scope **signed** — feature-register frozen and client-confirmed (PB-G2; Lite: owner ack recorded).
 - [ ] Prototype **frozen** — PB-G3 cleared; the build target matches the frozen visual contract.
 - [ ] **ERD FROZEN** (step 2.1, SA) — entities, normalization, audit + tenant fields reviewed; decision recorded by slug.
 - [ ] **Design approved** — design tokens + Component Coverage Matrix complete (1.10).
 - [ ] **Acceptance criteria** exist per in-scope feature (from the SRS `**shall**` statements).
 - [ ] **NFR** captured — `docs/requirements/srs/nfr.md` present; load / DR / compliance toggles decided (in-scope or N/A by decision).
 - [ ] Implementation plan exists at `plans/<YYMMDD-HHMM>-<slug>/` (step 2.3).
+- [ ] **Build manifest complete** — `docs/build/build-manifest.md` exists per `docs/templates/build-manifest.md`: **P0 (walking skeleton) defined**, every phase ≤ one agent session (≤~10 files), and the coverage checklist proves **every in-scope REQ-ID appears in exactly one phase**.
 - [ ] Stack decision recorded by slug (step 2.2, Tech Lead) — SA's ERD-freeze and Tech Lead's stack are **separate** decisions (D5).
 - [ ] STRIDE threat-model done at 2.2 (red-team required).
 
@@ -31,6 +31,7 @@ Confirmed by (PM):        <name>   on  YYYY-MM-DD
 ERD freeze decision:      docs/decisions/<slug>.md
 Stack decision:           docs/decisions/<slug>.md
 Plan:                     plans/<YYMMDD-HHMM>-<slug>/
+Build manifest:           docs/build/build-manifest.md  (coverage checklist green)
 ```
 
 > A failed line means Build does not start. Do not "start coding to find out" —

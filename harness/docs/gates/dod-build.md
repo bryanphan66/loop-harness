@@ -2,9 +2,14 @@
 
 > **Type:** internal exit gate to Macro-Stage 2, immediately before the client
 > **ACCEPTANCE** gate (step 2.12). **Step:** 2.10 (`docs/WORKFLOW.md`).
-> *Detailed Build goal text is built in the next macro-stage increment; this gate
-> checklist ships now to hold the conditional enterprise gate toggles (D2) in one
-> place so none is silently dropped.*
+> This checklist also holds the conditional enterprise gate toggles in one
+> place so none is silently dropped.
+>
+> **Gate rebalance (WORKFLOW § Macro-Stage 2):** during 2.6 every phase runs the
+> light floor self-check (`validate:quick` + design-system floor rules + phase
+> e2e smoke). The heavy gates below — 2.7 review, 2.9 security, 2.10 QA — run
+> **once when the build-manifest is complete** (plus a mid-point 2.7 review when
+> the manifest has >6 phases). This checklist is filled at that completion pass.
 
 DoD confirms the build is provably finished before it is shown to the client for
 acceptance. The verify-gate (`scripts/harness-verify-gate.sh`) is the mechanical
@@ -12,7 +17,8 @@ half; this checklist is the judgment half.
 
 ## Core Checklist
 
-- [ ] **Code review** (6-dim) passed — score ≥7, no dimension = 0 (step 2.7).
+- [ ] **Build manifest exhausted** — every phase in `docs/build/build-manifest.md` checked done, each closed by a token-citing stage-boundary commit.
+- [ ] **Code review** (6-dim) passed — score ≥7, no dimension = 0 (step 2.7; mid-point review done if manifest >6 phases).
 - [ ] **Design-System Compliance** — every grid/form screen classified to one §4 floorplan (`docs/visuals/diagrams/screen-inventory.md`) + `docs/gates/design-system-compliance.md` green per screen; no hardcoded tokens; components reused.
 - [ ] **E2E from BA docs** — every REQ-ID has ≥1 passing E2E test with a **TC-NNN** row (step 2.8).
 - [ ] **RTM forward-complete** (`docs/TRACE_SPEC.md`): every REQ-ID → ≥1 TC-NNN with `Result: pass` in the verification register.
@@ -51,5 +57,5 @@ Conditional toggles:               all rows above checked or N/A-by-decision
 ```
 
 > Only after DoD is filled does the client **ACCEPTANCE** gate (2.12, UAT +
-> sign-off) run. ACCEPTANCE and HANDOVER gate checklists are built in the next
-> macro-stage increment.
+> sign-off) run — its clearing conditions live in the WORKFLOW Canonical Gate
+> List and the 2.12 goal block; the HANDOVER gate's in 3.1.

@@ -19,6 +19,8 @@ Shape-only scaffold. Replace <placeholders>.
 ## Snapshot
 
 - **Macro-stage:** Pre-Build | Build & Go-live | Post-Build
+- **Lane:** Full | Lite — declared at intake (1.2); see `docs/WORKFLOW.md` § Lanes
+- **Harness source:** <path of the harness clone or `owner/repo@ref` — filled by install-harness.sh; step 2.4 scaffolds the stack template from here>
 - **Current step:** <e.g. 1.9 — Feature register + scope baseline>
 - **Last completed:** <e.g. 1.8 — Scenario edge-case> on YYYY-MM-DD (commit <short-sha>)
 - **Next gate:** <one-line — what unlocks the next step, e.g. "PB-G2: scope frozen (client)">
@@ -53,6 +55,10 @@ not applicable (never delete them silently).
 
 ### Macro 1 — Pre-Build
 
+> **Lite lane:** route is `1.1 → 1.2 → 1.5-lite → 1.9-lite → 1.10-lite → 1.11 →
+> 1.12 → 1.13 → 2.1`; mark 1.3/1.4/1.6/1.7 rows `merged into 1.5-lite` and
+> 1.14/1.15 `N/A-by-decision (Lite)` — never delete rows silently.
+
 | Step | Status | Gate to clear | Owner |
 |---|---|---|---|
 | 1.3 Discovery interview | pending | persona coverage / time-box | BA |
@@ -76,11 +82,11 @@ not applicable (never delete them silently).
 | 2.1 ERD freeze | pending | **ERD FROZEN** | SA |
 | 2.1b Data migration / cutover | pending | **CONDITIONAL — N/A-by-decision** if greenfield | SA + DevSecOps |
 | 2.2 Stack + TDR + threat-model | pending | stack justified, API complete, STRIDE | Tech Lead |
-| 2.3 Implementation plan + DoR | pending | **DoR GATE** | Tech Lead + PM |
-| 2.4 Env + CI/CD + observability/SLO | pending | pipeline green, alerting live, backup verified | DevSecOps |
-| 2.5 Seed + foundation data | pending | app boots with RBAC + admin | DevSecOps + Dev |
-| 2.6 Code feature by phase | pending | verify-gate pass, commit cites token | Fullstack Dev |
-| 2.7 Code review (6-dim) | pending | score ≥7, no dimension = 0 | Tech Lead |
+| 2.3 Implementation plan + build manifest + DoR | pending | **DoR GATE** (manifest coverage proven) | Tech Lead + PM |
+| 2.4 Walking skeleton (P0) + env + CI/CD | pending | **WALKING SKELETON** boots + CI green | DevSecOps |
+| 2.5 Seed + foundation data | pending | seeded admin login works; P0 done | DevSecOps + Dev |
+| 2.6 Code by phase (`/build-phase` loop P1..PN) | pending | per phase: validate:quick + smoke + token commit | Fullstack Dev |
+| 2.7 Code review (6-dim, at manifest completion) | pending | score ≥7, no dimension = 0 | Tech Lead |
 | 2.8 E2E + user manual | pending | every REQ-ID ≥1 E2E pass + TC-NNN | QC/QA |
 | 2.9 Security review | pending | **SECURITY SIGN-OFF**: 0 Critical/High | DevSecOps |
 | 2.10 QA real-browser + video | pending | **DoD GATE** | QC/QA |
