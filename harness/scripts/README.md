@@ -36,10 +36,11 @@ scripts/install-harness.sh --directory /path/to/existing --merge --yes
 scripts/install-harness.sh --dry-run --bootstrap ./preview
 
 # Remote — NO local clone needed. Fetches the repo tarball into a temp dir.
-# Private repo (default): authenticate first ('gh auth login' or export GH_TOKEN),
-# then pull the script itself via gh and pipe to bash:
-gh api repos/huunghiaish/vibecode-harness/contents/scripts/install-harness.sh \
-  -H "Accept: application/vnd.github.raw" | bash -s -- --bootstrap ./my-new-project
+# HARNESS_REPO (owner/repo) is required; authenticate first for a private repo
+# ('gh auth login' or export GH_TOKEN), then pull the script and pipe to bash:
+gh api repos/<owner>/<repo>/contents/harness/scripts/install-harness.sh \
+  -H "Accept: application/vnd.github.raw" \
+  | HARNESS_REPO=<owner>/<repo> bash -s -- --bootstrap ./my-new-project
 ```
 
 ### What `--bootstrap` does
@@ -83,7 +84,7 @@ gh api repos/huunghiaish/vibecode-harness/contents/scripts/install-harness.sh \
 > case) and the installer copies from the checkout. Run it **standalone** (no
 > clone in scope — `curl|bash`, or a lone copy of the script) and it **fetches the
 > repo as a tarball into a temp dir**, then installs with the same copy logic — so
-> you don't need vibecode-harness checked out. The fetch tries, in order: `gh`
+> you don't need the harness repo checked out (set HARNESS_REPO=owner/repo). The fetch tries, in order: `gh`
 > (your auth — **works for the private repo**), a token in `GH_TOKEN`/`GITHUB_TOKEN`,
 > then an anonymous tarball (public repos only). Override the source with
 > `HARNESS_REPO=owner/repo` and `HARNESS_REF=branch`. See

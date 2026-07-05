@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install-harness.sh — one-command bootstrap of the vibecode-harness skeleton
+# install-harness.sh — one-command bootstrap of the videcode-harness skeleton
 # into a NEW (or existing) project directory.
 #
 # What it does (see AGENTS.md + docs/HARNESS.md for the operating model):
@@ -23,9 +23,10 @@
 # docs/discovery/YYYY-MM-DD-<slug>.<ext> (VN diacritics ASCII-folded).
 #
 # Clean POSIX-leaning bash. No network needed in local mode (the common case:
-# run from a clone of the harness). Remote mode (no local clone found) fetches
-# the repo as a tarball into a temp dir, then installs with the same copy logic
-# — so you do NOT need vibecode-harness checked out locally. Private repos are
+# run from a clone of the harness repo, where the skeleton lives under
+# harness/). Remote mode (no local clone found) fetches the repo as a tarball
+# into a temp dir, then installs with the same copy logic — so you do NOT need
+# the harness checked out locally; set HARNESS_REPO (owner/repo). Private repos are
 # fetched via `gh` (or a GitHub token in GH_TOKEN/GITHUB_TOKEN); public repos
 # fall back to an anonymous tarball. Override the source with HARNESS_REPO
 # (owner/repo) and HARNESS_REF (branch/tag/sha).
@@ -39,7 +40,7 @@ usage() {
   cat <<'EOF'
 Usage: install-harness.sh [options] [path]
 
-Bootstrap the vibecode-harness skeleton into a target project directory.
+Bootstrap the videcode-harness skeleton into a target project directory.
 
 Options:
   -d, --directory <path>  Target directory. Defaults to the current directory.
@@ -80,14 +81,14 @@ Preflight (Independence Principle, decision D1/D6):
   invokes — they are NEVER copied/vendored into the project. The harness still
   runs on a bare agent + git + bash; ck-skills are accelerators, not deps.
 
-Remote (no local clone — fetches the repo as a tarball into a temp dir):
-  Private repo (default) — needs `gh auth login` OR a token in GH_TOKEN:
-    gh api repos/huunghiaish/vibecode-harness/contents/scripts/install-harness.sh \
-      -H "Accept: application/vnd.github.raw" | bash -s -- --bootstrap ./my-new-project
-  Public repo / fork:
-    curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/install-harness.sh \
+Remote (no local clone — fetches the repo as a tarball into a temp dir).
+  HARNESS_REPO (owner/repo) is REQUIRED in remote mode; there is no default:
+    gh api repos/<owner>/<repo>/contents/harness/scripts/install-harness.sh \
+      -H "Accept: application/vnd.github.raw" \
       | HARNESS_REPO=<owner>/<repo> bash -s -- --bootstrap ./my-new-project
-  Override source: HARNESS_REPO=owner/repo HARNESS_REF=branch scripts/install-harness.sh ...
+    curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/harness/scripts/install-harness.sh \
+      | HARNESS_REPO=<owner>/<repo> bash -s -- --bootstrap ./my-new-project
+  Pin a branch/tag with HARNESS_REF (default: main).
 
 Examples:
   scripts/install-harness.sh --bootstrap ./my-new-project
@@ -217,7 +218,7 @@ preflight_check_engine() {
 #
 # SKELETON_PATHS: top-level paths to mirror (file or directory). Missing ones
 # are silently skipped (logged in dry-run).
-SKELETON_PATHS="AGENTS.md README.md STAGE.md docs .claude .githooks scripts/harness-verify-gate.sh scripts/install-harness.sh scripts/README.md"
+SKELETON_PATHS="AGENTS.md STAGE.md docs .claude .githooks scripts/harness-verify-gate.sh scripts/install-harness.sh scripts/README.md"
 
 # Paths NEVER copied even if present under a skeleton dir (private/runtime).
 # Matched as path suffix anchored at the skeleton root.
@@ -316,10 +317,10 @@ cleanup_harness_tmp() {
 
 materialize_remote_source() {
   local repo="$HARNESS_REPO" ref="$HARNESS_REF"
-  [ -n "$repo" ] || fail "remote install needs HARNESS_REPO (owner/repo); none resolved."
+  [ -n "$repo" ] || fail "no local harness clone found and HARNESS_REPO is unset. Run from a clone (harness/scripts/install-harness.sh) or export HARNESS_REPO=owner/repo."
   command -v tar >/dev/null 2>&1 || fail "tar is required for remote installation."
 
-  HARNESS_TMP="$(mktemp -d "${TMPDIR:-/tmp}/vibecode-harness.XXXXXX")" \
+  HARNESS_TMP="$(mktemp -d "${TMPDIR:-/tmp}/videcode-harness.XXXXXX")" \
     || fail "could not create a temp dir for the remote fetch."
   trap cleanup_harness_tmp EXIT INT TERM
 
@@ -355,14 +356,15 @@ materialize_remote_source() {
 
   tar -xzf "$tarball" -C "$HARNESS_TMP" || fail "could not extract the harness tarball."
   # GitHub tarballs wrap the tree in a single top dir: <owner>-<repo>-<sha>/.
+  # The skeleton lives under harness/ inside the repo.
   local top
   top="$(find "$HARNESS_TMP" -mindepth 1 -maxdepth 1 -type d ! -name '.*' | head -n1)"
-  [ -n "$top" ] && [ -f "$top/AGENTS.md" ] && [ -f "$top/docs/HARNESS.md" ] \
-    || fail "extracted tarball missing AGENTS.md/docs/HARNESS.md — unexpected archive layout."
+  [ -n "$top" ] && [ -f "$top/harness/AGENTS.md" ] && [ -f "$top/harness/docs/HARNESS.md" ] \
+    || fail "extracted tarball missing harness/AGENTS.md or harness/docs/HARNESS.md — unexpected archive layout."
 
   # Flip to local mode pointing at the extracted tree; all later copy logic
   # (collect_skeleton_files / copy_file / write_source_file) then just works.
-  SOURCE_ROOT="$top"
+  SOURCE_ROOT="$top/harness"
   SOURCE_MODE="local"
 }
 
@@ -520,11 +522,11 @@ SCRIPT_PATH="${BASH_SOURCE[0]:-$0}"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" 2>/dev/null && pwd -P || printf '')"
 SOURCE_ROOT=""
 SOURCE_MODE="remote"
-SOURCE_BASE_URL="${HARNESS_SOURCE_BASE_URL:-https://raw.githubusercontent.com/huunghiaish/vibecode-harness/main}"
+SOURCE_BASE_URL="${HARNESS_SOURCE_BASE_URL:-}"
 SOURCE_BASE_URL="${SOURCE_BASE_URL%/}"
 # Remote fetch target (used only when no local clone is found): the harness repo
-# pulled as a tarball. Defaults track this repo; override for a fork or branch.
-HARNESS_REPO="${HARNESS_REPO:-huunghiaish/vibecode-harness}"
+# pulled as a tarball. No default — pass HARNESS_REPO=owner/repo explicitly.
+HARNESS_REPO="${HARNESS_REPO:-}"
 HARNESS_REF="${HARNESS_REF:-main}"
 
 if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../AGENTS.md" ] && [ -f "$SCRIPT_DIR/../docs/HARNESS.md" ]; then
@@ -533,7 +535,7 @@ if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../AGENTS.md" ] && [ -f "$SCRIPT_DI
 fi
 
 if [ "$YES" -eq 0 ] && can_prompt; then
-  prompt_tty "Install vibecode-harness into [$TARGET_INPUT]: "
+  prompt_tty "Install videcode-harness into [$TARGET_INPUT]: "
   REPLY_TARGET="$(read_tty)"
   [ -n "$REPLY_TARGET" ] && TARGET_INPUT="$REPLY_TARGET"
 fi
@@ -594,6 +596,7 @@ fi
 
 [ -d "$TARGET_DIR" ] && check_protected_target_paths
 
+SOURCE_MODE_ORIG="$SOURCE_MODE"
 if [ "$SOURCE_MODE" = "local" ]; then
   log "Harness source: $SOURCE_ROOT (local clone)"
 else
@@ -635,10 +638,15 @@ fi
 
 log ""
 log "Done. Created: $CREATED, updated: $UPDATED, skipped: $SKIPPED."
-[ "$SKIPPED" -gt 0 ] && [ "$FORCE" -eq 0 ] && \
+# Guard the conditional status lines with || true: under set -e a false test in
+# a trailing `[ ... ] && log` statement would abort the whole install right
+# here, silently skipping the bootstrap extras below.
+if [ "$SKIPPED" -gt 0 ] && [ "$FORCE" -eq 0 ]; then
   log "Existing files left untouched. Re-run with --force to overwrite (backups kept)."
-[ "$FORCE" -eq 1 ] && [ "$UPDATED" -gt 0 ] && [ "$DRY_RUN" -eq 0 ] && \
+fi
+if [ "$FORCE" -eq 1 ] && [ "$UPDATED" -gt 0 ] && [ "$DRY_RUN" -eq 0 ]; then
   log "Backups were written to: $BACKUP_DIR"
+fi
 
 # ---------------------------------------------------------------------------
 # Design-system pin banner
@@ -654,8 +662,9 @@ print_design_system_banner() {
   [ -f "$TARGET_DIR/$rules_file" ] || return 0
   local ver="unversioned"
   if [ -f "$version_file" ]; then
-    # First non-empty line of VERSION, trimmed.
-    ver="$(sed -n '/[^[:space:]]/{s/^[[:space:]]*//;s/[[:space:]]*$//;p;q}' "$version_file" 2>/dev/null)"
+    # First non-empty line of VERSION, trimmed (awk — portable across BSD/GNU;
+    # the equivalent sed one-liner breaks on macOS/BSD sed and aborts set -e).
+    ver="$(awk 'NF { gsub(/^[ \t]+|[ \t]+$/, ""); print; exit }' "$version_file" 2>/dev/null || true)"
     [ -n "$ver" ] || ver="unversioned"
     # The banner prints a literal "v" prefix; drop a leading v/V if VERSION
     # already carries one so we never render "vv2".
@@ -779,8 +788,13 @@ if [ "$BOOTSTRAP" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
       # Field labels match docs/templates/STAGE.md § Snapshot. Step-specific
       # fields (Client-paging?, Conditional gates) keep their placeholders —
       # the agent sets those as the project advances.
+      harness_source_note="$SOURCE_ROOT"
+      [ -n "${HARNESS_REPO:-}" ] && [ "${SOURCE_MODE_ORIG:-local}" = "remote" ] \
+        && harness_source_note="$HARNESS_REPO@$HARNESS_REF"
       sed -E \
         -e 's|^- \*\*Macro-stage:\*\*.*$|- **Macro-stage:** Pre-Build|' \
+        -e 's|^- \*\*Lane:\*\*.*$|- **Lane:** Full (default — revisit at intake 1.2; see docs/WORKFLOW.md § Lanes)|' \
+        -e "s|^- \*\*Harness source:\*\*.*\$|- **Harness source:** $harness_source_note|" \
         -e 's|^- \*\*Current step:\*\*.*$|- **Current step:** 1.1 — Lead capture (PB-G1 not yet decided)|' \
         -e "s|^- \*\*Last completed:\*\*.*\$|- **Last completed:** bootstrap baseline on $today (harness skeleton installed)|" \
         -e 's|^- \*\*Next gate:\*\*.*$|- **Next gate:** PB-G1 — intake go/no-go (internal capture)|' \
@@ -844,7 +858,7 @@ SETTINGSJSON
     if (cd "$TARGET_DIR" && git rev-parse --verify HEAD >/dev/null 2>&1); then
       log "  baseline commit: SKIPPED — HEAD already exists"
     else
-      commit_msg="chore: bootstrap vibecode-harness skeleton"
+      commit_msg="chore: bootstrap videcode-harness skeleton"
       if [ "${SPEC_COPIED:-0}" -gt 0 ]; then
         if [ "$SPEC_COPIED" -eq 1 ]; then
           commit_msg="$commit_msg + initial discovery spec"
@@ -903,10 +917,12 @@ What you bootstrapped:
     rationale in docs/decisions/<slug>.md. See docs/playbooks/design-system-3-tier.md.
   - Run \`cat STAGE.md\` any time to see which macro-stage/step this repo is at.
 
-3-macro map (docs/WORKFLOW.md): Pre-Build (this increment, built fully) →
-Build & Go-live → Post-Build. Client-paging gates: PB-G2 (scope frozen),
-PB-G3 (prototype frozen), PB-G4 (contract + deposit), ACCEPTANCE, HANDOVER.
-PB-G1 is internal — it does NOT page the client.
+3-macro map (docs/WORKFLOW.md): Pre-Build → Build & Go-live → Post-Build —
+all built fully. Lane: Full (paid client) or Lite (internal/small) — declare at
+intake (1.2). Run loop: /stage-next per step; at Build 2.6 switch to
+/build-phase (one manifest phase per invocation) until the manifest is done.
+Client-paging gates: PB-G2, PB-G3, PB-G4, ACCEPTANCE, HANDOVER (owner acks in
+the Lite lane). PB-G1 is internal — it does NOT page the client.
 
 Engine note (Independence Principle): the ck-* skills referenced in WORKFLOW
 steps are the live engine, invoked from your global ~/.claude — never vendored
