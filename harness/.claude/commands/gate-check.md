@@ -14,15 +14,19 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
 ## Arguments
 
 - `--gate <name>` → check a specific gate: `PB-G1 | PB-G2 | PB-G3 | PB-G4 |
-  DoR | ERD-FROZEN | SECURITY-SIGNOFF | DoD | ACCEPTANCE | HANDOVER`.
+  DoR | ERD-FROZEN | WALKING-SKELETON | SECURITY-SIGNOFF | DoD | ACCEPTANCE |
+  HANDOVER`.
 - `--before <step-id>` → "is the gate that must be GREEN before step `<id>`
   satisfied?" (auto-resolves the gate from the step's position).
 - No argument → check the gate that gates the **Current** step in `STAGE.md`.
 
 ## Steps
 
-1. Read `STAGE.md` (Current step, Lane, blockers) and `docs/WORKFLOW.md`
-   (the Canonical Gate List + the step tables).
+1. Read `STAGE.md` (Current step, **Lane**, blockers) and `docs/WORKFLOW.md`
+   (the Canonical Gate List + the step tables). In the **Lite lane**
+   (`docs/WORKFLOW.md` § Lanes): PB-G2/PB-G3 clear on a recorded owner ack, and
+   the 2.x hard line is PB-G3 frozen **+ `1.14/1.15 — N/A by decision (Lite
+   lane)` recorded in STAGE.md** instead of PB-G4.
 
 2. Resolve which gate to assert:
    - From `--gate`, use it directly.
@@ -30,9 +34,12 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
      - any `1.10`–`1.13` (design) → needs **PB-G2** (scope frozen) GREEN.
      - `1.14` (bao-gia) → needs **PB-G3** (prototype frozen) GREEN
        (PROTOTYPE-THEN-QUOTE invariant — quote only after the prototype freezes).
-     - any `2.x` (build code) → needs **PB-G4** (contract + deposit) GREEN.
-       **This is the hard line: no build code before PB-G4.**
-     - `2.6`+ → also needs **DoR** GREEN.
+     - any `2.x` (build code) → needs **PB-G4** (contract + deposit) GREEN
+       (**Lite lane:** PB-G3 frozen + 1.14/1.15 N/A-by-decision recorded).
+       **This is the hard line: no build code before it.**
+     - `2.4`+ → also needs **DoR** GREEN (incl. build-manifest completeness).
+     - `2.5`/`2.6` → also needs **WALKING-SKELETON** GREEN (2.6 additionally
+       needs manifest P0 marked done).
      - `2.10` (DoD) → needs review + E2E + security + QA evidence.
      - `2.13` (release) → needs **ACCEPTANCE** GREEN.
      - `3.2`+ → needs **HANDOVER** GREEN.
@@ -47,8 +54,9 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
    | **PB-G2** | every BLOCKER in `docs/requirements/CLARIFICATIONS.md` answered + `docs/scope-baseline/feature-register.{md,xlsx}` marked frozen + RTM **backward** complete (every feature-register line → ≥1 REQ-ID + ≥1 use case, per `docs/TRACE_SPEC.md`). Client sign recorded. |
    | **PB-G3** | `docs/visuals/prototype/feedback-final.md` records a written freeze; no open scope-drift items. |
    | **PB-G4** | signed contract + deposit recorded; `docs/ROADMAP.md` skeleton exists. **No build code may exist before this.** |
-   | **DoR** | requirements baselined + scope signed (PB-G4) + ERD frozen + design approved + acceptance criteria + NFR present. |
+   | **DoR** | requirements baselined + scope signed (PB-G4 / Lite equivalent) + ERD frozen + design approved + acceptance criteria + NFR present + **`docs/build/build-manifest.md` complete: every in-scope REQ-ID in exactly one phase, P0 defined**. |
    | **ERD-FROZEN** | ERD ADR (`docs/decisions/<domain>-data-model-freeze.md`) + entities/normalization/audit+tenant fields reviewed. |
+   | **WALKING-SKELETON** | scaffolded app: install + build green, `docker compose up` boots, health endpoint 200, seeded admin login works (after 2.5), CI(-equivalent local run) green, secret scan clean. Prefer running the commands over reading claims. |
    | **SECURITY-SIGNOFF** | security report shows 0 Critical/High open + red-team performed. |
    | **DoD** | review record (score ≥7) + every REQ-ID → ≥1 passing TC-NNN + security sign-off + QA evidence + user-manual. |
    | **ACCEPTANCE** | critical journeys pass + matches prototype + signed sign-off (`docs/uat/*` + signoff). RTM **forward** complete (every REQ-ID → passing TC-NNN). |
