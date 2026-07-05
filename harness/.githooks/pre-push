@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Harness pre-push gate. Activated by `git config core.hooksPath .githooks`
+# (set by scripts/install-harness.sh). Last backstop before sharing work: runs
+# lint/typecheck and blocks any committed `Result: fail` row in the
+# Verification Register (docs/TEST_MATRIX.md).
+#
+# Human escape: `git push --no-verify` skips this hook. That escape is for the
+# HUMAN with an explicit reason. Agents MUST NOT use it to bypass a blocked
+# gate (AGENTS.md § Verify Gate — No Bypass).
+exec bash "$(git rev-parse --show-toplevel)/scripts/harness-verify-gate.sh" pre-push

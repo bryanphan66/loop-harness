@@ -1,0 +1,12 @@
+# Secrets — never commit.
+.env
+
+# Local hook sentinels / caches (regenerated at runtime).
+.qa-sent
+.qa-telegram-sent
+.context-warned
+PENDING_NEXT_SESSION.md
+
+# Machine-local hook overrides. Remove this line if you want to track shared
+# hook config in git; keep it if settings.local.json holds per-machine paths.
+settings.local.json

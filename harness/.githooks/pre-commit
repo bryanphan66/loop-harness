@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Harness pre-commit gate. Activated by `git config core.hooksPath .githooks`
+# (set by scripts/install-harness.sh). Delegates to the shared verify gate:
+# lint/typecheck + Verification Register integrity + stage-boundary atomicity.
+#
+# Human escape: `git commit --no-verify` (or `-n`) skips this hook. That escape
+# is for the HUMAN with an explicit reason. Agents MUST NOT use it to bypass a
+# blocked gate (AGENTS.md § Verify Gate — No Bypass).
+exec bash "$(git rev-parse --show-toplevel)/scripts/harness-verify-gate.sh" pre-commit

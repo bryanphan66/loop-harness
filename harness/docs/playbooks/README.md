@@ -1,0 +1,101 @@
+# Playbooks
+
+Playbooks capture **reusable agent experience** — concrete, runnable recipes for
+the steps of the 3-macro delivery flow (`docs/WORKFLOW.md`). Read the matching
+playbook before re-deriving a step; add to the folder whenever a recipe is
+non-obvious and likely to recur.
+
+**Authority:** `PROPOSAL.md` §2–§4 (step tables) + §8 (locked decisions D1–D6).
+Every playbook obeys the **Independence Principle** (`docs/HARNESS.md` § D1): each
+names a `ck-*` skill as its **Engine** fast path, and a bare-agent fallback that
+produces the same artifact shape. The skill is an accelerator, never a hard
+requirement.
+
+## Build Increment
+
+**Pre-Build playbooks are built fully.** Build & Go-live and Post-Build playbooks
+**ship now** (so the harness is complete) but are *exercised* in macro-stages whose
+detailed orchestration arrives in the next increment — each carries an "Increment
+note". The map (`docs/WORKFLOW.md`) is authoritative for all three.
+
+## Lifecycle
+
+Each playbook carries a grep-able `**Lifecycle:**` line (`experimental` /
+`verified` / `deprecated`) per `docs/HARNESS.md` § Playbook Lifecycle. All
+playbooks here ship `experimental` (not yet exercised on a real step). Promotion to
+`verified` happens via `session-retrospective.md`.
+
+## Tokens (D3 — the only scheme)
+
+REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN` ·
+`CR-NN`. Chain: business problem → `GAP-NNN` → REQ-ID → use-case + RTM row →
+`SC-NNN` → feature-register line → SOW line → `TC-NNN` → UAT → release → handover.
+**`US-NNN.REQ-MMM` is NOT used.** Full grammar: `docs/TRACE_SPEC.md`.
+
+## Use Order
+
+1. Read `STAGE.md` → find the current macro-stage + step.
+2. Open the playbook that **owns that step** (the index below maps step → file).
+3. Follow it; use the Engine fast path if the `ck-*` skill is present (preflight
+   passed), else the bare-agent fallback.
+4. If a fix fails or partially works, append a **Variant** section (never delete
+   the original shape).
+5. If no playbook matches and the step is reusable, add one from `template.md`.
+
+## Index — By Macro-Stage
+
+### Meta / always-on
+
+| File | Owns | One-line |
+|---|---|---|
+| [solo-dev-client-delivery.md](solo-dev-client-delivery.md) | the whole flow | Meta-playbook mapping the 3 macro-stages onto harness artifacts. Pointers only; composes, never duplicates. |
+| [bilingual-delivery-template-pattern.md](bilingual-delivery-template-pattern.md) | D4 forks | `locale-vi/` fork pattern for all client-facing surfaces; IDs/paths/code stay EN. |
+| [playbook-composition-pattern.md](playbook-composition-pattern.md) | authoring | When to wrap playbooks into a meta-playbook (and when NOT). Hand-off contract + freshness `.meta.json`. |
+| [PATCH-EXTENSION-PROTOCOL.md](PATCH-EXTENSION-PROTOCOL.md) | org extension | Non-destructive `HARNESS:EXT` markers for org-local additions. Operating-model docs stay fork-not-patch. |
+| [template.md](template.md) | new playbooks | Canonical shape for a new playbook (Engine + step + Variant). |
+| [design-system-3-tier.md](design-system-3-tier.md) | cross-stage (1.10–1.12 + 2.6–2.10) | Owns 3-tier UI enforcement: Tier-1 floorplans/behavior (`docs/design-system/design-rules.md`), Tier-2 tokens + Tier-3 components (via `ui-design-system-contract.md`), screen-inventory classification (via `visual-and-behavioral-modeling.md` 1.11). HARD gate. |
+| [session-retrospective.md](session-retrospective.md) | Post-Build 3.6 + always-on | End-of-session cross-task insight capture; promotes `experimental` playbooks to `verified`. |
+
+### Macro-Stage 1 — Pre-Build *(built fully)*
+
+| File | Owns | One-line |
+|---|---|---|
+| [discovery-interview-playbook.md](discovery-interview-playbook.md) | 1.3 | 5-persona × 3-mode interview → REQ candidates + decisions log + open questions. Engine `ck-rri`. |
+| [gap-analysis.md](gap-analysis.md) | 1.4 | As-Is/To-Be MoSCoW; mints **GAP-NNN** (first token in the chain). Manual BA technique. |
+| [ba-core-doc-bundle.md](ba-core-doc-bundle.md) | **1.7** | **The load-bearing checklist** — the 5 BA artifacts (VISION_SCOPE, USE_CASES, GLOSSARY bilingual, BPMN, RTM) + the **RTM completeness gate** (every feature → ≥1 REQ-ID + ≥1 use case). No single ck-skill owns it. |
+| [scenario-taxonomy-playbook.md](scenario-taxonomy-playbook.md) | 1.8 | 12-dimension edge-case decomposition of high-risk REQ-IDs; mints **SC-NNN**. Engine `ck-scenario`. |
+| [ui-design-system-contract.md](ui-design-system-contract.md) | 1.10 | Brand + design tokens (light/dark), code-is-SoT, Component Coverage Matrix. Engine `ck-design-system`. |
+| [visual-and-behavioral-modeling.md](visual-and-behavioral-modeling.md) | 1.11 | Screen map / user flows / business workflows / ERD draft / RPM / status-flow. Engine `ck-ux-design`. |
+
+> 1.1 capture (`ck-intake-file`), 1.5 SRS (`ck-xre EXTRACT`), 1.6 validate
+> (`ck-xre VALIDATE`), 1.9 feature register (`ck-scope-package`) are skill-driven
+> steps with no separate playbook; **1.12 prototype is built in an external design
+> tool — Claude Design / Open Design / Google Stitch / Pencil.dev — not generated
+> in Claude Code.** Their contract is the Output-path + token grammar in
+> `docs/WORKFLOW.md`.
+
+### Macro-Stage 2 — Build & Go-live *(playbooks ship now; exercised next increment)*
+
+| File | Owns | One-line |
+|---|---|---|
+| [seed-data-pattern.md](seed-data-pattern.md) | 2.5 | Deterministic FK-valid demo data for DEV/TEST. Symbolic IDs, scoped cleanup, never production. Engine `ck-seed`. |
+| [build-execution.md](build-execution.md) | 2.6 | Trunk-based branching, commit cadence, D3 token-citation commit-msg hook, pre-commit + secret-scan, `validate:quick`. Engine `cook`. |
+| [payment-integration.md](payment-integration.md) | 2.6 (if money) | Webhook idempotency + signature verify + refund/dispute + reconciliation + PCI SAQ-A + 7-yr audit. Engine `ck-payment-integration`. |
+| [code-review-scoring.md](code-review-scoring.md) | 2.7 | 6-dim rubric (correctness 3 / security 2 / quality 2 / perf 1 / maint 1 / tests 1); pass ≥7, any 0 auto-blocks. Engine `ck-code-review`. |
+| [canonical-e2e-flow-playbook.md](canonical-e2e-flow-playbook.md) | 2.8 | Phase-typed E2E (form / workflow / readonly / mixed) from BA acceptance criteria; mints **TC-NNN**. Engine `ck-e2e-flow`. |
+| [e2e-qa-field-by-field-verify-with-report.md](e2e-qa-field-by-field-verify-with-report.md) | 2.10 | Field-by-field verify + `correct/incorrect/manual/not-found` report + user-guide video → DoD evidence. Engine `ck-qa`. |
+
+### Macro-Stage 3 — Post-Build *(mapped; detail next increment)*
+
+Post-Build steps (3.1 handover `ck-handover`, 3.2 hypercare `ck-hypercare`, 3.4
+maintenance proposal, 3.5 change-control `ck-xre CHANGE-REQUEST`) are skill-driven;
+their detailed playbooks arrive in the next increment. `session-retrospective.md`
+(3.6) ships now (listed under always-on).
+
+## Cross-Project Use
+
+This folder ships with the harness; any project that runs
+`scripts/install-harness.sh` gets the same playbooks. Treat each entry as
+**portable knowledge** — no project-specific paths, env values, or secrets in
+playbook bodies. Use placeholders (`<project-root>`, `<module>`). Playbooks stay
+**English** (agent-facing, D4); only client-facing templates fork to `locale-vi/`.
