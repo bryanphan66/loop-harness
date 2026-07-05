@@ -46,6 +46,7 @@ API Swagger docs: http://localhost:3001/docs — health: http://localhost:3001/h
 | `pnpm --filter ./apps/api db:migrate:dev` | Create a new migration after schema changes |
 | `pnpm --filter ./apps/api test:e2e` | Supertest integration specs (needs migrated + seeded db) |
 | `pnpm e2e` | Playwright login e2e (see below) |
+| `scripts/secret-scan.sh` | Secret scan: gitleaks if installed, else a grep fallback over tracked files |
 
 ## End-to-end tests
 
@@ -60,6 +61,13 @@ pnpm e2e
 
 First run: `pnpm --filter ./apps/web exec playwright install chromium`.
 
+**Do not run `pnpm build` while the dev servers are serving e2e.** The
+production `next build` overwrites `apps/web/.next` under the running `next dev`,
+breaking client hydration — every login e2e then fails with a native-form
+fallback that looks like a real regression. Run the full build in a separate
+step (stop the dev servers first, or run e2e against `next start` on the prod
+build). If it happens: `rm -rf apps/web/.next` and restart `next dev`.
+
 ## Production
 
 - `docker-compose.prod.yml` builds both images (context = repo root) and runs
@@ -73,3 +81,10 @@ First run: `pnpm --filter ./apps/web exec playwright install chromium`.
 - Node ≥ 20, pnpm ≥ 9 (managed via `packageManager` + corepack).
 - Native-module-free by design (bcryptjs, no node-gyp) so installs work everywhere.
 - Commit `pnpm-lock.yaml` after your first install (`--frozen-lockfile` in CI expects it).
+- DB image is `pgvector/pgvector:pg16` (postgres:16 superset + pgvector). Any
+  postgres-16-compatible image works — swap in compose + CI if pulls are slow.
+- Git hooks: under the videcode-harness, `.githooks/` owns `core.hooksPath`, but
+  `pnpm install` runs `prepare: husky` which re-points it to `.husky/_`. The
+  shipped `.husky/pre-commit` + `.husky/pre-push` therefore chain
+  `scripts/harness-verify-gate.sh` FIRST, so the harness gate fires under either
+  hooks path and an install can never silently disarm it.

@@ -1,0 +1,6 @@
+# Mirror of .githooks/pre-push for repos where `pnpm install` (prepare: husky)
+# has set core.hooksPath=.husky/_ — the harness verify gate must fire under
+# either hooks path.
+if [ -f scripts/harness-verify-gate.sh ]; then
+  bash scripts/harness-verify-gate.sh pre-push || exit 1
+fi

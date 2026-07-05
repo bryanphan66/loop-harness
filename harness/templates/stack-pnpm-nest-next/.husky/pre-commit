@@ -1,1 +1,8 @@
+# Harness verify gate runs FIRST and blocks the commit on red. This chain
+# exists because `pnpm install` runs the `prepare: husky` script, which sets
+# core.hooksPath=.husky/_ and would otherwise silently displace the harness
+# .githooks gate — the gate must fire under EITHER hooks path.
+if [ -f scripts/harness-verify-gate.sh ]; then
+  bash scripts/harness-verify-gate.sh pre-commit || exit 1
+fi
 pnpm lint-staged

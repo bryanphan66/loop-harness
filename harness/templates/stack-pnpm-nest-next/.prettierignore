@@ -1,0 +1,8 @@
+# Harness control-plane files: their markdown tables are parsed by
+# scripts/harness-verify-gate.sh and edited by scripted (exact-string) tools.
+# Prettier reformatting silently breaks those edits — keep hands off.
+STAGE.md
+docs/ROADMAP.md
+docs/TEST_MATRIX.md
+docs/build-manifest.md
+docs/visuals/diagrams/screen-inventory.md

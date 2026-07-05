@@ -33,7 +33,7 @@ echo "Copying template -> $TARGET_DIR"
 # Exclude template metadata and anything install/build-generated.
 rsync -a \
   --exclude 'node_modules' --exclude 'dist' --exclude '.next' --exclude 'coverage' \
-  --exclude 'playwright-report' --exclude 'test-results' --exclude '.git' \
+  --exclude 'playwright-report' --exclude 'test-results' --exclude '.git' --exclude '*.tsbuildinfo' \
   --exclude 'pnpm-lock.yaml' --exclude 'scripts/scaffold.sh' --exclude 'TEMPLATE_VERSION' \
   "$TEMPLATE_DIR/" "$TARGET_DIR/"
 
@@ -54,7 +54,12 @@ if [[ ! -f "$TARGET_DIR/.env" ]]; then
 fi
 
 cd "$TARGET_DIR"
-if [[ ! -d .git ]]; then
+# Probe with rev-parse, not `-d .git`: inside a git WORKTREE the target's .git
+# is a pointer FILE, and a `git init` there would replace it with a fresh repo,
+# disconnecting the worktree from its history and disarming core.hooksPath.
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "Target is already inside a git repo/worktree — skipping git init"
+else
   git init -q
   echo "Initialized git repository"
 fi
@@ -67,4 +72,8 @@ Scaffolded '$SLUG' at $TARGET_DIR. Next:
   pnpm install
   docker compose up -d db && pnpm db:migrate && pnpm db:seed
   pnpm dev
+
+Tip: on a slow network, pre-pull the base images early (they can take a while
+and later block the db boot / prod-image build):
+  docker pull pgvector/pgvector:pg16 & docker pull node:22-alpine &
 EOF

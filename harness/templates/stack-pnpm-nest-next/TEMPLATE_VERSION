@@ -1,6 +1,6 @@
 stack-pnpm-nest-next template
-version: 0.1.0
-verified: 2026-07-05 (full local verify: install, lint, typecheck, unit, build, db boot, migrate, seed, supertest e2e, Playwright login e2e)
+version: 0.1.1
+verified: 2026-07-06 (full local verify on fresh scaffold: install, lint, typecheck, unit, build, db boot pgvector/pgvector:pg16, migrate, seed, supertest e2e, Playwright login e2e; plus worktree-scaffold guard, husky-chained verify gate block, prettierignore, secret-scan fallback)
 
 Pinned majors (verified exact versions in parentheses):
 | dependency        | pin      | verified  |
@@ -17,10 +17,14 @@ Pinned majors (verified exact versions in parentheses):
 | vitest            | ^3       | 3.2.6     |
 | @playwright/test  | ^1.50    | 1.61.1    |
 | jest              | ^29      | 29.7.0    |
-| postgres (docker) | 16-alpine| 16.x      |
+| postgres (docker) | pgvector/pgvector:pg16 | 16.x |
 
 Design decisions:
 - Zod (not class-validator) at the API boundary via ZodValidationPipe; shared-types is type-only.
 - bcryptjs (not bcrypt): no native builds, installs everywhere.
 - No lockfile shipped: scaffolded projects generate + commit their own pnpm-lock.yaml.
 - Placeholder: __PROJECT_SLUG__ (package names + titles), replaced by scripts/scaffold.sh.
+
+History:
+- 0.1.1 (2026-07-06): db image -> pgvector/pgvector:pg16; .husky/pre-commit + pre-push chain the harness verify gate (a pnpm install can no longer disarm it); .prettierignore shields control-plane md tables; scripts/secret-scan.sh gitleaks/grep fallback; scaffold.sh worktree-safe git-init guard + base-image pre-pull tip.
+- 0.1.0 (2026-07-05): initial verified walking-skeleton template.

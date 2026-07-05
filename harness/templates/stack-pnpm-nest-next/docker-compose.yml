@@ -1,6 +1,9 @@
 services:
   db:
-    image: postgres:16-alpine
+    # pgvector/pgvector:pg16 = postgres:16 superset (adds the pgvector
+    # extension); matches the hasi-hub benchmark image. Any postgres-16-
+    # compatible image works — swap if this one pulls slowly on your network.
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
