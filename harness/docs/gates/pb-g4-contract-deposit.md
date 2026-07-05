@@ -34,4 +34,4 @@ Build authorized:       YES — only after both rows above are filled
 
 > This is the gate the human signs in the real world. Until it is filled, the
 > agent must refuse to start any Build step. The next client-paging gate is the
-> Build **ACCEPTANCE** gate (UAT + sign-off, step 2.12 — built next increment).
+> Build **ACCEPTANCE** gate (UAT + sign-off, step 2.12).

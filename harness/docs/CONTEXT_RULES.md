@@ -69,21 +69,61 @@ for the current step at the lowest token cost.
 | `docs/gates/pb-g4-contract-deposit.md` | Skip | Must | Must |
 | `docs/ROADMAP.md` (skeleton, born here) | Skip | Must at 1.15 | Must at 1.15 |
 
-## Macro-Stage 2 — BUILD & GO-LIVE *(detailed reading tables in next increment)*
+## Macro-Stage 2 — BUILD & GO-LIVE
 
-Until the next increment fills detail, load the WORKFLOW step row + these anchors:
+### Design steps (2.1–2.3)
 
-- `docs/gates/dor-build.md` (entry, 2.3) and `docs/gates/dod-build.md` (exit, 2.10).
-- `docs/system-architecture.md` (ERD freeze, 2.1) + the stack decision slug (2.2).
-- The files being changed + `docs/TEST_MATRIX.md` (existing proof + register).
-- `docs/TRACE_SPEC.md` — cite ≥1 token per commit; keep RTM forward-complete.
-- For any conditional enterprise gate touched, the matching toggle in `dod-build.md`.
+| Source | Tiny | Normal | High-risk |
+|---|---|---|---|
+| SRS(-lite) `data-model.md` + use-cases + status-flows (at 2.1) | Must | Must | Must |
+| `docs/decisions/*` (prior ADRs) | Should | Must | Must |
+| `docs/requirements/srs/nfr.md` (at 2.2) | Should | Must | Must |
+| `docs/visuals/diagrams/screen-inventory.md` (at 2.3) | Must | Must | Must |
+| `docs/gates/dor-build.md` (at 2.3) | Must | Must | Must |
+| `docs/templates/build-manifest.md` + `playbooks/build-manifest-compilation.md` (at 2.3) | Must | Must | Must |
 
-## Macro-Stage 3 — POST-BUILD *(detailed reading tables in next increment)*
+### Walking skeleton + seed (2.4–2.5)
 
-- `docs/handover/*` + `docs/runbook/*` at handover (3.1).
-- `docs/requirements/change-requests/*` for any `CR-NN` flow (3.5).
-- `docs/TRACE_SPEC.md` — every released REQ-ID in the handover; every `CR-NN` resolved.
+| Source | Tiny | Normal | High-risk |
+|---|---|---|---|
+| Stack-template README + `scaffold.sh` (harness source, per STAGE.md § Harness source) | Must | Must | Must |
+| Manifest P0 block | Must | Must | Must |
+| Frozen ERD (`docs/system-architecture.md`) + RPM (at 2.5) | Must | Must | Must |
+| `playbooks/seed-data-pattern.md` | Skip | Must | Must |
+
+### Phase loop (2.6) — **the ONLY reads per phase**
+
+| Source | Every phase |
+|---|---|
+| The phase's own block in `docs/build/build-manifest.md` | Must |
+| `docs/system-architecture.md` (ERD — the phase's entities) | Must |
+| The SRS module file(s) the phase's REQ-IDs live in (or `srs-lite.md`) | Must |
+| The screen-inventory rows for the phase's screens | Must |
+| Tier-2 tokens + Tier-3 `src/components/README.md` (UI phases) | Must |
+| Tier-1 `docs/design-system/design-rules.md` — the assigned floorplan's §§ only | Must (UI) |
+| `playbooks/build-execution.md` (first phase; skim after) | Should |
+| The whole manifest, whole SRS, prior phases' diffs, gap-analysis, scenarios not cited by the phase | **Skip — by design** |
+
+### Verification + release (2.7–2.13)
+
+| Source | Tiny | Normal | High-risk |
+|---|---|---|---|
+| `playbooks/code-review-scoring.md` (2.7) · `canonical-e2e-flow-playbook.md` (2.8) · `e2e-qa-field-by-field-verify-with-report.md` (2.10) | Must at their step | Must | Must |
+| `docs/decisions/<project>-threat-model.md` (2.9) | Must | Must | Must |
+| `docs/TEST_MATRIX.md` (register — every 2.x close) | Must | Must | Must |
+| `docs/gates/dod-build.md` (2.10) + conditional toggles | Must | Must | Must |
+| Frozen prototype + `docs/uat/` templates (2.12) | Skip | Must | Must |
+
+## Macro-Stage 3 — POST-BUILD
+
+| Source | When |
+|---|---|
+| `docs/templates/project-closure-story/*` + `docs/runbook/*` | 3.1 handover |
+| SLA terms (contract §, Full lane) or owner-declared window | 3.2 hypercare |
+| `docs/templates/maintenance-proposal.md` | 3.4 |
+| `docs/requirements/change-requests/*` + `docs/build/build-manifest.md` (CR → new phase) | 3.5 any CR-NN |
+| `playbooks/session-retrospective.md` + session traces | 3.6 retro |
+| `docs/TRACE_SPEC.md` — every released REQ-ID in the handover; every `CR-NN` resolved | 3.1–3.6 |
 
 ## Retrieval Triggers
 

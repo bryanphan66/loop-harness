@@ -10,15 +10,14 @@
 security). **Gate it serves:** every REQ-ID → ≥1 passing E2E + a TC-NNN row (RTM
 forward completeness toward ACCEPTANCE).
 
-> **Increment note:** ships now, *exercised* in the Build macro-stage (detailed
-> orchestration built next increment). The 4 flow types + TC grammar are
-> authoritative.
+> The 4 flow types + TC grammar below are authoritative.
 
 ## Engine
 
 - **Fast path:** `ck-e2e-flow` (per phase auto-generates canonical E2E happy-path
   cases + realistic demo data + an SVG flow diagram; owns the Build-side scenario
-  expansion per `PROPOSAL.md` §6 dedupe). Pairs with `ck-scenario` for edge cases.
+  expansion; Pre-Build risk discovery stays with `scenario-taxonomy-playbook.md`).
+  Pairs with `ck-scenario` for edge cases.
 - **Role:** QC/QA. **Bare-agent fallback:** the `tester` agent writes the E2E
   files by hand from the 4 skeletons below + the seed IDs. Per D1 the skill is an
   accelerator.

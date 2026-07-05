@@ -6,8 +6,8 @@
 > without losing portability of the automation, IDs, and cross-team references.
 > Always-on across all three macro-stages — every client-facing surface uses it.
 
-**Authority:** `PROPOSAL.md` §8 D4. The split rule below is the operational form of
-D4.
+**Authority:** locked decision **D4** (bilingual client-facing surfaces — see
+`docs/HARNESS.md` § Locked Decisions). The split rule below is its operational form.
 
 ## Engine
 
@@ -119,7 +119,7 @@ delete the original split rule.)
 
 ## Related
 
-- `PROPOSAL.md` §8 D4 — the locked bilingual decision this implements.
+- Locked decision D4 (`docs/HARNESS.md` § Locked Decisions) — the bilingual split this implements.
 - `docs/README.md` § Bilingual Surfaces — the harness crosswalk of VN forks.
 - `ba-core-doc-bundle.md` — the GLOSSARY VN fork (the bilingual term contract).
 - `playbook-composition-pattern.md` — composition rules the client-facing chains

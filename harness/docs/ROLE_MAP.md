@@ -6,7 +6,7 @@ are never vendored into a project (see `docs/HARNESS.md` § Independence
 Principle). On a bare agent + git + bash, the global agents alone can play every
 role; the skills only accelerate.
 
-**Authority:** `PROPOSAL.md` §1 Role Catalog. **Orchestration:** `docs/WORKFLOW.md`
+**Authority:** this file. **Orchestration:** `docs/WORKFLOW.md`
 binds each role to numbered steps; `stage-runner` delegates one step at a time.
 
 ## Role Catalog

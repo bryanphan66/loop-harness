@@ -10,9 +10,8 @@
 **Macro-stage / step:** Post-Build · 3.6 — and always-on at the end of any
 multi-task session in any macro-stage.
 
-> **Increment note:** the Post-Build macro-stage detail is built next increment;
-> this checklist ships now because it runs across all three macro-stages (every
-> multi-task session ends with it per `docs/WORKFLOW.md` § Always-On).
+> Runs across all three macro-stages — every multi-task session ends with it
+> (`docs/WORKFLOW.md` § Always-On).
 
 ## Engine
 

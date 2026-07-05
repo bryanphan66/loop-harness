@@ -5,18 +5,18 @@ the steps of the 3-macro delivery flow (`docs/WORKFLOW.md`). Read the matching
 playbook before re-deriving a step; add to the folder whenever a recipe is
 non-obvious and likely to recur.
 
-**Authority:** `PROPOSAL.md` §2–§4 (step tables) + §8 (locked decisions D1–D6).
+**Authority:** `docs/WORKFLOW.md` step tables + the locked decisions D1–D6
+(`docs/HARNESS.md` § Locked Decisions).
 Every playbook obeys the **Independence Principle** (`docs/HARNESS.md` § D1): each
 names a `ck-*` skill as its **Engine** fast path, and a bare-agent fallback that
 produces the same artifact shape. The skill is an accelerator, never a hard
 requirement.
 
-## Build Increment
+## Coverage
 
-**Pre-Build playbooks are built fully.** Build & Go-live and Post-Build playbooks
-**ship now** (so the harness is complete) but are *exercised* in macro-stages whose
-detailed orchestration arrives in the next increment — each carries an "Increment
-note". The map (`docs/WORKFLOW.md`) is authoritative for all three.
+Playbooks exist for all three macro-stages and are executable as written. The
+map (`docs/WORKFLOW.md`) is authoritative for step order and gates; each
+playbook owns its step's recipe.
 
 ## Lifecycle
 
@@ -86,12 +86,13 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 | [canonical-e2e-flow-playbook.md](canonical-e2e-flow-playbook.md) | 2.8 | Phase-typed E2E (form / workflow / readonly / mixed) from BA acceptance criteria; mints **TC-NNN**. Engine `ck-e2e-flow`. |
 | [e2e-qa-field-by-field-verify-with-report.md](e2e-qa-field-by-field-verify-with-report.md) | 2.10 | Field-by-field verify + `correct/incorrect/manual/not-found` report + user-guide video → DoD evidence. Engine `ck-qa`. |
 
-### Macro-Stage 3 — Post-Build *(mapped; detail next increment)*
+### Macro-Stage 3 — Post-Build
 
 Post-Build steps (3.1 handover `ck-handover`, 3.2 hypercare `ck-hypercare`, 3.4
-maintenance proposal, 3.5 change-control `ck-xre CHANGE-REQUEST`) are skill-driven;
-their detailed playbooks arrive in the next increment. `session-retrospective.md`
-(3.6) ships now (listed under always-on).
+maintenance proposal, 3.5 change-control `ck-xre CHANGE-REQUEST`) are
+skill-driven with goal blocks in `docs/STAGE_GOALS.md` + templates under
+`docs/templates/` (closure stories, maintenance-proposal, change-request-log).
+`session-retrospective.md` (3.6) is listed under always-on.
 
 ## Cross-Project Use
 

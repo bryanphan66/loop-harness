@@ -15,9 +15,8 @@
 UAT). **Gate it serves:** **DoD** — review + E2E + security + QA evidence +
 user-manual.
 
-> **Increment note:** ships now, *exercised* in the Build macro-stage (detailed
-> orchestration built next increment). The 3 deliverables + report shape are
-> authoritative. This is a **workflow recipe**, not a tooling-fix template.
+> The 3 deliverables + report shape below are authoritative. This is a
+> **workflow recipe**, not a tooling-fix template.
 
 ## Engine
 

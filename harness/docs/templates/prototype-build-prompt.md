@@ -18,8 +18,8 @@ SKILL ABSTRACTION (swappable):
 
 Fill the `<<...>>` placeholders, then paste the block into Claude Code at the project repo.
 
-- `<<PRODUCT_NAME>>` — e.g. "Auto Script"
-- `<<PRODUCT_ONE_LINER>>` — e.g. "SaaS đa tenant (port YouTube Radar → Next.js)"
+- `<<PRODUCT_NAME>>` — e.g. "Acme Portal"
+- `<<PRODUCT_ONE_LINER>>` — e.g. "SaaS quản lý đơn hàng đa tenant (Next.js)"
 - `<<SCREEN_COUNT>>` — total screens from `screen-inventory.md` (e.g. 29)
 - `<<STATE_MIN>>` — minimum total states (e.g. 63)
 - `<<ZONES>>` — board sections + frame numbers (from `sitemap-screen-map.md` §3)

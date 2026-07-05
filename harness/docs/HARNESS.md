@@ -1,6 +1,6 @@
 # Harness
 
-The **vibecode-harness** is a reusable operating model that lets a solo dev (with
+The **videcode-harness** is a reusable operating model that lets a solo dev (with
 agents) turn a raw client lead into safe, validated, accepted, maintained
 software across **3 macro-stages** — Pre-Build, Build & Go-live, Post-Build.
 
@@ -118,19 +118,34 @@ Update the `First use` and `Verified by` fields on promotion. Keep the line as a
 single sentence so `grep -l "experimental" docs/playbooks/` returns the current
 candidate set.
 
-## Build Increments
+## Coverage
 
-This harness is built macro-stage by macro-stage:
-
-- **Pre-Build** — built **fully** (templates, playbooks, goals, gates).
-- **Build & Go-live** + **Post-Build** — **mapped** in `docs/WORKFLOW.md` (full
-  step tables, roles, gates) with detailed templates/playbooks/goals **stubbed**
-  for the next increment.
+All three macro-stages are **built fully**: step tables + gates
+(`docs/WORKFLOW.md`), per-step goal text (`docs/STAGE_GOALS.md`), templates and
+playbooks. Macro 2 executes through the **build-manifest** (compiled at 2.3
+from the frozen spec) and the **`/build-phase` loop** (one manifest phase per
+isolated invocation) on top of the **walking-skeleton stack template**
+(`templates/stack-pnpm-nest-next/` in the harness source, scaffolded at 2.4).
+Macro-1 weight is lane-scaled (`docs/WORKFLOW.md` § Lanes: Full vs Lite).
 
 Conditional enterprise gates (data-migration/cutover, NFR/load, DR + RTO/RPO,
 compliance/privacy/WCAG, observability/SLO) live mostly in Build & Go-live and
 Post-Build. Each must be explicitly marked **N/A by decision** when not needed —
 never silently dropped.
+
+## Locked Decisions
+
+Shorthand labels cited across the docs (`D1`…`D6`). These are settled — an
+audit or refactor does not silently reverse them:
+
+| # | Decision |
+|---|---|
+| **D1** | Independence Principle — `ck-*` skills are accelerators, never dependencies; the harness runs on a bare agent + git + bash. |
+| **D2** | Balanced process — enterprise gates are **conditional**: cleared or explicitly `N/A by decision`, never silently dropped. |
+| **D3** | Token scheme — `GAP-NNN → REQ-ID (MODULE.AREA.NN) → SC-NNN → TC-NNN`, `CR-NN`; `US-NNN.REQ-MMM` is not used. |
+| **D4** | Bilingual split — client-facing surfaces fork to `locale-vi/`; internal technical artifacts stay English; IDs/paths/code stay EN everywhere. |
+| **D5** | SA and Tech Lead are separate named roles (ERD freeze vs stack/API/threat-model). |
+| **D6** | Engine is preflight-checked, never vendored — `install-harness.sh` warns about missing skills/agents but never copies them. |
 
 ## Growth Rule
 

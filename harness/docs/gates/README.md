@@ -15,7 +15,8 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 | `pb-g2-scope-frozen.md` | PB-G2 scope frozen | Pre-Build | **CLIENT** | yes |
 | `pb-g3-prototype-frozen.md` | PB-G3 prototype frozen | Pre-Build | **CLIENT** | yes |
 | `pb-g4-contract-deposit.md` | PB-G4 contract + deposit (hardest) | Pre-Build | **CLIENT** | yes |
-| `dor-build.md` | Definition of Ready (enter Build) | Build | internal | no |
+| `dor-build.md` | Definition of Ready (enter Build) — incl. build-manifest coverage | Build | internal | no |
+| *(no file — mechanical)* | WALKING SKELETON (2.4/2.5) — scaffold boots, health OK, seeded admin login, CI green; asserted by `/gate-check --gate WALKING-SKELETON` | Build | internal | no |
 | `design-system-compliance.md` | Design-System Compliance (per-screen 3-tier) | Build | internal | no |
 | `dod-build.md` | Definition of Done (exit Build) | Build | internal | no |
 
@@ -31,8 +32,11 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 > **Client-paging gates** (emit `MANUAL_CHECKPOINT`, page the human's phone):
 > PB-G2, PB-G3, PB-G4, plus the Build **ACCEPTANCE** gate (inside the UAT step)
 > and the Post-Build **HANDOVER** gate. **PB-G1 is internal — it does NOT page.**
-> ACCEPTANCE and HANDOVER gate checklists are **built in the next macro-stage
-> increment**; their gate rows live in `dod-build.md` (exit) and the WORKFLOW map.
+> ACCEPTANCE and HANDOVER clearing conditions live in the WORKFLOW Canonical
+> Gate List + the 2.12 / 3.1 goal blocks; their sign-off records use the
+> delivery-closure-story and project-closure-story templates. In the **Lite
+> lane** the paging gates page the owner; a one-line written ack clears them
+> (`docs/WORKFLOW.md` § Lanes).
 
 ## Conditional Enterprise Gates
 

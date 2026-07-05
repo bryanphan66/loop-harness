@@ -8,9 +8,9 @@
 > produces it. **Pointers only — no new mechanics.** Honors
 > `playbook-composition-pattern.md`: this composes, it never duplicates.
 
-**Authority:** `PROPOSAL.md` §2–§4 (approved step tables) + §8 (locked decisions
-D1–D6). The map below is a commercial wrapper around `docs/WORKFLOW.md`; when this
-file disagrees with `docs/WORKFLOW.md` or `PROPOSAL.md`, they win.
+**Authority:** `docs/WORKFLOW.md` (step tables) + the locked decisions D1–D6
+(`docs/HARNESS.md` § Locked Decisions). The map below is a commercial wrapper
+around `docs/WORKFLOW.md`; when this file disagrees with it, `WORKFLOW.md` wins.
 
 ## Engine
 
@@ -133,17 +133,17 @@ MACRO 3 — POST-BUILD        [next-increment detail]
 > bao-gia (1.14), so the quote anchors to a frozen visual contract — the #1
 > defense against scope dispute.
 
-## Macro-Stage 2 — Build & Go-live *(mapped; detail next increment)*
+## Macro-Stage 2 — Build & Go-live
 
 Entry PB-G4. The step table in `docs/WORKFLOW.md` §2.1–2.13 is authoritative.
-Key playbooks that ship in this increment but are *exercised* in Build:
+Key playbooks:
 `build-execution.md` (2.6), `code-review-scoring.md` (2.7),
 `canonical-e2e-flow-playbook.md` + `e2e-qa-field-by-field-verify-with-report.md`
 (2.8), `seed-data-pattern.md` (2.5), `payment-integration.md` (2.6 if money is in
 scope). SA freezes the ERD (2.1); Tech Lead chooses stack + threat-model (2.2) —
 two separate roles (D5). ACCEPTANCE (2.12) is the client gate.
 
-## Macro-Stage 3 — Post-Build *(mapped; detail next increment)*
+## Macro-Stage 3 — Post-Build
 
 Entry production deployed + sign-off signed. `docs/WORKFLOW.md` §3.1–3.6.
 HANDOVER (3.1) is the client gate; change-control (3.5) runs always-on and

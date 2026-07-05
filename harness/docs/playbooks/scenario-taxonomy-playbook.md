@@ -16,7 +16,7 @@ in Pre-Build; record an explicit skip for the rest.
 - **Role:** BA. **Bare-agent fallback:** the `researcher` agent walks the 12
   dimensions below by hand and emits the same SC table. Per D1 the skill is an
   accelerator. In Build, `ck-e2e-flow` owns the Build-side scenario expansion
-  (per `PROPOSAL.md` §6 dedupe) — this playbook owns the Pre-Build risk discovery.
+  — this playbook owns the Pre-Build risk discovery (no duplication between the two).
 
 ## When To Run
 

@@ -1,14 +1,15 @@
 # Agent Operating Guide
 
-**Project: Auto Script — part of the Auto Content ecosystem.** A multi-tenant
-SaaS for Vietnamese YouTube creators (competitor tracking, velocity-based outlier
-video detection, AI Vietnamese scriptwriting), ported from a legacy Google Apps
-Script tool. This is a real product project running on the vibecode-harness
-operating model — this is a bootstrapped project, not the harness itself.
+**Project: <project name — fill at bootstrap>.** <One-paragraph product
+description: who it serves, what it does, where it came from.> This project runs
+on the **videcode-harness** operating model — a bootstrapped project, not the
+harness itself.
 
-Check `STAGE.md` first (currently Pre-Build, step 1.12 — prototype). The 3-macro
-flow in `docs/WORKFLOW.md` governs the work; product contract lives in
-`docs/requirements/` (SRS + REQ-IDs + RTM) and `docs/discovery/` (raw input).
+Check `STAGE.md` first (Current step + **Lane**: Full | Lite). The 3-macro flow
+in `docs/WORKFLOW.md` governs the work; the product contract lives in
+`docs/requirements/` (SRS + REQ-IDs + RTM, or `srs-lite.md` in the Lite lane)
+and `docs/discovery/` (raw input); the build order lives in
+`docs/build/build-manifest.md` once step 2.3 compiles it.
 
 ## Source Of Truth
 
@@ -175,6 +176,9 @@ How to invoke:
 
 - Slash command: `/stage-next` (preferred — auto-detects the next step from
   `STAGE.md`).
+- **Build step 2.6:** `/build-phase` — one invocation = ONE build-manifest
+  phase; repeat until the manifest is exhausted, then `/stage-next` continues
+  at 2.7. Never run "all of 2.6" in one invocation.
 - Direct: `Task({ subagent_type: "stage-runner", prompt: "Run step <ID> per
   goal: …" })`.
 
@@ -185,9 +189,8 @@ When NOT to delegate:
 - A change-request flow — the always-on layer is not a "stage".
 
 The subagent returns a `**Status:**` block: `DONE | DONE_WITH_CONCERNS |
-BLOCKED | NEEDS_CONTEXT | MANUAL_CHECKPOINT_PENDING`. Handle per
-`~/.claude/rules/orchestration-protocol.md` § Subagent Status Protocol. Never
-silently retry on `BLOCKED` — change context, simplify, or escalate.
+BLOCKED | NEEDS_CONTEXT | MANUAL_CHECKPOINT_PENDING`. Never silently retry on
+`BLOCKED` — change context, simplify the scope, or escalate to the human.
 
 The `.claude/hooks/stage-deliver.sh` notifier hook fires on the subagent's
 stage-boundary commit, so the human gets the artifact + the next step's gate

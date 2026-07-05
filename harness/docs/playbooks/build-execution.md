@@ -9,9 +9,8 @@
 
 **Macro-stage / step:** Build & Go-live · 2.6 (after 2.5 seed, before 2.7 review).
 
-> **Increment note:** ships now, *exercised* in the Build & Go-live macro-stage
-> (detailed orchestration built next increment). Branching / commit / hook recipes
-> below are authoritative.
+> Branching / commit / hook recipes below are authoritative. Executed per
+> manifest phase via `/build-phase` (`docs/WORKFLOW.md` § Macro-Stage 2).
 
 ## Engine
 

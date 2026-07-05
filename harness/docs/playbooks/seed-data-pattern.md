@@ -9,9 +9,7 @@
 **Macro-stage / step:** Build & Go-live · 2.5 (after 2.4 env, before 2.6 code).
 **Gate:** app boots with RBAC + admin; FK-valid.
 
-> **Increment note:** ships now, *exercised* in the Build macro-stage (detailed
-> orchestration built next increment). The ID convention + FK order are
-> authoritative.
+> The ID convention + FK order below are authoritative.
 
 ## Engine
 

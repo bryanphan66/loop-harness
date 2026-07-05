@@ -11,9 +11,7 @@
 **Macro-stage / step:** Build & Go-live · 2.6 (code) — and a hard gate that pushes
 the feature to the **high-risk lane** (red-team required at 2.9 security).
 
-> **Increment note:** ships now, *exercised* in the Build macro-stage (detailed
-> orchestration built next increment). The webhook + PCI + audit rules are
-> authoritative.
+> The webhook + PCI + audit rules below are authoritative.
 
 ## Engine
 
