@@ -47,6 +47,12 @@ hold):**
    Matrix. Screen inventory + floorplan classification (1.11) stays
    **mandatory** for every grid/form screen.
 5. **1.12 prototype, ONE round** — then **1.13 freeze by owner ack** = PB-G3.
+   **Internal-product substitution:** a Lite internal product (no external
+   client to show) may substitute the classified screen inventory (1.11) + a
+   written per-screen states contract (sample-data + empty/error states
+   described per screen) for the visual prototype — record
+   `1.12 — N/A by decision (written screen specs substitute)` at the PB-G3
+   freeze. Floorplan classification + the design-system gate still apply.
 6. **1.14 / 1.15 skipped — N/A-by-decision auto** (record one line in STAGE.md
    Snapshot). Proceed to **2.1**.
 
@@ -96,7 +102,7 @@ clear.
 
 | # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
 |---|---|---|---|---|---|---|---|
-| 1.1 | Lead capture + intake raw files | PM | `ck-intake-file` · `project-manager` | client email/chat/docs | `docs/discovery/YYYY-MM-DD-<slug>.{ext}` (append-only) + Source Map | — (required even when self-initiated) | no |
+| 1.1 | Lead capture + intake raw files | PM | `ck-intake-file` · `project-manager` | client email/chat/docs | `docs/discovery/YYYY-MM-DD-<slug>.{ext}` (append-only) + Source Map (`docs/discovery/README.md § Source Map`) | — (required even when self-initiated) | no |
 | 1.2 | Intake brief go/no-go **+ Lane declaration** | PM | `project-manager` | discovery raw | `docs/intake/…-intake-brief.md` (`locale-vi/`) | **PB-G1** intake go/no-go — *internal capture, does NOT page client*; Lane recorded in STAGE.md | no |
 
 ### BLOCK B — BA Core Docs *(load-bearing spine; Lite lane: replaced by 1.5-lite + 1.9-lite)*
@@ -145,7 +151,7 @@ release note → production release. *(payment milestones attach here in Full)*
 | 2.1 | Solution/data arch — **freeze ERD** | **SA** | `ck-tech-design` (databases) + `tech-graph` | SRS(-lite) data-model + use-cases + screen inventory | `docs/decisions/<slug>.md` + `docs/system-architecture.md` (ERD) | ERD review: entities, normalization, audit + tenant fields; **ERD FROZEN** | no |
 | 2.1b | Data migration & cutover (brownfield) | SA + DevSecOps | `databases` + `devops` | legacy schema + ERD | migration plan + dry-run report | **CONDITIONAL — N/A by decision** (greenfield); else ETL + dry-run cutover + rollback-of-data + RTO/RPO | no |
 | 2.2 | Technical design + choose stack (TDR) | **Tech Lead** | `ck-tech-design` + `ck-predict` | NFR + ERD | `docs/decisions/<slug>.md` (stack) + API contract | stack justified vs NFR (**default = the shipped walking-skeleton stack template**; deviations need the ADR to say why), API contract complete, authz; **STRIDE threat-model here** | no |
-| 2.3 | Implementation plan + **BUILD MANIFEST** + DoR | Tech Lead + PM | `ck-plan` + build-manifest-compilation playbook | TDR + scope baseline + ERD + screen inventory | `plans/<YYMMDD-HHMM>-<slug>/` + **`docs/build/build-manifest.md`** | **DoR GATE** (`docs/gates/dor-build.md`): baselined + ERD frozen + design approved + acceptance criteria + NFR **+ build-manifest complete: every in-scope REQ-ID in exactly one phase, P0 defined** | no |
+| 2.3 | Implementation plan + **BUILD MANIFEST** + DoR | Tech Lead + PM | `ck-plan` + build-manifest-compilation playbook | TDR + scope baseline + ERD + screen inventory | `plans/<YYMMDD-HHMM>-<slug>/` + **`docs/build-manifest.md`** | **DoR GATE** (`docs/gates/dor-build.md`): baselined + ERD frozen + design approved + acceptance criteria + NFR **+ build-manifest complete: every in-scope REQ-ID in exactly one phase, P0 defined** | no |
 | 2.4 | **Walking skeleton** (manifest **P0**) + env + CI/CD + observability | DevSecOps | stack template `scaffold.sh` + `devops` + `deploy` | stack decision + manifest P0 | scaffolded monorepo + pipeline + compose | **WALKING SKELETON**: `install && build` green, `docker compose up` boots, health OK, CI(-equivalent local) green, secret scan clean; alerting/SLO live or N/A-by-decision | no |
 | 2.5 | Seed + foundation data | DevSecOps + Dev | `ck-seed` + seed-data-pattern | ERD + RBAC | seed scripts (extends the template's admin seed to the domain) | app boots with RBAC + **seeded admin login works**; FK-valid; P0 marked done in manifest | no |
 | 2.6 | **Code feature by phase — `/build-phase` loop P1..PN** | Fullstack Dev | `/build-phase` → `fullstack-developer` (·`cook`) | build-manifest + ERD + SRS module file(s) + screen-inventory rows + tokens | code commits + verification-register rows + manifest progress | per phase: compiles/runs, `validate:quick` green, e2e smoke for the phase's journeys, **floor self-check** (design-system floor rules), commit cites ≥1 token, phase marked done in manifest | no |
@@ -158,7 +164,7 @@ release note → production release. *(payment milestones attach here in Full)*
 | 2.13 | Release | Release Manager | `ship` + `deploy` | accepted build | release note + tag | release-note (every released REQ) + smoke pass; rollback = one `IMAGE_TAG` line | no |
 
 > **Build Manifest (step 2.3 output — the spec→code conversion layer).** ONE
-> file, `docs/build/build-manifest.md` (template:
+> file, `docs/build-manifest.md` (template:
 > `docs/templates/build-manifest.md`, playbook:
 > `docs/playbooks/build-manifest-compilation.md`), compressing the whole BA
 > spine into ordered executable phases **P0..PN**. P0 = walking skeleton
@@ -257,7 +263,10 @@ Independent of macro-stage, running across all three:
   (current-stage pointer + History row) and `docs/ROADMAP.md` (module progress).
   Never split into a follow-up commit. In 2.6, **each completed phase** is a
   stage-boundary commit (STAGE.md stays on 2.6 but its History gains a
-  `2.6/P<N>` row; the manifest checkbox flips in the same commit).
+  `2.6/P<N>` row; the manifest checkbox flips in the same commit). A
+  stage-boundary commit that changes no module progress (doc-only or repair)
+  still stages `docs/ROADMAP.md` — refresh its `Updated:` line so the file is
+  honestly current; the verify-gate's atomicity check requires both staged.
 
 ---
 

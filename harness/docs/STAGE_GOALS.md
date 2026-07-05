@@ -39,15 +39,16 @@ condition cannot loop forever.
 ### Step 1.1 — Lead capture + intake raw files
 
 - **Inputs:** client email / chat / dropped docs (PRD, screenshots, sheets).
-- **Output path:** `docs/discovery/{date}-{slug}.{ext}` (append-only) + a Source Map.
+- **Output path:** `docs/discovery/{date}-{slug}.{ext}` (append-only) + the Source Map at `docs/discovery/README.md § Source Map`.
 - **Gate:** — (always required, even when self-initiated; no gate to clear).
 - **Manual?** no.
 
 Goal:
 Every raw client input is filed under `docs/discovery/{date}-{slug}.{ext}` with
-the date-prefix naming convention, append-only (no edits to prior inputs). A
-Source Map lists each raw artifact, its type, and what it covers. No
-interpretation or derivation yet. STAGE.md Snapshot shows Current = 1.2.
+the date-prefix naming convention, append-only (no edits to prior inputs). The
+Source Map — a `## Source Map` section in `docs/discovery/README.md` — lists
+each raw artifact, its type, and what it covers. No interpretation or
+derivation yet. STAGE.md Snapshot shows Current = 1.2.
 Stop after 8 turns.
 
 ### Step 1.2 — Intake brief go/no-go + Lane declaration
@@ -292,6 +293,14 @@ freeze** (no unclassified grid/form screen; no §4/§7/§8 violation). Emit
 MANUAL_CHECKPOINT with the chosen tool + share URL + return condition, then
 stop. STAGE.md Current = 1.13. Stop after 8 turns.
 
+**Lite internal-product substitution (sanctioned):** when the product is
+internal with no external client to show, the classified screen inventory
+(1.11) + a written per-screen states contract (sample-data + empty/error states
+described per screen) may substitute for the visual prototype. Record
+`1.12 — N/A by decision (written screen specs substitute)` at the PB-G3 freeze;
+floorplan classification and the design-system gate still apply
+(`docs/WORKFLOW.md` § Lanes, item 5).
+
 ### Step 1.13 — Review loop + FREEZE *(CLIENT GATE; Lite: one round + owner ack)*
 
 - **Inputs:** prototype + **process annex** (BPMN / status-flow / flagged user-flows for process-complex features) + client feedback.
@@ -425,12 +434,12 @@ note. STAGE.md Current = 2.3. Stop after 15 turns.
 ### Step 2.3 — Implementation plan + BUILD MANIFEST + DoR
 
 - **Inputs:** TDR + scope baseline (or srs-lite) + frozen ERD + screen inventory + API contract.
-- **Output path:** `plans/<YYMMDD-HHMM>-<slug>/` (plan.md) + **`docs/build/build-manifest.md`**.
+- **Output path:** `plans/<YYMMDD-HHMM>-<slug>/` (plan.md) + **`docs/build-manifest.md`**.
 - **Gate:** **DoR** (`docs/gates/dor-build.md`) — incl. build-manifest complete: every in-scope REQ-ID in exactly one phase, P0 defined.
 - **Manual?** no.
 
 Goal:
-`docs/build/build-manifest.md` exists per `docs/templates/build-manifest.md`,
+`docs/build-manifest.md` exists per `docs/templates/build-manifest.md`,
 compiled per `docs/playbooks/build-manifest-compilation.md`: ordered phases
 **P0..PN** where **P0 = walking skeleton** (stack-template scaffold + boot +
 seed-admin login) and each later phase block lists: id, name, REQ-IDs covered,
@@ -449,7 +458,7 @@ Stop after 15 turns.
 
 - **Inputs:** stack decision + manifest P0 + the stack template (`templates/stack-pnpm-nest-next/` from the harness source — local clone or repo tarball; see the template README and `STAGE.md` Snapshot § Harness source).
 - **Output path:** scaffolded monorepo at repo root + `.github/workflows/ci.yml` + `docker-compose.yml` + `.env.example`.
-- **Gate:** **WALKING SKELETON** — install/build green, compose boots, health OK, CI(-equivalent local) green, secret scan clean.
+- **Gate:** **WALKING SKELETON** — install/build green, compose boots, health OK, CI(-equivalent local) green, secret scan clean (gitleaks, or the template's `scripts/secret-scan.sh` grep fallback).
 - **Manual?** no.
 
 Goal:
@@ -460,7 +469,12 @@ equivalent) completes clean; (2) lint + typecheck + unit + build all green
 locally (the CI-equivalent run); (3) `docker compose up` boots db + api + web;
 (4) the health endpoint returns 200; (5) the CI workflow file runs those same
 jobs; (6) `.env.example` lists every required var and no secret is committed
-(secret scan clean). Observability is decided: structured logging on by
+(secret scan clean — gitleaks or `scripts/secret-scan.sh`). **Offline caveat:**
+when a base-image pull is network-blocked, the boot evidence may substitute a
+locally-cached postgres-16-compatible image for the db, and app-container boot
+may be proven by running the exact prod commands on the built artifacts —
+record the caveat in the register row; do not block the gate on the network.
+Observability is decided: structured logging on by
 default; alerting/SLO configured or recorded `N/A by decision` in the
 dod-build toggles. STAGE.md Current = 2.5. Stop after 25 turns.
 
@@ -483,7 +497,7 @@ Current = 2.6. Stop after 12 turns.
 
 ### Step 2.6 — Code feature by phase (`/build-phase` loop)
 
-- **Inputs:** `docs/build/build-manifest.md` (next incomplete phase block) + frozen ERD + the SRS module file(s) the phase names + the screen-inventory rows for its screens + design tokens.
+- **Inputs:** `docs/build-manifest.md` (next incomplete phase block) + frozen ERD + the SRS module file(s) the phase names + the screen-inventory rows for its screens + design tokens.
 - **Output path:** code + tests + verification-register rows (`docs/TEST_MATRIX.md`) + manifest progress.
 - **Gate:** per phase — compiles/runs, `validate:quick` green, phase e2e smoke passes, design-system floor self-check clean, commit cites ≥1 token, manifest checkbox flipped.
 - **Manual?** no.
@@ -505,7 +519,7 @@ acceptance check with `Result: pass`; the design-system floor self-check is
 clean for touched screens (§4 floorplan / §7 actions / §8 modals, Tier-2 tokens
 only, Tier-3 reuse). One stage-boundary commit closes the phase: it cites ≥1
 token (REQ-ID / SC-NNN / TC-NNN), flips the phase checkbox in
-`docs/build/build-manifest.md`, adds a `2.6/P<N>` History row in STAGE.md, and
+`docs/build-manifest.md`, adds a `2.6/P<N>` History row in STAGE.md, and
 updates `docs/ROADMAP.md` progress — all in the same commit. STAGE.md Current
 stays 2.6 while phases remain; when the last phase closes, Current = 2.7.
 Stop after 25 turns.
@@ -573,7 +587,11 @@ Real-browser QA covers every critical journey with recorded evidence
 manual. The DoD checklist (`docs/gates/dod-build.md`) is filled: every core line
 checked, every conditional enterprise toggle either cleared or marked N/A by
 decision with reason + date, and the verification register has no `fail` /
-`never-run` rows. STAGE.md Current = 2.11. Stop after 15 turns.
+`never-run` rows. Sequencing hazard: do NOT run the production build
+(`pnpm build`) while the e2e dev server is serving — it clobbers the running
+`.next` and fakes a login regression (template README § End-to-end tests);
+build and browser-QA in separate steps. STAGE.md Current = 2.11. Stop after
+15 turns.
 
 ### Step 2.11 — Go-live readiness
 
@@ -584,7 +602,12 @@ decision with reason + date, and the verification register has no `fail` /
 
 Goal:
 The readiness checklist is green: production build variant (Dockerfiles +
-prod compose or deploy target) boots from a clean pull; environments isolated
+prod compose or deploy target) boots from a clean pull. **Offline caveat:** when
+the base-image pull is network-blocked locally, accept "prod compose config
+valid + Dockerfiles present + prod artifacts boot via their exact prod commands
+(`node dist/main.js`, `next start`) + image build delegated to CI" — record the
+caveat; the containerized boot must then be proven in CI/deploy before 2.13
+release. Environments isolated
 with `.env.<env>.example` complete; backups configured and a restore verified;
 **rollback rehearsed** (deploy previous `IMAGE_TAG`, one-line procedure
 recorded); monitoring/alerting live. DR restore-drill + RTO/RPO and NFR/load

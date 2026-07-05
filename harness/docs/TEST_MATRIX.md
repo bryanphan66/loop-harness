@@ -65,6 +65,12 @@ on any `fail` (and on any `never-run` at a stage-close).
 - A behavior is not closeable until its Verify command ran and `Result` is `pass`,
   **or** the story packet explains why no command exists (pure-docs, design-only,
   or a `MANUAL:` checkpoint the human signed off).
+- **Planned work stays OUT of the register until it runs.** Track intended
+  behavior as `planned` in the Behavior → Proof Matrix above; add its register
+  row (with the real command + result) only when the verify command first runs.
+  The verify-gate blocks ANY `never-run` register row on a stage-close commit —
+  including Pre-Build doc-only closes — so a planned row parked here would
+  freeze every stage close until it runs.
 - `Last verified` + `Result` update in the **same commit** that closes the
   behavior or its stage — drift between this register and the proof matrix is a bug.
 - For a `MANUAL:` verify step, the result is the human's sign-off reference (UAT

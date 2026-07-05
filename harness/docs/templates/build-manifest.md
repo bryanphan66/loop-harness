@@ -3,7 +3,9 @@ TEMPLATE: build-manifest.md (the spec→code conversion layer)
 Used by: WORKFLOW step 2.3 (compiled), 2.4/2.5 (P0), 2.6 /build-phase loop (P1..PN).
 Role: Tech Lead compiles it; Fullstack Dev executes it one phase at a time.
 Playbook: docs/playbooks/build-manifest-compilation.md
-Output path: <project-root>/docs/build/build-manifest.md
+Output path: <project-root>/docs/build-manifest.md
+  (a single file, deliberately NOT docs/build/ — that dir name collides with
+  common build-artifact ignore/deny patterns in agent tooling)
 Bilingual: INTERNAL — English only (no locale-vi fork).
 Rule of thumb: a build agent reads ITS phase block + the files that block names
 — never the whole BA spine. Write each block to be sufficient alone.

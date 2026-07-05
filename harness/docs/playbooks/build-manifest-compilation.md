@@ -2,7 +2,7 @@
 
 **Lifecycle:** experimental · **First use:** TBD · **Verified by:** none
 
-> Compiles the frozen Pre-Build spec into `docs/build/build-manifest.md` — the
+> Compiles the frozen Pre-Build spec into `docs/build-manifest.md` — the
 > ONE file the build loop executes. This is the **spec→code conversion layer**:
 > without it, a build agent faces the whole BA spine (hundreds of REQ-IDs,
 > scenarios, screens) and produces documents instead of software. Owns the

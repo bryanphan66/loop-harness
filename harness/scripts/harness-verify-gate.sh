@@ -39,6 +39,22 @@ fail=0
 
 say() { printf '%s\n' "$*" >&2; }
 
+# --- Self-check: hooks-path arming ------------------------------------------
+# A gate that can silently disarm is not a gate. `pnpm install` runs a template
+# `prepare: husky` script that re-points core.hooksPath to .husky/_ — the
+# template's .husky hooks chain this script so it still fires, but warn loudly
+# so the drift is visible and can be reverted (git config core.hooksPath
+# .githooks). Anything else (empty/other) means only a manual invocation ran
+# this gate — the next commit may run with NO gate at all.
+hooks_path="$(git config core.hooksPath 2>/dev/null || true)"
+if [ -d .githooks ] && [ "$hooks_path" != ".githooks" ]; then
+  say "  [self-check] WARNING: core.hooksPath is '${hooks_path:-unset}' (expected .githooks)."
+  case "$hooks_path" in
+    .husky*) say "  [self-check] husky owns the hook path (a pnpm install re-arms it); the .husky hooks must chain this gate. Restore with: git config core.hooksPath .githooks" ;;
+    *)       say "  [self-check] the harness gate is NOT armed as a git hook — future commits will skip it. Fix now: git config core.hooksPath .githooks" ;;
+  esac
+fi
+
 # --- Gate 1: lint / typecheck / quick validate ------------------------------
 # Auto-detect the project's validate command. Preference order within a stack:
 # validate > lint > typecheck > check. Package-manager precedence is driven by
@@ -175,6 +191,9 @@ check_atomicity() {
   say "  [atomicity] A stage-boundary commit must advance STAGE.md (current-stage"
   say "           pointer + History row) AND docs/ROADMAP.md (module progress) in"
   say "           the SAME commit. Stage them together:  git add docs/ROADMAP.md"
+  say "           If this close changes no module progress (doc-only / repair"
+  say "           commit), refresh the ROADMAP 'Updated:' line — that keeps the"
+  say "           file honestly current and satisfies this gate."
   return 1
 }
 

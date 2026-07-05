@@ -16,9 +16,9 @@ below must hold before the first build phase starts.
 - [ ] **ERD FROZEN** (step 2.1, SA) — entities, normalization, audit + tenant fields reviewed; decision recorded by slug.
 - [ ] **Design approved** — design tokens + Component Coverage Matrix complete (1.10).
 - [ ] **Acceptance criteria** exist per in-scope feature (from the SRS `**shall**` statements).
-- [ ] **NFR** captured — `docs/requirements/srs/nfr.md` present; load / DR / compliance toggles decided (in-scope or N/A by decision).
+- [ ] **NFR** captured — `docs/requirements/srs/nfr.md` present (Lite lane: the § NFR one-liners in `docs/requirements/srs-lite.md` suffice); load / DR / compliance toggles decided (in-scope or N/A by decision).
 - [ ] Implementation plan exists at `plans/<YYMMDD-HHMM>-<slug>/` (step 2.3).
-- [ ] **Build manifest complete** — `docs/build/build-manifest.md` exists per `docs/templates/build-manifest.md`: **P0 (walking skeleton) defined**, every phase ≤ one agent session (≤~10 files), and the coverage checklist proves **every in-scope REQ-ID appears in exactly one phase**.
+- [ ] **Build manifest complete** — `docs/build-manifest.md` exists per `docs/templates/build-manifest.md`: **P0 (walking skeleton) defined**, every phase ≤ one agent session (≤~10 files), and the coverage checklist proves **every in-scope REQ-ID appears in exactly one phase**.
 - [ ] Stack decision recorded by slug (step 2.2, Tech Lead) — SA's ERD-freeze and Tech Lead's stack are **separate** decisions (D5).
 - [ ] STRIDE threat-model done at 2.2 (red-team required).
 
@@ -31,7 +31,7 @@ Confirmed by (PM):        <name>   on  YYYY-MM-DD
 ERD freeze decision:      docs/decisions/<slug>.md
 Stack decision:           docs/decisions/<slug>.md
 Plan:                     plans/<YYMMDD-HHMM>-<slug>/
-Build manifest:           docs/build/build-manifest.md  (coverage checklist green)
+Build manifest:           docs/build-manifest.md  (coverage checklist green)
 ```
 
 > A failed line means Build does not start. Do not "start coding to find out" —

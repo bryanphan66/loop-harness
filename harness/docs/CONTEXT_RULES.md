@@ -95,7 +95,7 @@ for the current step at the lowest token cost.
 
 | Source | Every phase |
 |---|---|
-| The phase's own block in `docs/build/build-manifest.md` | Must |
+| The phase's own block in `docs/build-manifest.md` | Must |
 | `docs/system-architecture.md` (ERD — the phase's entities) | Must |
 | The SRS module file(s) the phase's REQ-IDs live in (or `srs-lite.md`) | Must |
 | The screen-inventory rows for the phase's screens | Must |
@@ -121,7 +121,7 @@ for the current step at the lowest token cost.
 | `docs/templates/project-closure-story/*` + `docs/runbook/*` | 3.1 handover |
 | SLA terms (contract §, Full lane) or owner-declared window | 3.2 hypercare |
 | `docs/templates/maintenance-proposal.md` | 3.4 |
-| `docs/requirements/change-requests/*` + `docs/build/build-manifest.md` (CR → new phase) | 3.5 any CR-NN |
+| `docs/requirements/change-requests/*` + `docs/build-manifest.md` (CR → new phase) | 3.5 any CR-NN |
 | `playbooks/session-retrospective.md` + session traces | 3.6 retro |
 | `docs/TRACE_SPEC.md` — every released REQ-ID in the handover; every `CR-NN` resolved | 3.1–3.6 |
 

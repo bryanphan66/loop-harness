@@ -78,7 +78,7 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 
 | File | Owns | One-line |
 |---|---|---|
-| [build-manifest-compilation.md](build-manifest-compilation.md) | 2.3 | Compile the frozen spec into `docs/build/build-manifest.md` (ordered phases P0..PN, coverage proof) — the spec→code conversion layer `/build-phase` executes. |
+| [build-manifest-compilation.md](build-manifest-compilation.md) | 2.3 | Compile the frozen spec into `docs/build-manifest.md` (ordered phases P0..PN, coverage proof) — the spec→code conversion layer `/build-phase` executes. |
 | [seed-data-pattern.md](seed-data-pattern.md) | 2.5 | Deterministic FK-valid demo data for DEV/TEST. Symbolic IDs, scoped cleanup, never production. Engine `ck-seed`. |
 | [build-execution.md](build-execution.md) | 2.6 | Trunk-based branching, commit cadence, D3 token-citation commit-msg hook, pre-commit + secret-scan, `validate:quick`. Engine `cook`. |
 | [payment-integration.md](payment-integration.md) | 2.6 (if money) | Webhook idempotency + signature verify + refund/dispute + reconciliation + PCI SAQ-A + 7-yr audit. Engine `ck-payment-integration`. |

@@ -43,6 +43,11 @@ Shape-only scaffold. Replace <placeholders>.
 Append-only. One row per completed step. Cite the short SHA so `git show <sha>`
 reproduces the artifact set.
 
+**Commit-SHA back-fill convention:** a stage-boundary commit cannot know its own
+SHA. Write `— (this commit)` in the new row, then back-fill the previous row's
+real SHA in the NEXT stage-boundary commit. A row left `—` is still resolvable:
+`git log --oneline --grep 'step <ID>'` is the source of truth.
+
 | Macro-stage | Step | Done date | Commit | Gate cleared | Notes |
 |---|---|---|---|---|---|
 | Pre-Build | 1.1 Lead capture | YYYY-MM-DD | — | — | <how the project started> |

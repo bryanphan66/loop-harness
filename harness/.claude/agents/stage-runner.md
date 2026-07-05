@@ -62,7 +62,7 @@ exactly what you need.
 6. `docs/STAGE_GOALS.md` — confirm the goal you were given matches the canonical
    text; on drift, prefer the file and flag it.
 7. The playbook(s) named in the WORKFLOW row (`docs/playbooks/`).
-8. **For 2.6 only:** `docs/build/build-manifest.md` — your phase block is your
+8. **For 2.6 only:** `docs/build-manifest.md` — your phase block is your
    scope contract. Also read ONLY the files the phase block names (ERD in
    `docs/system-architecture.md`, the SRS module file(s), the screen-inventory
    rows, the token paths) — never the whole BA spine.
@@ -88,7 +88,7 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
    playbooks) stay **English**; IDs/paths/code stay EN even inside VN files.
 4. Read prior-step artifacts the row lists under Inputs (`docs/discovery/`,
    `docs/intake/`, `docs/requirements/`, `docs/scope-baseline/`, `docs/design/`,
-   `docs/visuals/`, `docs/build/`, etc.).
+   `docs/visuals/`, `docs/build-manifest.md`, etc.).
 
 ## Execute the step
 
@@ -111,7 +111,7 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
 ### Build steps (2.x) — execution rules
 
 - **2.1 / 2.1b / 2.2 / 2.3** are design/document steps — run them as above.
-  2.3 additionally compiles `docs/build/build-manifest.md` per
+  2.3 additionally compiles `docs/build-manifest.md` per
   `docs/playbooks/build-manifest-compilation.md`; its DoR gate includes the
   manifest coverage check (every in-scope REQ-ID in exactly one phase, P0
   defined).
@@ -130,7 +130,7 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
   smoke passes against the running app → verification-register row(s)
   (TC-NNN, `Result: pass`) → design-system floor self-check on touched screens
   → ONE stage-boundary commit that cites ≥1 token, flips the phase checkbox in
-  `docs/build/build-manifest.md`, adds the `2.6/P<N>` History row in STAGE.md,
+  `docs/build-manifest.md`, adds the `2.6/P<N>` History row in STAGE.md,
   and updates `docs/ROADMAP.md`. Before coding any grid/form screen, confirm
   its screen-inventory floorplan row exists — a missing row is a `BLOCKED`
   (Designer must classify), never an invented floorplan. Your Status block MUST

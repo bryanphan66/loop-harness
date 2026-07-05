@@ -9,7 +9,7 @@ Check `STAGE.md` first (Current step + **Lane**: Full | Lite). The 3-macro flow
 in `docs/WORKFLOW.md` governs the work; the product contract lives in
 `docs/requirements/` (SRS + REQ-IDs + RTM, or `srs-lite.md` in the Lite lane)
 and `docs/discovery/` (raw input); the build order lives in
-`docs/build/build-manifest.md` once step 2.3 compiles it.
+`docs/build-manifest.md` once step 2.3 compiles it.
 
 ## Source Of Truth
 
@@ -181,6 +181,21 @@ How to invoke:
   at 2.7. Never run "all of 2.6" in one invocation.
 - Direct: `Task({ subagent_type: "stage-runner", prompt: "Run step <ID> per
   goal: …" })`.
+- **Agent-registry caveat:** `stage-runner` resolves only in sessions started
+  AFTER the harness was installed — a session's agent registry is frozen at
+  start, so the very session that ran the installer gets "agent not found".
+  Fall back to `subagent_type: "fullstack-developer"` (or run inline) for that
+  session; the next session picks up `stage-runner` normally.
+
+**Background-session isolation:** `.claude/settings.json` ships with
+`"worktree": {"bgIsolation": "none"}` so a bg agent works at the checked-out
+root and `STAGE.md` / the verify gate stay live. The setting is read at session
+START — a bg session launched before it existed is already fenced into
+`.claude/worktrees/`. In that case run the WHOLE flow inside that one worktree
+(never split work across the worktree and the root) and fast-forward the main
+branch from the worktree branch at the end. Never scaffold or `git init` inside
+a worktree — its `.git` is a pointer file (see the stack template's
+`scaffold.sh`).
 
 When NOT to delegate:
 

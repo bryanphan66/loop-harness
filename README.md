@@ -21,7 +21,7 @@ Principle, `harness/docs/HARNESS.md`).
 | Path | What |
 |---|---|
 | `harness/` | The installable skeleton: `AGENTS.md`, `docs/` (WORKFLOW, STAGE_GOALS, gates, playbooks, templates, design-system), `.claude/` (stage-runner agent + `/stage-next` `/build-phase` `/gate-check` commands + notifier hooks), `.githooks/` + `scripts/harness-verify-gate.sh` (non-bypassable verify gate), `scripts/install-harness.sh` |
-| `harness/templates/stack-pnpm-nest-next/` | Walking-skeleton stack template (hasi-hub-shaped starter monorepo) scaffolded at Build step 2.4 |
+| `harness/templates/stack-pnpm-nest-next/` | Walking-skeleton stack template (hasi-hub-shaped starter monorepo) scaffolded at Build step 2.4 — v0.1.1, full local verify 2026-07-06 (see its `TEMPLATE_VERSION`) |
 | `plans/` | Harness development plans + reports (not installed into projects) |
 
 ## Install into a fresh project
@@ -51,7 +51,7 @@ Open Claude Code in the project and repeat:
    (PB-G2/G3/G4, ACCEPTANCE, HANDOVER) emit a `MANUAL_CHECKPOINT` and wait for
    your written ack. `/gate-check` verifies any gate on demand.
 3. **`/build-phase`** (Build step 2.6) — the phase loop. Step 2.3 compiles the
-   frozen spec into `docs/build/build-manifest.md` (ordered phases P0..PN, every
+   frozen spec into `docs/build-manifest.md` (ordered phases P0..PN, every
    in-scope REQ-ID in exactly one phase); step 2.4 scaffolds the **walking
    skeleton** from the stack template and boots it; then each `/build-phase`
    run implements ONE phase: code → `validate:quick` → e2e smoke →
