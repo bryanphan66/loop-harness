@@ -30,8 +30,8 @@
 |---|---|---|---|
 | 1 | Harness v2 docs+control-plane (`harness/` — A,B,D,E,F,G) | bg task | done 2026-07-05 — commits 68044b7..0d40859; report `phase-01-harness-v2-docs-build-report.md` (5/5 acceptance) |
 | 2 | Stack template built + verified boot (C) | bg task | done 2026-07-05 — commit 2d2e66d; verify ALL GREEN on fresh scaffold (`phase-02-stack-template-verify-report.md`) |
-| 3 | Proof run: sample project through Lite Pre-Build → Macro 2 → running app | bg task(s) | pending |
-| 4 | Audit vs hasi-hub checklist; iterate until pass; final README polish | control + bg | pending |
+| 3 | Proof run: sample project through Lite Pre-Build → Macro 2 → running app | bg task(s) | done 2026-07-06 — 9/9 benchmark green; v0.1.0 tagged; 52 api unit + 5 web unit + 8 Playwright e2e; STAGE trail full 1.1→2.13; report `phase-03-proof-run-report.md` (friction log F1..F18) |
+| 4 | Patch harness from friction log F1..F18; re-verify template; README polish | control + bg | pending |
 
 Detail: `phase-01-harness-v2-docs.md`, `phase-02-stack-template.md`, `phase-03-proof-run.md`.
 
