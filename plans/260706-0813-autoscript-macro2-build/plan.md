@@ -29,3 +29,13 @@
 | 1 | 1f8bcf7a | Build 2.1 | (running) | harness v2 upgrade `5724415` → 2.1 ERD FROZEN 21 entities `15cd1b4` → 2.2 TDR `20aa100` → 2.3 manifest **P0..P22, 240 REQ-IDs** DoR GREEN `4bcc592` → 2.4 skeleton boots `63ebbbc` → 2.5 seed P0 done `e8bd499` → 2.6 loop entered at P1 (Auth) |
 
 **Scale confirmed at DoR:** 23 phases (P0 done + P1..P22 feature phases). Design-drift check 2026-07-06: live Claude Design board `674d5340…` = frozen v3 bundle, file-for-file — no post-freeze changes; 100+ artboards = state variants of the 30 logical screens.
+
+## ⏸️ PAUSED 2026-07-06 13:32 (operator: token budget needed elsewhere; resume ~21:00 tonight)
+
+**State at pause:** leg-1 session `1f8bcf7a` soft-stopped (`claude stop` — worktree + job state retained; `claude rm` NOT run). Progress: **P0..P6 DONE (7/23), committed through `2f5a8d9`**. **P7 (Outlier Scoring Engine, core IP, golden tests) IN PROGRESS — UNCOMMITTED work sits in the worktree** `~/Desktop/Workspace/auto-script/.claude/worktrees/macro2-build`: modified schema.prisma, scans module/worker, scan-engine e2e, TEST_MATRIX + untracked `scoring/` dir, `scan-scoring.service.ts`, migration `20260706160000_add_scan_video_results`. My poller `bkp57lw2w` will self-exit on next tick (session no longer working) — ignore its notification.
+
+**RESUME RUNBOOK (~21:00) — thực hiện Y NHƯ TRƯỚC:**
+1. Dispatch leg-2 bg session: `cd ~/Desktop/Workspace/auto-script && claude --bg --dangerously-skip-permissions --model claude-fable-5 '<leg-2 prompt>'`. Leg-2 prompt = same hard rules as §Standing constraints + §Dispatch pattern of this plan (KHÔNG hỏi giữa chừng; secrets → env+mock, ghi docs/build-needs-credentials.md; ports 3200/3201/5434 compose project autoscript; PUB port từ export v3, APP/ADM theo design system; verify-gate no bypass; token chain; dừng sạch ở boundary khi cạn context + handoff report) **PLUS leg-2 specific**: "Work IN the existing worktree `.claude/worktrees/macro2-build` (branch macro2-build — do NOT create a new worktree/branch; if session isolation forces one, base it on macro2-build). FIRST: reconcile the in-progress P7 — read git status/diff, finish or redo P7 cleanly (golden tests must pass), commit, THEN continue the /build-phase loop P8→P22."
+2. Re-arm poller (same script as before, id pattern of new session), report milestones to operator, relay legs 3+ the same way when a session ends cleanly.
+3. Mandatory operator stop remains **2.12 UAT (ACCEPTANCE)** — page operator, do not self-clear.
+4. After 2.13 release: final report vs benchmark + friction log → fold new frictions into harness (like phase-4 did).
