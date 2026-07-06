@@ -27,7 +27,8 @@
 | Leg | Session | Start stage | End stage | Notes |
 |---|---|---|---|---|
 | 1 | 1f8bcf7a (Fable 5) | Build 2.1 | 2.6 mid-P7 (paused 13:32) | harness v2 upgrade `5724415` → 2.1 ERD `15cd1b4` → 2.2 TDR `20aa100` → 2.3 manifest **P0..P22, 240 REQ-IDs** DoR GREEN `4bcc592` → 2.4 skeleton `63ebbbc` → 2.5 seed `e8bd499` → P1 `c1baefb` P2 `5555432` P3 `418a5f5` P4 `852f259` P5 `28f969c` P6 `2f5a8d9`; P7 uncommitted at pause |
-| 2 | 1e577ebf (**Opus 4.8** — operator decision 21:27: build legs on Opus, control stays Fable 5) | 2.6 P7 reconcile | (running) | resume per runbook: reconcile P7 → P8..P22 |
+| 2a | 1e577ebf (Opus 4.8) | 2.6 P7 reconcile | stopped 21:33 after ~6 min | operator reversed: **full Fable 5 for all legs** (21:33) — no commits made by 2a |
+| 2b | 123ab211 (**Fable 5** — standing model for ALL legs per operator 21:33) | 2.6 P7 reconcile | (running) | resume per runbook: reconcile P7 → P8..P22 |
 
 **Scale confirmed at DoR:** 23 phases (P0 done + P1..P22 feature phases). Design-drift check 2026-07-06: live Claude Design board `674d5340…` = frozen v3 bundle, file-for-file — no post-freeze changes; 100+ artboards = state variants of the 30 logical screens.
 
