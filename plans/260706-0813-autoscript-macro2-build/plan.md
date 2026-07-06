@@ -26,4 +26,6 @@
 
 | Leg | Session | Start stage | End stage | Notes |
 |---|---|---|---|---|
-| 1 | (dispatching) | Build 2.1 | | harness upgrade + as far as safe |
+| 1 | 1f8bcf7a | Build 2.1 | (running) | harness v2 upgrade `5724415` → 2.1 ERD FROZEN 21 entities `15cd1b4` → 2.2 TDR `20aa100` → 2.3 manifest **P0..P22, 240 REQ-IDs** DoR GREEN `4bcc592` → 2.4 skeleton boots `63ebbbc` → 2.5 seed P0 done `e8bd499` → 2.6 loop entered at P1 (Auth) |
+
+**Scale confirmed at DoR:** 23 phases (P0 done + P1..P22 feature phases). Design-drift check 2026-07-06: live Claude Design board `674d5340…` = frozen v3 bundle, file-for-file — no post-freeze changes; 100+ artboards = state variants of the 30 logical screens.
