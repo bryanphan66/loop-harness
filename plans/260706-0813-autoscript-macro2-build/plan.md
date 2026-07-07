@@ -49,6 +49,21 @@ Heavy build phases done. Remaining legs (UAT fixes, release, close-out) dispatch
 
 **Scale confirmed at DoR:** 23 phases (P0 done + P1..P22 feature phases). Design-drift check 2026-07-06: live Claude Design board `674d5340…` = frozen v3 bundle, file-for-file — no post-freeze changes; 100+ artboards = state variants of the 30 logical screens.
 
+
+## UAT iteration log (2026-07-07, staging live)
+
+Post-deploy the operator ran UAT and hit real gaps. Fixes shipped as CRs on the same worktree (one leg at a time — never parallel, per the 97bc20ff hazard):
+- Round 1 (`ddd1047`): real landing images, locale `/en/en` bug, OAuth cross-subdomain cookie.
+- CR-17/18/19 (`dd61ad6`): un-mock OTP email (Brevo SMTP), AI script/blueprint (omniroute), SePay webhook real payload.
+- Round 2 (`d8f68fb`): **brand teal tokens** into APP/ADM (was still scaffold zinc — harness blind spot #1), SePay live QR wiring.
+- SePay bank test acct `0000000001`/Vietcombank wired; webhook envelope `{success:true}` fix (`2c47e53`).
+- **UI-port leg `30ac4392` (Fable 5, model-escalated for design-critical work)**: operator rejected the plain design-system rebuild of APP screens — porting the real Claude Design v3 export markup faithfully (Feed/Dashboard/shell) + fixing script-gen error surfacing (basic-tier model gate swallowed to generic error) + QR image render.
+
+### Harness blind spots to fold back at close-out
+1. **No visual-fidelity gate for APP/ADM vs prototype.** The "rebuild-not-port" rule + gates that only check floorplan + token compliance let a plain-but-correct app pass 2.7/2.10/2.12 while looking nothing like the design-heavy mockup. Add a prototype-diff visual check for APP/ADM, not only PUB.
+2. **Brand tokens not substituted on APP rebuild** — scaffold defaults shipped; design-system-compliance gate checked classification, not token VALUES.
+3. **Error swallowing** — real job errors (tier gate) surfaced as generic "đã có lỗi"; e2e only exercised happy paths. Add negative-path + error-surfacing checks.
+
 ## ⏸️ PAUSED 2026-07-06 13:32 (operator: token budget needed elsewhere; resume ~21:00 tonight)
 
 **State at pause:** leg-1 session `1f8bcf7a` soft-stopped (`claude stop` — worktree + job state retained; `claude rm` NOT run). Progress: **P0..P6 DONE (7/23), committed through `2f5a8d9`**. **P7 (Outlier Scoring Engine, core IP, golden tests) IN PROGRESS — UNCOMMITTED work sits in the worktree** `~/Desktop/Workspace/auto-script/.claude/worktrees/macro2-build`: modified schema.prisma, scans module/worker, scan-engine e2e, TEST_MATRIX + untracked `scoring/` dir, `scan-scoring.service.ts`, migration `20260706160000_add_scan_video_results`. My poller `bkp57lw2w` will self-exit on next tick (session no longer working) — ignore its notification.
