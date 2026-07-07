@@ -64,22 +64,36 @@ Do NOT implement the phase in the main session — orchestrate only.
    <verbatim phase block>
 
    Read only: docs/system-architecture.md (ERD), <SRS module path(s)>,
-   the screen-inventory rows below, <tokens path>, src/components/README.md.
+   the screen-inventory rows below, the prototype export source files the
+   phase block cites, <tokens path>, src/components/README.md.
 
    Screen-inventory rows for this phase:
    <quoted rows>
+
+   Screens are PORTED from their cited prototype export files (markup/structure
+   /styles reconciled to Tier-2 tokens, real data wired in), NOT rebuilt from
+   spec — unless the phase block marks `rebuild (decision: <slug>)`
+   (docs/playbooks/build-execution.md § Prototype → Code Fidelity). Failed
+   operations must surface their REAL cause to the UI — no generic
+   error-swallow. A fix touching a systemic pattern (error handling, model/tier
+   resolution, auth, quota) sweeps ALL grep'd call-sites, not just the reported
+   one.
 
    Pipeline, in order: implement → validate:quick green → phase e2e smoke
    (the journeys the acceptance checks name) passes against the running app →
    add verification-register row(s) (TC-NNN, Result: pass) in
    docs/TEST_MATRIX.md → design-system floor self-check on touched screens
    (§4 floorplan / §7 actions / §8 modals, Tier-2 tokens only, Tier-3 reuse) →
+   visual-fidelity self-check (each ported screen side-by-side vs its export
+   render — docs/gates/visual-fidelity.md; divergent = fix before commit) →
    ONE stage-boundary commit citing ≥1 token that also flips the phase
    checkbox in docs/build-manifest.md, adds the 2.6/<P-id> History row
    in STAGE.md, and updates docs/ROADMAP.md.
 
    A grid/form screen with no screen-inventory row is BLOCKED (Designer must
-   classify) — never invent a floorplan. Do not bypass the verify-gate.
+   classify) — never invent a floorplan. A screen with no export citation and
+   no recorded rebuild decision is BLOCKED the same way. Do not bypass the
+   verify-gate.
 
    Project context: Today <date> · Repo <basename> · Lane <lane>.
 

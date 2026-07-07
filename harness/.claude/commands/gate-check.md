@@ -58,7 +58,7 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
    | **ERD-FROZEN** | ERD ADR (`docs/decisions/<domain>-data-model-freeze.md`) + entities/normalization/audit+tenant fields reviewed. |
    | **WALKING-SKELETON** | scaffolded app: install + build green, `docker compose up` boots, health endpoint 200, seeded admin login works (after 2.5), CI(-equivalent local run) green, secret scan clean. Prefer running the commands over reading claims. |
    | **SECURITY-SIGNOFF** | security report shows 0 Critical/High open + red-team performed. |
-   | **DoD** | review record (score ≥7) + every REQ-ID → ≥1 passing TC-NNN + security sign-off + QA evidence + user-manual. |
+   | **DoD** | review record (score ≥7, floor rules clean) + every REQ-ID → ≥1 passing TC-NNN (incl. negative-path + auth-to-data coverage per `docs/playbooks/canonical-e2e-flow-playbook.md` § Mandatory Coverage Rules) + security sign-off + QA evidence + `docs/gates/visual-fidelity.md` all key screens pass + user-manual. |
    | **ACCEPTANCE** | critical journeys pass + matches prototype + signed sign-off (`docs/uat/*` + signoff). RTM **forward** complete (every REQ-ID → passing TC-NNN). |
    | **HANDOVER** | docs/credentials/training/source-IP received + verified + secrets rotated. |
 

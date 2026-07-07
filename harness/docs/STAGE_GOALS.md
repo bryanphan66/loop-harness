@@ -444,10 +444,14 @@ compiled per `docs/playbooks/build-manifest-compilation.md`: ordered phases
 **P0..PN** where **P0 = walking skeleton** (stack-template scaffold + boot +
 seed-admin login) and each later phase block lists: id, name, REQ-IDs covered,
 entities touched, API endpoints, screens (+floorplan class from
-screen-inventory), **concrete runnable acceptance checks**, verify commands, and
+screen-inventory, + each screen's **prototype export source file** and its
+fidelity strategy `port from export` | `rebuild (decision: <slug>)` — port is
+the default per `playbooks/build-execution.md` § Prototype → Code Fidelity),
+**concrete runnable acceptance checks**, verify commands, and
 size (S/M/L). **Every in-scope REQ-ID appears in exactly one phase** (the
 manifest ends with the coverage checklist proving it); any phase estimated
-beyond one agent session (~10 files touched) is split. A thin
+beyond one agent session (~10 files touched) is split; any PUB product-shot
+capture phase depends on the APP screen phases it depicts. A thin
 `plans/<YYMMDD-HHMM>-<slug>/plan.md` records ordering rationale + risks (the
 manifest is the executable source, the plan is the why). The DoR checklist
 (`docs/gates/dor-build.md`) is filled and green. In the Lite lane
@@ -512,12 +516,20 @@ The next incomplete manifest phase is implemented: entities/migrations, API
 endpoints, and screens named in the phase block, with loading/empty/error states
 on every screen and input validation at the boundary. Before coding any
 grid/form screen its screen-inventory floorplan row is confirmed (missing row =
-blocker — escalate, never invent a floorplan). Then, in order: `validate:quick`
-green; the phase's e2e smoke (the journeys its acceptance checks name) passes
-against the running app; a verification-register row (TC-NNN) is added per
-acceptance check with `Result: pass`; the design-system floor self-check is
-clean for touched screens (§4 floorplan / §7 actions / §8 modals, Tier-2 tokens
-only, Tier-3 reuse). One stage-boundary commit closes the phase: it cites ≥1
+blocker — escalate, never invent a floorplan), and its **prototype export source
+file** (cited in the phase block) is opened — screens are **ported from the
+export** per `playbooks/build-execution.md` § Prototype → Code Fidelity, not
+rebuilt from spec, unless the phase block records `rebuild (decision: <slug>)`.
+Failed operations surface their real cause to the UI (no generic error-swallow);
+a fix touching a systemic pattern sweeps ALL its call-sites. Then, in order:
+`validate:quick` green; the phase's e2e smoke (the journeys its acceptance
+checks name) passes against the running app; a verification-register row
+(TC-NNN) is added per acceptance check with `Result: pass`; the design-system
+floor self-check is clean for touched screens (§4 floorplan / §7 actions / §8
+modals, Tier-2 tokens only, Tier-3 reuse); the **visual-fidelity self-check**
+(`docs/gates/visual-fidelity.md`) is clean — each ported screen eyeballed
+side-by-side against its export render. One stage-boundary commit closes the
+phase: it cites ≥1
 token (REQ-ID / SC-NNN / TC-NNN), flips the phase checkbox in
 `docs/build-manifest.md`, adds a `2.6/P<N>` History row in STAGE.md, and
 updates `docs/ROADMAP.md` progress — all in the same commit. STAGE.md Current
@@ -534,8 +546,15 @@ Stop after 25 turns.
 Goal:
 A 6-dimension review record exists per `playbooks/code-review-scoring.md` over
 the diff since P0 (or since the previous mid-point review): overall score ≥7
-with no dimension at 0, and the Design-System Compliance floor verified per
-screen (any unclassified or rule-violating grid/form screen = automatic block).
+with no dimension at 0, and the floor rules verified — **Design-System
+Compliance** per screen (any unclassified or rule-violating grid/form screen =
+automatic block), **Visual Fidelity** per screen (any APP/ADM screen divergent
+from its prototype export render, or lacking both an export citation and a
+recorded rebuild decision, = automatic block — `docs/gates/visual-fidelity.md`),
+and **no generic error-swallow** (any user-facing failure surfacing a generic
+message instead of its real cause = automatic block). The systemic-pattern
+sweep rule is applied: any fix of a systemic pattern is checked against all
+grep'd call-sites, siblings left broken = finding.
 Blocking findings are fixed and re-verified in this step; non-blocking findings
 are logged with a disposition. If this is the mid-point review (manifest >6
 phases, roughly half done), STAGE.md Current returns to 2.6; otherwise
@@ -552,10 +571,17 @@ Goal:
 An E2E suite written **from the BA acceptance criteria** (never reverse-derived
 from the code) covers every in-scope REQ-ID with ≥1 passing test, each recorded
 as a TC-NNN row in the verification register (2.6 phase smokes count where they
-map 1:1 to a REQ-ID — the register row is what matters). The RTM is
-forward-progressing: no in-scope REQ-ID without a TC-NNN. A field-by-field user
-manual exists for every screen (per the e2e-qa playbook), ready to hand to UAT.
-STAGE.md Current = 2.9. Stop after 25 turns.
+map 1:1 to a REQ-ID — the register row is what matters). The **Mandatory
+Coverage Rules** (`playbooks/canonical-e2e-flow-playbook.md`) hold: (1) every
+user-facing operation that can fail — AI/generation, tier/quota-gated, payment,
+provider-dependent, permission-gated — has ≥1 **negative-path** e2e that
+triggers the failure and asserts the REAL cause surfaces in the UI (asserting a
+generic error message = fail); (2) **every auth method** has an e2e that logs in
+AND loads real authenticated data (data calls 200 + rendered values — route
+reached is not proof), plus one switch-auth-method-on-same-browser
+cookie-hygiene case. The RTM is forward-progressing: no in-scope REQ-ID without
+a TC-NNN. A field-by-field user manual exists for every screen (per the e2e-qa
+playbook), ready to hand to UAT. STAGE.md Current = 2.9. Stop after 25 turns.
 
 ### Step 2.9 — Independent security review
 
@@ -576,15 +602,22 @@ Stop after 20 turns.
 
 ### Step 2.10 — QA real-browser + video (DoD)
 
-- **Inputs:** the running build + user manual + E2E results.
-- **Output path:** QA evidence under `plans/reports/` + filled `docs/gates/dod-build.md`.
+- **Inputs:** the running build + user manual + E2E results + the frozen prototype export bundle.
+- **Output path:** QA evidence under `plans/reports/` + filled `docs/gates/visual-fidelity.md` + filled `docs/gates/dod-build.md`.
 - **Gate:** **DoD** — review + E2E + security + QA evidence + user-manual + design-system-compliance green per screen; verification register all pass.
 - **Manual?** no.
 
 Goal:
 Real-browser QA covers every critical journey with recorded evidence
 (video/screenshots under `plans/reports/`), field-by-field against the user
-manual. The DoD checklist (`docs/gates/dod-build.md`) is filled: every core line
+manual. The **visual-fidelity evidence pass** is done: for each key APP/ADM
+screen, a screenshot of the running app placed side-by-side with the render of
+its prototype export, recorded as a `pass`/`divergent` row in
+`docs/gates/visual-fidelity.md` — every row `pass` (divergent = fix or a
+recorded rebuild decision, then re-check). PUB product-shot images (landing
+hero/feature captures of the product) were captured AFTER the APP screens they
+depict passed fidelity — stale early-UI captures are re-taken now. The DoD
+checklist (`docs/gates/dod-build.md`) is filled: every core line
 checked, every conditional enterprise toggle either cleared or marked N/A by
 decision with reason + date, and the verification register has no `fail` /
 `never-run` rows. Sequencing hazard: do NOT run the production build
