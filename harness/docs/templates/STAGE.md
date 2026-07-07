@@ -90,7 +90,7 @@ not applicable (never delete them silently).
 | 2.3 Implementation plan + build manifest + DoR | pending | **DoR GATE** (manifest coverage proven) | Tech Lead + PM |
 | 2.4 Walking skeleton (P0) + env + CI/CD | pending | **WALKING SKELETON** boots + CI green | DevSecOps |
 | 2.5 Seed + foundation data | pending | seeded admin login works; P0 done | DevSecOps + Dev |
-| 2.6 Code by phase (`/build-phase` loop P1..PN) | pending | per phase: validate:quick + smoke + token commit | Fullstack Dev |
+| 2.6 Code by phase (`/build-phase` loop P1..PN) | pending | per phase: validate:quick + smoke + token commit + **PHASE ACCEPTANCE** (verifier PASS; human checkpoint per cadence) | Fullstack Dev |
 | 2.7 Code review (6-dim, at manifest completion) | pending | score ≥7, no dimension = 0 | Tech Lead |
 | 2.8 E2E + user manual | pending | every REQ-ID ≥1 E2E pass + TC-NNN | QC/QA |
 | 2.9 Security review | pending | **SECURITY SIGN-OFF**: 0 Critical/High | DevSecOps |

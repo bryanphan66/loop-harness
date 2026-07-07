@@ -254,6 +254,41 @@ landing images were stale and had to be re-captured — auto-script Macro-2.)
 - Commit the capture script/recipe so shots are re-generatable after later UI
   changes.
 
+## Incremental Preview (a running app after EVERY phase)
+
+Verification cannot wait for the end of the manifest — both legs of the
+per-phase acceptance gate (`docs/gates/phase-acceptance.md`) inspect the
+**running app**, phase by phase:
+
+- **Local (default):** the compose/dev-server stack that booted at P0 (walking
+  skeleton) stays bootable at every phase close. The build-manifest header
+  records the ONE-line **Preview command** + URL (e.g. `docker compose up` →
+  `http://localhost:3000`); the implementing agent leaves it runnable when it
+  returns, and a phase that leaves the app un-bootable FAILs acceptance
+  regardless of its diff.
+- **Staging (optional):** when a shared/staging target exists (chosen at
+  2.2/2.4), deploy each phase commit there and hand that URL to the verifier +
+  operator — same mechanic, remote surface. Go-live readiness (2.11) then
+  confirms the production variant; it is not the first time the app runs.
+
+This is the delivery surface for the **human checkpoint**: the operator reviews
+each module on the real app as it lands (cadence knob in the manifest header),
+instead of meeting the whole product for the first time at UAT.
+
+## Per-Phase Acceptance Verification (after commit, before the next phase)
+
+The phase pipeline does not end at the stage-boundary commit. Per
+`docs/gates/phase-acceptance.md`: an **independent agent verifier** (spawned by
+the `/build-phase` orchestrator — never the implementer) re-runs the phase's
+acceptance checks against the running preview (functional + visual-fidelity per
+shipped screen + negative-path); FAIL → fix inside the same phase and
+re-verify (cap 3 rounds); PASS → `Accepted` cell + TC-NNN row; then the human
+checkpoint when the phase's `Verify-by` is `both`. The implementer's
+self-checks above exist to make the verifier pass first try — they never
+substitute for it. (Failure evidence: verifying only at 2.7/2.8/2.10 let
+per-phase defects accumulate to the end and forced multiple UAT-fix rounds —
+auto-script Macro-2; per-phase catch is the cheap point on the token curve.)
+
 ## Implementation Guardrails (reference)
 
 The story's Implementation Guardrails section is the authority; restated for the
@@ -297,6 +332,9 @@ agent reading this at the start of 2.6:
   consults; never invent a floorplan.
 - `docs/gates/visual-fidelity.md` — the per-screen screenshot-vs-export check
   every ported screen must pass (2.6 self-check, 2.7 floor rule, 2.10 DoD).
+- `docs/gates/phase-acceptance.md` — the per-phase acceptance-verification gate
+  (independent verifier + cadence-driven human checkpoint) this playbook's
+  Incremental Preview serves.
 - `design-system-3-tier.md` — the cross-stage 3-tier enforcement chain.
 - `seed-data-pattern.md` — step 2.5 precedes; provides demo data.
 - `payment-integration.md` — applies when money is in scope at 2.6.

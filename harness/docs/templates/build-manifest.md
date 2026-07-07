@@ -25,14 +25,21 @@ Shape-only scaffold. Replace <placeholders>.
 - **Sources (frozen):** ERD `docs/system-architecture.md` (<commit>) · SRS <path> · screen inventory `docs/visuals/diagrams/screen-inventory.md` · API contract <path>
 - **Stack:** <ADR slug, e.g. `<project>-stack-selection`> (default: walking-skeleton stack template)
 - **Phase count:** <N+1> · **Sizes:** S ≤3 files · M ≤6 · L ≤10 (harder than L → SPLIT)
+- **Human checkpoint cadence:** `per-ui-phase` *(knob — `per-phase` | `per-ui-phase` (default) | `per-milestone` | `end-only`; sets each phase's Verify-by below — `docs/gates/phase-acceptance.md`)*
+- **Preview command:** `<one line, e.g. docker compose up → http://localhost:3000>` *(the running app both acceptance-verification legs check against — incremental preview, `build-execution.md` § Incremental Preview)*
 
 ## Progress
 
-| Phase | Name | Size | Status | Closed by (commit) |
-|---|---|---|---|---|
-| P0 | Walking skeleton | M | [ ] | |
-| P1 | <name> | S | [ ] | |
-| P2 | <name> | M | [ ] | |
+> A phase is done only when its **Accepted** cell is filled per
+> `docs/gates/phase-acceptance.md`: `agent-pass <date>` always; plus
+> `human-ok <date>` when Verify-by = `both`. `/build-phase` refuses to start
+> the next phase while the previous one's Accepted cell is incomplete.
+
+| Phase | Name | Size | Verify-by | Status | Accepted (agent / human) | Closed by (commit) |
+|---|---|---|---|---|---|---|
+| P0 | Walking skeleton | M | agent | [ ] | | |
+| P1 | <name> | S | both | [ ] | | |
+| P2 | <name> | M | agent | [ ] | | |
 
 ## Phase blocks
 
@@ -61,12 +68,19 @@ Shape-only scaffold. Replace <placeholders>.
   `docs/playbooks/build-execution.md` § Prototype → Code Fidelity; `rebuild`
   requires the named `docs/decisions/<slug>.md` to exist)*
 - **Depends on:** <P-ids or "P0 only">
-- **Acceptance checks (concrete + runnable):**
-  1. <e.g. admin creates X via UI → appears in list with status DRAFT>
-  2. <e.g. member without role R gets 403 on POST /x>
-  3. <error/empty state check — the real failure cause surfaces, no generic message>
-  4. visual-fidelity self-check: each ported screen side-by-side vs its export
-     render — no structural/visual divergence (`docs/gates/visual-fidelity.md`)
+- **Verify-by:** `agent` | `both` *(compiled from the header cadence — `both` =
+  agent verifier + human checkpoint; the agent leg is never skipped —
+  `docs/gates/phase-acceptance.md`)*
+- **Acceptance checks (MANDATORY — concrete + runnable; the independent
+  verifier exercises these against the running preview, so a check that cannot
+  be run is a 2.3 compile defect). Every phase MUST cover all three
+  categories:**
+  1. **functional** — <e.g. admin creates X via UI → appears in list with status DRAFT>
+  2. **functional** — <e.g. member without role R gets 403 on POST /x>
+  3. **negative-path** — <error/empty state check — trigger the failure for real; the REAL cause surfaces, no generic message>
+  4. **visual-fidelity** — each screen this phase ships, side-by-side vs its
+     export render — no structural/visual divergence (`docs/gates/visual-fidelity.md`)
+     *(phases with no screens record `n/a — no screens` here)*
 - **Verify commands:** `<validate:quick>` · `<targeted test/e2e command>`
 - **Est. size:** S | M | L
 - **Notes:** <sharp edges, SC-NNN scenarios to honor, out-of-scope reminders>
@@ -95,5 +109,7 @@ re-generatable. (build-execution.md § PUB product-shot capture is a LATE phase)
 - [ ] P0 defined; every phase ≤ L (one agent session, ≤~10 files)
 - [ ] Every phase's screens have a screen-inventory floorplan row
 - [ ] Every phase's screens cite a **prototype export source** + fidelity strategy (`port from export` default; `rebuild` only with an existing `docs/decisions/<slug>.md`)
+- [ ] Every phase has **runnable acceptance checks covering all three categories** (functional + negative-path + visual-fidelity or `n/a — no screens`) and a **Verify-by** value compiled from the header cadence (`docs/gates/phase-acceptance.md`)
+- [ ] Human checkpoint cadence + preview command declared in the header
 - [ ] Any PUB product-shot capture phase **depends on every APP screen phase it depicts** (late-phase rule)
 - [ ] Change requests (CR-NN) enter as NEW phases appended here — never stretch a done phase

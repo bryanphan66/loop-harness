@@ -54,17 +54,29 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
    fidelity strategy** (`port from export` default; `rebuild (decision: <slug>)`
    only with a recorded decision — `build-execution.md` § Prototype → Code
    Fidelity), **concrete runnable acceptance
-   checks** (the phase's e2e smoke script in prose — a check names an actor, an
-   action, and an observable outcome — including the error/empty check and the
-   visual-fidelity self-check), verify commands, dependencies, size.
+   checks covering all three MANDATORY categories** — functional,
+   negative-path (trigger the failure for real; the real cause must surface),
+   and visual-fidelity per shipped screen (`n/a — no screens` where true) — a
+   check names an actor, an action, and an observable outcome; an independent
+   verifier will execute these against the running preview
+   (`docs/gates/phase-acceptance.md`), so an unrunnable check is a compile
+   defect. Plus verify commands, dependencies, size, and the **`Verify-by`**
+   field (`agent` | `both`) compiled from the manifest-header cadence knob.
    The block must be executable WITHOUT reading the rest of the manifest.
    **Late-phase rule:** a PUB product-shot capture phase depends on every APP
    screen phase it depicts.
-6. **Prove coverage.** Fill the coverage checklist: every in-scope REQ-ID in
+6. **Set the acceptance knobs (header).** Declare the **Human checkpoint
+   cadence** (`per-phase` | `per-ui-phase` default | `per-milestone` |
+   `end-only`) and the one-line **Preview command** — then derive each phase's
+   `Verify-by` from the cadence. The operator may retune the cadence mid-build;
+   re-derive the remaining phases' `Verify-by` when they do.
+7. **Prove coverage.** Fill the coverage checklist: every in-scope REQ-ID in
    exactly one phase. A REQ-ID in zero phases = scope silently dropped; in two
    = double-build drift. Both block DoR.
-7. **Gate.** DoR (`docs/gates/dor-build.md`) now includes: manifest complete,
-   coverage proven, P0 defined, every phase ≤ one session.
+8. **Gate.** DoR (`docs/gates/dor-build.md`) now includes: manifest complete,
+   coverage proven, P0 defined, every phase ≤ one session, every phase's
+   acceptance checks covering the three categories + `Verify-by` set + the
+   cadence/preview header declared.
 
 ## Anti-patterns
 
@@ -97,4 +109,6 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
 - `.claude/commands/build-phase.md` — the loop that executes the manifest.
 - `build-execution.md` — per-phase discipline (commits, hooks, fidelity).
 - `docs/gates/dor-build.md` — the gate the manifest must satisfy.
+- `docs/gates/phase-acceptance.md` — the per-phase gate the acceptance checks
+  + `Verify-by` + cadence knob feed.
 - `docs/TRACE_SPEC.md` — REQ-ID grammar; the coverage rule is a trace rule.
