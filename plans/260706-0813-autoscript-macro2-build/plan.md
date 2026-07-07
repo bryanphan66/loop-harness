@@ -32,7 +32,8 @@ UAT/staging review = **Dokploy on VPS 160.250.134.226**, domain `autoscript.160.
 |---|---|---|---|---|
 | 1 | 1f8bcf7a (Fable 5) | Build 2.1 | 2.6 mid-P7 (paused 13:32) | harness v2 upgrade `5724415` → 2.1 ERD `15cd1b4` → 2.2 TDR `20aa100` → 2.3 manifest **P0..P22, 240 REQ-IDs** DoR GREEN `4bcc592` → 2.4 skeleton `63ebbbc` → 2.5 seed `e8bd499` → P1 `c1baefb` P2 `5555432` P3 `418a5f5` P4 `852f259` P5 `28f969c` P6 `2f5a8d9`; P7 uncommitted at pause |
 | 2a | 1e577ebf (Opus 4.8) | 2.6 P7 reconcile | stopped 21:33 after ~6 min | operator reversed: **full Fable 5 for all legs** (21:33) — no commits made by 2a |
-| 2b | 123ab211 (**Fable 5** — standing model for ALL legs per operator 21:33) | 2.6 P7 reconcile | (running) | resume per runbook: reconcile P7 → P8..P22 |
+| 2b | 123ab211 (Fable 5) | 2.6 P7 reconcile | 2.9 DONE, halted pre-2.10 | 11h run: P7..P22 ALL done (manifest exhausted `b83e924`) + 2.7 review 9.5/10 `e950527` + 2.8 RTM 240/240 `5122d2f` + 2.9 security PASS 0 Crit/High `27346e4`. Halted deliberately: parallel orchestrator (root-Workspace session 97bc20ff) dispatched a duplicate 2.9 stage-runner onto the worktree — race detected + reconciled by both agents, tree clean. Handoff `macro2-leg-02-handoff.md` |
+| 3 | 2f942a4e (Fable 5) | 2.10 QA/DoD | (running) | sole owner confirmed (operator approved stopping 97bc20ff, 08:56). Scope: 2.10 → 2.11 + Dokploy staging prep → STOP at 2.12 MANUAL_CHECKPOINT for operator UAT |
 
 **Scale confirmed at DoR:** 23 phases (P0 done + P1..P22 feature phases). Design-drift check 2026-07-06: live Claude Design board `674d5340…` = frozen v3 bundle, file-for-file — no post-freeze changes; 100+ artboards = state variants of the 30 logical screens.
 
