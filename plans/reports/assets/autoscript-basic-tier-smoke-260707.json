@@ -1,0 +1,30 @@
+{
+  "captured": "2026-07-07T22 (Asia/Saigon)",
+  "app": "auto-script LIVE (Dokploy compose EBvEqNSqJES3xRjhyQB_S, commit 79483a7)",
+  "tier": "basic (WORKSPACE_TIER_DEFAULT, no subscription, email has no 'premium' override)",
+  "providers": "all *_MODE=live -> https://omniroute.reno.ai.vn/v1 (real API tokens)",
+  "email": "smoke.tierfix.basic+1783437464809@example.com",
+  "modelsVisibleToBasic": ["deepseek-chat", "gpt-4o-mini"],
+  "brand_blueprint": {
+    "note": "THE reported regression — brand_gen defaulted to pro-only claude-sonnet-4-6 and failed on basic",
+    "httpStatus": 202,
+    "jobStatus": "completed",
+    "errorMessage": null,
+    "brandId": "80b29c6c-9443-4a5d-96ef-5605a59e4c74",
+    "modelUsed": "deepseek-chat",
+    "providerStatus": 200,
+    "niche": "Chuyên gia đơn giản hóa công nghệ và lập trình cho người mới bắt đầu tại Việt Nam.",
+    "rawMarkdownLen": 2818,
+    "rawMarkdownHead": "### BRAND POSITIONING\nChuyên gia đơn giản hóa công nghệ và lập trình cho người mới bắt đầu tại Việt Nam.\n\n### IDEAL CUSTOMER AVATAR\nTuổi: 18-30. Nỗi đau: Cảm thấy lập trình và AI quá phức tạp..."
+  },
+  "idea_gen": {
+    "httpStatus": 202,
+    "jobStatus": "completed",
+    "errorMessage": null,
+    "ideaId": "29d98533-2c61-4ac9-9c34-da65cf65fc39",
+    "modelUsed": "gpt-4o-mini",
+    "providerStatus": 200,
+    "contentLen": 3085,
+    "contentHead": "### Ngách\nNgách chính: Lập trình AI cho người mới\nMicro-niche: Học lập trình AI qua các khóa học trực tuyến và lộ trình tự học."
+  }
+}
