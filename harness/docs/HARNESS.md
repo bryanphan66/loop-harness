@@ -153,7 +153,9 @@ The harness grows from friction. When an agent is confused, repeats manual
 reasoning, finds a missing rule, or hits a recurring failure, it must improve the
 harness directly or record the friction. The capture mechanism is the **Friction**
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
-work graduates into a plan or a decision.
+work graduates into a plan or a decision. Harness-version changes are logged in
+`docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
+it closes).
 
 ## Traceability Tokens
 
