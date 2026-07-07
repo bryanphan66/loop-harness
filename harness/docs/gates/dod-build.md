@@ -20,7 +20,8 @@ half; this checklist is the judgment half.
 - [ ] **Build manifest exhausted** — every phase in `docs/build-manifest.md` checked done, each closed by a token-citing stage-boundary commit.
 - [ ] **Code review** (6-dim) passed — score ≥7, no dimension = 0 (step 2.7; mid-point review done if manifest >6 phases).
 - [ ] **Design-System Compliance** — every grid/form screen classified to one §4 floorplan (`docs/visuals/diagrams/screen-inventory.md`) + `docs/gates/design-system-compliance.md` green per screen; no hardcoded tokens; components reused.
-- [ ] **E2E from BA docs** — every REQ-ID has ≥1 passing E2E test with a **TC-NNN** row (step 2.8).
+- [ ] **Visual Fidelity** — `docs/gates/visual-fidelity.md` filled per key APP/ADM screen: running-app screenshot vs prototype-export render side-by-side, every screen `pass` (divergent screens fixed or covered by a recorded rebuild decision); PUB product-shots captured AFTER the APP screens they depict were fidelity-checked.
+- [ ] **E2E from BA docs** — every REQ-ID has ≥1 passing E2E test with a **TC-NNN** row (step 2.8), **including the negative-path + auth-to-data-load coverage rules** (`docs/playbooks/canonical-e2e-flow-playbook.md` § Mandatory Coverage Rules).
 - [ ] **RTM forward-complete** (`docs/TRACE_SPEC.md`): every REQ-ID → ≥1 TC-NNN with `Result: pass` in the verification register.
 - [ ] **Security sign-off** — STRIDE+OWASP, **red-team required**; 0 Critical/High open (step 2.9).
 - [ ] **QA evidence** — real-browser QA with video; human approval recorded (step 2.10). *Lite/internal:* [ ] cleared · [ ] N/A by decision — `<reason> (<date>)` (scripted real-browser evidence — Playwright traces/screenshots + register rows — substitutes for video + human approval).
@@ -51,6 +52,7 @@ DoD — build done, ready for client ACCEPTANCE
 Confirmed by (Tech Lead reviewer): <name>   on  YYYY-MM-DD
 Confirmed by (QC/QA):              <name>   on  YYYY-MM-DD
 Design-System Compliance:          docs/gates/design-system-compliance.md   all grid/form screens classified + green: YES
+Visual Fidelity:                   docs/gates/visual-fidelity.md   all key screens pass vs prototype export: YES
 Security sign-off:                 <report path>   0 Critical/High: YES
 Verification register:             docs/TEST_MATRIX.md  (all pass / reasons recorded)
 Conditional toggles:               all rows above checked or N/A-by-decision

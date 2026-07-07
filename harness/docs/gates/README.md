@@ -18,6 +18,7 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 | `dor-build.md` | Definition of Ready (enter Build) — incl. build-manifest coverage | Build | internal | no |
 | *(no file — mechanical)* | WALKING SKELETON (2.4/2.5) — scaffold boots, health OK, seeded admin login, CI green; asserted by `/gate-check --gate WALKING-SKELETON` | Build | internal | no |
 | `design-system-compliance.md` | Design-System Compliance (per-screen 3-tier) | Build | internal | no |
+| `visual-fidelity.md` | Visual Fidelity (per-screen, app vs prototype export) | Build | internal | no |
 | `dod-build.md` | Definition of Done (exit Build) | Build | internal | no |
 
 > **`design-system-compliance.md`** is a per-screen checklist (one fill per
@@ -28,6 +29,16 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 > **re-verified at 2.7** (code review floor rule) and **2.10** (DoD), and walked
 > by `/gate-check` alongside the step gate. It is internal — it does **not** page
 > the client.
+
+> **`visual-fidelity.md`** is a per-screen checklist proving the running app
+> **looks like the frozen prototype**: for each key APP/ADM screen, a
+> running-app screenshot compared side-by-side with the screen's prototype
+> export render; structural/visual divergence without a recorded rebuild
+> decision = auto-block. **Self-checked per phase at 2.6**, enforced as a
+> code-review **floor rule at 2.7**, and filled with evidence at **2.10** (DoD).
+> Complements `design-system-compliance.md` — compliance checks classification
+> and rules; fidelity checks the screen actually matches the design the client
+> froze. Internal — does **not** page the client.
 
 > **Client-paging gates** (emit `MANUAL_CHECKPOINT`, page the human's phone):
 > PB-G2, PB-G3, PB-G4, plus the Build **ACCEPTANCE** gate (inside the UAT step)
