@@ -502,9 +502,9 @@ Current = 2.6. Stop after 12 turns.
 ### Step 2.6 — Code feature by phase (`/build-phase` loop)
 
 - **Inputs:** `docs/build-manifest.md` (next incomplete phase block) + frozen ERD + the SRS module file(s) the phase names + the screen-inventory rows for its screens + design tokens.
-- **Output path:** code + tests + verification-register rows (`docs/TEST_MATRIX.md`) + manifest progress.
-- **Gate:** per phase — compiles/runs, `validate:quick` green, phase e2e smoke passes, design-system floor self-check clean, commit cites ≥1 token, manifest checkbox flipped.
-- **Manual?** no.
+- **Output path:** code + tests + verification-register rows (`docs/TEST_MATRIX.md`) + manifest progress (incl. the `Accepted` cell).
+- **Gate:** per phase — compiles/runs, `validate:quick` green, phase e2e smoke passes, design-system floor self-check clean, commit cites ≥1 token, manifest checkbox flipped, **+ PHASE ACCEPTANCE** (`docs/gates/phase-acceptance.md`): independent agent verifier PASS on the phase's Acceptance checks against the running preview; human checkpoint per the manifest cadence when `Verify-by: both`.
+- **Manual?** **cadence-driven** — phases with `Verify-by: both` emit a MANUAL_CHECKPOINT (internal, pages the operator — not the client).
 
 **Execution model:** this step is a **loop driven by `/build-phase`** — one
 invocation implements exactly ONE manifest phase in an isolated context. Do not
@@ -532,8 +532,17 @@ side-by-side against its export render. One stage-boundary commit closes the
 phase: it cites ≥1
 token (REQ-ID / SC-NNN / TC-NNN), flips the phase checkbox in
 `docs/build-manifest.md`, adds a `2.6/P<N>` History row in STAGE.md, and
-updates `docs/ROADMAP.md` progress — all in the same commit. STAGE.md Current
-stays 2.6 while phases remain; when the last phase closes, Current = 2.7.
+updates `docs/ROADMAP.md` progress — all in the same commit. **Then the phase
+must be ACCEPTED before the next phase starts**
+(`docs/gates/phase-acceptance.md`): an INDEPENDENT agent verifier (never the
+implementer) re-runs the phase's Acceptance checks against the running preview
+(functional + visual-fidelity per shipped screen + negative-path) and returns
+PASS/FAIL; FAIL is fixed inside the same phase and re-verified (cap 3 rounds,
+then BLOCKED). PASS fills the manifest's `Accepted` cell + a TC-NNN acceptance
+row. When the phase's `Verify-by` is `both` (manifest cadence knob, default
+`per-ui-phase`), emit the gate's MANUAL_CHECKPOINT with the preview URL and
+wait for the operator's OK before the next phase. STAGE.md Current stays 2.6
+while phases remain; when the last phase closes AND is accepted, Current = 2.7.
 Stop after 25 turns.
 
 ### Step 2.7 — Code review (6-dim) — at manifest completion (+ mid-point if >6 phases)

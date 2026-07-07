@@ -178,7 +178,10 @@ How to invoke:
   `STAGE.md`).
 - **Build step 2.6:** `/build-phase` — one invocation = ONE build-manifest
   phase; repeat until the manifest is exhausted, then `/stage-next` continues
-  at 2.7. Never run "all of 2.6" in one invocation.
+  at 2.7. Never run "all of 2.6" in one invocation. Each phase ends with the
+  **acceptance verification** (`docs/gates/phase-acceptance.md`): independent
+  verifier PASS + cadence-driven operator checkpoint — the next phase does not
+  start before it.
 - Direct: `Task({ subagent_type: "stage-runner", prompt: "Run step <ID> per
   goal: …" })`.
 - **Agent-registry caveat:** `stage-runner` resolves only in sessions started

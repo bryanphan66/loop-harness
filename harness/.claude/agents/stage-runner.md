@@ -135,6 +135,15 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
   its screen-inventory floorplan row exists — a missing row is a `BLOCKED`
   (Designer must classify), never an invented floorplan. Your Status block MUST
   name the phase id and each verify result.
+  **Acceptance verification is NOT yours** (`docs/gates/phase-acceptance.md`):
+  after your commit, the ORCHESTRATOR spawns an independent verifier that
+  re-checks the phase's Acceptance checks against the running app, and pages
+  the operator when the phase's `Verify-by` is `both`. Never fill the
+  manifest's `Accepted` cell yourself, and leave the preview (the manifest
+  header's Preview command) bootable when you return. Your self-checks reduce
+  verifier FAIL rounds; they do not replace the verifier. If you are instead
+  invoked AS the verifier for a phase, follow the gate file's verdict block
+  exactly and touch no implementation code.
 - **2.7–2.11:** evidence steps — produce the record the goal names
   (review record, E2E + TC rows, security report, QA evidence + DoD checklist,
   readiness checklist). Run the commands; never assert without evidence.

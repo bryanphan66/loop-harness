@@ -26,6 +26,11 @@ Do NOT implement the phase in the main session — orchestrate only.
      (P0 first — though P0 is normally closed by steps 2.4/2.5).
    - `--phase <id>` argument overrides (e.g. `--phase P3`), but refuse to run a
      phase whose listed dependencies (earlier phases it names) are not done.
+   - **Acceptance precondition (`docs/gates/phase-acceptance.md`):** refuse to
+     start a phase while the PREVIOUS done phase's `Accepted` cell in the
+     manifest Progress table is incomplete — missing `agent-pass`, verdict
+     FAIL, or (`Verify-by: both`) missing `human-ok`. Fix / verify / get the
+     operator's OK first; never build on an unverified phase.
 
 3. **Assemble the MINIMAL context packet** for the subagent — ONLY:
    - The phase's own block from `docs/build-manifest.md` (verbatim).
@@ -96,20 +101,51 @@ Do NOT implement the phase in the main session — orchestrate only.
    verify-gate.
 
    Project context: Today <date> · Repo <basename> · Lane <lane>.
+   Preview command/URL: <from the manifest header — leave the app runnable>.
 
    Return the final Status block (with phase id + verify results) as your last
-   message.
+   message. Implementation self-checks are NOT acceptance — an independent
+   verifier runs after you; leave the preview bootable for it.
    ```
 
-5. **Report back** — quote ONLY the returned Status block, then one line:
-   - `DONE` + phases remain → "Phase <id> done, <k> remaining — run
-     `/build-phase` again."
+5. **ACCEPTANCE VERIFICATION** (`docs/gates/phase-acceptance.md`) — runs after
+   the stage-runner returns `DONE`, BEFORE the phase counts as done:
+
+   a. **Agent verifier — ALWAYS, every phase.** Spawn a SECOND, independent
+      subagent (fresh context — `general-purpose` or `tester`; never the
+      implementer) with ONLY: the phase block verbatim (its Acceptance checks
+      are the contract), the preview command/URL from the manifest header, the
+      phase's screen-inventory rows + export source paths, and
+      `docs/gates/phase-acceptance.md`. It verifies against the RUNNING app:
+      every functional AC as written, visual fidelity per shipped screen
+      (side-by-side vs export render), and the negative-path check (real cause
+      surfaces, no generic message). It returns the gate's verdict block
+      (PASS/FAIL + per-check results + evidence paths + reasons).
+   b. **FAIL → fix in the SAME phase.** Dispatch a fix leg (same phase scope,
+      the verifier's Reasons as input), re-run the verifier. Cap 3 rounds; then
+      `BLOCKED` — page the human. Never start the next phase on a FAIL.
+   c. **PASS → record it:** fill the phase's `Accepted` cell
+      (`agent-pass <date>`) in the manifest Progress table + a TC-NNN
+      acceptance row in `docs/TEST_MATRIX.md`, committed as one small
+      `test(<scope>):` commit citing the TC token.
+   d. **Human checkpoint — when the phase's `Verify-by` is `both`** (compiled
+      from the manifest-header cadence knob; default `per-ui-phase`): emit the
+      gate's `MANUAL_CHECKPOINT` block with the preview URL so the operator
+      reviews THIS module on the running app. The next phase waits for the
+      operator's OK (`human-ok <date>` in the Accepted cell); reported defects
+      are fixed in this phase and re-verified from (a).
+
+6. **Report back** — quote ONLY the returned Status block + the acceptance
+   verdict line, then one line:
+   - `DONE` + accepted + phases remain → "Phase <id> done + accepted, <k>
+     remaining — run `/build-phase` again." (If waiting on a human checkpoint,
+     say so — next phase starts only after the OK.)
    - `DONE` + manifest exhausted → "Manifest complete — run `/stage-next` for
      the 2.7 review." (If the manifest has >6 phases and roughly half are done,
      recommend the mid-point 2.7 review now — WORKFLOW § Gate rebalance.)
    - `BLOCKED` → relay the blocker + the unblock owner (e.g. unclassified
-     screen → Designer/1.11). Never blind-retry the same phase; fix the input
-     first.
+     screen → Designer/1.11; 3× verify FAIL → human). Never blind-retry the
+     same phase; fix the input first.
    - `DONE_WITH_CONCERNS` → surface the concerns; decide address-now vs log,
      per the concern's correctness impact.
 
@@ -124,6 +160,9 @@ Do NOT implement the phase in the main session — orchestrate only.
 - One invocation = one phase. Looping is the human's (or the calling
   session's) choice per invocation — this command never auto-runs the next
   phase.
+- A phase is done only when its acceptance verdict is recorded — implement +
+  self-check + commit without the independent verifier PASS is NOT done
+  (`docs/gates/phase-acceptance.md`). The verifier is never the implementer.
 - Never widen scope mid-phase: a discovered missing requirement goes to the
   manifest as a NEW phase (or a CR-NN if scope changed), not into this phase.
 - Respect the verify-gate: a red gate on the phase commit means the phase is

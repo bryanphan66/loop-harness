@@ -76,7 +76,7 @@ MACRO 1 — PRE-BUILD  (Full lane: no build code until PB-G4; Lite: until PB-G3-
 MACRO 2 — BUILD & GO-LIVE
   2.1 ERD freeze (SA) → 2.2 stack/threat-model (Tech Lead)
   → 2.3 plan + BUILD MANIFEST + DoR → 2.4 walking skeleton + env/CI (P0)
-  → 2.5 seed → 2.6 /build-phase loop P1..PN (per-phase verify)
+  → 2.5 seed → 2.6 /build-phase loop P1..PN (per-phase ACCEPTANCE verify)
   → 2.7 review (manifest-complete) → 2.8 E2E → 2.9 security sign-off
   → 2.10 QA (DoD) → 2.11 go-live readiness
   → 2.12 UAT + sign-off (ACCEPTANCE, CLIENT) → 2.13 release
@@ -154,7 +154,7 @@ release note → production release. *(payment milestones attach here in Full)*
 | 2.3 | Implementation plan + **BUILD MANIFEST** + DoR | Tech Lead + PM | `ck-plan` + build-manifest-compilation playbook | TDR + scope baseline + ERD + screen inventory | `plans/<YYMMDD-HHMM>-<slug>/` + **`docs/build-manifest.md`** | **DoR GATE** (`docs/gates/dor-build.md`): baselined + ERD frozen + design approved + acceptance criteria + NFR **+ build-manifest complete: every in-scope REQ-ID in exactly one phase, P0 defined** | no |
 | 2.4 | **Walking skeleton** (manifest **P0**) + env + CI/CD + observability | DevSecOps | stack template `scaffold.sh` + `devops` + `deploy` | stack decision + manifest P0 | scaffolded monorepo + pipeline + compose | **WALKING SKELETON**: `install && build` green, `docker compose up` boots, health OK, CI(-equivalent local) green, secret scan clean; alerting/SLO live or N/A-by-decision | no |
 | 2.5 | Seed + foundation data | DevSecOps + Dev | `ck-seed` + seed-data-pattern | ERD + RBAC | seed scripts (extends the template's admin seed to the domain) | app boots with RBAC + **seeded admin login works**; FK-valid; P0 marked done in manifest | no |
-| 2.6 | **Code feature by phase — `/build-phase` loop P1..PN** | Fullstack Dev | `/build-phase` → `fullstack-developer` (·`cook`) | build-manifest + ERD + SRS module file(s) + screen-inventory rows + **prototype export files** + tokens | code commits + verification-register rows + manifest progress | per phase: compiles/runs, `validate:quick` green, e2e smoke for the phase's journeys, **floor self-check** (design-system floor rules + **visual-fidelity self-check** — screens ported from the export per `build-execution.md` § Prototype → Code Fidelity), commit cites ≥1 token, phase marked done in manifest | no |
+| 2.6 | **Code feature by phase — `/build-phase` loop P1..PN** | Fullstack Dev | `/build-phase` → `fullstack-developer` (·`cook`) + independent verifier subagent | build-manifest + ERD + SRS module file(s) + screen-inventory rows + **prototype export files** + tokens | code commits + verification-register rows + manifest progress (incl. `Accepted` cell) | per phase: compiles/runs, `validate:quick` green, e2e smoke for the phase's journeys, **floor self-check** (design-system floor rules + **visual-fidelity self-check** — screens ported from the export per `build-execution.md` § Prototype → Code Fidelity), commit cites ≥1 token, phase marked done in manifest, **+ PHASE ACCEPTANCE** (`docs/gates/phase-acceptance.md`): independent agent-verifier PASS on the phase's AC vs the running preview; human checkpoint per the manifest cadence | **cadence** — `Verify-by: both` phases page the operator (internal, not the client) |
 | 2.7 | Code review (6-dim) — **once at manifest completion** (+ mid-point if >6 phases) | Tech Lead (reviewer) | `ck-code-review` | full diff since P0 | review record | score ≥7, no dimension = 0; **+ FLOOR rules: Design-System Compliance · Visual Fidelity · no generic error-swallow** (note below) + systemic-pattern sweep | no |
 | 2.8 | E2E from BA docs + user manual | QC/QA | `ck-e2e-flow` (+ `ck-scenario`) | acceptance criteria | E2E tests + **TC-NNN** rows | every REQ-ID ≥1 E2E pass + TC row (phase smokes from 2.6 count when they map to a REQ-ID); **+ Mandatory Coverage Rules** (canonical-e2e playbook): negative-path e2e for every failable op asserting the REAL cause surfaces; every auth method login→data-load (200) + cookie-hygiene switch case | no |
 | 2.9 | Independent security review — **once, after manifest complete** | DevSecOps (sec hat) | `ck-security` (STRIDE+OWASP, **red-team required**) | code + threat-model | security report | **SECURITY SIGN-OFF**: 0 Critical/High open | no |
@@ -175,12 +175,23 @@ release note → production release. *(payment milestones attach here in Full)*
 > phase block + the files that block names — never the whole spine.
 
 > **Gate rebalance (per-phase vs once).** During 2.6, every phase runs the
-> **light floor self-check**: `validate:quick` + the design-system floor rules
+> **light floor self-check** (`validate:quick` + the design-system floor rules
 > (§4 floorplan / §7 actions / §8 modals for touched screens) + the phase's e2e
-> smoke. The **heavy** gates — 2.7 six-dimension review, 2.9 security review,
-> 2.10 full QA — run **once when the manifest is complete**, plus one mid-point
-> 2.7 review if the manifest has more than 6 phases. Do not page a full review
-> per phase; do not skip the floor self-check on any phase.
+> smoke) **and then the PHASE ACCEPTANCE verification**
+> (`docs/gates/phase-acceptance.md`): an independent agent verifier re-runs the
+> phase's acceptance checks against the running **incremental preview**
+> (functional + visual-fidelity + negative-path), FAIL is fixed in the same
+> phase before the next phase starts, and a human checkpoint fires per the
+> manifest's cadence knob (default `per-ui-phase`). The **heavy** gates — 2.7
+> six-dimension review, 2.9 security review, 2.10 full QA — still run **once
+> when the manifest is complete** (plus one mid-point 2.7 review if the
+> manifest has more than 6 phases), but as **aggregation and cross-phase
+> confirmation** — per-phase acceptance means they are no longer the first
+> place a phase's defect can be caught. Catching a defect in its own phase
+> costs one fix cycle; catching it at the end costs cross-phase rework — the
+> single biggest token sink observed in the field. Do not page a full review
+> per phase; do not skip the floor self-check or the acceptance verification on
+> any phase.
 
 > **Conditional enterprise gates (each marked N/A by decision if not needed —
 > never silently dropped):** 2.1b data-migration/cutover · 2.11 NFR/load (k6 p95
@@ -242,6 +253,7 @@ Change-control runs continuously, re-entering the pipeline at 2.3 / 2.6.
 | **DoD** | Build | internal | review + E2E (incl. negative-path + auth-to-data coverage) + security + QA evidence + user-manual + design-system-compliance + visual-fidelity green per screen |
 | **Design-System Compliance** | Build | internal (floor-rule auto-block) | every grid/form screen classified to one §4 floorplan (or CUSTOM) + obeys §4/§7/§8 rules — per-phase self-check (2.6) + 2.7 floor rule + a DoD line |
 | **Visual Fidelity** | Build | internal (floor-rule auto-block) | every key APP/ADM screen matches its prototype export render (screenshot side-by-side), or carries a recorded rebuild decision — per-phase self-check (2.6) + 2.7 floor rule + 2.10 evidence pass + a DoD line (`docs/gates/visual-fidelity.md`) |
+| **Phase Acceptance** | Build | internal (per-phase auto-block) | per 2.6 phase: independent agent-verifier PASS on the phase's acceptance checks (functional + visual-fidelity + negative-path) against the running preview, recorded in the manifest `Accepted` cell + a TC-NNN row; human checkpoint OK when the phase's `Verify-by` is `both` — the next phase MUST NOT start before both (`docs/gates/phase-acceptance.md`) |
 | **ACCEPTANCE** | Build | **CLIENT** (Lite: owner ack) | critical journeys pass + matches prototype + sign-off signed |
 | **HANDOVER** | Post-Build | **CLIENT** (Lite: owner ack) | docs/credentials/training/source-IP received + verified + secrets rotated |
 
