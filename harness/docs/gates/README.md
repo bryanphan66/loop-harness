@@ -19,6 +19,7 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 | *(no file — mechanical)* | WALKING SKELETON (2.4/2.5) — scaffold boots, health OK, seeded admin login, CI green; asserted by `/gate-check --gate WALKING-SKELETON` | Build | internal | no |
 | `design-system-compliance.md` | Design-System Compliance (per-screen 3-tier) | Build | internal | no |
 | `visual-fidelity.md` | Visual Fidelity (per-screen, app vs prototype export) | Build | internal | no |
+| `phase-acceptance.md` | Phase Acceptance (per-phase AC verify — agent verifier + cadence human checkpoint) | Build | internal | no (pages the **operator** on `Verify-by: both` phases — never the client) |
 | `dod-build.md` | Definition of Done (exit Build) | Build | internal | no |
 
 > **`design-system-compliance.md`** is a per-screen checklist (one fill per
@@ -39,6 +40,18 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 > Complements `design-system-compliance.md` — compliance checks classification
 > and rules; fidelity checks the screen actually matches the design the client
 > froze. Internal — does **not** page the client.
+
+> **`phase-acceptance.md`** is a **per-build-manifest-phase** gate proving each
+> phase meets its own Acceptance Criteria **before the next phase starts**: an
+> independent agent verifier (never the implementer) re-runs the phase's AC
+> against the running incremental preview (functional + visual-fidelity +
+> negative-path; FAIL = fix in the same phase), plus a human checkpoint driven
+> by the manifest's cadence knob (default `per-ui-phase`). The durable record
+> is the manifest Progress table's `Verify-by` + `Accepted` columns and TC-NNN
+> rows — **walked by `/build-phase` between phases**, not by `/gate-check`;
+> DoD (2.10) confirms the record is complete. It moves defect-catch from
+> end-of-manifest to per-phase — the cheap point on the token curve. Internal;
+> its checkpoint pages the operator, never the client.
 
 > **Client-paging gates** (emit `MANUAL_CHECKPOINT`, page the human's phone):
 > PB-G2, PB-G3, PB-G4, plus the Build **ACCEPTANCE** gate (inside the UAT step)

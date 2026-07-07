@@ -7,9 +7,12 @@
 >
 > **Gate rebalance (WORKFLOW § Macro-Stage 2):** during 2.6 every phase runs the
 > light floor self-check (`validate:quick` + design-system floor rules + phase
-> e2e smoke). The heavy gates below — 2.7 review, 2.9 security, 2.10 QA — run
-> **once when the build-manifest is complete** (plus a mid-point 2.7 review when
-> the manifest has >6 phases). This checklist is filled at that completion pass.
+> e2e smoke) **and the per-phase acceptance verification**
+> (`docs/gates/phase-acceptance.md`). The heavy gates below — 2.7 review, 2.9
+> security, 2.10 QA — run **once when the build-manifest is complete** (plus a
+> mid-point 2.7 review when the manifest has >6 phases), as aggregation and
+> cross-phase confirmation — not the first place a per-phase defect is caught.
+> This checklist is filled at that completion pass.
 
 DoD confirms the build is provably finished before it is shown to the client for
 acceptance. The verify-gate (`scripts/harness-verify-gate.sh`) is the mechanical
@@ -18,6 +21,7 @@ half; this checklist is the judgment half.
 ## Core Checklist
 
 - [ ] **Build manifest exhausted** — every phase in `docs/build-manifest.md` checked done, each closed by a token-citing stage-boundary commit.
+- [ ] **Per-phase acceptance record complete** — every phase's `Accepted` cell filled per `docs/gates/phase-acceptance.md`: `agent-pass` on all phases, `human-ok` on every `Verify-by: both` phase, and a TC-NNN acceptance row per phase in the verification register. The record is per-phase evidence — a missing cell is a DoD block, not retroactively fillable.
 - [ ] **Code review** (6-dim) passed — score ≥7, no dimension = 0 (step 2.7; mid-point review done if manifest >6 phases).
 - [ ] **Design-System Compliance** — every grid/form screen classified to one §4 floorplan (`docs/visuals/diagrams/screen-inventory.md`) + `docs/gates/design-system-compliance.md` green per screen; no hardcoded tokens; components reused.
 - [ ] **Visual Fidelity** — `docs/gates/visual-fidelity.md` filled per key APP/ADM screen: running-app screenshot vs prototype-export render side-by-side, every screen `pass` (divergent screens fixed or covered by a recorded rebuild decision); PUB product-shots captured AFTER the APP screens they depict were fidelity-checked.

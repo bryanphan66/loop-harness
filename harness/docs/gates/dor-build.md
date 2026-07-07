@@ -20,6 +20,7 @@ below must hold before the first build phase starts.
 - [ ] Implementation plan exists at `plans/<YYMMDD-HHMM>-<slug>/` (step 2.3).
 - [ ] **Build manifest complete** — `docs/build-manifest.md` exists per `docs/templates/build-manifest.md`: **P0 (walking skeleton) defined**, every phase ≤ one agent session (≤~10 files), and the coverage checklist proves **every in-scope REQ-ID appears in exactly one phase**.
 - [ ] **Fidelity strategy per screen** — every phase's screens cite their prototype export source + `port from export` (default) or `rebuild (decision: <slug>)` with the decision recorded; any PUB product-shot capture phase sequenced after the APP screen phases it depicts.
+- [ ] **Per-phase acceptance ready** (`docs/gates/phase-acceptance.md`) — every phase has runnable acceptance checks covering **functional + negative-path + visual-fidelity** (or `n/a — no screens`) and a `Verify-by` value (`agent` | `both`); the manifest header declares the **human checkpoint cadence** and the **preview command**. A phase whose AC an independent verifier could not execute is not ready.
 - [ ] Stack decision recorded by slug (step 2.2, Tech Lead) — SA's ERD-freeze and Tech Lead's stack are **separate** decisions (D5).
 - [ ] STRIDE threat-model done at 2.2 (red-team required).
 
