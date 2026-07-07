@@ -22,6 +22,10 @@
 - PUB zone ports prototype export (`docs/visuals/prototype/exports/claude-design-v3/`) per build-execution playbook; APP/ADM rebuild via design system.
 - Follow auto-script's own AGENTS.md + STAGE.md + token chain; verify-gate no bypass.
 
+## Deploy target (operator decision 2026-07-07 08:48)
+
+UAT/staging review = **Dokploy on VPS 160.250.134.226**, domain `autoscript.160.250.134.226.sslip.io`. Compatible with TDR (platform-agnostic, Docker image + IMAGE_TAG rollback, platform secret store). Flow: 2.11 readiness → deploy staging to Dokploy → 2.12 UAT on that URL vs prototype v3 → sign-off → 2.13 release. Operator must supply before UAT: Dokploy access (panel/API token) + real secrets per `docs/build-needs-credentials.md` (Google OAuth w/ sslip.io callback, YouTube API, AI provider, SePay, SMTP); features lacking real keys run mocked and are flagged in the UAT checklist.
+
 ## Relay log
 
 | Leg | Session | Start stage | End stage | Notes |
