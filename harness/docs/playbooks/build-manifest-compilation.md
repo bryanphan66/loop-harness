@@ -27,6 +27,8 @@ gate closes). **Template:** `docs/templates/build-manifest.md`.
    class per screen.
 4. API contract (2.2 output).
 5. Scenarios (`docs/requirements/scenarios/*`) for high-risk REQ-IDs.
+6. Prototype export bundle (`docs/visuals/prototype/exports/<engine-vN>/`) —
+   the per-screen implementation reference each phase block cites.
 
 A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
 
@@ -48,10 +50,16 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
    never a "backend phase" + "frontend phase" for the same feature unless the
    API is consumed by a later phase).
 5. **Write each phase block per the template:** REQ-IDs, entities (new/extend),
-   endpoints, screens + floorplan class, **concrete runnable acceptance
+   endpoints, screens + floorplan class + **prototype export source file +
+   fidelity strategy** (`port from export` default; `rebuild (decision: <slug>)`
+   only with a recorded decision — `build-execution.md` § Prototype → Code
+   Fidelity), **concrete runnable acceptance
    checks** (the phase's e2e smoke script in prose — a check names an actor, an
-   action, and an observable outcome), verify commands, dependencies, size.
+   action, and an observable outcome — including the error/empty check and the
+   visual-fidelity self-check), verify commands, dependencies, size.
    The block must be executable WITHOUT reading the rest of the manifest.
+   **Late-phase rule:** a PUB product-shot capture phase depends on every APP
+   screen phase it depicts.
 6. **Prove coverage.** Fill the coverage checklist: every in-scope REQ-ID in
    exactly one phase. A REQ-ID in zero phases = scope silently dropped; in two
    = double-build drift. Both block DoR.

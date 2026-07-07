@@ -101,6 +101,61 @@ Each test header cites its **TC-NNN** (global counter) and the REQ-ID it `proves
 (+ the SC-NNN if it proves a specific scenario). The composite `US-NNN.TC-MMM`
 form is **not used** (D3).
 
+## Mandatory Coverage Rules
+
+Happy-path journeys alone do NOT satisfy 2.8. Two coverage rules are hard
+requirements — the DoD E2E line reads them:
+
+### 1. Negative-path for every operation that can fail
+
+Every user-facing operation with a realistic failure mode — **AI/generation
+calls, tier/quota-gated features, payment, external providers, permission-gated
+actions** — MUST have ≥1 e2e that **triggers the failure** (lower-tier user,
+exhausted quota, provider error/mock-reject, invalid payment) and asserts:
+
+- the operation fails *gracefully* (no crash, no stuck spinner), AND
+- **the REAL cause surfaces in the UI** — assert on the specific message
+  (e.g. "model X requires plan Y"), NOT on a generic error string. A test that
+  passes on "something went wrong" proves the swallow, not the surfacing.
+
+```pseudo
+test "TC-021 — basic-tier user generating with a pro-only default":
+  given: logged in as basic-tier user (seed `seed-basic-1`)
+  when:  trigger generate on a feature whose default model is pro-gated
+  then:  assert job completes on the tier-valid fallback model
+         OR assert the visible error names the tier restriction + the allowed model
+         assert NO generic "something went wrong" text
+  proves: <REQ-ID> (SC-NNN)
+```
+
+(Evidence: a run's e2e suite exercised only happy paths; real tier-gate errors
+reached users as a generic toast and every gated sibling feature was broken —
+found only in manual UAT. auto-script Macro-2, systemic tier-model fix leg.)
+
+### 2. Every auth method proves login → real data loads
+
+For **EVERY auth method the app ships** (OAuth, OTP/passwordless, password,
+admin login), ≥1 e2e that logs in AND then loads **real authenticated data** —
+assert the post-login screen's data calls return 200 and render actual
+values/empty-states. "Reached the dashboard route" is NOT proof: an SSR gate can
+pass on a dead cookie while every API call 401s.
+
+Plus **one cookie-hygiene case per app**: on the SAME browser profile, log in
+via method A, log out, log in via method B → assert data loads (no stale-cookie
+shadowing, no 401s).
+
+**Single cookie-scope authority note (for the implementation this tests):** the
+app should have exactly ONE writer and ONE scope for session cookies (either
+host-only or domain-wide — never both). Two flows writing the same cookie names
+at different scopes creates split-brain jars: the browser keeps both copies,
+reads return the stale one, and the fresh login is shadowed. If two scopes are
+unavoidable (cross-subdomain OAuth), the client must purge all ancestor-scope
+copies on every set/clear and prefer the most-recently-set copy on read.
+(Evidence: OTP login after a dead OAuth session left every data card
+"Unauthorized" — two cookie writers at different scopes; only caught in manual
+UAT because the e2e stopped at "reached dashboard". auto-script Macro-2,
+OTP-dashboard auth fix leg.)
+
 ## Cap
 
 - One user journey per E2E file. If the journey forks, write a sibling file
@@ -129,4 +184,7 @@ delete the original 4 types.)
 - `seed-data-pattern.md` — provides the seed IDs the skeletons reference.
 - `e2e-qa-field-by-field-verify-with-report.md` — field-by-field verify + QA
   report (2.10 evidence).
+- `code-review-scoring.md` — the "no generic error-swallow" floor rule (2.7)
+  that the negative-path tests here prove at the e2e level.
+- `docs/gates/dod-build.md` — the DoD E2E line reads § Mandatory Coverage Rules.
 - `docs/ROLE_MAP.md` — QC/QA role + `ck-e2e-flow` engine binding.

@@ -80,10 +80,10 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 |---|---|---|
 | [build-manifest-compilation.md](build-manifest-compilation.md) | 2.3 | Compile the frozen spec into `docs/build-manifest.md` (ordered phases P0..PN, coverage proof) — the spec→code conversion layer `/build-phase` executes. |
 | [seed-data-pattern.md](seed-data-pattern.md) | 2.5 | Deterministic FK-valid demo data for DEV/TEST. Symbolic IDs, scoped cleanup, never production. Engine `ck-seed`. |
-| [build-execution.md](build-execution.md) | 2.6 | Trunk-based branching, commit cadence, D3 token-citation commit-msg hook, pre-commit + secret-scan, `validate:quick`. Engine `cook`. |
+| [build-execution.md](build-execution.md) | 2.6 | Trunk-based branching, commit cadence, D3 token-citation commit-msg hook, pre-commit + secret-scan, `validate:quick`; **port-first Prototype→Code fidelity** (export = implementation reference; visual-fidelity self-check), systemic-fix full-sweep rule, late PUB product-shot capture. Engine `cook`. |
 | [payment-integration.md](payment-integration.md) | 2.6 (if money) | Webhook idempotency + signature verify + refund/dispute + reconciliation + PCI SAQ-A + 7-yr audit. Engine `ck-payment-integration`. |
-| [code-review-scoring.md](code-review-scoring.md) | 2.7 | 6-dim rubric (correctness 3 / security 2 / quality 2 / perf 1 / maint 1 / tests 1); pass ≥7, any 0 auto-blocks. Engine `ck-code-review`. |
-| [canonical-e2e-flow-playbook.md](canonical-e2e-flow-playbook.md) | 2.8 | Phase-typed E2E (form / workflow / readonly / mixed) from BA acceptance criteria; mints **TC-NNN**. Engine `ck-e2e-flow`. |
+| [code-review-scoring.md](code-review-scoring.md) | 2.7 | 6-dim rubric (correctness 3 / security 2 / quality 2 / perf 1 / maint 1 / tests 1); pass ≥7, any 0 auto-blocks; floor rules: design-system, visual fidelity, no generic error-swallow; systemic-pattern sweep. Engine `ck-code-review`. |
+| [canonical-e2e-flow-playbook.md](canonical-e2e-flow-playbook.md) | 2.8 | Phase-typed E2E (form / workflow / readonly / mixed) from BA acceptance criteria; mints **TC-NNN**; Mandatory Coverage Rules: negative-path for every failable op (real cause surfaces) + every auth method login→data-load + cookie hygiene. Engine `ck-e2e-flow`. |
 | [e2e-qa-field-by-field-verify-with-report.md](e2e-qa-field-by-field-verify-with-report.md) | 2.10 | Field-by-field verify + `correct/incorrect/manual/not-found` report + user-guide video → DoD evidence. Engine `ck-qa`. |
 
 ### Macro-Stage 3 — Post-Build

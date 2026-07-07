@@ -63,6 +63,34 @@ floorplan row lives in `docs/visuals/diagrams/screen-inventory.md`. This does no
 add a scored dimension — the six weights and the ≥7 threshold are unchanged; it
 is a floor that blocks regardless of score.
 
+Floor rule (visual fidelity): an **APP/ADM screen that is structurally/visually
+divergent from its prototype export render — or that has neither an export
+source citation nor a recorded `rebuild (decision: <slug>)` marker in its
+build-manifest phase block — = automatic merge block**, same auto-block mechanic,
+scores unchanged. Source-of-truth checklist: `docs/gates/visual-fidelity.md`;
+port-first rule: `build-execution.md` § Prototype → Code Fidelity. (Evidence for
+why: a design-heavy build passed every scored dimension while looking nothing
+like the frozen mockup and was rejected at UAT — auto-script Macro-2.)
+
+Floor rule (no generic error-swallow): a **user-facing operation that can fail
+but surfaces only a generic message ("something went wrong") instead of the real
+cause = automatic merge block**, same mechanic. The real cause (tier/quota
+limit, provider error, validation detail) must reach the UI — sanitized of
+internals, but specific. (Evidence: real tier-gate errors were swallowed into a
+generic toast; the failure was only diagnosable in manual UAT — auto-script
+Macro-2.)
+
+**Systemic-pattern sweep rule (Correctness dimension):** when the diff fixes an
+instance of a systemic pattern (error handling, model/tier resolution, auth,
+quota, permission checks), the reviewer MUST grep all call-sites of that pattern
+and confirm every sibling is covered. **A fix that leaves sibling sites broken
+is an automatic review finding** (Correctness capped at 1 — happy path only —
+until the sweep is done or the siblings are shown out of scope). Prefer a single
+chokepoint (one resolver/guard/helper) over per-feature patches — score Quality
+accordingly. (Evidence: a tier-model fix patched one generator; every sibling
+AI-gen entrypoint kept the broken default and failed in UAT — auto-script
+Macro-2, systemic tier-model fix leg.)
+
 Red-team coupling: the Security dimension **auto-blocks** if a money-handling or
 auth surface lacks signature/authz verification (see `payment-integration.md`).
 Red-team is required at the high-risk Build gates (2.2 threat-model, 2.9 security,
@@ -124,6 +152,11 @@ delete the original dimensions or weights.)
 - `payment-integration.md` — the Security auto-block source for money surfaces.
 - `docs/gates/design-system-compliance.md` — the per-screen checklist the
   design-system floor rule reads (source of truth for §4 / §7 / §8 / §10).
+- `docs/gates/visual-fidelity.md` — the per-screen checklist the visual-fidelity
+  floor rule reads (app screenshot vs prototype export).
+- `build-execution.md` § Prototype → Code Fidelity — the port-first default the
+  fidelity floor rule enforces; § Implementation Guardrails — the systemic-sweep
+  + error-surfacing rules the author applies before review.
 - `docs/design-system/design-rules.md` — Tier-1 floorplan + behavior doctrine the
   floor rule enforces (§4 floorplans, §7 actions, §8 modals, §10 states).
 - `design-system-3-tier.md` — the cross-stage playbook that owns 3-tier enforcement.

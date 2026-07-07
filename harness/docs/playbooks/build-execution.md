@@ -173,9 +173,13 @@ Before writing any UI for a screen, the Fullstack Dev MUST:
 
 1. Find the screen's row in `docs/visuals/diagrams/screen-inventory.md` and
    confirm its assigned §4 floorplan + table/message/modal/create behaviors.
-2. Reuse the components listed in `src/components/README.md` (the Tier-3
+2. Open the screen's **prototype export source file** (cited in its
+   build-manifest phase block) — the implementation reference per
+   § Prototype → Code Fidelity below. No export + no recorded rebuild decision =
+   blocker.
+3. Reuse the components listed in `src/components/README.md` (the Tier-3
    inventory) before writing new ones — reuse-first, do not re-derive.
-3. Consult the relevant section of `docs/design-system/design-rules.md` for the
+4. Consult the relevant section of `docs/design-system/design-rules.md` for the
    assigned floorplan's rules (§7 action placement, §8 modals, §10 states).
 
 A grid/form screen with **no inventory row is a build blocker** — escalate to the
@@ -186,33 +190,69 @@ empty/placeholder Floorplan cell once `screen-inventory.md` exists, and the 2.7
 review (`code-review-scoring.md`) treats an unclassified or rule-violating screen
 as an automatic merge block.
 
-## Prototype → Code Fidelity (by zone)
+## Prototype → Code Fidelity (port-first by default)
 
 The frozen prototype is built in an external design tool (Claude Design / Open
 Design) that **exports real HTML/CSS/JSX** (bundle at
-`docs/visuals/prototype/exports/<engine-vN>/`). How faithfully to reproduce it in
-code **depends on the zone** — do not apply one rule to all screens:
+`docs/visuals/prototype/exports/<engine-vN>/`). **The export is the primary
+implementation reference for EVERY zone — port it, don't re-derive it:**
 
 | Zone | Target | Strategy |
 |---|---|---|
 | **PUB** (landing, **pricing**, marketing, auth) | **Pixel-faithful** — this is the public "shop window" | **PORT the export** markup + styles ~verbatim into the marketing routes; wire content/links. Do NOT rebuild from a screenshot. |
-| **APP / ADM** (dashboards, tables, wizards, forms) | **Function-faithful + consistent** — not pixel | **REBUILD** via the design-system (shadcn + §4 floorplan + Tier-2 tokens). The export is a **spec**, not the implementation. |
+| **APP / ADM** (dashboards, tables, wizards, forms) | **Design-faithful + data-wired** | **PORT the export** markup/structure/styles as the implementation reference, reconcile its values to **Tier-2 tokens**, then wire real data + loading/empty/error states into the ported structure. Do NOT rebuild-from-spec via generic design-system components. |
 
-Rationale: marketing/landing pages are mostly **static** → the export is
-production-usable, so porting yields ~100% fidelity at low cost, and these screens
-are CUSTOM (§4.7) — bespoke marketing CSS is allowed, outside strict floorplan
-discipline. App/admin screens need **real data wiring + cross-screen consistency**;
-chasing pixel-parity there wastes effort and hurts maintainability — the
-design-system is the contract, not the export bitmap.
+**Why port-first for APP/ADM too (failure evidence):** an earlier rule said
+"rebuild APP/ADM via the design-system; the export is a spec, not the
+implementation". On a design-heavy product that rule produced a
+plain-but-functionally-correct app that passed every gate (floorplan
+classification, token compliance, e2e) while **looking nothing like the frozen
+mockup** — the operator rejected it at UAT and the screens had to be re-ported
+from the export anyway (example: the auto-script Macro-2 run, UI-port fix leg).
+The client froze the *prototype*, not an abstract spec; the build must look like
+what was frozen.
 
-Guardrails when porting PUB:
-- Reconcile the export's colors/typography to **Tier-2 tokens** where feasible; an
-  isolated marketing-only token/value is acceptable if recorded (don't hardcode app-wide).
-- **Real assets required** — placeholders do not port. Logo + hero/product imagery
-  must be provided or generated (`ai-artist` / `ai-multimodal`) before the PUB build,
+Porting APP/ADM does NOT waive the design-system contract — it composes with it:
+- Reconcile the export's raw colors/typography/spacing to **Tier-2 tokens**
+  (the export tends to hardcode values; tokenize them — same visual result,
+  compliant source). Genuinely one-off values may stay local if recorded.
+- The screen's §4 floorplan row (screen-inventory) still applies — a frozen
+  prototype screen already conforms to its floorplan (the 1.12 gate checked it),
+  so porting preserves conformance by construction.
+- Reuse Tier-3 components where the export's structure maps 1:1 onto an existing
+  component; port bespoke structure where it doesn't. Do not force the export
+  into a generic component that changes its look.
+- **Every ported screen records its export source file** in its build-manifest
+  phase block, and passes the **visual-fidelity check**
+  (`docs/gates/visual-fidelity.md`): screenshot of the running screen
+  side-by-side with the export render — structurally/visually divergent = block.
+
+**Deviation needs a decision record.** Rebuilding a screen from spec instead of
+porting (e.g. the export for that screen is broken, or the screen has no
+prototype) is allowed ONLY with a recorded `docs/decisions/<slug>.md` naming the
+screens and the reason. The build-manifest phase block marks each screen
+`port from export` or `rebuild (decision: <slug>)` — never silently the latter.
+
+Guardrails when porting (all zones):
+- **Real assets required** — placeholders do not port. Logo + hero imagery must
+  be provided or generated (`ai-artist` / `ai-multimodal`) before the PUB build,
   so it ports once.
-- The plan (2.3) should state the split explicitly: *"port PUB from the export;
-  rebuild APP/ADM via design-system."*
+- The plan (2.3) states the fidelity strategy explicitly per zone; the manifest
+  carries it per screen.
+
+### PUB product-shot capture is a LATE phase
+
+Marketing screens (landing hero, feature sections) often embed **screenshots of
+the product itself**. Capture those from the RUNNING APP only **after** the APP
+screens they depict are built + styled + fidelity-checked — never from an early
+flat/scaffold UI. (Failure evidence: a run captured landing hero/feature shots
+off the early unported UI; after the APP screens were ported to the design the
+landing images were stale and had to be re-captured — auto-script Macro-2.)
+
+- The build-manifest sequences the PUB product-shot capture phase (or 2.10
+  sub-step) with an explicit **depends-on: every APP screen phase it depicts**.
+- Commit the capture script/recipe so shots are re-generatable after later UI
+  changes.
 
 ## Implementation Guardrails (reference)
 
@@ -223,7 +263,20 @@ agent reading this at the start of 2.6:
 - Architecture change → new `docs/decisions/<slug>.md` before merging.
 - Don't delete referenced code without grep proof.
 - UI: handle loading + empty + error states, not just happy path.
+- **Errors surface their real cause** — a user-facing operation that fails must
+  show the actual reason (tier/quota limit, provider error, validation detail),
+  never a generic "something went wrong" that swallows it. Generic-swallow is a
+  2.7 review floor block (`code-review-scoring.md`).
 - Input validation at the boundary.
+- **Systemic fix = full sweep.** When a change fixes an instance of a systemic
+  pattern (error handling, model/tier resolution, auth, quota, permission
+  checks), grep ALL call-sites of that pattern and cover every sibling in the
+  same change — prefer moving the logic into a **single chokepoint** (one
+  resolver/guard/helper) over per-feature patches (DRY). A fix that leaves
+  sibling sites broken is an automatic 2.7 review finding. (Failure evidence:
+  a run patched tier-model resolution only in the one generator the bug was
+  reported against; every other AI-gen entrypoint kept the same broken default
+  and failed in UAT — auto-script Macro-2, systemic tier-model fix leg.)
 - Commit body explains the change + cites ≥1 token.
 
 ## Variant Section
@@ -242,6 +295,8 @@ agent reading this at the start of 2.6:
   inventory) the build reuses from.
 - `docs/design-system/design-rules.md` — Tier-1 §4/§7/§8/§10 rules a screen build
   consults; never invent a floorplan.
+- `docs/gates/visual-fidelity.md` — the per-screen screenshot-vs-export check
+  every ported screen must pass (2.6 self-check, 2.7 floor rule, 2.10 DoD).
 - `design-system-3-tier.md` — the cross-stage 3-tier enforcement chain.
 - `seed-data-pattern.md` — step 2.5 precedes; provides demo data.
 - `payment-integration.md` — applies when money is in scope at 2.6.

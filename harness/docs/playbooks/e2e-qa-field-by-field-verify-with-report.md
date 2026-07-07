@@ -146,7 +146,12 @@ incomplete seed (`seed-data-pattern.md`), not a render bug — fix the seed.
 
 ## Related
 
-- `docs/WORKFLOW.md` § 2.10 — the step this playbook owns (DoD gate).
+- `docs/WORKFLOW.md` § 2.10 — the step this playbook owns (DoD gate). The same
+  step also runs the **visual-fidelity evidence pass**
+  (`docs/gates/visual-fidelity.md`): per key APP/ADM screen, a running-app
+  screenshot side-by-side with its prototype export render, recorded
+  pass/divergent — and re-captures any PUB product-shot taken before the APP
+  screens it depicts were final.
 - `docs/TRACE_SPEC.md` — TC-NNN the report rows map to.
 - `canonical-e2e-flow-playbook.md` — the fill/navigation counterpart (2.8).
 - `seed-data-pattern.md` — `not-found` rows often trace to incomplete seed.
