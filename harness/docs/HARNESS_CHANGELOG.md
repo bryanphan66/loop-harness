@@ -1,7 +1,39 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v5.1**.
+templates). Per-project state never lives here. Current version: **v5.2**.
+
+## v5.2 — 2026-07-10 — install embeds the stack template (INSTALL gap fix)
+
+`install-harness.sh` shipped the harness skeleton into a project but never
+placed the stack template anywhere the project could actually reach it: step
+2.4 (`docs/STAGE_GOALS.md`) told scaffold to pull `templates/stack-pnpm-nest-next/`
+"from the harness source — local clone or repo tarball", but nothing told the
+*installed project* where that source was once the installer had finished and
+moved on. **Field evidence (elearning-platform):** at scaffold time the
+template wasn't reachable, so the build agent hand-built an equivalent
+scaffold and re-implemented tier-2 (queue/storage) instead of reusing the
+shipped, red-teamed `packages/queue-core` / `packages/storage-core` — defeating
+the entire point of shipping proven template code.
+
+- **`install-harness.sh`** now embeds the stack template into
+  `<target>/.harness/stack-template/` on every install (normal, `--bootstrap`,
+  and re-install/upgrade) — source only, `node_modules`/`dist`/`.turbo`/`.next`/
+  `pnpm-lock.yaml` excluded. `.harness/` is harness-owned (never
+  project-authored): each run wipes and recopies it wholesale so a stale
+  `TEMPLATE_VERSION` never lingers. Honors `--dry-run` (lists what would be
+  embedded, writes nothing). Appends `.harness/` to the target's `.gitignore`
+  (creates the file if absent) so the embed is never committed into the
+  project's own repo — done before the bootstrap baseline auto-commit.
+  `STAGE.md` Snapshot § Harness source now also records the embedded path +
+  `TEMPLATE_VERSION` when bootstrap fills it.
+- **`docs/STAGE_GOALS.md` step 2.4** + **`docs/templates/build-manifest.md` P0
+  block**: scaffold's PRIMARY path is now the embedded copy
+  (`.harness/stack-template/scripts/scaffold.sh <target> <slug>`); the
+  harness-source clone/tarball is a fallback only for a missing/stale embed. A
+  hand-built equivalent scaffold is now explicitly a last resort that must be
+  recorded as a decision (`docs/decisions/<slug>.md`) — the exact
+  improvisation risk this fix removes.
 
 ## v5 — 2026-07-10 — BS7: non-CRUD delivery capability
 

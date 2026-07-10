@@ -45,7 +45,7 @@ Shape-only scaffold. Replace <placeholders>.
 
 ### P0 — Walking skeleton *(executed by steps 2.4 + 2.5, not /build-phase)*
 
-- **Scope:** scaffold from the stack template (`scaffold.sh`, slug `<project-slug>`); env + CI + compose; seed extended to domain foundation data.
+- **Scope:** scaffold from the embedded stack template — `.harness/stack-template/scripts/scaffold.sh <target-dir> <project-slug>` (primary; harness-source clone/tarball is a fallback only if the embed is missing/stale — see `STAGE_GOALS.md` step 2.4); env + CI + compose; seed extended to domain foundation data.
 - **REQ-IDs:** <the infra/auth reqs it satisfies, e.g. `IF.AUTH.01`, or "platform — no feature REQ">
 - **Acceptance checks (all must run, not be assumed):**
   1. `pnpm install && pnpm -r build` green

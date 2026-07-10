@@ -471,15 +471,24 @@ Stop after 15 turns.
 
 ### Step 2.4 — Walking skeleton (manifest P0) + env + CI/CD + observability
 
-- **Inputs:** stack decision + manifest P0 + the stack template (`templates/stack-pnpm-nest-next/` from the harness source — local clone or repo tarball; see the template README and `STAGE.md` Snapshot § Harness source).
+- **Inputs:** stack decision + manifest P0 + the stack template — **primary:** the embedded copy at `.harness/stack-template/` (placed by `install-harness.sh` at install time; see `STAGE.md` Snapshot § Harness source); **fallback only** (embed missing/stale): the harness source itself — local clone or repo tarball (`templates/stack-pnpm-nest-next/`; see the template README).
 - **Output path:** scaffolded monorepo at repo root + `.github/workflows/ci.yml` + `docker-compose.yml` + `.env.example`.
 - **Gate:** **WALKING SKELETON** — install/build green, compose boots, health OK, CI(-equivalent local) green, secret scan clean (gitleaks, or the template's `scripts/secret-scan.sh` grep fallback).
 - **Manual?** no.
 
 Goal:
-The project root contains the scaffolded monorepo produced by the stack
-template's `scaffold.sh` (project slug substituted), or an equivalent manual
-scaffold if the ADR chose a different stack. Then: (1) `pnpm install` (or stack
+The project root contains the scaffolded monorepo produced by
+`.harness/stack-template/scripts/scaffold.sh <target> <slug>` (project slug
+substituted) — the embedded, proven copy is the PRIMARY scaffold path so the
+walking skeleton reuses the shipped, red-teamed tier-2 primitives
+(`packages/queue-core`, `packages/storage-core`) instead of re-deriving them.
+Only when `.harness/stack-template/` is missing does scaffold fall back to
+cloning/fetching the harness source directly (re-run `install-harness.sh` to
+repair the embed first). A hand-built equivalent scaffold is a LAST RESORT —
+only when the ADR (2.2) explicitly chose a different stack — and it MUST be
+recorded as a decision (`docs/decisions/<slug>.md`); silently hand-rolling an
+equivalent because the template "wasn't reachable" is the exact defect this
+step exists to prevent. Then: (1) `pnpm install` (or stack
 equivalent) completes clean; (2) lint + typecheck + unit + build all green
 locally (the CI-equivalent run); (3) `docker compose up` boots db + api + web;
 (4) the health endpoint returns 200; (5) the CI workflow file runs those same
