@@ -33,16 +33,19 @@ API Swagger docs: http://localhost:3001/docs — health: http://localhost:3001/h
 Not wired into `AppModule` by default — the walking skeleton stays db+api+web. Adopt it
 when a project has an async-job / media-pipeline / storage / external-integration phase:
 
-- `docker compose --profile tier2 up -d` starts `redis` (+ `worker`, which builds
-  `apps/worker/Dockerfile` and needs ffmpeg for the sample `transcode` job — already baked
-  into that image).
+- `docker compose --profile tier2 up -d` starts `redis` + `minio` (+ `minio-mc`, a
+  one-shot that creates the `STORAGE_S3_BUCKET` bucket then exits) + `worker`, which
+  builds `apps/worker/Dockerfile` and needs ffmpeg for the sample `transcode` job —
+  already baked into that image. MinIO console: http://localhost:9001.
 - Import `QueueModule` (`apps/api/src/common/queue`) and/or `StorageModule`
   (`apps/api/src/common/storage`) into a feature module to get `QueueService`
   (`enqueue`/`status`) and `StorageService` (`put`/`signedGetUrl`/`signedPutUrl`/`delete`)
   via Nest DI.
 - `pnpm dev:worker` runs the worker locally in watch mode (needs `REDIS_URL` reachable).
-- Switch `STORAGE_DRIVER=s3` (see `.env.example`) to point at AWS S3 or an S3-compatible
-  endpoint (Cloudflare R2, MinIO) instead of the local filesystem driver.
+- Switch `STORAGE_DRIVER=s3` (see `.env.example`) to exercise the real signed-URL path
+  against the tier2 MinIO container — swap the same driver's endpoint/credentials for
+  Cloudflare R2 or AWS S3 in staging/prod, no code change. The `local` driver (default)
+  stays filesystem-only, zero dependencies, with stubbed (non-expiring) signed URLs.
 
 ## Conventions baked in
 

@@ -11,8 +11,13 @@ import { storageConfigSchema } from '@__PROJECT_SLUG__/storage-core';
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-    // Override to point at a non-PATH ffmpeg binary; blank uses `ffmpeg` from PATH.
+    // Override to point at a non-PATH ffmpeg/ffprobe binary; blank uses the
+    // PATH lookup. ffprobe ships alongside ffmpeg in every image this
+    // template installs it in (Alpine's + Debian/Ubuntu's `ffmpeg` package
+    // both bundle it) — used to detect a source with no audio stream so the
+    // HLS ladder can build an audio-free var_stream_map instead of failing.
     FFMPEG_PATH: z.string().default('ffmpeg'),
+    FFPROBE_PATH: z.string().default('ffprobe'),
   })
   .merge(queueConfigSchema)
   .merge(storageConfigSchema);

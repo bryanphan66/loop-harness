@@ -40,9 +40,14 @@ export interface JobResultMap {
   transcode: TranscodeJobResult;
 }
 
-export interface JobStatus {
+export interface JobStatus<Result = unknown> {
+  // BullMQ's own states (waiting | active | completed | failed | delayed |
+  // waiting-children | prioritized) — 'unknown' is our own addition for a
+  // jobId that no longer/never existed. There is no 'queued' state.
   state: JobState | 'unknown';
   // Matches bullmq's own Job['progress'] shape rather than a guessed one.
   progress: Job<unknown, unknown, string>['progress'];
+  /** The job's return value once `state` is 'completed'; undefined otherwise. */
+  result?: Result;
   failedReason?: string;
 }

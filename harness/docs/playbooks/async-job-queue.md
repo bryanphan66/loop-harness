@@ -60,13 +60,18 @@ preview:
 1. **Idempotency-key** — enqueueing the same logical unit twice (same
    `idempotencyKey`) runs the job **once**; the second `enqueue` returns the
    existing `jobId`. Without this, a retried client request = duplicate transcode /
-   double email.
+   double email. **Retention caveat:** the dedup only holds while the original
+   job is still present in BullMQ (`removeOnComplete`/`removeOnFail` age+count
+   in `queue-factory.ts`) — once evicted, the same `idempotencyKey` can run
+   again. Do not treat this as permanent dedup; a caller needing a durable
+   guarantee records the key in its own DB, not just in the queue.
 2. **Retry / backoff + dead-letter** — a job that throws is retried with backoff
    (bounded attempts), and on final failure lands in a dead-letter/failed state
    that an operator can list and requeue — never silently dropped.
-3. **Status-polling API** — a real endpoint returns the job state
-   (`queued | active | completed | failed` + progress) so the UI can poll; the
-   verifier drives it from enqueue → terminal state.
+3. **Status-polling API** — a real endpoint returns the job state (BullMQ's own
+   states: `waiting | active | completed | failed`, plus `delayed` while a retry
+   backoff is pending — never a made-up `queued`) + progress; the verifier
+   drives it from enqueue → terminal state.
 4. **Failure surfaces the REAL cause** — a forced job failure (bad input, provider
    down) propagates the real reason to `failedReason` and to the UI/status; a
    generic "something went wrong" = FAIL (no-error-swallow floor rule,

@@ -79,6 +79,7 @@ function waitForRedisReady(port: number, timeoutMs = 5000): Promise<void> {
 
       const status = await service.status(jobId);
       expect(status.state).toBe('completed');
+      expect(status.result).toEqual({ doubled: 20 });
 
       const dedupedId = await service.enqueue('double', { n: 999 }, { idempotencyKey: 'itest-double-10' });
       expect(dedupedId).toBe(jobId);

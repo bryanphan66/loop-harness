@@ -41,10 +41,16 @@ SDK from story code**:
 
 - **Module:** `apps/api/src/common/storage/` — interface
   `StorageAdapter { put(key, body, opts); signedGetUrl(key, ttlSec); signedPutUrl(key, ttlSec); delete(key) }`.
-- **Drivers:** `s3` / `r2` (prod) + `local` (minio, local-dev parity). Selected by
-  env; story code is driver-agnostic.
-- **minio:** opt-in `docker-compose` profile (tier-2) so local dev + CI exercise
-  the real signed-URL path without a cloud account.
+- **Drivers:** `s3` (AWS S3, Cloudflare R2, or a local MinIO endpoint — same
+  driver code, only `STORAGE_S3_ENDPOINT`/credentials change) + `local`
+  (filesystem, zero-dependency dev; its signed URLs are unauthenticated
+  `file://` stubs with no real expiry — see category 5 below). Selected by env;
+  story code is driver-agnostic.
+- **minio:** a real S3-compatible service under the opt-in `docker-compose`
+  `tier2` profile (`docker compose --profile tier2 up -d`, console at
+  `http://localhost:9001`). Set `STORAGE_DRIVER=s3` + the `STORAGE_S3_*` vars
+  (`.env.example`) to point the `s3` driver at it — this is how local dev + CI
+  exercise the real signed-URL/entitlement path without a cloud account.
 
 Uploads go **direct to storage via a signed PUT** (browser → bucket), never
 streamed through the API process. Downloads go via a signed GET or a CDN URL —
@@ -61,13 +67,18 @@ verifier (`phase-acceptance.md`) exercises each against the running preview:
 2. **Entitlement** — an **unauthenticated / unentitled** GET is DENIED. Objects are
    NOT world-readable; the URL that grants access is minted only for a caller the
    authz layer approved. This is the category most often missed → data leak.
+   Exercised with `STORAGE_DRIVER=s3` against MinIO/R2/S3 (a real signature +
+   TTL to deny); `n/a` on `STORAGE_DRIVER=local` — its `file://` stub URLs
+   never expire and carry no signature, so this category cannot fail-closed on
+   that driver (dev-only, never the target of the entitlement check).
 3. **Lifecycle / cleanup-on-delete** — deleting the owning entity deletes (or
    tombstones) its objects; no orphaned blobs accrue. The verifier deletes a record
    and confirms the object is gone / inaccessible.
 4. **Quota** — per-user/per-tenant size or count limits are enforced at upload; an
    over-quota upload is rejected with the real reason (not a silent truncate).
-5. **Local-dev parity (minio)** — the same code path works against minio locally
-   and S3/R2 in prod; no `if (prod)` fork in story code.
+5. **Local-dev parity (minio)** — the `s3` driver runs unmodified against the
+   tier2 MinIO container locally and against S3/R2 in prod (only endpoint +
+   credentials differ); no `if (prod)` fork in story code.
 
 Visual-fidelity + negative-path legs still apply to any screen the phase ships
 (upload widget, file list, error states) ported from its prototype export.

@@ -52,26 +52,44 @@ updates job progress the player polls (`status(jobId)`).
 
 ## The documented ffmpeg HLS ladder (480 / 720 / 1080)
 
-The shipped transcode-stub runs this command (the ladder projects extend, never
-re-derive):
+**Single source of truth:** `apps/worker/src/jobs/hls-ladder.ts`
+(`buildHlsLadderArgs`) — the args below are generated, never hand-copied here;
+if this doc and that file ever disagree, the file wins. Renditions (label /
+height / bitrates) are `HLS_RENDITIONS` in the same file.
+
+Shape of the generated command (source is a **local file path** — the worker
+downloads the signed-GET source to a tmp file before invoking ffmpeg, so a
+long transcode can't 403 on a source URL expiring mid-run; see Atomicity
+below):
 
 ```bash
-ffmpeg -i "$SOURCE" \
-  -filter_complex "[0:v]split=3[v1][v2][v3]; \
-    [v1]scale=w=854:h=480[v1out]; [v2]scale=w=1280:h=720[v2out]; [v3]scale=w=1920:h=1080[v3out]" \
-  -map "[v1out]" -c:v:0 libx264 -b:v:0 1400k -maxrate:v:0 1498k -bufsize:v:0 2100k \
-  -map "[v2out]" -c:v:1 libx264 -b:v:1 2800k -maxrate:v:1 2996k -bufsize:v:1 4200k \
-  -map "[v3out]" -c:v:2 libx264 -b:v:2 5000k -maxrate:v:2 5350k -bufsize:v:2 7500k \
-  -map a:0 -map a:0 -map a:0 -c:a aac -b:a 128k -ac 2 \
+ffmpeg -y -i "$LOCAL_SOURCE_FILE" \
+  -filter_complex "[0:v]split=3[v0][v1][v2]; \
+    [v0]scale=w=-2:h=480[v0out]; [v1]scale=w=-2:h=720[v1out]; [v2]scale=w=-2:h=1080[v2out]" \
+  -map "[v0out]" -map 0:a:0? -c:v:0 libx264 -b:v:0 800k  -c:a:0 aac -b:a:0 96k \
+  -map "[v1out]" -map 0:a:0? -c:v:1 libx264 -b:v:1 2500k -c:a:1 aac -b:a:1 128k \
+  -map "[v2out]" -map 0:a:0? -c:v:2 libx264 -b:v:2 5000k -c:a:2 aac -b:a:2 128k \
+  -var_stream_map "v:0,a:0,name:480p v:1,a:1,name:720p v:2,a:2,name:1080p" \
   -f hls -hls_time 6 -hls_playlist_type vod \
-  -hls_segment_filename "hls/%v/seg_%03d.ts" \
-  -master_pl_name "master.m3u8" \
-  -var_stream_map "v:0,a:0 v:1,a:1 v:2,a:2" "hls/%v/index.m3u8"
+  -master_pl_name "master.m3u8" -hls_segment_filename "%v/segment_%03d.ts" \
+  "%v/playlist.m3u8"
 ```
 
-Output: three renditions (480/720/1080) + a `master.m3u8` the adaptive player
-selects from. **ffmpeg in CI:** gate the transcode smoke behind the tier-2 profile
-so the base template CI stays lean (ffmpeg is only on the media-enabled image).
+Output layout (relative to the worker's per-job `cwd`, then uploaded via the
+storage adapter under the job's `outputPrefix`): `480p/playlist.m3u8` ·
+`720p/playlist.m3u8` · `1080p/playlist.m3u8` · `master.m3u8` — **not** the
+`hls/%v/index.m3u8` shape (an earlier, never-shipped draft of this doc).
+
+The worker probes the source with `ffprobe` first (`lib/probe-audio.ts`,
+`hasAudioStream`) — a silent/screen-capture source with no audio stream skips
+audio entirely: no `-map 0:a:0?` / `-c:a:N` / `-b:a:N` args, AND
+`-var_stream_map` drops the `a:N` half too (`v:0,name:480p v:1,name:720p
+v:2,name:1080p`). Both must change together — `-map 0:a:0?`'s trailing `?`
+only makes the *map* optional; a `var_stream_map` that still references a
+now-nonexistent `a:N` output fails the whole HLS mux ("Unable to map
+stream"). **ffmpeg in CI:** gate the transcode smoke behind the tier-2 profile
+so the base template CI stays lean (ffmpeg is only on the media-enabled
+image).
 
 ## Acceptance categories (the media-pipeline phase's type-specific AC)
 
@@ -82,9 +100,19 @@ verifier (`phase-acceptance.md`) exercises each against the running preview:
    resumable where the size warrants) without streaming through the API; the
    documented max-size limit rejects an over-limit file with the real cause.
 2. **Transcode atomicity + multi-bitrate ladder present** — a job either produces a
-   **complete** rendition set (480/720/1080 + master manifest) or none; a
-   half-transcoded artifact is never served. The verifier confirms all three
-   renditions + the master exist.
+   **complete** rendition set (480/720/1080 + master manifest) or none is ever
+   served. **Real contract (no stage→atomic-publish primitive):** the worker
+   uploads renditions as ffmpeg produces them, so a running job's manifest key
+   IS reachable in storage before it is complete — the consumer MUST gate on
+   `status(jobId)` reporting `completed` before exposing the HLS manifest to a
+   player; gating on "the manifest key exists" alone is a FAIL. If the upload
+   loop itself fails partway (transient storage error), the worker best-effort
+   deletes every rendition/segment key this job attempted to write — on this
+   attempt, not only once retries are exhausted — so no half ladder is ever
+   left reachable, including in the window between retries. The verifier
+   confirms all three renditions + the master exist ONLY once `status(jobId)`
+   is `completed`, and confirms nothing remains under `outputPrefix` after a
+   forced upload failure.
 3. **HLS manifest via signed-URL / CDN** — the master + segment URLs are served
    through signed GETs or a CDN, NOT a public bucket; an unentitled fetch is denied
    (inherits `object-storage` entitlement).

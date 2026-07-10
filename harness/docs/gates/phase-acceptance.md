@@ -57,11 +57,15 @@ app**, never by reading the diff and assuming:
      denied**; deleting the owner removes the object; over-quota is rejected
      (`docs/playbooks/object-storage.md`).
    - `media-pipeline` — a large upload transcodes to the **full 480/720/1080
-     ladder + master manifest** (atomic — never half); the manifest is served via
-     signed-URL/CDN (unentitled fetch denied); progress/status surfaced; renditions
-     cleaned on delete; **streaming NFR asserted HERE — player first-byte within
-     budget, signed-URL entitlement, multi-bitrate present** (not deferred to
-     2.11) (`docs/playbooks/media-pipeline.md`).
+     ladder + master manifest**, exposed to the consumer only once `status(jobId)`
+     reports `completed` (the primitive uploads renditions as they're produced —
+     no automatic stage→atomic-publish — so gating on job state, not "the key
+     exists", is what makes this atomic in practice); a forced upload failure
+     leaves no orphaned renditions under the output prefix; the manifest is served
+     via signed-URL/CDN (unentitled fetch denied); progress/status surfaced;
+     renditions cleaned on delete; **streaming NFR asserted HERE — player
+     first-byte within budget, signed-URL entitlement, multi-bitrate present**
+     (not deferred to 2.11) (`docs/playbooks/media-pipeline.md`).
    - `external-integration` — sandbox credentials on the test path (no prod key
      reachable); an unsigned webhook is rejected before any DB read; a duplicate
      callback is idempotent; a failed outbound surfaces the real provider error

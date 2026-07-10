@@ -1,7 +1,7 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v5**.
+templates). Per-project state never lives here. Current version: **v5.1**.
 
 ## v5 — 2026-07-10 — BS7: non-CRUD delivery capability
 
@@ -49,8 +49,9 @@ opt-in (YAGNI); the walking skeleton stays `db+api+web`.
 - **Tier-2 primitives (shipped by the stack template — separate build):** queue
   `apps/api/src/common/queue/` (`enqueue(name,payload,{idempotencyKey}) -> jobId;
   status(jobId)`), storage adapter `apps/api/src/common/storage/`
-  (`StorageAdapter { put; signedGetUrl; signedPutUrl; delete }`, drivers s3/r2 +
-  local/minio), worker `apps/worker/`; Redis/minio opt-in compose profiles.
+  (`StorageAdapter { put; signedGetUrl; signedPutUrl; delete }`, drivers `s3`
+  (AWS S3/R2/MinIO — one driver, endpoint-selected) + `local` (filesystem,
+  dev-only)), worker `apps/worker/`; Redis/MinIO opt-in compose profiles.
   Playbooks reference these exact contracts so projects **wire, not architect**.
 - **Acceptance/NFR wiring** (`phase-acceptance.md`): the 2.6 verifier exercises the
   type-specific categories against the running preview — the **streaming NFR**
@@ -63,6 +64,37 @@ opt-in (YAGNI); the walking skeleton stays `db+api+web`.
   **Independence Principle intact** — no new hard `ck-*` dep (playbook engines are
   existing `backend-development` / `media-processing` / `devops` accelerators with
   bare-agent fallbacks).
+
+## v5.1 — 2026-07-10 — red-team fixes on v5's tier-2 primitives
+
+A focused fix round on v5's non-CRUD stack code + playbooks, closing the gap
+between what the docs claimed and what actually shipped:
+
+- **MinIO now a real tier-2 service** (`docker-compose.yml`, `minio` + a
+  `minio-mc` bucket-init one-shot) — the `object-storage`/`media-pipeline`
+  signed-URL/entitlement ACs were previously undocumented as runnable
+  (the doc claimed a `minio` compose profile that didn't exist). `.env.example`
+  + `object-storage.md` corrected: `minio` is the `s3` driver pointed at a
+  local endpoint, not a separate "local/minio" driver.
+- **media-pipeline.md's ffmpeg command synced** to the actual
+  `hls-ladder.ts` output (`<label>/playlist.m3u8` + `master.m3u8`; the doc
+  previously showed a never-shipped `hls/%v/index.m3u8` shape).
+- **`JobStatus.result`** (BullMQ `returnvalue`) added end-to-end — the
+  `async-job-queue.md` primitive line already promised it; the type/impl
+  didn't carry it. `queued` state wording fixed to BullMQ's real
+  `waiting | active | completed | failed` everywhere it appeared.
+- **Transcode source-expiry fix**: the worker downloads the signed-GET source
+  to a local tmp file before invoking ffmpeg, so a multi-hour transcode can't
+  403 on a source URL expiring mid-run.
+- **Audio-optional ffmpeg map** (`-map 0:a:0?`) — a silent/screen-capture
+  upload no longer fails the whole transcode job.
+- **Atomicity truth**: on an upload-loop failure the worker best-effort
+  deletes every rendition/segment key it attempted to write (no orphaned
+  partial ladder); the playbook + phase-acceptance gate now say explicitly
+  that a consumer must gate on job `completed`, not "the manifest key exists"
+  — there is no automatic stage→atomic-publish.
+- **Idempotency retention caveat** documented: dedup only holds within
+  BullMQ's completed/failed retention window (`queue-factory.ts`).
 
 ## v4 — 2026-07-08 — BS6: per-phase acceptance-verification gate
 

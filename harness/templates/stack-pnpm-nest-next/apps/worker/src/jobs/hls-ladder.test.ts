@@ -17,6 +17,27 @@ describe('buildHlsLadderArgs', () => {
     expect(filterComplex).toContain('scale=w=-2:h=1080');
   });
 
+  it('maps audio as optional (hasAudio defaults true) so a source WITH audio still gets it encoded', () => {
+    const args = buildHlsLadderArgs('https://example.com/source.mp4');
+    const audioMapCount = args.filter((arg) => arg === '0:a:0?').length;
+
+    expect(audioMapCount).toBe(HLS_RENDITIONS.length);
+    expect(args).not.toContain('0:a:0'); // must be the optional form, not a hard map
+    expect(args.indexOf('-var_stream_map') + 1).toBeGreaterThan(0);
+    expect(args[args.indexOf('-var_stream_map') + 1]).toBe('v:0,a:0,name:480p v:1,a:1,name:720p v:2,a:2,name:1080p');
+  });
+
+  it('drops audio mapping AND the var_stream_map a:N reference entirely when hasAudio=false', () => {
+    const args = buildHlsLadderArgs('https://example.com/source.mp4', HLS_RENDITIONS, false);
+
+    // A stale `a:N` in var_stream_map with no matching audio output stream
+    // fails the whole ffmpeg HLS mux ("Unable to map stream") — the two must
+    // agree, not just the per-rendition `-map` calls.
+    expect(args).not.toContain('0:a:0?');
+    expect(args.filter((arg) => arg.startsWith('-c:a:'))).toEqual([]);
+    expect(args[args.indexOf('-var_stream_map') + 1]).toBe('v:0,name:480p v:1,name:720p v:2,name:1080p');
+  });
+
   it('names each variant stream so %v resolves to a readable rendition folder', () => {
     const args = buildHlsLadderArgs('https://example.com/source.mp4');
     const varStreamMapIndex = args.indexOf('-var_stream_map') + 1;

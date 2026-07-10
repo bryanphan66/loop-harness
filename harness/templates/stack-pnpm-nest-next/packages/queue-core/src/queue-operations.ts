@@ -29,14 +29,22 @@ export async function enqueueJob<Payload>(
   return job.id as string;
 }
 
-/** Status lookup — `unknown` (not `failedReason: 'not found'`) so callers can 404 cleanly. */
-export async function getJobStatus(queue: Queue, jobId: string): Promise<JobStatus> {
+/**
+ * Status lookup — `unknown` (not `failedReason: 'not found'`) so callers can
+ * 404 cleanly. `result` surfaces BullMQ's `returnvalue` (populated once
+ * `state` is 'completed'); undefined for every other state.
+ */
+export async function getJobStatus<Result = unknown>(
+  queue: Queue,
+  jobId: string,
+): Promise<JobStatus<Result>> {
   const job = await queue.getJob(jobId);
   if (!job) return { state: 'unknown', progress: 0 };
   const state = await job.getState();
   return {
     state,
     progress: job.progress ?? 0,
+    result: job.returnvalue as Result | undefined,
     failedReason: job.failedReason || undefined,
   };
 }

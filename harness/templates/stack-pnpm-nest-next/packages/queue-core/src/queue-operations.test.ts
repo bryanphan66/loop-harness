@@ -58,4 +58,32 @@ describe('getJobStatus', () => {
 
     expect(status).toEqual({ state: 'failed', progress: 42, failedReason: 'ffmpeg exited 1' });
   });
+
+  it('surfaces BullMQ returnvalue as result once the job is completed', async () => {
+    const job = {
+      getState: vi.fn().mockResolvedValue('completed'),
+      progress: 100,
+      returnvalue: { doubled: 42 },
+      failedReason: undefined,
+    } as unknown as Job;
+    const queue = fakeQueue({ getJob: vi.fn().mockResolvedValue(job) });
+
+    const status = await getJobStatus<{ doubled: number }>(queue, 'job-2');
+
+    expect(status).toEqual({ state: 'completed', progress: 100, result: { doubled: 42 } });
+  });
+
+  it('leaves result undefined for a job with no returnvalue yet (not completed)', async () => {
+    const job = {
+      getState: vi.fn().mockResolvedValue('active'),
+      progress: 10,
+      returnvalue: undefined,
+      failedReason: undefined,
+    } as unknown as Job;
+    const queue = fakeQueue({ getJob: vi.fn().mockResolvedValue(job) });
+
+    const status = await getJobStatus(queue, 'job-3');
+
+    expect(status.result).toBeUndefined();
+  });
 });

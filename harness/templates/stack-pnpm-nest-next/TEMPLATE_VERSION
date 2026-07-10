@@ -1,13 +1,19 @@
 stack-pnpm-nest-next template
-version: 0.2.0
-verified: 2026-07-10 (full local verify with tier-2 added, from a clean `rm -rf node_modules`
-install: install (postinstall auto-builds queue-core/storage-core dist), lint, typecheck,
-unit, build across all workspaces incl. apps/worker + packages/queue-core +
-packages/storage-core; real-redis-server enqueue->worker->status smoke (api's QueueService
-+ a real BullMQ worker); real-ffmpeg HLS-ladder transcode smoke (480/720/1080p, uploaded via
-the real LocalStorageDriver); compiled `node apps/worker/dist/main.js` boots and connects
+version: 0.2.1
+verified: 2026-07-10 (v5.1 red-team fix round)
+install: install, lint, typecheck, unit, build all green across all workspaces incl.
+apps/worker + packages/queue-core + packages/storage-core (incl. new tests: no-audio
+transcode, no-var_stream_map-a:N-without-audio, source-download-before-ffmpeg,
+upload-failure-cleanup, JobStatus.result); real-redis-server enqueue->worker->status
+smoke, asserting `status(jobId).result` (api's QueueService + a real BullMQ worker,
+and queue-core's own wiring test); real-ffmpeg HLS-ladder transcode smoke
+(480/720/1080p, uploaded via the real LocalStorageDriver); real-MinIO smoke (docker,
+ad hoc — not a committed test) proving the `s3` driver's signed PUT/GET round-trip +
+entitlement (unsigned GET -> 403) + delete against a live MinIO container; compiled
+worker `start` script (`node dist/main.js`) boots and connects to a real redis-server
 without the workspace-package resolution crash a raw-TS `main` field would hit; base
-`docker compose up` unaffected — redis/worker only start under --profile tier2)
+`docker compose config` (no profile) still shows only `db`, `--profile app` only adds
+api+web, `--profile tier2` only adds redis/worker/minio/minio-mc)
 
 Pinned majors (verified exact versions in parentheses):
 | dependency        | pin      | verified  |
@@ -28,6 +34,8 @@ Pinned majors (verified exact versions in parentheses):
 | redis (docker, tier-2) | redis:7-alpine | 7.x |
 | bullmq (tier-2)   | ^5.79    | 5.79.3    |
 | @aws-sdk/client-s3, s3-request-presigner (tier-2) | ^3.1084 | 3.1084.0 |
+| minio (docker, tier-2) | minio/minio:RELEASE.2025-09-07T16-13-09Z | same |
+| minio/mc (docker, tier-2, bucket-init one-shot) | minio/mc:RELEASE.2025-08-13T08-35-41Z | same |
 
 Design decisions:
 - Zod (not class-validator) at the API boundary via ZodValidationPipe; shared-types is type-only.
@@ -48,6 +56,20 @@ Design decisions:
   order needs no change.
 
 History:
+- 0.2.1 (2026-07-10): red-team fix round on the tier-2 code — minio+minio-mc services
+  under the docker-compose `tier2` profile (real S3-compatible endpoint for the `s3`
+  storage driver, so the signed-URL/entitlement AC is actually runnable locally, not
+  just documented); media-pipeline.md's ffmpeg command doc synced to the real
+  hls-ladder.ts output shape (`<label>/playlist.m3u8` + `master.m3u8`, not the
+  never-shipped `hls/%v/index.m3u8` form); `JobStatus.result` (BullMQ `returnvalue`)
+  added end-to-end (job-types.ts, queue-operations.ts, api's QueueService) and the
+  `queued` state wording fixed to BullMQ's real `waiting | active | completed | failed`
+  everywhere; transcode.job.ts downloads the signed-GET source to a local tmp file
+  BEFORE running ffmpeg (a >1h transcode can no longer 403 on an expired source URL
+  mid-run) and best-effort deletes every rendition/segment key it attempted to write
+  if the upload loop fails partway; hls-ladder.ts maps audio as optional (`0:a:0?`) so
+  a silent/screen-capture source doesn't fail the whole job; async-job-queue.md notes
+  idempotency dedup only holds within BullMQ's completed/failed retention window.
 - 0.2.0 (2026-07-10): tier-2 opt-in stack code — packages/queue-core (BullMQ wrapper:
   enqueue/status, idempotency-key dedup, retry/backoff, dead-letter), packages/storage-core
   (StorageAdapter interface + s3/r2 + local drivers), apps/api/src/common/{queue,storage}

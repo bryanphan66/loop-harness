@@ -21,8 +21,25 @@ export const HLS_RENDITIONS: RenditionSpec[] = [
  * all variants with `-var_stream_map`. Run with `cwd` = the output dir so the
  * relative `%v/...` output patterns below land at `<cwd>/<label>/...` and the
  * master playlist at `<cwd>/master.m3u8`.
+ *
+ * `sourcePath` is a **local file path** (transcode.job.ts downloads the
+ * signed-GET source to a tmp file up front — a job outliving the URL's TTL
+ * must not hand ffmpeg a URL that can expire mid-run); the parameter still
+ * accepts any string ffmpeg's `-i` understands (this fn does not care), which
+ * is why the unit test below also exercises a bare `file://` URL.
+ *
+ * `hasAudio` (probe-audio.ts, ffprobe-detected — a silent/screen-capture
+ * source has none) drives whether audio is mapped/encoded AND whether
+ * `-var_stream_map` references an `a:N` stream at all: a trailing `?` on
+ * `-map 0:a:0?` alone only makes the map itself optional — `-var_stream_map`
+ * would still reference the now-nonexistent `a:N` output and ffmpeg would
+ * fail the whole HLS mux ("Unable to map stream"), so the two must agree.
  */
-export function buildHlsLadderArgs(inputUrl: string, renditions: RenditionSpec[] = HLS_RENDITIONS): string[] {
+export function buildHlsLadderArgs(
+  sourcePath: string,
+  renditions: RenditionSpec[] = HLS_RENDITIONS,
+  hasAudio = true,
+): string[] {
   const filterComplex = [
     `[0:v]split=${renditions.length}${renditions.map((_, i) => `[v${i}]`).join('')}`,
     ...renditions.map((r, i) => `[v${i}]scale=w=-2:h=${r.height}[v${i}out]`),
@@ -31,25 +48,21 @@ export function buildHlsLadderArgs(inputUrl: string, renditions: RenditionSpec[]
   return [
     '-y',
     '-i',
-    inputUrl,
+    sourcePath,
     '-filter_complex',
     filterComplex,
     ...renditions.flatMap((r, i) => [
       '-map',
       `[v${i}out]`,
-      '-map',
-      '0:a:0',
+      ...(hasAudio ? ['-map', '0:a:0?'] : []),
       `-c:v:${i}`,
       'libx264',
       `-b:v:${i}`,
       r.videoBitrate,
-      `-c:a:${i}`,
-      'aac',
-      `-b:a:${i}`,
-      r.audioBitrate,
+      ...(hasAudio ? [`-c:a:${i}`, 'aac', `-b:a:${i}`, r.audioBitrate] : []),
     ]),
     '-var_stream_map',
-    renditions.map((r, i) => `v:${i},a:${i},name:${r.label}`).join(' '),
+    renditions.map((r, i) => (hasAudio ? `v:${i},a:${i},name:${r.label}` : `v:${i},name:${r.label}`)).join(' '),
     '-f',
     'hls',
     '-hls_time',

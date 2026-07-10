@@ -63,8 +63,9 @@ describe.skipIf(!hasRedis)('enqueue -> worker -> status wiring (real redis-serve
         });
       });
 
-      const status = await getJobStatus(queue, jobId);
+      const status = await getJobStatus<{ doubled: number }>(queue, jobId);
       expect(status.state).toBe('completed');
+      expect(status.result).toEqual({ doubled: 42 });
 
       // Idempotency: re-enqueueing the same key returns the SAME job, no duplicate created.
       const dedupedId = await enqueueJob(queue, 'double', { n: 999 }, { idempotencyKey: 'smoke-double-21' });

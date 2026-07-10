@@ -3,7 +3,9 @@ import { QueueService } from './queue.service';
 
 const mockQueue = { close: jest.fn().mockResolvedValue(undefined) };
 const enqueueJob = jest.fn().mockResolvedValue('job-123');
-const getJobStatus = jest.fn().mockResolvedValue({ state: 'completed', progress: 100 });
+const getJobStatus = jest
+  .fn()
+  .mockResolvedValue({ state: 'completed', progress: 100, result: { manifestKey: 'hls/x/master.m3u8' } });
 
 jest.mock('@__PROJECT_SLUG__/queue-core', () => ({
   // Keep the real queueConfigSchema/etc — config/env.ts (imported transitively
@@ -39,7 +41,11 @@ describe('QueueService', () => {
   it('status() delegates to getJobStatus', async () => {
     const status = await service.status('job-123');
 
-    expect(status).toEqual({ state: 'completed', progress: 100 });
+    expect(status).toEqual({
+      state: 'completed',
+      progress: 100,
+      result: { manifestKey: 'hls/x/master.m3u8' },
+    });
     expect(getJobStatus).toHaveBeenCalledWith(mockQueue, 'job-123');
   });
 
