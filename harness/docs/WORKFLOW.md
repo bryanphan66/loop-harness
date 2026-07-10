@@ -200,6 +200,24 @@ release note → production release. *(payment milestones attach here in Full)*
 > Red-team is **required** at the 3 high-risk gates: 2.2 (threat-model), 2.9
 > (security), 2.10 (DoD).
 
+> **Non-CRUD phase-types (2.3 routing + 2.6 acceptance).** The build-manifest
+> phase block carries a **`Phase-type`**: `crud` (default) `| async-job |
+> media-pipeline | external-integration | storage`. At 2.3 a REQ-ID citing an
+> async/media/storage/integration signal (transcode, HLS, upload, queue, webhook,
+> signed-url, storage, PDF-render, email-blast) MUST route to its non-CRUD
+> phase-type — folding it into a CRUD phase is a 2.3 compile defect
+> (`docs/playbooks/build-manifest-compilation.md` step 4b). Each non-CRUD type adds
+> **type-specific acceptance categories** the 2.6 independent verifier exercises
+> against the running preview at THAT phase (`docs/gates/phase-acceptance.md`) — the
+> **streaming NFR** (first-byte, signed-URL entitlement, multi-bitrate present) is
+> asserted at the media phase, not only at 2.11. Playbooks:
+> `async-job-queue.md` · `object-storage.md` · `media-pipeline.md` ·
+> `external-integration.md` (payment stays the concrete money instance). The stack
+> ships opt-in **tier-2 primitives** — queue (`apps/api/src/common/queue/`),
+> storage adapter (`apps/api/src/common/storage/`), worker (`apps/worker/`) — wired
+> only when a non-CRUD phase exists; CRUD-only projects never boot them (YAGNI). The
+> 2.2 stack pick surfaces tier-2 when any such capability is in scope.
+
 > **Design-System Compliance is a code-review FLOOR rule (2.7) and a per-phase
 > self-check rule (2.6).** It reuses the "any dimension scoring 0 is an
 > automatic block" mechanic — it does **NOT** change the 6-dimension scoring or
@@ -337,6 +355,7 @@ phase. The verify-gate reads the RTM rule; the DoR gate reads the manifest rule.
 - **Roles:** `docs/ROLE_MAP.md`
 - **Token grammar:** `docs/TRACE_SPEC.md`
 - **Build manifest:** template `docs/templates/build-manifest.md` · playbook `docs/playbooks/build-manifest-compilation.md`
+- **Non-CRUD delivery playbooks:** `docs/playbooks/async-job-queue.md` · `object-storage.md` · `media-pipeline.md` · `external-integration.md`
 - **SRS-lite (Lite lane):** `docs/templates/srs-lite.md`
 - **Docs crosswalk:** `docs/README.md`
 - **Per-project stage tracker:** `docs/templates/STAGE.md`

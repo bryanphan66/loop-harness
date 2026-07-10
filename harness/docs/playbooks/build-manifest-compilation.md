@@ -49,6 +49,20 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
    (vertical slice first: split by screen or by sub-workflow, not by layer —
    never a "backend phase" + "frontend phase" for the same feature unless the
    API is consumed by a later phase).
+4b. **Route the phase-type — a REQ-ID's delivery shape decides its lane.** Set
+   each phase's **`Phase-type`** (`crud` default | `async-job` | `media-pipeline` |
+   `external-integration` | `storage`). A REQ-ID citing an **async / media /
+   storage / integration** signal — grep the SRS + NFR + ERD notes for
+   `transcode`, `HLS`, `upload`, `queue`, `webhook`, `signed-url`, `storage`,
+   `PDF-render`, `email-blast`, `stream`, `bitrate`, `SES`, `Zalo`, `provider` —
+   **MUST** get the matching non-CRUD phase-type carrying its type-specific
+   acceptance categories (`docs/templates/build-manifest.md` § Non-CRUD
+   phase-types + the named playbook). **Folding such a REQ-ID into a CRUD phase is
+   a 2.3 compile defect** — the CRUD trio can't assert the idempotency / signed-URL
+   / entitlement / multi-bitrate / webhook-verify NFRs, so the build agent
+   improvises the risky infra unproven. When a non-CRUD phase-type exists, confirm
+   the stack ADR (2.2) surfaced the tier-2 primitives (queue / storage / worker).
+
 5. **Write each phase block per the template:** REQ-IDs, entities (new/extend),
    endpoints, screens + floorplan class + **prototype export source file +
    fidelity strategy** (`port from export` default; `rebuild (decision: <slug>)`
@@ -86,6 +100,11 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
   vertical so each phase ends with a demonstrable journey.
 - **Kitchen-sink P1** — half the REQ-IDs in one phase. Split until every phase
   is one session.
+- **CRUD-folded infra** — an async / media / storage / integration REQ-ID
+  smuggled into a CRUD phase with no `Phase-type`. Its NFRs (idempotency,
+  signed-URL entitlement, multi-bitrate, webhook-verify) then go unasserted and the
+  build agent improvises the risky bit unproven. Route it to its non-CRUD
+  phase-type (step 4b).
 - **Re-reading the spine** — if executing a phase requires reading files its
   block does not name, the block is under-specified; fix the block, don't widen
   the read.

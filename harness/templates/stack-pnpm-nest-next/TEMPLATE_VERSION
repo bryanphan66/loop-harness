@@ -1,6 +1,13 @@
 stack-pnpm-nest-next template
-version: 0.1.1
-verified: 2026-07-06 (full local verify on fresh scaffold: install, lint, typecheck, unit, build, db boot pgvector/pgvector:pg16, migrate, seed, supertest e2e, Playwright login e2e; plus worktree-scaffold guard, husky-chained verify gate block, prettierignore, secret-scan fallback)
+version: 0.2.0
+verified: 2026-07-10 (full local verify with tier-2 added, from a clean `rm -rf node_modules`
+install: install (postinstall auto-builds queue-core/storage-core dist), lint, typecheck,
+unit, build across all workspaces incl. apps/worker + packages/queue-core +
+packages/storage-core; real-redis-server enqueue->worker->status smoke (api's QueueService
++ a real BullMQ worker); real-ffmpeg HLS-ladder transcode smoke (480/720/1080p, uploaded via
+the real LocalStorageDriver); compiled `node apps/worker/dist/main.js` boots and connects
+without the workspace-package resolution crash a raw-TS `main` field would hit; base
+`docker compose up` unaffected — redis/worker only start under --profile tier2)
 
 Pinned majors (verified exact versions in parentheses):
 | dependency        | pin      | verified  |
@@ -18,13 +25,37 @@ Pinned majors (verified exact versions in parentheses):
 | @playwright/test  | ^1.50    | 1.61.1    |
 | jest              | ^29      | 29.7.0    |
 | postgres (docker) | pgvector/pgvector:pg16 | 16.x |
+| redis (docker, tier-2) | redis:7-alpine | 7.x |
+| bullmq (tier-2)   | ^5.79    | 5.79.3    |
+| @aws-sdk/client-s3, s3-request-presigner (tier-2) | ^3.1084 | 3.1084.0 |
 
 Design decisions:
 - Zod (not class-validator) at the API boundary via ZodValidationPipe; shared-types is type-only.
 - bcryptjs (not bcrypt): no native builds, installs everywhere.
 - No lockfile shipped: scaffolded projects generate + commit their own pnpm-lock.yaml.
 - Placeholder: __PROJECT_SLUG__ (package names + titles), replaced by scripts/scaffold.sh.
+- Tier-2 (queue/storage/worker) is opt-in: not imported by AppModule, redis/worker only
+  start under `docker compose --profile tier2`. Queue/storage driver logic lives once in
+  packages/queue-core + packages/storage-core (DRY) — apps/api wraps them as NestJS
+  modules, apps/worker consumes them directly (no NestJS dependency for a background job
+  runner). Job payload contract fixed in queue-core/job-types.ts (transcode today).
+- queue-core/storage-core ship REAL runtime exports (unlike shared-types, which is
+  type-only) — so unlike shared-types they have their own `build`+`postinstall` (tsc ->
+  dist/) and `main`/`types` point at `dist`, not `src`. Without this, a compiled
+  `node dist/main.js` in production cannot resolve the raw `.ts` workspace package (Node's
+  own module resolver, not a bundler); `postinstall` guarantees `dist/` exists right after
+  `pnpm install`, before typecheck/test/build ever run, so CI's lint->typecheck->test->build
+  order needs no change.
 
 History:
+- 0.2.0 (2026-07-10): tier-2 opt-in stack code — packages/queue-core (BullMQ wrapper:
+  enqueue/status, idempotency-key dedup, retry/backoff, dead-letter), packages/storage-core
+  (StorageAdapter interface + s3/r2 + local drivers), apps/api/src/common/{queue,storage}
+  (NestJS wrappers, not wired into AppModule), apps/worker (real ffmpeg HLS 480/720/1080p
+  transcode job), redis+worker services under docker-compose `tier2` profile, tier-2 env
+  vars in .env.example. queue-core/storage-core build to `dist/` via `postinstall` (they
+  carry real runtime code, unlike the type-only shared-types package) so a compiled
+  `node dist/main.js` resolves them in production. Base db+api+web skeleton and its
+  `docker compose up` unaffected.
 - 0.1.1 (2026-07-06): db image -> pgvector/pgvector:pg16; .husky/pre-commit + pre-push chain the harness verify gate (a pnpm install can no longer disarm it); .prettierignore shields control-plane md tables; scripts/secret-scan.sh gitleaks/grep fallback; scaffold.sh worktree-safe git-init guard + base-image pre-pull tip.
 - 0.1.0 (2026-07-05): initial verified walking-skeleton template.

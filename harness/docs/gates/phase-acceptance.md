@@ -46,6 +46,27 @@ app**, never by reading the diff and assuming:
 3. **Negative path** — the phase's error/empty acceptance check(s) trigger the
    failure for real and the REAL cause surfaces in the UI (a generic message =
    FAIL, per the no-error-swallow floor rule).
+4. **Type-specific categories (non-CRUD phase-types only)** — when the phase's
+   `Phase-type` ≠ `crud`, the verifier ALSO exercises that type's categories
+   against the running preview (`docs/templates/build-manifest.md` § Non-CRUD
+   phase-types + the named playbook):
+   - `async-job` — idempotency-key holds (same key → one run), a forced failure
+     retries then dead-letters, the status endpoint reports terminal state, the
+     real cause surfaces (`docs/playbooks/async-job-queue.md`).
+   - `storage` — a signed PUT then signed GET round-trips; an **unauth GET is
+     denied**; deleting the owner removes the object; over-quota is rejected
+     (`docs/playbooks/object-storage.md`).
+   - `media-pipeline` — a large upload transcodes to the **full 480/720/1080
+     ladder + master manifest** (atomic — never half); the manifest is served via
+     signed-URL/CDN (unentitled fetch denied); progress/status surfaced; renditions
+     cleaned on delete; **streaming NFR asserted HERE — player first-byte within
+     budget, signed-URL entitlement, multi-bitrate present** (not deferred to
+     2.11) (`docs/playbooks/media-pipeline.md`).
+   - `external-integration` — sandbox credentials on the test path (no prod key
+     reachable); an unsigned webhook is rejected before any DB read; a duplicate
+     callback is idempotent; a failed outbound surfaces the real provider error
+     (`docs/playbooks/external-integration.md`).
+   A type-specific category that FAILs blocks the phase exactly like a functional AC.
 
 The verifier returns a **verdict block**:
 
@@ -55,6 +76,7 @@ Verdict: PASS | FAIL
 Checks: <n passed> / <n total>   (list each AC id → pass/fail)
 Fidelity: <screens checked → pass/divergent>
 Negative path: <triggered? real cause surfaced?>
+Type-specific: <Phase-type ≠ crud → each category → pass/fail; or n/a — crud>
 Evidence: <screenshot/log paths under plans/reports/>
 Reasons (on FAIL): <concrete, reproducible — what to fix>
 ```

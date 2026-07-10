@@ -155,7 +155,10 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes).
+it closes) — latest **v5** (non-CRUD delivery capability: manifest `Phase-type` +
+the async-job / object-storage / media-pipeline / external-integration playbooks +
+opt-in tier-2 stack primitives, so a media/async/storage/integration REQ-ID is
+routed and acceptance-verified instead of improvised into a CRUD phase).
 
 ## Traceability Tokens
 

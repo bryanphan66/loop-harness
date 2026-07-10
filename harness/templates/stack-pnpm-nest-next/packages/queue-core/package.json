@@ -1,0 +1,24 @@
+{
+  "name": "@__PROJECT_SLUG__/queue-core",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "postinstall": "tsc -p tsconfig.build.json",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "bullmq": "^5.79.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@__PROJECT_SLUG__/tsconfig": "workspace:*",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

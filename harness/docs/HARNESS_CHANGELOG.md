@@ -1,7 +1,68 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v4**.
+templates). Per-project state never lives here. Current version: **v5**.
+
+## v5 — 2026-07-10 — BS7: non-CRUD delivery capability
+
+The 7th blind spot from Macro-2 field runs: the harness assumed **every phase =
+CRUD** (entities + endpoints + screens). A REQ-ID whose real work is **async job /
+media pipeline / object storage / external integration** had no slot — the 2.3
+compile silently folded it into a CRUD phase, the build agent improvised the risky
+infra per-phase unproven, and phase-acceptance had no way to assert the right NFRs
+(idempotency, signed-URL entitlement, multi-bitrate ladder, webhook signature).
+This is the exact class that stalls Macro-2. **Field evidence (elearning-platform
+prototype):** the frozen client prototype mandates a full video pipeline
+(`C2 video-player-learning-screen` — HLS 1080p · CDN R2; `D1.4
+LessonUploadProcessing` — 248MB → HLS 480/720/1080, 72%; max 2GB) plus async
+cert/invoice PDF+QR and SES/Zalo email (SRS `SC-016..022`, `nfr.md PERF.04–06`,
+`IF.DB.02` queue, `PLF.STORAGE.01` R2, `CT.ISSUE.01` async PDF) — none expressible
+in a CRUD-only manifest. **Trade-off / token rationale:** four new playbooks + a
+manifest `Phase-type` add authoring surface, but they buy out the Macro-2 stall —
+the build agent now **wires** proven tier-2 primitives (contract fixed once) instead
+of re-architecting queue/storage/transcode per project and shipping unverified
+infra that only fails at UAT. A media/async defect caught at its own phase costs one
+in-context fix; the same defect surfacing at 2.10/2.12 costs cross-phase rework (the
+v4 lesson, now extended to non-CRUD). CRUD-only projects pay **nothing** — tier-2 is
+opt-in (YAGNI); the walking skeleton stays `db+api+web`.
+
+- **Manifest `Phase-type`** (`docs/templates/build-manifest.md`): enum `crud`
+  (default) `| async-job | media-pipeline | external-integration | storage`. For
+  non-CRUD types Entities/API/Screens are optional; the block adds type-specific
+  fields + **type-specific acceptance categories** that extend the CRUD trio
+  (functional + negative + visual-fidelity). New § Non-CRUD phase-types table +
+  coverage-checklist row.
+- **Compile routing** (`build-manifest-compilation.md` step 4b + anti-pattern): a
+  REQ-ID citing an async/media/storage/integration signal (transcode, HLS, upload,
+  queue, webhook, signed-url, storage, PDF-render, email-blast) MUST get a non-CRUD
+  phase-type — CRUD-folding it is a 2.3 compile defect.
+- **Four new playbooks** (mirroring `payment-integration.md` rigor, composed per
+  `playbook-composition-pattern.md`): `async-job-queue.md` (BullMQ+Redis —
+  idempotency-key · retry/backoff+dead-letter · status API · real-cause failure) ·
+  `object-storage.md` (S3/R2 adapter — signed PUT/GET · entitlement · cleanup ·
+  quota · minio parity) · `media-pipeline.md` (composes the two + ffmpeg —
+  resumable upload · transcode atomicity + 480/720/1080 ladder · signed HLS manifest
+  · progress · cleanup + documented ffmpeg command) · `external-integration.md`
+  (SES/Zalo/webhook — sandbox/prod credentials · webhook signature verify ·
+  idempotent handling · retry + provider-error · adapter abstraction).
+  payment-integration stays the concrete money instance.
+- **Tier-2 primitives (shipped by the stack template — separate build):** queue
+  `apps/api/src/common/queue/` (`enqueue(name,payload,{idempotencyKey}) -> jobId;
+  status(jobId)`), storage adapter `apps/api/src/common/storage/`
+  (`StorageAdapter { put; signedGetUrl; signedPutUrl; delete }`, drivers s3/r2 +
+  local/minio), worker `apps/worker/`; Redis/minio opt-in compose profiles.
+  Playbooks reference these exact contracts so projects **wire, not architect**.
+- **Acceptance/NFR wiring** (`phase-acceptance.md`): the 2.6 verifier exercises the
+  type-specific categories against the running preview — the **streaming NFR**
+  (first-byte, signed-URL entitlement, multi-bitrate present) asserted at the media
+  phase, not only 2.11. Verdict block gains a `Type-specific:` line. DoR (phase-types
+  routed + tier-2 surfaced) + DoD (non-CRUD categories recorded at-phase) lines.
+- **Wiring:** WORKFLOW non-CRUD-phase-types note + Quick Links; STAGE_GOALS 2.2
+  (stack pick surfaces tier-2 when async/media/storage/integration in scope) + 2.3
+  (compile routes phase-types); playbooks README index rows; HARNESS growth note.
+  **Independence Principle intact** — no new hard `ck-*` dep (playbook engines are
+  existing `backend-development` / `media-processing` / `devops` accelerators with
+  bare-agent fallbacks).
 
 ## v4 — 2026-07-08 — BS6: per-phase acceptance-verification gate
 

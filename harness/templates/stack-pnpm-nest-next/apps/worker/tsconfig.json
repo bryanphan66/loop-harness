@@ -1,0 +1,11 @@
+{
+  "extends": "@__PROJECT_SLUG__/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

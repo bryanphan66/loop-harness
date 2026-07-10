@@ -1,0 +1,26 @@
+{
+  "name": "@__PROJECT_SLUG__/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:watch": "dotenv -e ../../.env -- tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@__PROJECT_SLUG__/queue-core": "workspace:*",
+    "@__PROJECT_SLUG__/storage-core": "workspace:*",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@__PROJECT_SLUG__/tsconfig": "workspace:*",
+    "@types/node": "^22.10.0",
+    "dotenv-cli": "^8.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -22,8 +22,27 @@ API Swagger docs: http://localhost:3001/docs — health: http://localhost:3001/h
 | --- | --- |
 | `apps/api` | NestJS 11 · Prisma 6 · module-per-domain (`modules/auth`, `modules/users`, `modules/health`) |
 | `apps/web` | Next.js 15 App Router · Tailwind v4 · `components/ui` primitives (CVA) · `lib/api` typed fetch adapter |
+| `apps/worker` | Tier-2, opt-in: BullMQ worker process, ships a real ffmpeg HLS-transcode job |
 | `packages/shared-types` | Type-only DTO contracts shared by api + web (`import type` only) |
+| `packages/queue-core` | Tier-2, opt-in: BullMQ queue/worker factory + enqueue/status helpers, shared by api + worker |
+| `packages/storage-core` | Tier-2, opt-in: `StorageAdapter` interface + s3/r2 and local-dev drivers, shared by api + worker |
 | `packages/tsconfig` | Shared tsconfig bases (`base`, `nest`, `nextjs`) |
+
+## Tier-2 (opt-in): queue + object storage + worker
+
+Not wired into `AppModule` by default — the walking skeleton stays db+api+web. Adopt it
+when a project has an async-job / media-pipeline / storage / external-integration phase:
+
+- `docker compose --profile tier2 up -d` starts `redis` (+ `worker`, which builds
+  `apps/worker/Dockerfile` and needs ffmpeg for the sample `transcode` job — already baked
+  into that image).
+- Import `QueueModule` (`apps/api/src/common/queue`) and/or `StorageModule`
+  (`apps/api/src/common/storage`) into a feature module to get `QueueService`
+  (`enqueue`/`status`) and `StorageService` (`put`/`signedGetUrl`/`signedPutUrl`/`delete`)
+  via Nest DI.
+- `pnpm dev:worker` runs the worker locally in watch mode (needs `REDIS_URL` reachable).
+- Switch `STORAGE_DRIVER=s3` (see `.env.example`) to point at AWS S3 or an S3-compatible
+  endpoint (Cloudflare R2, MinIO) instead of the local filesystem driver.
 
 ## Conventions baked in
 
@@ -41,6 +60,7 @@ API Swagger docs: http://localhost:3001/docs — health: http://localhost:3001/h
 | Command | What |
 | --- | --- |
 | `pnpm dev` / `dev:api` / `dev:web` | Run both apps (or one) in watch mode |
+| `pnpm dev:worker` | Tier-2, opt-in: run the worker in watch mode (needs Redis reachable) |
 | `pnpm lint` / `typecheck` / `test` / `build` | Full-repo quality gates (same as CI) |
 | `pnpm db:migrate` / `db:seed` | Apply migrations / seed admin (needs db up) |
 | `pnpm --filter ./apps/api db:migrate:dev` | Create a new migration after schema changes |

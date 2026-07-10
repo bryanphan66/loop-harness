@@ -429,7 +429,13 @@ The authz model (roles, guard strategy, resource ownership rules) is stated.
 `docs/decisions/<project>-threat-model.md` holds a STRIDE table over the main
 assets/flows with a red-team pass (attacker personas: external, authenticated
 abuser, insider) and each threat mapped to a mitigation or an accepted-risk
-note. STAGE.md Current = 2.3. Stop after 15 turns.
+note. **When any in-scope REQ-ID is async / media / storage / integration** (grep
+the NFR + SRS for transcode/HLS/upload/queue/webhook/signed-url/storage/PDF-render/
+email-blast), the stack decision **surfaces the opt-in tier-2 primitives** — Redis
+queue (`apps/api/src/common/queue/`), object-storage adapter
+(`apps/api/src/common/storage/`), worker app (`apps/worker/`) — and names the
+matching playbook per capability; a CRUD-only project leaves tier-2 off (YAGNI).
+STAGE.md Current = 2.3. Stop after 15 turns.
 
 ### Step 2.3 — Implementation plan + BUILD MANIFEST + DoR
 
@@ -448,8 +454,13 @@ screen-inventory, + each screen's **prototype export source file** and its
 fidelity strategy `port from export` | `rebuild (decision: <slug>)` — port is
 the default per `playbooks/build-execution.md` § Prototype → Code Fidelity),
 **concrete runnable acceptance checks**, verify commands, and
-size (S/M/L). **Every in-scope REQ-ID appears in exactly one phase** (the
-manifest ends with the coverage checklist proving it); any phase estimated
+size (S/M/L), plus a **`Phase-type`** (`crud` default | `async-job` |
+`media-pipeline` | `external-integration` | `storage`) — every REQ-ID citing an
+async/media/storage/integration signal routes to its non-CRUD phase-type carrying
+that type's acceptance categories (`build-manifest-compilation.md` step 4b; folding
+it into a CRUD phase is a 2.3 defect). **Every in-scope REQ-ID appears in exactly
+one phase** (the manifest ends with the coverage checklist proving it); any phase
+estimated
 beyond one agent session (~10 files touched) is split; any PUB product-shot
 capture phase depends on the APP screen phases it depicts. A thin
 `plans/<YYMMDD-HHMM>-<slug>/plan.md` records ordering rationale + risks (the

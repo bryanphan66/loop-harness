@@ -10,6 +10,7 @@
     "dev": "pnpm -r --parallel dev",
     "dev:api": "pnpm --filter ./apps/api dev",
     "dev:web": "pnpm --filter ./apps/web dev",
+    "dev:worker": "pnpm --filter ./apps/worker dev:watch",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",

@@ -58,9 +58,15 @@ Shape-only scaffold. Replace <placeholders>.
 ### P1 — <phase name>
 
 - **Goal (1 line):** <user-visible capability this phase delivers>
+- **Phase-type:** `crud` *(default — enum: `crud | async-job | media-pipeline |
+  external-integration | storage`; non-CRUD types make Entities/API/Screens
+  OPTIONAL and add the type-specific fields + acceptance categories in § Non-CRUD
+  phase-types below — routed at 2.3 per `build-manifest-compilation.md`)*
 - **REQ-IDs covered:** `<MODULE.AREA.NN>`, `<MODULE.AREA.NN>` *(each in-scope REQ-ID appears in exactly ONE phase)*
 - **Entities touched:** `<Entity>` (new | migrate | extend) — per frozen ERD
+  *(optional for non-CRUD types with no owned entity)*
 - **API endpoints:** `<METHOD /path>` (auth: <roles>) — per API contract
+  *(optional for non-CRUD types with no HTTP surface)*
 - **Screens:** one line per screen — name · floorplan `<§4 class or CUSTOM>`
   (row: screen-inventory.md) · **export source**
   `<docs/visuals/prototype/exports/<engine-vN>/<file>>` · **fidelity strategy**
@@ -74,7 +80,8 @@ Shape-only scaffold. Replace <placeholders>.
 - **Acceptance checks (MANDATORY — concrete + runnable; the independent
   verifier exercises these against the running preview, so a check that cannot
   be run is a 2.3 compile defect). Every phase MUST cover all three
-  categories:**
+  categories; a non-CRUD `Phase-type` ALSO covers its type-specific categories
+  (§ Non-CRUD phase-types):**
   1. **functional** — <e.g. admin creates X via UI → appears in list with status DRAFT>
   2. **functional** — <e.g. member without role R gets 403 on POST /x>
   3. **negative-path** — <error/empty state check — trigger the failure for real; the REAL cause surfaces, no generic message>
@@ -88,6 +95,29 @@ Shape-only scaffold. Replace <placeholders>.
 ### P2 — <phase name>
 
 <same shape>
+
+## Non-CRUD phase-types *(only when a phase's `Phase-type` ≠ `crud`)*
+
+A REQ-ID whose work is **async / media / storage / integration** cannot be a CRUD
+phase (folding it into one = a 2.3 compile defect — `build-manifest-compilation.md`).
+Set the phase's `Phase-type`; Entities/API/Screens become optional; the block adds
+the type-specific fields + acceptance categories below. Each category is
+**runnable** — the verifier exercises it against the running preview at THIS phase
+(`docs/gates/phase-acceptance.md`), not deferred to a later gate.
+
+| `Phase-type` | Extra block fields | Type-specific acceptance categories | Playbook |
+|---|---|---|---|
+| `async-job` | queue job name(s); `enqueue`/`status` surface used | idempotency-key · retry/backoff + dead-letter · status-polling API · failure surfaces REAL cause | `docs/playbooks/async-job-queue.md` |
+| `storage` | bucket/key scheme; adapter driver (s3\|r2\|local) | signed PUT/GET · entitlement (unauth GET denied) · lifecycle/cleanup-on-delete · quota · local-dev parity (minio) | `docs/playbooks/object-storage.md` |
+| `media-pipeline` | ladder (480/720/1080); source→rendition keys; player | large/resumable upload · transcode atomicity + multi-bitrate ladder present · HLS manifest via signed-URL/CDN · progress/status surfaced · storage cleanup on delete · **streaming NFR (first-byte, entitlement, multi-bitrate) at this phase** | `docs/playbooks/media-pipeline.md` |
+| `external-integration` | provider(s); webhook route; adapter interface | credential resolution (sandbox vs prod) · webhook signature verify · idempotent webhook handling · retry + provider-error surfaced · adapter abstraction (swappable) | `docs/playbooks/external-integration.md` |
+
+Uses the shipped tier-2 primitives — **wire, don't architect:** queue at
+`apps/api/src/common/queue/` (`enqueue(name,payload,{idempotencyKey}) -> jobId; status(jobId)`),
+storage at `apps/api/src/common/storage/`
+(`StorageAdapter { put; signedGetUrl; signedPutUrl; delete }`), worker at
+`apps/worker/`. These boot only under their opt-in compose profile (YAGNI for
+CRUD-only projects).
 
 <!--
 LATE-PHASE RULE — PUB product-shot capture:
@@ -110,6 +140,7 @@ re-generatable. (build-execution.md § PUB product-shot capture is a LATE phase)
 - [ ] Every phase's screens have a screen-inventory floorplan row
 - [ ] Every phase's screens cite a **prototype export source** + fidelity strategy (`port from export` default; `rebuild` only with an existing `docs/decisions/<slug>.md`)
 - [ ] Every phase has **runnable acceptance checks covering all three categories** (functional + negative-path + visual-fidelity or `n/a — no screens`) and a **Verify-by** value compiled from the header cadence (`docs/gates/phase-acceptance.md`)
+- [ ] Every phase declares a **`Phase-type`**; every REQ-ID citing an async/media/storage/integration signal (transcode, HLS, upload, queue, webhook, signed-url, storage, PDF-render, email-blast) sits in a **non-CRUD** phase-type carrying its type-specific acceptance categories — none folded into a CRUD phase (`build-manifest-compilation.md`)
 - [ ] Human checkpoint cadence + preview command declared in the header
 - [ ] Any PUB product-shot capture phase **depends on every APP screen phase it depicts** (late-phase rule)
 - [ ] Change requests (CR-NN) enter as NEW phases appended here — never stretch a done phase

@@ -48,5 +48,36 @@ services:
     depends_on:
       - api
 
+  # Tier-2, opt-in: `docker compose --profile tier2 up -d` — only needed by a
+  # project with an async-job/media-pipeline/storage/external-integration
+  # phase. Base `docker compose up` (no profile) never starts these, so a
+  # simple db+api+web project is completely unaffected.
+  redis:
+    profiles: ['tier2']
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  worker:
+    profiles: ['tier2']
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+      STORAGE_LOCAL_DIR: /data/storage-local
+    volumes:
+      - worker-storage-local:/data/storage-local
+    depends_on:
+      redis:
+        condition: service_healthy
+
 volumes:
   db-data:
+  worker-storage-local:
