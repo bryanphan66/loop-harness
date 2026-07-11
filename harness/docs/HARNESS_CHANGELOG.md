@@ -3,7 +3,7 @@
 Version log of the harness operating model itself (docs, playbooks, gates,
 templates). Per-project state never lives here. Current version: **v6.8**.
 
-## v6.8 — 2026-07-11 — interactive-UI floors: reorder-both-directions (U5) + navigable breadcrumbs (U6) + Approach-B width reconciliation
+## v6.8 — 2026-07-11 — interactive-UI floors: reorder-both-directions (U5) + navigable breadcrumbs (U6) + ported-mockup width cap as a tree-wide lint (U7)
 
 The P6 human glance surfaced a cluster of **interaction** defects that the visual
 fidelity gate (which proved the *look*) did not catch — the screen matched the
@@ -21,14 +21,23 @@ gate rules (visual-fidelity.md Auto-Block 12–13 + adoption note):
 - **U6 navigable breadcrumbs.** The object-page breadcrumb rendered every crumb as
   inert text. Rule: non-last crumbs are keyboard-focusable links that route to the
   ancestor; only the last is plain `aria-current="page"`.
-- **Approach-B width reconciliation.** A ported export screen can bake a fixed
-  `max-width` (a 720px editor column) that fights the shell's content column;
-  removing it to use full content width is a **legitimate deliberate deviation**,
-  recorded as a rebuild-style note so the glance knows the divergence is intended.
+- **U7 ported-mockup width cap (root-cause fix, not a patch).** The frozen export
+  screens are drawn as centered narrow columns, so each ported screen bakes its
+  own `maxWidth: 720/760` that overrides the shell content column and renders the
+  page not-full-width. This is not a one-off — the cap rides in with every ported
+  screen, so it surfaced on the chapter editor and then AGAIN on the sibling
+  lesson editor. The remedy is therefore NOT another screen-local assertion but a
+  **single lint over the whole screen tree** (`check-admin-screen-width-caps.mjs`,
+  wired into `lint:gates`): any LARGE inline `maxWidth`/`max-w-[…px]` (≥480px) under
+  the admin route dir fails the gate; small element caps + control `minWidth`s pass;
+  a truly-intended narrow column opts out with `// width-cap-ok: <reason>`. Removing
+  the cap to fill the shell column is a legitimate deliberate export deviation.
 
 Same lesson as v6.1–v6.5: a defect the human finds once becomes a machine
-assertion so it never returns — here the class was interaction, not appearance, so
-the fidelity gate grew interaction teeth alongside its visual ones.
+assertion so it never returns — here two of the three (U5/U6) were interaction, not
+appearance, so the fidelity gate grew interaction teeth; and U7 adds the meta-rule
+that **a defect recurring across sibling ported screens is promoted to one lint over
+the entire screen directory** — catch the whole class at the source, not per-screen.
 
 ## v6.7 — 2026-07-11 — front-load the cross-cutting floors: the per-phase gate proves them, the human confirms
 

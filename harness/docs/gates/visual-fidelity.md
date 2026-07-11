@@ -234,13 +234,24 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     `aria-current="page"`. A breadcrumb that renders all crumbs as inert spans is a
     dropped interaction (the trail exists to navigate, not to decorate) and blocks.
 
-> **Approach-B width reconciliation** (adoption note, not a block by itself): a
-> ported export screen can carry a **fixed `max-width`** baked into the mockup
-> (e.g. a 720px editor column) that fights the host shell's content column. When
-> the operator wants the screen to use the shell's full content width, removing
-> that cap is a **legitimate deliberate deviation** from the frozen export —
-> record it as a `rebuild (decision: <slug>)`-style note in the phase block so the
-> fidelity glance knows the divergence is intended, and keep it responsive.
+14. **A ported-mockup width cap fights the shell content column** (U7 RED) — the
+    frozen export screens are drawn as centered narrow columns (a mockup-canvas
+    convention), so each ported screen tends to bake its own `maxWidth: 720/760`
+    (or `max-w-[720px]`) that overrides the shell's `.page`/`.page-body` content
+    column and renders the page not-full-width. **Root cause, not a one-off:** the
+    cap rides in with EVERY ported screen, so fixing it per-screen is whack-a-mole
+    (it surfaced on the chapter editor, then again on the sibling lesson editor).
+    **Remedy is a single machine guard over the whole screen tree**, not a
+    per-screen assertion: a lint (`scripts/check-admin-screen-width-caps.mjs`)
+    fails when any screen under the admin route dir carries a LARGE inline
+    `maxWidth`/`max-w-[…px]` (≥ ~480px = a content-column cap, not a badge/cell),
+    wired into `lint:gates`. Small element caps and control `minWidth`s are fine.
+    Removing the cap so the page fills the shell column is a **legitimate
+    deliberate deviation** from the frozen export; a genuinely intended narrow
+    admin column opts out with a `// width-cap-ok: <reason>` line. General rule:
+    when a ported-export defect recurs across sibling screens, promote the fix
+    from a screen-local regression assertion to **one lint over the entire ported
+    screen directory** — catch the whole class at the source, at once.
 
 ## Regression Ledger — a fixed UI defect NEVER comes back
 
