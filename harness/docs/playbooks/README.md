@@ -55,6 +55,7 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 | [template.md](template.md) | new playbooks | Canonical shape for a new playbook (Engine + step + Variant). |
 | [design-system-3-tier.md](design-system-3-tier.md) | cross-stage (1.10–1.12 + 2.6–2.10) | Owns 3-tier UI enforcement: Tier-1 floorplans/behavior (`docs/design-system/design-rules.md`), Tier-2 tokens + Tier-3 components (via `ui-design-system-contract.md`), screen-inventory classification (via `visual-and-behavioral-modeling.md` 1.11). HARD gate. |
 | [session-retrospective.md](session-retrospective.md) | Post-Build 3.6 + always-on | End-of-session cross-task insight capture; promotes `experimental` playbooks to `verified`. |
+| [status-surfaces-ops-and-client.md](status-surfaces-ops-and-client.md) | the two status Artifacts | Internal ops-board (team) + curated client-facing roadmap (PM-owned, CS-forwarded). Same verified facts, two readers; phase→value-bucket recipe + curation checklist. Composes `bilingual-delivery-template-pattern.md` (D4). |
 
 ### Macro-Stage 1 — Pre-Build *(built fully)*
 

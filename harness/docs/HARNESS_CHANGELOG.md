@@ -1,7 +1,29 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.8**.
+templates). Per-project state never lives here. Current version: **v6.9**.
+
+## v6.9 — 2026-07-11 — the status surface splits in two: internal ops-board + curated client-facing roadmap
+
+The status Artifact (v6.6) was a single surface — full engineering truth for the
+team. But that surface must NEVER be handed to the client: it carries phase IDs,
+SHAs, harness versions, gate names, stack nouns. The run therefore keeps **two**
+hosted Artifacts, each to its own stable URL:
+
+- **Internal ops-board** — unchanged: the team's cockpit, everything revealed.
+- **Client-facing roadmap** — a *curated* buyer view (Locked Decision D4): same
+  verified facts, but grouped into **value buckets** (not P-phases), stripped of
+  all machine tokens, one honest %-framed-positively, SOW-date milestones, and
+  only the blockers **the client must act on** phrased as a courteous "what we need
+  from you" callout. It is a **PM deliverable the CS role forwards** to the client;
+  in a solo run the operator wears both hats but the two files stay separate — the
+  internal board is never the thing sent out.
+
+New playbook `playbooks/status-surfaces-ops-and-client.md` owns the how (phase→
+value-bucket roll-up recipe + a 5-point curation checklist that fails a surface
+that leaks any internal token or inflates the number); HARNESS.md § Status Artifact
+gains the two-surface table + curation rules + the PM/CS ownership handoff. Same
+verify-at-source discipline (FC6) governs both — curation reframes, it never lies.
 
 ## v6.8 — 2026-07-11 — interactive-UI floors: reorder-both-directions (U5) + navigable breadcrumbs (U6) + ported-mockup width cap as a tree-wide lint (U7)
 

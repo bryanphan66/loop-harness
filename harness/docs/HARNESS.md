@@ -168,6 +168,48 @@ Practice:
 The status Artifact is the operator's cockpit; the reports are the flight
 recorder. Both are kept; they serve different readers.
 
+### Two surfaces — internal ops-board vs client-facing roadmap
+
+The status Artifact above is the **internal ops-board**: full engineering truth
+for the *team* — phase IDs, SHAs, harness versions, deploy state, gate results,
+the operator's-language gloss. It reveals everything.
+
+A client must never be handed that surface. So the harness keeps a **second,
+separate Artifact — the client-facing roadmap** — a *curated* view the delivery
+side controls, aligned with Locked Decision **D4** (client-facing surfaces are
+forked + localized; internal technical artifacts stay English). It is the same
+truth, filtered and reframed for the buyer:
+
+| | Internal ops-board | Client-facing roadmap |
+|---|---|---|
+| Reader | The team | The client |
+| Language | Engineering + operator gloss | Clean business language, **zero internal jargon** (no phase IDs, SHAs, harness versions, stack terms) |
+| Unit | Per-phase (P0…Pn) + gates | **Value groups** (business capability buckets) + SOW milestones + dates |
+| Progress | Exact phase count / % | Same honest %, positively framed (foundation + core first) |
+| Blockers | Every FC / OQ, technical | Only the ones **the client must act on**, phrased as a courteous action item |
+| Control | Raw, mirrors truth | **Curated** — the delivery side decides what the client sees |
+
+Curation rules (so the client surface stays honest AND clean):
+- **Never inflate.** The % and "delivered" states are the same verified facts as
+  the ops-board (FC6). Reframing is allowed; lying is not.
+- **Group by value, not by phase.** Collapse the P-list into business buckets the
+  client recognizes (accounts, courses, payments, certificates, …). A bucket's
+  state is the roll-up of its phases (delivered / in-progress / upcoming / waiting).
+- **Strip the machine.** No phase numbers, commit SHAs, harness versions, gate
+  names, or stack nouns (HLS, authz, dnd-kit…) — say the capability, not the tech.
+- **Surface only client-owed blockers**, as a "what we need from you" callout
+  (e.g. legacy-DB credentials for migration), framed so it does not read as our delay.
+- **Timeline in SOW dates**, milestone-level.
+- **Separate file → separate URL**, published + kept stable independently of the
+  ops-board; refreshed at the same milestones.
+
+**Ownership / handoff (team model).** The client roadmap is a **PM-role
+deliverable**: the PM compiles it from the same verified state, and the **CS
+(customer-success) role forwards it to the client** as the progress attachment.
+The PM controls curation; CS controls delivery. In a solo run the operator wears
+both hats but the two surfaces stay distinct — the internal board is never the
+thing sent out.
+
 ## Locked Decisions
 
 Shorthand labels cited across the docs (`D1`…`D6`). These are settled — an
@@ -190,7 +232,7 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes) — latest **v6.8** (interactive-UI floors: any drag-reorder uses a real DnD primitive with a keyboard sensor and the gate asserts sort_order persists across reload in BOTH directions — the hand-rolled down-direction no-op is auto-blocked (U5); object-page breadcrumb non-last crumbs are navigable links, not dead text (U6); a ported export screen's baked-in fixed max-width is reconciled against the shell content column as a legitimate deliberate deviation — the fidelity gate grew interaction teeth alongside its visual ones after a screen matched the export pixel-for-pixel yet was operationally broken; prior **v6.7**: front-load the cross-cutting floors: per-phase verifier gains Leg-5 Universal-UI (shared fidelity fixture, inherited not re-copied), Leg-6 Security (default-deny authz + fail-closed secrets), Leg-7 Index-discipline — the machine proves the whole class in-phase, the human confirms; Status Artifact: a live, always-current human tracking dashboard refreshed at each milestone — cockpit to the reports' flight recorder; Regression Ledger: every noted-and-fixed UI defect becomes a permanent machine assertion so it never returns as the run continues; UI phases carry the SRS-mandated cross-cutting NFRs
+it closes) — latest **v6.9** (the status surface splits in two: the internal ops-board stays the team's full-truth cockpit, and a separate **curated client-facing roadmap** — value buckets not phase IDs, machine tokens stripped, one honest positively-framed %, SOW-date milestones, only client-owed blockers as a courteous callout — becomes a PM deliverable the CS role forwards to the client; same verify-at-source facts, two readers, two stable URLs — `playbooks/status-surfaces-ops-and-client.md` owns the phase→value-bucket recipe + curation checklist; prior **v6.8**: interactive-UI floors: any drag-reorder uses a real DnD primitive with a keyboard sensor and the gate asserts sort_order persists across reload in BOTH directions — the hand-rolled down-direction no-op is auto-blocked (U5); object-page breadcrumb non-last crumbs are navigable links, not dead text (U6); a ported export screen's baked-in fixed max-width is reconciled against the shell content column as a legitimate deliberate deviation — the fidelity gate grew interaction teeth alongside its visual ones after a screen matched the export pixel-for-pixel yet was operationally broken; prior **v6.7**: front-load the cross-cutting floors: per-phase verifier gains Leg-5 Universal-UI (shared fidelity fixture, inherited not re-copied), Leg-6 Security (default-deny authz + fail-closed secrets), Leg-7 Index-discipline — the machine proves the whole class in-phase, the human confirms; Status Artifact: a live, always-current human tracking dashboard refreshed at each milestone — cockpit to the reports' flight recorder; Regression Ledger: every noted-and-fixed UI defect becomes a permanent machine assertion so it never returns as the run continues; UI phases carry the SRS-mandated cross-cutting NFRs
 — i18n VI+EN + responsive ≥375px — as DoD with machine assertions, not just the
 frozen desktop-single-language look; the stale-export trap: the local export is a
 CACHE, not the source of truth — pin the live Claude-Design project + version and
