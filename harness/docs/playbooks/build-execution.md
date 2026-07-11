@@ -190,55 +190,82 @@ empty/placeholder Floorplan cell once `screen-inventory.md` exists, and the 2.7
 review (`code-review-scoring.md`) treats an unclassified or rule-violating screen
 as an automatic merge block.
 
-## Prototype → Code Fidelity (port-first by default)
+## Prototype → Code Fidelity (consume the export as code — do NOT re-draw)
 
 The frozen prototype is built in an external design tool (Claude Design / Open
-Design) that **exports real HTML/CSS/JSX** (bundle at
-`docs/visuals/prototype/exports/<engine-vN>/`). **The export is the primary
-implementation reference for EVERY zone — port it, don't re-derive it:**
+Design) that **exports real code** — a bundle at
+`docs/visuals/prototype/exports/<engine-vN>/`: `tokens.css` + `components.css`
+(+ product-specific `components-<domain>.css`), a component kit `kit.jsx`, and
+per-screen `screens-*.jsx`. **When a frozen client-approved export exists, the
+build ADOPTS that code verbatim — it does NOT re-implement the look in fresh
+Tailwind by "reading" the export.** Full method: `prototype-export-adoption.md`.
 
-| Zone | Target | Strategy |
-|---|---|---|
-| **PUB** (landing, **pricing**, marketing, auth) | **Pixel-faithful** — this is the public "shop window" | **PORT the export** markup + styles ~verbatim into the marketing routes; wire content/links. Do NOT rebuild from a screenshot. |
-| **APP / ADM** (dashboards, tables, wizards, forms) | **Design-faithful + data-wired** | **PORT the export** markup/structure/styles as the implementation reference, reconcile its values to **Tier-2 tokens**, then wire real data + loading/empty/error states into the ported structure. Do NOT rebuild-from-spec via generic design-system components. |
+**The rule (adopt, don't re-approximate):**
 
-**Why port-first for APP/ADM too (failure evidence):** an earlier rule said
-"rebuild APP/ADM via the design-system; the export is a spec, not the
-implementation". On a design-heavy product that rule produced a
-plain-but-functionally-correct app that passed every gate (floorplan
-classification, token compliance, e2e) while **looking nothing like the frozen
-mockup** — the operator rejected it at UAT and the screens had to be re-ported
-from the export anyway (example: the auto-script Macro-2 run, UI-port fix leg).
-The client froze the *prototype*, not an abstract spec; the build must look like
-what was frozen.
+1. **Bring the export's real CSS into the app** — copy `tokens.css` +
+   `components.css` (+ `components-<domain>.css`) into
+   `apps/web/src/styles/prototype/` and import them globally. The theme + spacing
+   + component look now hold **by construction**, not by an agent re-deriving
+   them.
+2. **Port the kit components KEEPING the exact classNames** — each `kit.jsx`
+   component becomes a real app component (`Button`/`Input`/`Logo`/`AuthShell`/
+   `OtpInput`/`Badge`/…) that renders **the same class names** the imported CSS
+   targets. Same classes → the CSS applies → the component looks right with zero
+   eye-tuning. Changing the markup/classes to "clean it up" breaks the CSS
+   binding — don't.
+3. **Rebuild each screen from its `screens-*.jsx` structure** — same element
+   tree, same components, same classes as the export screen; then wire real
+   data / routing / API into that structure. Content changes; structure + look
+   do not.
+4. **Wire ONLY the real data / behaviour** — routing, API calls, form state,
+   loading/empty/error states — into the adopted markup. Everything visual came
+   from the export; the build adds only what the export could not carry.
 
-Porting APP/ADM does NOT waive the design-system contract — it composes with it:
-- Reconcile the export's raw colors/typography/spacing to **Tier-2 tokens**
-  (the export tends to hardcode values; tokenize them — same visual result,
-  compliant source). Genuinely one-off values may stay local if recorded.
+**Why adopt-as-code, NOT re-draw (failure evidence):** an earlier rule said
+"port the export markup/structure/styles as the *reference*, reconcile to Tier-2
+tokens, rebuild in the app's own Tailwind". Re-implementing a frozen
+Claude-Design export by *reading* it into fresh Tailwind reproduced the
+functional skeleton but landed at **~80%**: dropped elements (logo, the
+"Đăng ký học" link, the VI/EN toggle), the **wrong theme** (dark instead of the
+export's light-first), a washed-out primary button, and a broken **OTP input**
+(backspace did not delete + step back) — all requiring heavy manual eye-tuning
+and still diverging (elearning-platform P1/P2/P3). The fix that reached **~99%
+by construction** did the opposite: it brought the export's real `tokens.css` +
+`components.css` in, ported the kit components keeping their classNames, and
+rebuilt the screens from `screens-*.jsx` — wiring only real data (elearning
+commit `re-base auth screens on the frozen prototype export`). The client froze
+the *prototype code*; adopt it, don't re-approximate it. **An LLM re-drawing a
+design from a screenshot or a JSX read is the fidelity-loss step — remove it.**
+
+Adopting the export does NOT waive the design-system contract — it composes:
+- The export's `tokens.css` **is** the Tier-2 token layer for this project (its
+  CSS variables are the tokens). Screens use those variables via the ported
+  components — no hardcoded values re-introduced, no scaffold/default theme.
 - The screen's §4 floorplan row (screen-inventory) still applies — a frozen
   prototype screen already conforms to its floorplan (the 1.12 gate checked it),
-  so porting preserves conformance by construction.
-- Reuse Tier-3 components where the export's structure maps 1:1 onto an existing
-  component; port bespoke structure where it doesn't. Do not force the export
-  into a generic component that changes its look.
-- **Every ported screen records its export source file** in its build-manifest
-  phase block, and passes the **visual-fidelity check**
-  (`docs/gates/visual-fidelity.md`): screenshot of the running screen
-  side-by-side with the export render — structurally/visually divergent = block.
+  so adopting its structure preserves conformance by construction.
+- The ported kit **is** the Tier-3 inventory — record it in
+  `src/components/README.md` so later screens reuse, never re-invent (a
+  re-invented kit component is a build-phase BLOCK).
+- **Every screen records its export source file** in its build-manifest phase
+  block and satisfies the **visual-fidelity gate**
+  (`docs/gates/visual-fidelity.md`): its required-element + interaction
+  assertions pass on the running app AND the human glance approves the
+  side-by-side.
 
-**Deviation needs a decision record.** Rebuilding a screen from spec instead of
-porting (e.g. the export for that screen is broken, or the screen has no
-prototype) is allowed ONLY with a recorded `docs/decisions/<slug>.md` naming the
-screens and the reason. The build-manifest phase block marks each screen
-`port from export` or `rebuild (decision: <slug>)` — never silently the latter.
+**Fallback — no frozen export exists** (net-new screen, or a screen the
+prototype never covered): build it via the design-system (Tier-1 floorplan +
+Tier-2 tokens + Tier-3 components). This is a recorded `rebuild (decision:
+<slug>)` in the phase block, never a silent choice — the build-manifest marks
+each screen `adopt from export` (default when an export exists) or
+`rebuild (decision: <slug>)`.
 
-Guardrails when porting (all zones):
-- **Real assets required** — placeholders do not port. Logo + hero imagery must
-  be provided or generated (`ai-artist` / `ai-multimodal`) before the PUB build,
-  so it ports once.
-- The plan (2.3) states the fidelity strategy explicitly per zone; the manifest
-  carries it per screen.
+Guardrails (all zones):
+- **Real assets required** — placeholders do not adopt. Logo + hero imagery must
+  be provided or generated (`ai-artist` / `ai-multimodal`) before the build, so
+  the real asset is in the adopted markup once.
+- The plan (2.3) states adopt-vs-rebuild per zone; the manifest carries it per
+  screen.
 
 ### PUB product-shot capture is a LATE phase
 
@@ -330,8 +357,16 @@ agent reading this at the start of 2.6:
   inventory) the build reuses from.
 - `docs/design-system/design-rules.md` — Tier-1 §4/§7/§8/§10 rules a screen build
   consults; never invent a floorplan.
-- `docs/gates/visual-fidelity.md` — the per-screen screenshot-vs-export check
-  every ported screen must pass (2.6 self-check, 2.7 floor rule, 2.10 DoD).
+- `prototype-export-adoption.md` — the step-by-step method § Prototype → Code
+  Fidelity points to (adopt the export's CSS + kit + screens verbatim).
+- `docs/gates/visual-fidelity.md` — the toothy per-screen gate every UI phase
+  must pass: machine-checkable Playwright assertions (element completeness +
+  interaction behaviour) + a human side-by-side glance before the phase closes
+  (2.6 leg, 2.7 floor rule, 2.10 DoD).
+- `docs/HARNESS.md` § Control-Plane Failure Classes — **FC6** (verify at the real
+  source, never a wrapper exit) + **FC7** (human review must be real — surface
+  the side-by-side, no rubber-stamp) bind this playbook's commit/push +
+  fidelity-gate legs.
 - `docs/gates/phase-acceptance.md` — the per-phase acceptance-verification gate
   (independent verifier + cadence-driven human checkpoint) this playbook's
   Incremental Preview serves.

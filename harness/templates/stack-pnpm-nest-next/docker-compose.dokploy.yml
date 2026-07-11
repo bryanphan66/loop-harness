@@ -1,0 +1,120 @@
+# Dokploy deploy overlay — point the Dokploy app's "compose path" at THIS
+# file (not docker-compose.yml). It must be self-contained: Dokploy's label
+# injector (adds traefik routing labels per domain'd service) reads a single
+# compose file and does NOT expand `include:`, so this duplicates the base
+# docker-compose.yml service definitions rather than layering on top of it.
+# Keep the service set here in sync with docker-compose.yml by hand.
+#
+# Differences from docker-compose.yml (base, local dev):
+# 1. No `profiles:` gating — Dokploy's compose deploy always runs whatever is
+#    in the file (no `--profile` flag support in its UI), so every service a
+#    deployed project needs must be unconditional here. minio + minio-mc are
+#    OMITTED on purpose: they're a local/CI-only S3-API emulator (see
+#    docker-compose.yml's comment on the `minio` service) — a real Dokploy
+#    deploy points STORAGE_S3_ENDPOINT at actual Cloudflare R2 / AWS S3
+#    instead (README.md, "Tier-2" section), so shipping the emulator
+#    container to production would be pointless and wasteful. Drop the
+#    `redis`/`worker` blocks below too if a project has no tier-2 code.
+# 2. `dokploy-network` (external, created by Dokploy itself) is added so a
+#    service can be assigned a domain in the Dokploy UI. Dokploy's per-domain
+#    network injection REPLACES a service's `networks:` with just
+#    `dokploy-network` unless the compose file already lists more than one
+#    network for it — which would silently cut `api` off from `db` (and
+#    `redis`, if tier-2 is on), breaking Prisma with a connection error
+#    (P1001) the moment `api` gets a domain. Listing `[default,
+#    dokploy-network]` on `api` up front keeps both reachable. `web` doesn't
+#    talk to `api` over the internal network (it calls the public
+#    NEXT_PUBLIC_API_URL from the browser), so it doesn't need this.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d app']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/app?schema=public
+      API_PORT: 3001
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret}
+      # STORAGE_* only takes effect once a feature module wires in
+      # StorageModule AND STORAGE_DRIVER=s3 points at a real R2/S3 endpoint
+      # (see the header comment: no minio in this overlay).
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+      STORAGE_LOCAL_DIR: /data/storage-local
+      STORAGE_S3_BUCKET: ${STORAGE_S3_BUCKET:-app-media}
+      STORAGE_S3_REGION: ${STORAGE_S3_REGION:-auto}
+      STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT:-}
+      STORAGE_S3_ACCESS_KEY_ID: ${STORAGE_S3_ACCESS_KEY_ID:-}
+      STORAGE_S3_SECRET_ACCESS_KEY: ${STORAGE_S3_SECRET_ACCESS_KEY:-}
+      STORAGE_S3_FORCE_PATH_STYLE: ${STORAGE_S3_FORCE_PATH_STYLE:-false}
+    ports:
+      - '3001:3001'
+    networks: [default, dokploy-network]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      # See apps/web/Dockerfile + docker-compose.yml: NEXT_PUBLIC_API_URL
+      # must be a build arg (Next inlines it at `next build` time), not a
+      # runtime env var. Point this at api's PUBLIC Dokploy domain, not the
+      # internal service name — the browser fetches it directly.
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?required}
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+      STORAGE_LOCAL_DIR: /data/storage-local
+      STORAGE_S3_BUCKET: ${STORAGE_S3_BUCKET:-app-media}
+      STORAGE_S3_REGION: ${STORAGE_S3_REGION:-auto}
+      STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT:-}
+      STORAGE_S3_ACCESS_KEY_ID: ${STORAGE_S3_ACCESS_KEY_ID:-}
+      STORAGE_S3_SECRET_ACCESS_KEY: ${STORAGE_S3_SECRET_ACCESS_KEY:-}
+      STORAGE_S3_FORCE_PATH_STYLE: ${STORAGE_S3_FORCE_PATH_STYLE:-false}
+    volumes:
+      - worker-storage-local:/data/storage-local
+    depends_on:
+      redis:
+        condition: service_healthy
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  db-data:
+  worker-storage-local:

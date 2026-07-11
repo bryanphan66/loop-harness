@@ -155,10 +155,34 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes) — latest **v5** (non-CRUD delivery capability: manifest `Phase-type` +
-the async-job / object-storage / media-pipeline / external-integration playbooks +
-opt-in tier-2 stack primitives, so a media/async/storage/integration REQ-ID is
-routed and acceptance-verified instead of improvised into a CRUD phase).
+it closes) — latest **v6** (toothy visual-fidelity gate: adopt the frozen
+prototype export **as code** instead of re-drawing it, per-screen Playwright
+fidelity assertions + a human side-by-side glance replace the builder's hollow
+"matches export" self-claim, plus control-plane rules FC6 (verify at the real
+source) + FC7 (make human review real)).
+
+## Control-Plane Failure Classes
+
+Recurring build failures are classified so the harness fixes the **class**, not
+the instance (full taxonomy + evidence in `docs/HARNESS_CHANGELOG.md`). Two are
+control-plane rules every orchestrator + verifier obeys:
+
+- **FC6 — verify at the real source, never trust a wrapper signal.** A tool's
+  own output/state is the truth — not a shell wrapper's exit code, a `| tail`'d
+  tail, or a relayed "exit 0". **Evidence:** an orchestrator reported a push as
+  `exit 0` off a `git push … | tail` pipeline while `git push` actually returned
+  1 (the remote **rejected** it) — the pipe masked the real exit and false
+  success was relayed. Rule: read the operation's real result (git's own
+  stderr/`git status`/the remote ref; a health endpoint's `.status`, not an HTTP
+  200; the running artifact's version, not a green CI run). A gate that checks a
+  wrapper instead of the source is toothless.
+- **FC7 — make human review real; no rubber-stamp.** A checkpoint that asks the
+  operator to "approve" without **surfacing the artifact** produces a blind OK.
+  Every human gate MUST surface what it is asking about — for UI, the built
+  screenshot **side-by-side** with the prototype image (`docs/gates/visual-fidelity.md`
+  Tooth B). The machine teeth (assertions, source checks) do the heavy lifting;
+  the human judges only what a machine cannot (aesthetics), and only when it is
+  actually put in front of them.
 
 ## Traceability Tokens
 

@@ -65,12 +65,17 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
 
 5. **Write each phase block per the template:** REQ-IDs, entities (new/extend),
    endpoints, screens + floorplan class + **prototype export source file +
-   fidelity strategy** (`port from export` default; `rebuild (decision: <slug>)`
-   only with a recorded decision — `build-execution.md` § Prototype → Code
-   Fidelity), **concrete runnable acceptance
+   fidelity strategy** (`adopt from export` default — adopt the export as code;
+   `rebuild (decision: <slug>)` only, with a recorded decision, when no export
+   covers the screen — `build-execution.md` § Prototype → Code Fidelity +
+   `prototype-export-adoption.md`) + each UI screen's **fidelity contract as
+   executable assertions** (required elements + interactions to encode as a
+   Playwright fidelity spec — `docs/gates/visual-fidelity.md`; prose is not a
+   contract), **concrete runnable acceptance
    checks covering all three MANDATORY categories** — functional,
    negative-path (trigger the failure for real; the real cause must surface),
-   and visual-fidelity per shipped screen (`n/a — no screens` where true) — a
+   and visual-fidelity per shipped screen (fidelity assertions green + glance;
+   `n/a — no screens` where true) — a
    check names an actor, an action, and an observable outcome; an independent
    verifier will execute these against the running preview
    (`docs/gates/phase-acceptance.md`), so an unrunnable check is a compile

@@ -40,9 +40,12 @@ app**, never by reading the diff and assuming:
 
 1. **Functional AC** — every numbered acceptance check in the phase block is
    exercised as written (actor → action → observable outcome) and holds.
-2. **Visual fidelity** — each screen the phase ships, side-by-side vs its
-   prototype export render per `docs/gates/visual-fidelity.md` (an implementer
-   self-check is not a substitute — the verifier re-checks with fresh eyes).
+2. **Visual fidelity** — each screen the phase ships has its **Playwright
+   fidelity assertions** (element completeness + interaction behaviour) run
+   GREEN and its screenshot captured for the human side-by-side glance, per
+   `docs/gates/visual-fidelity.md`. The verifier RUNS the assertions — it does
+   NOT LLM-compare two images, and an implementer's "matches export" self-claim
+   is not a substitute.
 3. **Negative path** — the phase's error/empty acceptance check(s) trigger the
    failure for real and the REAL cause surfaces in the UI (a generic message =
    FAIL, per the no-error-swallow floor rule).

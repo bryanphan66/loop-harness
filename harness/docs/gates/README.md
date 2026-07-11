@@ -31,11 +31,13 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 > by `/gate-check` alongside the step gate. It is internal — it does **not** page
 > the client.
 
-> **`visual-fidelity.md`** is a per-screen checklist proving the running app
-> **looks like the frozen prototype**: for each key APP/ADM screen, a
-> running-app screenshot compared side-by-side with the screen's prototype
-> export render; structural/visual divergence without a recorded rebuild
-> decision = auto-block. **Self-checked per phase at 2.6**, enforced as a
+> **`visual-fidelity.md`** is a per-screen gate proving the running app **is**
+> the frozen prototype, with real teeth: (a) **Playwright fidelity assertions**
+> per screen — element completeness + interaction behaviour, a RED test =
+> auto-block; (b) a **human side-by-side glance** (built screenshot vs prototype
+> image) before the phase closes. NOT an agent self-cert or an LLM image-compare.
+> Missing/RED assertions or a missing glance (or no export citation + no recorded
+> rebuild decision) = auto-block. **Acceptance leg at 2.6**, enforced as a
 > code-review **floor rule at 2.7**, and filled with evidence at **2.10** (DoD).
 > Complements `design-system-compliance.md` — compliance checks classification
 > and rules; fidelity checks the screen actually matches the design the client

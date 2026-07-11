@@ -4,6 +4,10 @@ FROM node:22-alpine AS build
 RUN corepack enable
 WORKDIR /repo
 
+# Next.js inlines NEXT_PUBLIC_* env vars into the browser bundle at BUILD
+# time (next build below), not at container-start time — so this MUST be a
+# build ARG, set BEFORE `next build` runs. A runtime-only `docker run -e`
+# or compose `environment:` entry is too late and ships an empty API URL.
 ARG NEXT_PUBLIC_API_URL=http://localhost:3001
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 

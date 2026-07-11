@@ -52,8 +52,13 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      # Next.js inlines NEXT_PUBLIC_* into the browser bundle at BUILD time
+      # (next build), not at container-start time — a runtime `environment:`
+      # entry here would be too late and ship an empty API URL. Must be a
+      # build arg, consumed by apps/web/Dockerfile's `ARG NEXT_PUBLIC_API_URL`
+      # before its `next build` step.
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:3001
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
     ports:
       - '3000:3000'
     depends_on:

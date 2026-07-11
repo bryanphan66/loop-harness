@@ -96,6 +96,10 @@ build). If it happens: `rm -rf apps/web/.next` and restart `next dev`.
 - `docker-compose.prod.yml` builds both images (context = repo root) and runs
   `prisma migrate deploy` before starting the API. Required env: `POSTGRES_USER`,
   `POSTGRES_PASSWORD`, `CORS_ORIGIN`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `NEXT_PUBLIC_API_URL`.
+- **Dokploy:** point the app's compose path at `docker-compose.dokploy.yml`, not
+  `docker-compose.yml` or `docker-compose.prod.yml` — it's a self-contained overlay
+  (Dokploy doesn't expand compose `include:`) with the `dokploy-network` wiring a
+  domain'd `api` needs to keep reaching `db`/`redis` (see that file's header comment).
 - CI (`.github/workflows/ci.yml`): lint → typecheck → unit → build, plus an integration job
   against a Postgres service (migrate + seed + supertest).
 

@@ -1,7 +1,83 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v5.2**.
+templates). Per-project state never lives here. Current version: **v6**.
+
+## v6 — 2026-07-11 — toothy fidelity gate + adopt-export-as-code (FC2/FC3 root fix) + FC6/FC7
+
+The live elearning-platform run surfaced a CLASS of UI-fidelity failure the v3
+"port-first" rule did not close: **P1/P2/P3 diverged hard from the frozen
+Claude-Design prototype** (dark theme instead of the export's light, logo +
+"Đăng ký học" link + VI/EN toggle dropped, washed-out primary button, a broken
+OTP input where backspace didn't delete + step back) **while the automated
+verifier stamped PASS** on the builder's own "matches export" claim. Root cause
+= two classes: **FC2 (fidelity gap)** — "port from export" was interpreted as
+*re-implement the look in fresh Tailwind by reading the export*, which reproduces
+the skeleton but silently drops elements + gets the theme wrong (~80%); and
+**FC3 (toothless verification)** — the gate was the builder's unverified claim,
+no assertions, no human eyes.
+
+**The pivot — approach B: consume the export as CODE, don't re-draw it.** When a
+frozen client-approved export exists (Claude-Design export:
+`tokens.css`/`components.css`/`components-<domain>.css` + `kit.jsx` components +
+`screens-*.jsx`), the build now **adopts it verbatim**: bring the export's real
+CSS into the app, port the kit components **keeping the exact classNames** so the
+CSS applies, rebuild each screen from its `screens-*.jsx` structure, and wire
+only real data/routing/API. **Evidence it works:** the elearning fix (commit
+*re-base auth screens on the frozen prototype export* — verbatim CSS +
+components, real data) reached **~99% by construction** where the re-draw sat at
+~80% with heavy eye-tuning. The LLM re-drawing step IS the fidelity-loss step —
+it is removed. The old "reconcile-and-rebuild-in-our-own-Tailwind" wording is
+quoted in `build-execution.md` as the FAILURE.
+
+**Toothy verification (FC3).** The visual-fidelity gate's teeth are now
+**machine-checkable, not an LLM opinion**: (a) **per-screen Playwright
+assertions** — element completeness (every element/icon/link/toggle the
+prototype screen has is present in the built DOM) + interaction behaviour (e.g.
+OTP: type fills+advances, backspace deletes+steps back, paste fills, submit
+disabled until valid) — a dropped element / wrong interaction = a RED test; and
+(b) a **human side-by-side glance** at the built screenshot vs the prototype
+image **before the phase closes**. The builder's "self-certifies matches export"
+is killed. Stated plainly in the gate: an LLM comparing two screenshots is
+unreliable + biased toward "same" — the machine tooth is the assertions, the
+human judges only aesthetics. The kit is adopted + operator-signed **once** (a
+P0.5 / walking-skeleton leg) so per-screen theme+components are correct by
+construction and the glance stays a quick check that scales to many screens.
+
+- **`docs/playbooks/build-execution.md` § Prototype → Code Fidelity** — flipped
+  from "port-first (rebuild-in-our-Tailwind)" to **"consume the export as code —
+  do NOT re-draw"**; the 4-step adopt rule (bring CSS in · port kit keeping
+  classNames · rebuild screens from `screens-*.jsx` · wire only real data);
+  old approach quoted as the ~80%/OTP-backspace failure; fallback = design-system
+  build when no export covers the screen; Related + FC6/FC7 pointers.
+- **New playbook `docs/playbooks/prototype-export-adoption.md`** — the
+  step-by-step adoption method + when it applies (frozen export exists → adopt)
+  vs the fallback (no export → design-system rebuild) + kit-first ordering.
+  Registered in `docs/playbooks/README.md`.
+- **`docs/gates/visual-fidelity.md`** — rewritten toothy: Tooth A (Playwright
+  element + interaction assertions, RED = block) + Tooth B (human side-by-side
+  glance before phase-close); explicitly does NOT rely on agent self-cert or LLM
+  image-compare; auto-block on missing/RED assertions or missing glance;
+  per-screen table gains fidelity-spec + assertions + glance columns.
+- **`docs/templates/build-manifest.md`** — screens carry a **Fidelity contract
+  (executable, not prose)**: required-element + interaction assertions to encode
+  as a Playwright fidelity spec; strategy renamed `port from export` →
+  `adopt from export`; visual-fidelity acceptance category = assertions green +
+  glance approved; coverage-checklist rows updated. **`.claude/commands/build-phase.md`
+  step 4/5** — the packet says adopt-as-code + encode fidelity assertions; the
+  acceptance leg RUNS the assertions + captures the screenshot (no LLM
+  image-compare).
+- **FC6 + FC7 control rules** (`docs/HARNESS.md` § Control-Plane Failure
+  Classes, referenced from `build-execution.md`): **FC6** — verify at the real
+  source, never trust a wrapper exit/signal (evidence: a `git push … | tail`
+  reported exit 0 while git actually REJECTED the push and the orchestrator
+  relayed false success); **FC7** — make human review real: surface the built
+  screenshot side-by-side, don't accept a blind rubber-stamp.
+- **Wiring:** `docs/HARNESS.md` Growth-Rule latest = v6; `docs/STAGE_GOALS.md`
+  2.6 + `docs/WORKFLOW.md` fidelity references updated to assertions + glance.
+  **Independence Principle intact** — Playwright already ships in the stack; no
+  new hard `ck-*` dependency (adoption engines are `frontend-development` /
+  `ui-styling` accelerators with bare-agent fallbacks).
 
 ## v5.2 — 2026-07-10 — install embeds the stack template (INSTALL gap fix)
 

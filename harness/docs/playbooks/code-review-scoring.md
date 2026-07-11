@@ -63,12 +63,13 @@ floorplan row lives in `docs/visuals/diagrams/screen-inventory.md`. This does no
 add a scored dimension — the six weights and the ≥7 threshold are unchanged; it
 is a floor that blocks regardless of score.
 
-Floor rule (visual fidelity): an **APP/ADM screen that is structurally/visually
-divergent from its prototype export render — or that has neither an export
-source citation nor a recorded `rebuild (decision: <slug>)` marker in its
+Floor rule (visual fidelity): a **UI screen whose Playwright fidelity assertions
+(element completeness + interaction behaviour) are RED — or that has neither an
+export source citation nor a recorded `rebuild (decision: <slug>)` marker in its
 build-manifest phase block — = automatic merge block**, same auto-block mechanic,
 scores unchanged. Source-of-truth checklist: `docs/gates/visual-fidelity.md`;
-port-first rule: `build-execution.md` § Prototype → Code Fidelity. (Evidence for
+adopt-export-as-code rule: `build-execution.md` § Prototype → Code Fidelity +
+`prototype-export-adoption.md`. (Evidence for
 why: a design-heavy build passed every scored dimension while looking nothing
 like the frozen mockup and was rejected at UAT — auto-script Macro-2.)
 
@@ -152,10 +153,10 @@ delete the original dimensions or weights.)
 - `payment-integration.md` — the Security auto-block source for money surfaces.
 - `docs/gates/design-system-compliance.md` — the per-screen checklist the
   design-system floor rule reads (source of truth for §4 / §7 / §8 / §10).
-- `docs/gates/visual-fidelity.md` — the per-screen checklist the visual-fidelity
-  floor rule reads (app screenshot vs prototype export).
-- `build-execution.md` § Prototype → Code Fidelity — the port-first default the
-  fidelity floor rule enforces; § Implementation Guardrails — the systemic-sweep
+- `docs/gates/visual-fidelity.md` — the per-screen gate the visual-fidelity
+  floor rule reads (Playwright fidelity assertions + human glance).
+- `build-execution.md` § Prototype → Code Fidelity — the adopt-export-as-code
+  default the fidelity floor rule enforces; § Implementation Guardrails — the systemic-sweep
   + error-surfacing rules the author applies before review.
 - `docs/design-system/design-rules.md` — Tier-1 floorplan + behavior doctrine the
   floor rule enforces (§4 floorplans, §7 actions, §8 modals, §10 states).

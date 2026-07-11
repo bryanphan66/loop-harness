@@ -69,10 +69,20 @@ Shape-only scaffold. Replace <placeholders>.
   *(optional for non-CRUD types with no HTTP surface)*
 - **Screens:** one line per screen — name · floorplan `<§4 class or CUSTOM>`
   (row: screen-inventory.md) · **export source**
-  `<docs/visuals/prototype/exports/<engine-vN>/<file>>` · **fidelity strategy**
-  `port from export` | `rebuild (decision: <slug>)` *(port is the DEFAULT —
-  `docs/playbooks/build-execution.md` § Prototype → Code Fidelity; `rebuild`
-  requires the named `docs/decisions/<slug>.md` to exist)*
+  `<docs/visuals/prototype/exports/<engine-vN>/screens-<x>.jsx>` · **fidelity
+  strategy** `adopt from export` | `rebuild (decision: <slug>)` *(adopt is the
+  DEFAULT when an export exists — `docs/playbooks/prototype-export-adoption.md`;
+  `rebuild` (no export for the screen) requires the named
+  `docs/decisions/<slug>.md` to exist)*
+- **Fidelity contract (per screen — EXECUTABLE, not prose):** the screen's
+  Required-Elements Checklist + interaction behaviours, to be encoded as
+  **Playwright assertions** in `<...-fidelity.spec.ts>` and run green before the
+  phase closes (`docs/gates/visual-fidelity.md`). List them concretely — e.g.
+  `logo <img> visible · "Đăng ký học" link visible · VI/EN toggle visible ·
+  page bg = light token · OTP: type advances / backspace deletes+steps back /
+  paste fills / submit disabled until valid`. A UI screen with no fidelity
+  assertions listed is a 2.3 compile defect; "port from export" as prose is NOT
+  a contract.
 - **Depends on:** <P-ids or "P0 only">
 - **Verify-by:** `agent` | `both` *(compiled from the header cadence — `both` =
   agent verifier + human checkpoint; the agent leg is never skipped —
@@ -85,8 +95,10 @@ Shape-only scaffold. Replace <placeholders>.
   1. **functional** — <e.g. admin creates X via UI → appears in list with status DRAFT>
   2. **functional** — <e.g. member without role R gets 403 on POST /x>
   3. **negative-path** — <error/empty state check — trigger the failure for real; the REAL cause surfaces, no generic message>
-  4. **visual-fidelity** — each screen this phase ships, side-by-side vs its
-     export render — no structural/visual divergence (`docs/gates/visual-fidelity.md`)
+  4. **visual-fidelity** — each screen this phase ships passes its **fidelity
+     assertions** (element completeness + interaction behaviour, green) AND the
+     human side-by-side glance is approved before the phase closes
+     (`docs/gates/visual-fidelity.md`) — not done until both
      *(phases with no screens record `n/a — no screens` here)*
 - **Verify commands:** `<validate:quick>` · `<targeted test/e2e command>`
 - **Est. size:** S | M | L
@@ -138,7 +150,8 @@ re-generatable. (build-execution.md § PUB product-shot capture is a LATE phase)
 - [ ] Every in-scope REQ-ID from the feature register / srs-lite appears above **exactly once**
 - [ ] P0 defined; every phase ≤ L (one agent session, ≤~10 files)
 - [ ] Every phase's screens have a screen-inventory floorplan row
-- [ ] Every phase's screens cite a **prototype export source** + fidelity strategy (`port from export` default; `rebuild` only with an existing `docs/decisions/<slug>.md`)
+- [ ] Every phase's screens cite a **prototype export source** + fidelity strategy (`adopt from export` default; `rebuild` only, with an existing `docs/decisions/<slug>.md`, when no export covers the screen)
+- [ ] Every UI screen lists its **fidelity contract as executable assertions** (required-element + interaction) to encode in a Playwright fidelity spec — no screen left with only prose "port from export" (`docs/gates/visual-fidelity.md`)
 - [ ] Every phase has **runnable acceptance checks covering all three categories** (functional + negative-path + visual-fidelity or `n/a — no screens`) and a **Verify-by** value compiled from the header cadence (`docs/gates/phase-acceptance.md`)
 - [ ] Every phase declares a **`Phase-type`**; every REQ-ID citing an async/media/storage/integration signal (transcode, HLS, upload, queue, webhook, signed-url, storage, PDF-render, email-blast) sits in a **non-CRUD** phase-type carrying its type-specific acceptance categories — none folded into a CRUD phase (`build-manifest-compilation.md`)
 - [ ] Human checkpoint cadence + preview command declared in the header

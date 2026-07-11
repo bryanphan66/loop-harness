@@ -75,11 +75,16 @@ Do NOT implement the phase in the main session — orchestrate only.
    Screen-inventory rows for this phase:
    <quoted rows>
 
-   Screens are PORTED from their cited prototype export files (markup/structure
-   /styles reconciled to Tier-2 tokens, real data wired in), NOT rebuilt from
-   spec — unless the phase block marks `rebuild (decision: <slug>)`
-   (docs/playbooks/build-execution.md § Prototype → Code Fidelity). Failed
-   operations must surface their REAL cause to the UI — no generic
+   Screens ADOPT their cited prototype export as code (bring the export's real
+   tokens.css/components.css into the app; port kit components KEEPING their
+   classNames so the CSS applies; rebuild each screen from its screens-*.jsx
+   structure; wire only real data/routing/API) — do NOT re-implement the look in
+   fresh Tailwind by reading the export. `rebuild (decision: <slug>)` (no export
+   for the screen) is the only exception (docs/playbooks/build-execution.md §
+   Prototype → Code Fidelity + prototype-export-adoption.md). Encode the phase
+   block's per-screen fidelity contract (required elements + interactions) as
+   Playwright assertions in a `<screen>-fidelity.spec.ts` and run them green.
+   Failed operations must surface their REAL cause to the UI — no generic
    error-swallow. A fix touching a systemic pattern (error handling, model/tier
    resolution, auth, quota) sweeps ALL grep'd call-sites, not just the reported
    one.
@@ -89,8 +94,10 @@ Do NOT implement the phase in the main session — orchestrate only.
    add verification-register row(s) (TC-NNN, Result: pass) in
    docs/TEST_MATRIX.md → design-system floor self-check on touched screens
    (§4 floorplan / §7 actions / §8 modals, Tier-2 tokens only, Tier-3 reuse) →
-   visual-fidelity self-check (each ported screen side-by-side vs its export
-   render — docs/gates/visual-fidelity.md; divergent = fix before commit) →
+   visual-fidelity: each screen's fidelity assertions GREEN (element
+   completeness + interaction behaviour) + capture the running screenshot for
+   the human glance — docs/gates/visual-fidelity.md; a RED assertion = fix
+   before commit; do NOT self-certify "matches export" →
    ONE stage-boundary commit citing ≥1 token that also flips the phase
    checkbox in docs/build-manifest.md, adds the 2.6/<P-id> History row
    in STAGE.md, and updates docs/ROADMAP.md.
@@ -118,9 +125,11 @@ Do NOT implement the phase in the main session — orchestrate only.
       phase's screen-inventory rows + export source paths, and
       `docs/gates/phase-acceptance.md`. It verifies against the RUNNING app:
       every functional AC as written, visual fidelity per shipped screen
-      (side-by-side vs export render), and the negative-path check (real cause
-      surfaces, no generic message). It returns the gate's verdict block
-      (PASS/FAIL + per-check results + evidence paths + reasons).
+      (**runs the screen's Playwright fidelity assertions** — element
+      completeness + interaction behaviour — and captures the screenshot for the
+      human glance; it does NOT LLM-compare two images), and the negative-path
+      check (real cause surfaces, no generic message). It returns the gate's
+      verdict block (PASS/FAIL + per-check results + evidence paths + reasons).
    b. **FAIL → fix in the SAME phase.** Dispatch a fix leg (same phase scope,
       the verifier's Reasons as input), re-run the verifier. Cap 3 rounds; then
       `BLOCKED` — page the human. Never start the next phase on a FAIL.

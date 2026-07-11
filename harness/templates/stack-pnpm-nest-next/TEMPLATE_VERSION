@@ -1,6 +1,6 @@
 stack-pnpm-nest-next template
-version: 0.2.1
-verified: 2026-07-10 (v5.1 red-team fix round)
+version: 0.2.2
+verified: 2026-07-11 (Dokploy deploy hardening, from elearning-platform findings)
 install: install, lint, typecheck, unit, build all green across all workspaces incl.
 apps/worker + packages/queue-core + packages/storage-core (incl. new tests: no-audio
 transcode, no-var_stream_map-a:N-without-audio, source-download-before-ffmpeg,
@@ -56,6 +56,27 @@ Design decisions:
   order needs no change.
 
 History:
+- 0.2.2 (2026-07-11): three fixes baked in after deploying elearning-platform
+  (built from this template) to Dokploy hit them for real: (1) web's
+  docker-compose.yml build args now resolve NEXT_PUBLIC_API_URL from the
+  host env (was hardcoded to the dev default, so it silently couldn't be
+  overridden without editing the compose file) — Next inlines NEXT_PUBLIC_*
+  at `next build` time, so a runtime env is always too late and ships an
+  empty API URL, causing mixed-content failures on an HTTPS deploy;
+  apps/web/Dockerfile's existing ARG/ENV now carries an explanatory comment
+  of the same gotcha. (2) apps/web/src/app/layout.tsx documents (commented,
+  since the family is project-specific) loading web fonts via a runtime
+  `<head><link>` instead of `next/font/google` — the web Docker build stage
+  has no network egress to fonts.googleapis.com, so `next/font/google`
+  throws at `next build` and fails the image build. (3) new
+  docker-compose.dokploy.yml: a self-contained Dokploy compose overlay
+  (Dokploy's label injector doesn't expand compose `include:`) mirroring
+  db/api/web/redis/worker (minio/minio-mc dropped — dev-only S3 emulator,
+  prod points at real R2/S3) with `dokploy-network` (external) added and
+  `api` on both `default` and `dokploy-network` — Dokploy's per-domain
+  network injection otherwise replaces a domain'd service's `networks:`
+  entirely, silently cutting `api` off from `db`/`redis` and breaking
+  Prisma with connection error P1001 the moment `api` gets a domain.
 - 0.2.1 (2026-07-10): red-team fix round on the tier-2 code — minio+minio-mc services
   under the docker-compose `tier2` profile (real S3-compatible endpoint for the `s3`
   storage driver, so the signed-URL/entitlement AC is actually runnable locally, not

@@ -537,18 +537,23 @@ endpoints, and screens named in the phase block, with loading/empty/error states
 on every screen and input validation at the boundary. Before coding any
 grid/form screen its screen-inventory floorplan row is confirmed (missing row =
 blocker — escalate, never invent a floorplan), and its **prototype export source
-file** (cited in the phase block) is opened — screens are **ported from the
-export** per `playbooks/build-execution.md` § Prototype → Code Fidelity, not
-rebuilt from spec, unless the phase block records `rebuild (decision: <slug>)`.
+file** (cited in the phase block) is opened — screens **adopt the export as
+code** (bring its `tokens.css`/`components.css` in, port the kit KEEPING
+classNames, rebuild the screen from its `screens-*.jsx`, wire only real data) per
+`playbooks/build-execution.md` § Prototype → Code Fidelity +
+`prototype-export-adoption.md` — NOT re-drawn in fresh Tailwind, unless the phase
+block records `rebuild (decision: <slug>)` (no export for that screen).
 Failed operations surface their real cause to the UI (no generic error-swallow);
 a fix touching a systemic pattern sweeps ALL its call-sites. Then, in order:
 `validate:quick` green; the phase's e2e smoke (the journeys its acceptance
 checks name) passes against the running app; a verification-register row
 (TC-NNN) is added per acceptance check with `Result: pass`; the design-system
 floor self-check is clean for touched screens (§4 floorplan / §7 actions / §8
-modals, Tier-2 tokens only, Tier-3 reuse); the **visual-fidelity self-check**
-(`docs/gates/visual-fidelity.md`) is clean — each ported screen eyeballed
-side-by-side against its export render. One stage-boundary commit closes the
+modals, Tier-2 tokens only, Tier-3 reuse); the **visual-fidelity check**
+(`docs/gates/visual-fidelity.md`) passes — each screen's **Playwright fidelity
+assertions** (element completeness + interaction behaviour) are green and its
+screenshot is captured for the human side-by-side glance (no self-certified
+"matches export"). One stage-boundary commit closes the
 phase: it cites ≥1
 token (REQ-ID / SC-NNN / TC-NNN), flips the phase checkbox in
 `docs/build-manifest.md`, adds a `2.6/P<N>` History row in STAGE.md, and
