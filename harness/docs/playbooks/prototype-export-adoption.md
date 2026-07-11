@@ -97,6 +97,17 @@ porting classes 1:1, operator sign-off on the kit once. Every screen phase then
 inherits correct theme + components, so per-screen review is a quick glance that
 scales to many screens.
 
+**The app-shell is part of this P0.5 foundation, not a later screen.** The
+export's portal chrome — `Sidebar` (full role-gated nav), `TopBar` (search, lang
+toggle, theme toggle, notification bell, user chip), `AvatarMenu` — is ported and
+mounted at P0.5, so **every authenticated screen renders inside it**. Building an
+inner screen (e.g. a permission matrix) as a standalone panel on a skeleton shell
+is the failure the gate's **U1 (app-shell-present)** assertion now blocks: it
+shipped once (elearning /admin/roles was a bare panel with a one-item sidebar and
+an empty topbar), passed element + interaction checks for its own content, and
+still missed ~90% of the mandated portal chrome. Sequence the shell first; inner
+screens are children of it.
+
 ## Variant Section
 
 (Append a Variant block here when this playbook fails or partially works.)

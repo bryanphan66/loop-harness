@@ -86,6 +86,34 @@ await expect(submit).toBeEnabled();
 await expect(submit).toBeDisabled();                                   // submit disabled until valid
 ```
 
+**Two UNIVERSAL assertions — every APP/ADM screen, every text input** (mandatory,
+NOT per-screen opt-in). Both gaps below passed element checks, review, and e2e
+and still shipped (elearning /admin/roles): the screen rendered as a bare panel
+with no portal chrome, and its create-role input lost focus after every
+keystroke. A per-screen checklist misses them because they are cross-cutting —
+so they are always-on:
+
+```ts
+// (U1) App-shell present — an authenticated screen is NEVER a bare panel; it
+// renders INSIDE the frozen portal chrome. A screen built as an isolated panel
+// (no sidebar sections + no topbar controls) is a RED test.
+await expect(page.getByRole('navigation')).toBeVisible();            // sidebar
+for (const s of SHELL_NAV_SECTIONS) await expect(page.getByText(s)).toBeVisible();
+await expect(shellSearch).toBeVisible();                             // topbar search
+await expect(langToggle).toBeVisible();                             // VI/EN
+await expect(themeToggle).toBeVisible();                             // dark-mode
+await expect(userChip).toBeVisible();                               // user menu
+
+// (U2) No text input loses focus while typing — the dialog/OTP focus-steal
+// class. Type a multi-char string in ONE burst: the whole string must land AND
+// the field stay focused (a focus effect that re-runs per keystroke, or a
+// controlled input that remounts, drops focus and fails this).
+await field.click();
+await page.keyboard.type('abcdefghij0123456789');
+await expect(field).toHaveValue('abcdefghij0123456789');
+await expect(field).toBeFocused();
+```
+
 A dropped element or a wrong interaction = a **RED test = block**. The assertions
 live in the screen's fidelity spec and run in `validate:quick` / the phase e2e
 smoke, so they gate every commit, not just the final QA pass.
@@ -130,6 +158,13 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
    (`docs/decisions/<slug>.md`) does not exist.
 5. The human **glance is not recorded** for a screen the phase ships (assertions
    green is necessary, not sufficient — FC7).
+6. An **APP/ADM screen renders without the portal app-shell** (U1 RED) — shipped
+   as a bare/isolated panel (no sidebar sections + topbar controls). The app-shell
+   is a **P0.5 foundation adopted before any inner screen** (`prototype-export-
+   adoption.md` § Kit-First Ordering); inner screens mount inside it.
+7. **Any text input loses focus mid-typing** (U2 RED) — a controlled input that
+   remounts or a focus effect that re-runs per keystroke. Every screen with a
+   text input carries U2.
 
 ## Sign-Off
 

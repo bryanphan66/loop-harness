@@ -1,7 +1,30 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6**.
+templates). Per-project state never lives here. Current version: **v6.1**.
+
+## v6.1 — 2026-07-11 — two universal fidelity assertions + app-shell-first sequencing
+
+Same elearning run, one phase later: the v6 toothy gate still let two
+cross-cutting defects through because they are not per-screen element checks.
+(1) `/admin/roles` shipped as a **bare panel** — a one-item sidebar + empty
+topbar — missing ~90% of the frozen portal chrome (full role-gated nav, search,
+VI/EN, dark-mode, notification bell, user menu); its own content assertions were
+green. (2) The create-role modal's text input **lost focus after every
+keystroke** (a `Dialog` focus effect depending on an inline `onClose` re-ran per
+render) — the same interaction class as the earlier OTP-backspace miss, but on a
+different screen with no assertion covering it.
+
+Fix — `docs/gates/visual-fidelity.md` § Tooth A gains **two UNIVERSAL, always-on
+assertions** (not per-screen opt-in): **U1 app-shell-present** — every APP/ADM
+screen must render inside the portal chrome (sidebar sections + topbar controls),
+so a screen built as an isolated panel is RED; **U2 input-focus** — typing a
+multi-char string in one burst must land intact with the field still focused, so
+any remount / per-keystroke focus effect is RED. Auto-Block rules 6 + 7 encode
+them. `prototype-export-adoption.md` § Kit-First Ordering now states the
+**app-shell is part of the P0.5 foundation** (ported + mounted before any inner
+screen; inner screens are its children), closing the sequencing gap that let a
+screen ship without its shell.
 
 ## v6 — 2026-07-11 — toothy fidelity gate + adopt-export-as-code (FC2/FC3 root fix) + FC6/FC7
 
