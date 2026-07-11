@@ -1,7 +1,33 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.1**.
+templates). Per-project state never lives here. Current version: **v6.2**.
+
+## v6.2 — 2026-07-11 — theme fidelity in BOTH modes (U3) + shell-stays-put (U4); the scaffold-token-override trap
+
+Human review of the app-shell in DARK mode exposed why "adopt the export → 99%"
+still shipped **badly wrong colours**: the light theme (the frozen default) was
+faithful, but three net-new app-shell behaviours were never verified. The deep
+root cause of the colour break: the scaffold's `apps/web/src/app/globals.css`
+**re-declared the export's entire token set inside `@layer base` with divergent
+values** — and Tailwind v3 `@layer base` is not a native cascade layer, so it
+emits plain CSS *after* the imported `tokens.css` and **silently overrode the
+adopted export in BOTH modes** (dark `--background` was `150 39% 10%` instead of
+the export's `150 32% 6%`; the sidebar fell to a near-black body colour instead
+of the export's deep-green ink). Adopting the export CSS is necessary but **not
+sufficient if a scaffold stylesheet redeclares the same token names.**
+
+Two more universal Tooth-A assertions (always-on, not per-screen): **U3 theme
+fidelity** — the computed token in **both** light and dark must equal the export
+value (not a scaffold value), and the portal chrome keeps its own brand
+background in dark; **U4 shell-stays-put** — scrolling the content must not move
+the sidebar/topbar (the shell is viewport-bound, only the inner region scrolls).
+Auto-Block rules 8 + 9. Tooth B (human glance) is now **captured in both light
+AND dark when the export ships a dark theme** — the wrong-dark defect was
+invisible because only light was ever glanced. Companion misses fixed the same
+round: the user-chip dropped its name+role on port, and the shell used
+`min-height:100vh` (content grew the grid → document scrolled) instead of
+`height:100dvh`.
 
 ## v6.1 — 2026-07-11 — two universal fidelity assertions + app-shell-first sequencing
 

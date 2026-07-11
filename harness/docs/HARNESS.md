@@ -155,9 +155,11 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes) — latest **v6.1** (adds two universal fidelity assertions — U1
-app-shell-present so no screen ships as a bare panel, U2 input-focus so no input
-remounts mid-typing — and makes the app-shell a P0.5 foundation; on top of v6's
+it closes) — latest **v6.2** (four universal fidelity assertions — U1
+app-shell-present, U2 input-focus, U3 theme-fidelity-in-both-modes so a scaffold
+`globals.css` can't silently override the adopted export tokens, U4
+shell-stays-put on scroll — a both-theme human glance, and the app-shell as a
+P0.5 foundation; on top of v6's
 toothy visual-fidelity gate: adopt the frozen
 prototype export **as code** instead of re-drawing it, per-screen Playwright
 fidelity assertions + a human side-by-side glance replace the builder's hollow

@@ -86,12 +86,13 @@ await expect(submit).toBeEnabled();
 await expect(submit).toBeDisabled();                                   // submit disabled until valid
 ```
 
-**Two UNIVERSAL assertions — every APP/ADM screen, every text input** (mandatory,
-NOT per-screen opt-in). Both gaps below passed element checks, review, and e2e
-and still shipped (elearning /admin/roles): the screen rendered as a bare panel
-with no portal chrome, and its create-role input lost focus after every
-keystroke. A per-screen checklist misses them because they are cross-cutting —
-so they are always-on:
+**Four UNIVERSAL assertions — every APP/ADM screen** (mandatory, NOT per-screen
+opt-in). All four gaps below passed element checks, review, and e2e and still
+shipped (elearning /admin/roles): the screen rendered as a bare panel with no
+portal chrome (U1); its create-role input lost focus after every keystroke (U2);
+its dark theme was wrong because a scaffold `globals.css` re-declared the export
+tokens (U3); and its sidebar scrolled away with the page (U4). A per-screen
+checklist misses them because they are cross-cutting — so they are always-on:
 
 ```ts
 // (U1) App-shell present — an authenticated screen is NEVER a bare panel; it
@@ -112,6 +113,28 @@ await field.click();
 await page.keyboard.type('abcdefghij0123456789');
 await expect(field).toHaveValue('abcdefghij0123456789');
 await expect(field).toBeFocused();
+
+// (U3) Theme fidelity in BOTH modes + no scaffold overrides the adopted tokens.
+// The export ships light (:root) AND dark (.dark) tokens; the build must honour
+// BOTH. The trap: a scaffold globals.css that re-declares the export's token
+// names in `@layer base` emits AFTER the imported tokens.css and silently wins
+// in BOTH modes (Tailwind v3 @layer base is not a real cascade layer) — the app
+// shipped the wrong dark theme this way while the light glance looked fine.
+for (const theme of ['light', 'dark']) {
+  await setTheme(theme);                                            // toggle .dark
+  const bg = await page.locator('main').evaluate(e => getComputedStyle(e).backgroundColor);
+  expect(bg).toBe(EXPORT_BG[theme]);      // == the export token, NOT a scaffold value
+}
+// portal chrome keeps its own brand background in dark (not the body dark):
+await setTheme('dark');
+await expect(page.locator('.shell-sidebar')).not.toHaveCSS('background-color', EXPORT_BG.dark);
+
+// (U4) The app-shell stays put while content scrolls — sidebar is a fixed cell,
+// only the inner content region scrolls (a shell not bound to the viewport lets
+// the whole document scroll and the sidebar disappears).
+await contentRegion.evaluate(el => el.scrollTo(0, el.scrollHeight));
+expect(await page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(1);
+await expect(firstNavItem).toBeInViewport();
 ```
 
 A dropped element or a wrong interaction = a **RED test = block**. The assertions
@@ -122,9 +145,12 @@ smoke, so they gate every commit, not just the final QA pass.
 
 The gate **surfaces** the built screenshot next to the prototype image the
 operator already has (the acceptance leg captures the running screen via
-Playwright and stores it under `plans/reports/`). The human approves the pair
-**before** the phase is marked done — aesthetics only (the assertions already
-proved structure + behaviour). A phase whose fidelity assertions are green but
+Playwright and stores it under `plans/reports/`). **When the export ships a dark
+theme, the glance is captured in BOTH light and dark** — the wrong-dark-theme
+defect (U3) was invisible because only the light screen was ever glanced. The
+human approves the pair **before** the phase is marked done — aesthetics only
+(the assertions already proved structure + behaviour). A phase whose fidelity
+assertions are green but
 whose glance is not yet approved is **not done** (FC7 — no blind rubber-stamp).
 
 The kit is adopted + operator-signed **once** (P0.5 / walking-skeleton leg —
@@ -165,6 +191,14 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
 7. **Any text input loses focus mid-typing** (U2 RED) — a controlled input that
    remounts or a focus effect that re-runs per keystroke. Every screen with a
    text input carries U2.
+8. **Dark (or light) theme is not the export's** (U3 RED) — the computed token in
+   either mode diverges from the export, most often because a scaffold
+   `globals.css` re-declares an export-owned token. Rule: the scaffold MUST NOT
+   redeclare any token the adopted `tokens.css` defines (light OR dark); the
+   export tokens win, and both modes are asserted + glanced.
+9. **The app-shell scrolls with the page** (U4 RED) — the shell is not bound to
+   the viewport, so the sidebar/topbar scroll away instead of the content region
+   scrolling inside its own container.
 
 ## Sign-Off
 
