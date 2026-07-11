@@ -150,7 +150,9 @@ Practice:
   each harness-version bump. Re-publish the SAME file so the URL is stable; the
   operator's bookmark never breaks.
 - **Contents** (a UI to scan, not a doc to read): live service checks (verified
-  at source, not a CI badge), delivered capabilities with state chips
+  at source, not a CI badge — each service URL a **clickable link that opens the
+  live app in a new tab**, so the operator jumps straight from the dashboard to
+  the running thing), delivered capabilities with state chips
   (live / building / parked), the harness lessons locked this run, run parameters
   (repo, branch, stack, current SHA, blockers). Summary before detail; state
   encoded in form (dots, chips) so what needs attention reads at a glance.
