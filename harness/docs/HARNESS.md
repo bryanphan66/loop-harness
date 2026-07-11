@@ -133,6 +133,34 @@ compliance/privacy/WCAG, observability/SLO) live mostly in Build & Go-live and
 Post-Build. Each must be explicitly marked **N/A by decision** when not needed —
 never silently dropped.
 
+## Status Artifact — the human tracking surface
+
+The reports under `plans/reports/` are the machine's memory — dense, per-phase,
+read on demand. The human running the build needs the opposite: **one glanceable
+page that is always current**, so tracking progress never means scrolling a
+transcript or opening files. That page is a **status Artifact** — a self-contained
+hosted dashboard, anchored to the session, that the operator bookmarks and the
+team can be shown.
+
+Practice:
+
+- **Stand it up early** (once the dev preview is live / the first real phase
+  lands), not at the end — its value is watching the build *in progress*.
+- **Refresh it at every milestone** — each gate cleared, each phase deployed,
+  each harness-version bump. Re-publish the SAME file so the URL is stable; the
+  operator's bookmark never breaks.
+- **Contents** (a UI to scan, not a doc to read): live service checks (verified
+  at source, not a CI badge), delivered capabilities with state chips
+  (live / building / parked), the harness lessons locked this run, run parameters
+  (repo, branch, stack, current SHA, blockers). Summary before detail; state
+  encoded in form (dots, chips) so what needs attention reads at a glance.
+- **It mirrors truth, never narrates ahead of it** — a capability is "live" only
+  when its live check passes, matching the verify-at-source rule (FC6). It is a
+  view over the same facts the gates enforce, not a second source.
+
+The status Artifact is the operator's cockpit; the reports are the flight
+recorder. Both are kept; they serve different readers.
+
 ## Locked Decisions
 
 Shorthand labels cited across the docs (`D1`…`D6`). These are settled — an
@@ -155,7 +183,7 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes) — latest **v6.5** (Regression Ledger: every noted-and-fixed UI defect becomes a permanent machine assertion so it never returns as the run continues; UI phases carry the SRS-mandated cross-cutting NFRs
+it closes) — latest **v6.6** (Status Artifact: a live, always-current human tracking dashboard refreshed at each milestone — cockpit to the reports' flight recorder; Regression Ledger: every noted-and-fixed UI defect becomes a permanent machine assertion so it never returns as the run continues; UI phases carry the SRS-mandated cross-cutting NFRs
 — i18n VI+EN + responsive ≥375px — as DoD with machine assertions, not just the
 frozen desktop-single-language look; the stale-export trap: the local export is a
 CACHE, not the source of truth — pin the live Claude-Design project + version and

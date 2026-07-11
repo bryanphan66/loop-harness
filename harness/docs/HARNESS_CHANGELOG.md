@@ -1,7 +1,21 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.5**.
+templates). Per-project state never lives here. Current version: **v6.6**.
+
+## v6.6 — 2026-07-11 — the Status Artifact: a live human tracking surface
+
+Reports are the machine's per-phase memory (dense, read on demand); the operator
+needs the opposite — one glanceable, always-current page so tracking never means
+scrolling the transcript. Formalized in `HARNESS.md` § Status Artifact: stand up
+a self-contained hosted dashboard early (once the dev preview is live), refresh it
+at every milestone (re-publish the same file → stable URL → the bookmark never
+breaks), and show live service checks + delivered capabilities with state chips +
+the run's harness lessons + run parameters — summary before detail, state encoded
+as dots/chips. It mirrors verified truth (FC6: a capability reads "live" only when
+its live check passes), never narrates ahead. The status Artifact is the
+operator's cockpit; the reports are the flight recorder — both kept, different
+readers. (First instance: the elearning "Build Mission Control" dashboard.)
 
 ## v6.5 — 2026-07-11 — the Regression Ledger: a noted-and-fixed UI defect never comes back
 
