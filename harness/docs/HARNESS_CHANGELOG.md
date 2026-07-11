@@ -1,7 +1,25 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.3**.
+templates). Per-project state never lives here. Current version: **v6.4**.
+
+## v6.4 — 2026-07-11 — UI phases carry the mandated cross-cutting NFRs (i18n + responsive), not just the look
+
+A frozen Claude-Design prototype captures the DESKTOP look in a SINGLE language.
+But the SRS mandates more: `NFR.I18N.01` (locale floor VI+EN, locale-aware
+number/currency/date — "5,000,000 VNĐ") and `NFR.UX.01` (student-facing usable at
+≥375px, no horizontal page scroll, tap targets ≥44×44px), `NFR.UXC.08`/`PORT.01`
+(responsive), `NFR.A11Y.01` (WCAG 2.2 AA). The elearning run shipped screens that
+matched the prototype pixel-for-pixel yet had a dead VI/EN toggle and no responsive
+behaviour — faithful to the look, silent on the NFR floor. Fix — gate Auto-Block
+rule 11: every UI phase ships the SRS-mandated i18n + responsive as DoD, proven by
+machine assertions (locale switch changes the visible strings + currency/date
+render per locale, no target-locale string hardcoded; at the mandated min viewport
+no horizontal scroll + tap-size floor). These are *additive faithful work* — the
+second locale and the reflow are designed on top of the frozen visual language
+(the prototype has no responsive/i18n spec, so the reflow is free-design within
+the same tokens/components), not a redraw. The prototype covers look; the NFRs are
+a separate, mandatory floor.
 
 ## v6.3 — 2026-07-11 — the stale-export trap: pin + re-verify the export against the LIVE prototype
 

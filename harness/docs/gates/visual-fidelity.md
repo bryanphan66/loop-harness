@@ -205,6 +205,18 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     the client keeps editing; adopting a stale cache faithfully ships the wrong
     design while every "matches the export" check passes. Re-pull + diff the live
     source (tokens + components + chrome) before adoption, or the phase is blocked.
+11. **Cross-cutting UI NFRs the SRS mandates are absent** — when the SRS requires
+    i18n and/or responsive (e.g. `NFR.I18N.01` locale floor VI+EN with
+    locale-aware number/currency/date; `NFR.UX.01` student-facing usable at the
+    mandated min width with no horizontal page scroll + tap targets ≥44×44px),
+    EVERY UI phase ships them as part of DoD, with machine assertions: switching
+    locale changes the visible strings (no target-locale string left hardcoded on
+    the screen) + currency/date render in the active locale; at the mandated min
+    viewport the page has no horizontal scroll and key controls meet the tap-size
+    floor. A frozen prototype is usually desktop + single-language, so these are
+    additive faithful work (the reflow/second-locale is designed on top of the
+    frozen visual language), not a redraw. A screen missing a mandated UI NFR is
+    blocked — the prototype only covers look, not the NFR floor.
 
 ## Sign-Off
 
