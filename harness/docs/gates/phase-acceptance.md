@@ -93,9 +93,15 @@ app**, never by reading the diff and assuming:
    opt-in per controller. The verifier asserts each new route: unauth → 401,
    under-privileged → 403, and the route appears in the phase's authz matrix.
    Secrets **fail closed** — production refuses to boot without the required
-   JWT/provider secrets (no source-committed fallback). This moves authz + secret
-   coverage from the 2.9 security sign-off (where one forgotten guard hides for
-   the remaining phases) into the phase that adds the route.
+   JWT/provider secrets (no source-committed fallback). Baseline hardening the
+   app carries once (asserted present, not re-added per phase): **per-IP
+   rate-limit** — shared across instances (Redis-backed, never in-memory on a
+   multi-container API), tiered (strict on auth/OTP), 429 + `Retry-After`,
+   proxy-aware client-IP (X-Forwarded-For, else every caller looks like the
+   reverse proxy) — and **HTTP security headers** (helmet: HSTS, nosniff,
+   frameguard). This moves authz + secret + abuse-control coverage from the 2.9
+   security sign-off (where one forgotten guard hides for the remaining phases)
+   into the phase that adds the route.
 7. **Index discipline (`crud` phases)** — any schema change indexes every
    foreign-key scalar + the common filter/sort columns; a schema-lint fails a
    relation scalar with no index. Keeps p95 (`NFR.PERF`) from degrading silently
