@@ -155,7 +155,7 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes) — latest **v6.4** (UI phases carry the SRS-mandated cross-cutting NFRs
+it closes) — latest **v6.5** (Regression Ledger: every noted-and-fixed UI defect becomes a permanent machine assertion so it never returns as the run continues; UI phases carry the SRS-mandated cross-cutting NFRs
 — i18n VI+EN + responsive ≥375px — as DoD with machine assertions, not just the
 frozen desktop-single-language look; the stale-export trap: the local export is a
 CACHE, not the source of truth — pin the live Claude-Design project + version and

@@ -1,7 +1,20 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.4**.
+templates). Per-project state never lives here. Current version: **v6.5**.
+
+## v6.5 — 2026-07-11 — the Regression Ledger: a noted-and-fixed UI defect never comes back
+
+Operator directive after a run of "small" mobile bugs (clipped modal, sub-44px
+tap target, modal-won't-dismiss): once a defect is noted, the related parts must
+NEVER be wrong again as the harness runs on. Formalized in `visual-fidelity.md`
+§ Regression Ledger: **noted-and-fixed ⇒ locked-by-assertion** — every fixed UI
+defect, however small, becomes a permanent machine assertion on the touched
+screen's spec that runs on every later phase; a fix without a regression
+assertion is incomplete and blocks the phase. Recurring/cross-cutting classes get
+promoted to universal always-on assertions (this is literally how U2/U3/U4 were
+born). The point: machine memory, not human memory, keeps small bugs from
+returning across the run.
 
 ## v6.4 — 2026-07-11 — UI phases carry the mandated cross-cutting NFRs (i18n + responsive), not just the look
 

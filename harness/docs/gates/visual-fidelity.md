@@ -218,6 +218,20 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     frozen visual language), not a redraw. A screen missing a mandated UI NFR is
     blocked — the prototype only covers look, not the NFR floor.
 
+## Regression Ledger — a fixed UI defect NEVER comes back
+
+Every UI defect the human review surfaces — however small (a clipped modal, a
+mis-sized tap target, a modal that won't dismiss, a dropped element) — becomes a
+**permanent machine assertion** the moment it is fixed, added to the touched
+screen's fidelity spec. It runs on **every** subsequent phase, so the same defect
+cannot silently reappear on that screen OR on a related/later one. A recurring or
+inherently cross-cutting class is **promoted to a universal always-on assertion**
+(the U-series above were born exactly this way: OTP-backspace → U2, wrong-dark →
+U3, shell-scroll → U4). Operating rule: **noted-and-fixed ⇒ locked-by-assertion**;
+a fix without a regression assertion is an incomplete fix and blocks the phase.
+This is the machine memory that keeps "small" bugs from returning as the harness
+runs on — it does not rely on anyone remembering them.
+
 ## Sign-Off
 
 ```text
