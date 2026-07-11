@@ -158,6 +158,11 @@ Practice:
   when its live check passes, matching the verify-at-source rule (FC6). It is a
   view over the same facts the gates enforce, not a second source.
 
+- **Speak the operator's language.** The status Artifact is read by the human, so
+  it is written in *their* language, not the codebase's English — glossing
+  technical/English terms inline when the operator is still learning them. (The
+  reports and code stay in the project's canonical language.)
+
 The status Artifact is the operator's cockpit; the reports are the flight
 recorder. Both are kept; they serve different readers.
 
