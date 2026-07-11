@@ -188,7 +188,7 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes) — latest **v6.6** (Status Artifact: a live, always-current human tracking dashboard refreshed at each milestone — cockpit to the reports' flight recorder; Regression Ledger: every noted-and-fixed UI defect becomes a permanent machine assertion so it never returns as the run continues; UI phases carry the SRS-mandated cross-cutting NFRs
+it closes) — latest **v6.7** (front-load the cross-cutting floors: per-phase verifier gains Leg-5 Universal-UI (shared fidelity fixture, inherited not re-copied), Leg-6 Security (default-deny authz + fail-closed secrets), Leg-7 Index-discipline — the machine proves the whole class in-phase, the human confirms; Status Artifact: a live, always-current human tracking dashboard refreshed at each milestone — cockpit to the reports' flight recorder; Regression Ledger: every noted-and-fixed UI defect becomes a permanent machine assertion so it never returns as the run continues; UI phases carry the SRS-mandated cross-cutting NFRs
 — i18n VI+EN + responsive ≥375px — as DoD with machine assertions, not just the
 frozen desktop-single-language look; the stale-export trap: the local export is a
 CACHE, not the source of truth — pin the live Claude-Design project + version and

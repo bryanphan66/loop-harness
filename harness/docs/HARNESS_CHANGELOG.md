@@ -1,7 +1,34 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.6**.
+templates). Per-project state never lives here. Current version: **v6.7**.
+
+## v6.7 — 2026-07-11 — front-load the cross-cutting floors: the per-phase gate proves them, the human confirms
+
+A 3-agent audit at P3/P4 confirmed the operator's fear structurally: the harness
+was **reactive** — every cross-cutting concern (i18n, responsive, a11y, theme,
+security-authz, loading/empty/error states, DB indexes) was end-loaded to the
+2.7/2.9/2.10 gates or discovered by the human glance, then retrofitted (v6.1–v6.5
+all landed in one day, each closing a defect a human had just found). Worse, the
+"universal" U1–U4 assertions were **prose, not a mechanism** — hand-copied into
+the two screens that failed, with no shared fixture and no injection into the 2.3
+compile, so a new screen got them only if its author remembered. That does not
+reach P25: the human becomes the discovery bottleneck.
+
+Fix — `phase-acceptance.md` Leg-1 verifier gains **three always-run legs** so the
+MACHINE proves the whole cross-cutting class *in every phase* and the human glance
+drops back to confirming aesthetics: **Leg 5 Universal UI floor** (a shared
+`_universal.fidelity.ts` fixture — app-shell/focus/both-themes/shell-scroll/i18n/
+responsive/states + axe-core a11y — that every `*-fidelity.spec.ts` must import,
+enforced by a RED lint gate, so screens inherit it by construction); **Leg 6
+Security floor** (default-deny global authz — no route metadata ⇒ 403; unauth→401
+/ under-priv→403 asserted per new route; secrets fail-closed at boot); **Leg 7
+Index discipline** (`crud` phases index every FK + filter/sort column, schema-lint
+enforced). First realized as the elearning **P3.5 Foundation Hardening** phase
+(before P4) so the remaining 22 phases inherit a clean floor instead of accreting
+debt against it. The Regression Ledger (v6.5) stays the reactive backstop for
+genuinely novel one-offs; this change removes the whole-*class* leakage it was
+being asked to carry.
 
 ## v6.6 — 2026-07-11 — the Status Artifact: a live human tracking surface
 

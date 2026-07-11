@@ -74,6 +74,32 @@ app**, never by reading the diff and assuming:
      callback is idempotent; a failed outbound surfaces the real provider error
      (`docs/playbooks/external-integration.md`).
    A type-specific category that FAILs blocks the phase exactly like a functional AC.
+5. **Universal UI floor (every phase that ships or touches a screen)** — the
+   shared fixture `apps/web/e2e-ui/_universal.fidelity.ts` runs against each
+   screen: app-shell present (U1), no input focus-steal (U2), both themes
+   faithful (U3), shell stays put on scroll (U4), i18n locale-switch changes the
+   visible strings + currency/date per locale, responsive (no horizontal page
+   scroll at the mandated min width + tap targets ≥44×44px), loading/empty/error
+   states present (not just the happy path), and an **axe-core a11y pass**
+   (0 serious/critical, WCAG 2.2 AA). These are NOT per-screen opt-in — a
+   `*-fidelity.spec.ts` that does not import + call the universal fixture is a
+   RED lint gate. This moves theme/i18n/responsive/a11y/shell/states from an
+   end-of-manifest gate (where they silently accrue across phases and surface in
+   a batch — the exact anti-pattern this gate exists to kill) into every phase,
+   by a mechanism screens inherit, not a checklist authors re-copy.
+6. **Security floor (every phase that adds or touches an API route)** — authz is
+   **default-deny**: a route with no `@Public` / `@RequireGrant(...)` /
+   `@SelfScope(...)` metadata is denied (403), enforced by a global guard, not
+   opt-in per controller. The verifier asserts each new route: unauth → 401,
+   under-privileged → 403, and the route appears in the phase's authz matrix.
+   Secrets **fail closed** — production refuses to boot without the required
+   JWT/provider secrets (no source-committed fallback). This moves authz + secret
+   coverage from the 2.9 security sign-off (where one forgotten guard hides for
+   the remaining phases) into the phase that adds the route.
+7. **Index discipline (`crud` phases)** — any schema change indexes every
+   foreign-key scalar + the common filter/sort columns; a schema-lint fails a
+   relation scalar with no index. Keeps p95 (`NFR.PERF`) from degrading silently
+   as tables grow, in-phase rather than discovered under load at go-live.
 
 The verifier returns a **verdict block**:
 
