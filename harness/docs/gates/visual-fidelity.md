@@ -217,6 +217,30 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     additive faithful work (the reflow/second-locale is designed on top of the
     frozen visual language), not a redraw. A screen missing a mandated UI NFR is
     blocked — the prototype only covers look, not the NFR floor.
+12. **A drag-reorder UI is hand-rolled and/or one-directional** (U5 RED) — any
+    screen that reorders items by drag (chapters, lessons, list rows) MUST use a
+    real DnD primitive with a **keyboard sensor** (e.g. dnd-kit) — NOT a bespoke
+    HTML5 `dragstart/drop` handler. The classic hand-rolled bug is a
+    **down-direction no-op**: dropping onto the next row lands one slot short, so
+    items move UP but never DOWN. The gate asserts reorder **persists across
+    reload in BOTH directions** (drag a row down AND up), the **whole row** is the
+    handle (not a 12px grip icon), and **keyboard reorder** works with axe 0
+    serious/critical (drag-drop alone fails keyboard a11y). Persistence is verified
+    at source (reload → new `sort_order`), never assumed from the optimistic UI.
+13. **Breadcrumb crumbs are dead text** (U6 RED) — on any object/detail page whose
+    header renders a breadcrumb trail, every **non-last** crumb MUST be a
+    keyboard-focusable navigable link (`<a>`/`<Link>`) that actually routes back to
+    that ancestor; only the **last** crumb stays plain text with
+    `aria-current="page"`. A breadcrumb that renders all crumbs as inert spans is a
+    dropped interaction (the trail exists to navigate, not to decorate) and blocks.
+
+> **Approach-B width reconciliation** (adoption note, not a block by itself): a
+> ported export screen can carry a **fixed `max-width`** baked into the mockup
+> (e.g. a 720px editor column) that fights the host shell's content column. When
+> the operator wants the screen to use the shell's full content width, removing
+> that cap is a **legitimate deliberate deviation** from the frozen export —
+> record it as a `rebuild (decision: <slug>)`-style note in the phase block so the
+> fidelity glance knows the divergence is intended, and keep it responsive.
 
 ## Regression Ledger — a fixed UI defect NEVER comes back
 

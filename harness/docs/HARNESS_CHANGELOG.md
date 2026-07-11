@@ -1,7 +1,34 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.7**.
+templates). Per-project state never lives here. Current version: **v6.8**.
+
+## v6.8 — 2026-07-11 — interactive-UI floors: reorder-both-directions (U5) + navigable breadcrumbs (U6) + Approach-B width reconciliation
+
+The P6 human glance surfaced a cluster of **interaction** defects that the visual
+fidelity gate (which proved the *look*) did not catch — the screen matched the
+export pixel-for-pixel yet was operationally broken. Three promoted to permanent
+gate rules (visual-fidelity.md Auto-Block 12–13 + adoption note):
+
+- **U5 reorder-both-directions.** The chapter/lesson editor used a hand-rolled
+  HTML5 `dragstart/drop` reorder with the classic **down-direction no-op** (drop
+  onto the next row landed one slot short → items moved UP but never DOWN), and
+  only a 12px grip was draggable with no keyboard path (axe-failing). Rule: any
+  drag-reorder MUST use a real DnD primitive with a keyboard sensor (dnd-kit), the
+  **whole row** is the handle, and the gate asserts `sort_order` **persists across
+  reload in BOTH directions** + keyboard reorder works. Persistence verified at
+  source, never from the optimistic UI.
+- **U6 navigable breadcrumbs.** The object-page breadcrumb rendered every crumb as
+  inert text. Rule: non-last crumbs are keyboard-focusable links that route to the
+  ancestor; only the last is plain `aria-current="page"`.
+- **Approach-B width reconciliation.** A ported export screen can bake a fixed
+  `max-width` (a 720px editor column) that fights the shell's content column;
+  removing it to use full content width is a **legitimate deliberate deviation**,
+  recorded as a rebuild-style note so the glance knows the divergence is intended.
+
+Same lesson as v6.1–v6.5: a defect the human finds once becomes a machine
+assertion so it never returns — here the class was interaction, not appearance, so
+the fidelity gate grew interaction teeth alongside its visual ones.
 
 ## v6.7 — 2026-07-11 — front-load the cross-cutting floors: the per-phase gate proves them, the human confirms
 
