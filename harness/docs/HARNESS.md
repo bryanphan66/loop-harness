@@ -155,7 +155,10 @@ harness directly or record the friction. The capture mechanism is the **Friction
 field in every session trace (`docs/TRACE_SPEC.md`); friction that should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round, naming the failures
-it closes) — latest **v6.2** (four universal fidelity assertions — U1
+it closes) — latest **v6.3** (the stale-export trap: the local export is a CACHE,
+not the source of truth — pin the live Claude-Design project + version and
+re-pull/diff local-vs-live before adopting, else a faithful adoption ships the
+wrong, drifted design; adds four universal fidelity assertions — U1
 app-shell-present, U2 input-focus, U3 theme-fidelity-in-both-modes so a scaffold
 `globals.css` can't silently override the adopted export tokens, U4
 shell-stays-put on scroll — a both-theme human glance, and the app-shell as a

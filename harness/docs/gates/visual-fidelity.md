@@ -199,6 +199,12 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
 9. **The app-shell scrolls with the page** (U4 RED) — the shell is not bound to
    the viewport, so the sidebar/topbar scroll away instead of the content region
    scrolling inside its own container.
+10. **The local export was not verified against the LIVE prototype** — no pinned
+    version + no local-vs-live diff at adoption (`prototype-export-adoption.md`
+    § Source Freshness). A local export snapshot silently drifts from the design
+    the client keeps editing; adopting a stale cache faithfully ships the wrong
+    design while every "matches the export" check passes. Re-pull + diff the live
+    source (tokens + components + chrome) before adoption, or the phase is blocked.
 
 ## Sign-Off
 

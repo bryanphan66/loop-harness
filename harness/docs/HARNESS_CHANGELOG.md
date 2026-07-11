@@ -1,7 +1,31 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.2**.
+templates). Per-project state never lives here. Current version: **v6.3**.
+
+## v6.3 — 2026-07-11 — the stale-export trap: pin + re-verify the export against the LIVE prototype
+
+The most serious fidelity failure of the elearning run, and the deepest reason
+the "99% adopt-the-export" claim was hollow: **the local export copy in the repo
+had drifted from the live frozen Claude-Design prototype.** The repo carried a
+**v2.2** portal chrome (header + sidebar both deep-green-ink `#07130c`,
+near-black); the LIVE prototype had advanced to **v3.5/v4.1** — a WHITE
+`--surface` topbar + a brand-green forest-gradient sidebar with a ribbon-pattern
+SVG. approach-B adopted the stale local copy faithfully, so the app shipped a
+near-black chrome the client never approved, and every "matches the export" check
+passed because it compared the app to the same stale cache. Confirmed by pulling
+the live `components.css` via DesignSync and diffing: the live chrome rule is
+`.shell-topbar { background: hsl(var(--surface)) }` (white) + a multi-layer green
+`.shell-sidebar` with `url("sidebar-pattern.svg")`, versus the repo's `#07130c`.
+
+Root lesson: **the export under `docs/visuals/prototype/` is a CACHE, not the
+source of truth — the live Claude-Design project is.** A cache goes stale as the
+designer keeps editing. Fix — `prototype-export-adoption.md` § Source Freshness:
+pin the live project id + version, **re-pull and diff local-vs-live before
+adopting and again at re-verify**, refresh the cache when they disagree, and
+measure fidelity against live-derived screenshots so a stale cache cannot
+self-certify. Gate Auto-Block rule 10 enforces it. (elearning was re-synced to
+the live v3.5/v4.1 chrome as the corrective.)
 
 ## v6.2 — 2026-07-11 — theme fidelity in BOTH modes (U3) + shell-stays-put (U4); the scaffold-token-override trap
 

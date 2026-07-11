@@ -10,6 +10,36 @@
 
 **Macro-stage / step:** Build & Go-live · 2.6 (per UI phase).
 
+## Source Freshness — the export IS a snapshot; it goes STALE (CRITICAL)
+
+The `docs/visuals/prototype/.../` export is a **local copy pulled at one moment**.
+The **live Claude-Design project keeps being edited** by the designer/client after
+that pull — so the local copy silently drifts from the *actually frozen* design.
+Adopting the local copy faithfully then yields an app that is a faithful copy of
+**the wrong (old) design**, and a fidelity gate that only ever compares against
+the local copy reports "99%" while the real prototype has moved on.
+
+**This happened (elearning):** the local export carried a **v2.2** portal chrome
+(header + sidebar both deep-green-ink `#07130c`, near-black); the LIVE prototype
+had advanced to **v3.5/v4.1** (white `--surface` topbar, brand-green forest
+gradient sidebar with a ribbon-pattern SVG). The build adopted the stale local
+copy, so it shipped a near-black chrome the client never approved, and every
+"matches the export" check passed because it compared to the stale copy.
+
+**Rules (do this or the adoption is built on sand):**
+1. **Pin the version.** Record the live project id + a version marker (the export
+   carries `vN` comments / screen version tags) in the phase block. If the live
+   prototype has no stable version, pin the pull date.
+2. **Re-pull + diff before adopting, and again at re-verify.** At adoption time,
+   re-fetch the live export (DesignSync `get_file` on the design project) and
+   **diff local-vs-live** for at least `tokens.css` + `components*.css` + the
+   chrome rules. A non-empty diff means the local copy is stale → refresh it
+   FIRST, then adopt. Never trust a local export you did not just verify.
+3. **The live project is the source of truth, not the repo copy.** The repo copy
+   is a cache. When they disagree, the live wins; re-sync the cache.
+4. **Fidelity is measured against the live-derived screenshots**, not the local
+   export's own render, so a stale cache cannot self-certify.
+
 ## Engine
 
 - **Fast path:** `frontend-development` (component port) + `ui-styling` (CSS
