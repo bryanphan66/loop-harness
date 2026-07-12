@@ -1,7 +1,21 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.14**.
+templates). Per-project state never lives here. Current version: **v6.15**.
+
+## v6.15 — 2026-07-12 — a webhook is authenticated to the PROVIDER's real scheme, not a guessed HMAC
+
+P11 built the SePay webhook verify as HMAC-SHA256 over the raw body (`x-sepay-
+signature`). Correct security *shape* — verify-before-DB, constant-time — but the
+WRONG scheme: SePay authenticates webhooks with a shared API key in the
+`Authorization: Apikey <key>` header, no body signing. So every real SePay webhook
+would have 401'd and no payment ever auto-confirmed — a silent break a mocked test
+(which signed with the same HMAC) sails through. Fixed the provider to the Apikey
+scheme, verified at source (no-key/wrong-key → 401, right-key → 200/handled). The
+external-integration playbook's "webhook signature verify" AC becomes "webhook AUTH
+verify — to the provider's ACTUAL documented scheme (HMAC sig / `Authorization:
+Apikey` / basic / mTLS), confirmed against their docs AND a real sandbox callback,
+not a guessed default." The scheme stays one adapter detail behind the provider port.
 
 ## v6.14 — 2026-07-12 — a new fail-closed secret must ship with its deploy-env value, or the next deploy crash-loops
 

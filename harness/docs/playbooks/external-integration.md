@@ -61,10 +61,19 @@ the verifier (`phase-acceptance.md`) exercises each against the running preview:
    secret vault; local dev + CI resolve **sandbox/test** credentials. No hardcoded
    key, no prod key reachable from a test path. The verifier confirms the sandbox
    path is used locally.
-2. **Webhook signature verify** — inbound callbacks verify the provider signature
-   (HMAC / shared secret) **before any DB read**; unsigned / invalid-signed → reject
-   (401) before the handler runs. Unverified handlers are how a caller fakes a
-   provider event.
+2. **Webhook auth verify — to the provider's ACTUAL scheme, read from their docs,
+   not a guessed default.** Inbound callbacks are authenticated **before any DB
+   read**; unauthenticated → reject (401) before the handler runs. But CHECK how
+   the specific provider actually authenticates its webhook — the schemes differ:
+   an HMAC-SHA256 body signature in a header (Stripe-style `x-…-signature`), OR a
+   shared **API key in the `Authorization: Apikey <key>` header** (SePay), OR a
+   basic-auth secret, OR mTLS. Building the generic HMAC assumption when the
+   provider actually sends `Authorization: Apikey` means **every real webhook is
+   401'd** and payments/events never confirm — a silent integration break that a
+   mocked test passes. Verify against the provider's documentation AND at source
+   (a real/sandbox callback from the provider gets past auth; a wrong/missing
+   credential 401s). Keep it behind the provider port so the scheme is one adapter
+   detail. (Learned when a SePay webhook was built HMAC-first; SePay uses Apikey.)
 3. **Idempotent webhook handling** — the same callback delivered twice → same state
    (dedupe on the provider event id, same discipline as `payment-integration.md`).
 4. **Retry + provider-error surfaced** — an outbound call that fails is retried with
