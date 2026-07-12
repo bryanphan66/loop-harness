@@ -1,7 +1,21 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.13**.
+templates). Per-project state never lives here. Current version: **v6.14**.
+
+## v6.14 — 2026-07-12 — a new fail-closed secret must ship with its deploy-env value, or the next deploy crash-loops
+
+P11 (SePay) correctly made its money-flow config fail-closed — the API refuses to
+boot in production without SEPAY_WEBHOOK_SECRET/IPS/ACCOUNT_NUMBER/BANK_CODE (no
+weak-default HMAC on a payment webhook). Right call. But the deploy compose didn't
+provide those vars, so the next deploy **crash-looped the API** (box 404, health
+red) while the worker stayed up. Same class already hit once with JWT-secret + prod-
+seed. Security floor (Leg-6) gains the corollary: a phase that introduces a new
+`NODE_ENV=production`-required env var MUST, in the same phase, either add a safe
+sandbox/placeholder default to the deploy compose (`${VAR:-default}`, staging boots,
+real creds override) OR list it in the report under "deploy env the control must set
+before deploying". A new fail-closed secret with neither is an incomplete phase —
+the fail-closed check is correct; the missing deploy-env is the defect.
 
 ## v6.13 — 2026-07-12 — a ported screen must be the WHOLE design, not a reduced gist
 

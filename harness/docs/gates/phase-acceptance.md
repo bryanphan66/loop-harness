@@ -93,7 +93,19 @@ app**, never by reading the diff and assuming:
    opt-in per controller. The verifier asserts each new route: unauth → 401,
    under-privileged → 403, and the route appears in the phase's authz matrix.
    Secrets **fail closed** — production refuses to boot without the required
-   JWT/provider secrets (no source-committed fallback). Baseline hardening the
+   JWT/provider secrets (no source-committed fallback). **Corollary — a new
+   fail-closed secret ships WITH its deploy-env value in the same phase, or it
+   crash-loops the box.** The fail-closed check is correct, but a phase that adds
+   a new prod-required secret/config (a payment webhook HMAC + account, an SES
+   key, an OAuth secret) and does NOT also add a sandbox/placeholder default to
+   the deploy compose (the `${VAR:-default}` pattern the stack already uses) —
+   or have the control deploy step inject it — turns the *next deploy* into an
+   API crash-loop (the box 404s, health red). The gate: for every new
+   `NODE_ENV=production`-required env var a phase introduces, either a safe
+   sandbox default lands in `docker-compose.*.yml` (staging boots; real creds
+   override) or the phase report lists it under "deploy env the control must set
+   before deploying" — a new required secret with neither is an incomplete phase.
+   Baseline hardening the
    app carries once (asserted present, not re-added per phase): **per-IP
    rate-limit** — shared across instances (Redis-backed, never in-memory on a
    multi-container API), tiered (strict on auth/OTP), 429 + `Retry-After`,
