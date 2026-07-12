@@ -266,6 +266,23 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     markers render (e.g. the poster + `.vplay` + badge are present before any
     `<video>` mounts; no `window.prompt|confirm|alert` on a screen the export gives
     a dialog). The interaction-side twin of the U1–U4 look assertions.
+16. **A typed entity renders the one designed variant for ALL its types** (U9 RED)
+    — an entity carries a `type`/`kind`/`format` enum with N values (a lesson
+    `video|text|pdf`, a block `image|quote|embed`, a field `string|date|select`),
+    the SRS defines DISTINCT content/behavior per value, but the frozen prototype
+    only drew ONE variant (usually the richest — the video lesson) — and the build
+    renders that one layout for every value. So a `text` lesson shows a video
+    banner, a `pdf` lesson shows a video banner: nonsensical, and a silent spec
+    violation. Rule: an editor/viewer for a typed entity is **type-aware** — it
+    branches on the enum and surfaces the SRS-defined content per type (video →
+    video asset; text → rich-text body as the primary content; pdf → the PDF
+    upload/preview), NOT the single drawn layout defaulted onto all. Where the
+    prototype only drew one variant, the others are **designed on top of the frozen
+    kit** (type-appropriate, visually consistent) — the gap between "the enum has N
+    values" and "the prototype drew 1" is additive faithful work, never a silent
+    default. The verifier asserts each enum value renders its correct content
+    surface (no video frame on a text/pdf lesson). Read from build-manifest 2.3:
+    when a phase's entity has a type enum, its screens must be checked per value.
 
 ## Regression Ledger — a fixed UI defect NEVER comes back
 

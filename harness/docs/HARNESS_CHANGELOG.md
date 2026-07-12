@@ -1,7 +1,22 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.11**.
+templates). Per-project state never lives here. Current version: **v6.12**.
+
+## v6.12 — 2026-07-12 — a typed entity must render per-type, not the one variant the prototype drew
+
+The lesson list showed video / text / pdf lessons — but the lesson EDITOR rendered
+the video banner for ALL of them (a `text` "bài viết" lesson and a `pdf` lesson both
+showed a video frame). Root: the SRS (`course-management.md` CM.CHAP.02) defines
+three DISTINCT contents — video → R2 video asset, text → rich-text HTML body, pdf →
+R2 PDF URL — but the frozen prototype only DREW the video lesson-edit screen, so the
+build defaulted that one layout onto every type. **U9 (visual-fidelity auto-block
+16):** an editor/viewer for a typed entity (a `type`/`kind` enum) is type-aware — it
+branches on the enum and surfaces the SRS-defined content per value; where the
+prototype drew only one variant, the others are designed on top of the frozen kit
+(additive faithful work), never the drawn layout defaulted onto all. The verifier
+checks each enum value renders its correct surface. A phase whose entity has a type
+enum must be checked per value at 2.3/2.6.
 
 ## v6.11 — 2026-07-12 — a working native primitive is not the adopted design; and a transcode ladder never upscales
 
