@@ -148,7 +148,7 @@ app**, never by reading the diff and assuming:
    permission grid) is NOT a data grid and is exempt; the floor is for record
    lists. The verifier asserts each new record-list screen carries the pagination
    + filter + sort controls, wired (not decorative) — a list phase missing them is
-   FAIL. (Project NFR: `NFR.UXC.08`.)
+   FAIL. (Project NFR: `NFR.UXC.09`.)
 
 The verifier returns a **verdict block**:
 
