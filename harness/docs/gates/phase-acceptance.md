@@ -136,6 +136,19 @@ app**, never by reading the diff and assuming:
    foreign-key scalar + the common filter/sort columns; a schema-lint fails a
    relation scalar with no index. Keeps p95 (`NFR.PERF`) from degrading silently
    as tables grow, in-phase rather than discovered under load at go-live.
+8. **Grid completeness floor — every data grid ships pagination + filter + sort.**
+   A data grid / list (a table of records: users, courses, orders, leads,
+   students…) is not "done" as a bare list. It ships, as DoD: **server-side
+   pagination** (already `NFR.PERF.08`), **at least one filter/search**, and
+   **column sort** — and an Excel/CSV **export** where the feature's REQ calls for
+   it. This is a project standard the operator elevated from per-feature to
+   universal: a grid that surfaces records without a way to filter or sort them is
+   an incomplete grid, not a smaller one — the same lesson as the public catalog
+   shipping without its filter row (U10). A pure 2-D config matrix (a role×area
+   permission grid) is NOT a data grid and is exempt; the floor is for record
+   lists. The verifier asserts each new record-list screen carries the pagination
+   + filter + sort controls, wired (not decorative) — a list phase missing them is
+   FAIL. (Project NFR: `NFR.UXC.08`.)
 
 The verifier returns a **verdict block**:
 

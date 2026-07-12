@@ -1,7 +1,20 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.15**.
+templates). Per-project state never lives here. Current version: **v6.16**.
+
+## v6.16 — 2026-07-12 — grid completeness floor: every data grid ships pagination + filter + sort (operator elevated from per-feature to universal)
+
+Pagination was already universal (NFR.PERF.08); filter + sort were only per-feature
+(leads, orders, dashboards) + the CRM grid. The operator elevated the rule: EVERY
+data grid (a table of records) ships pagination + at least one filter/search +
+column sort as DoD — plus export where the feature calls for it. A grid that lists
+records with no way to filter/sort them is an incomplete grid, not a smaller one
+(the same shape as the public catalog shipping without its filter row, U10). Added
+as phase-acceptance Leg-8 (crud phases) + project NFR NFR.UXC.08. A pure 2-D config
+matrix (role×area permissions) is exempt — the floor is for record lists. The
+verifier now fails a new record-list screen that ships without wired
+pagination/filter/sort.
 
 ## v6.15 — 2026-07-12 — a webhook is authenticated to the PROVIDER's real scheme, not a guessed HMAC
 
