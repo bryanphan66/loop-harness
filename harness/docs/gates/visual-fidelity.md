@@ -252,6 +252,20 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     when a ported-export defect recurs across sibling screens, promote the fix
     from a screen-local regression assertion to **one lint over the entire ported
     screen directory** — catch the whole class at the source, at once.
+15. **A native browser primitive is substituted for a designed export component**
+    (U8 RED) — the export shows a *designed* control (a custom video player =
+    poster + center play + rich status badge; a styled insert-link/insert-image
+    dialog; a styled select/confirm), and the build ships the raw browser default:
+    a native `<video controls>` grey bar, a `window.prompt()` / `window.confirm()`
+    / `alert()` chrome, a bare `<select>`. It "works" and survives a loose glance,
+    so it slips — but it is NOT the adopted design (approach-B), it is redraw-by-
+    omission. Rule: when the frozen export defines a control's look, adopt THAT
+    (poster-then-play, not a default control bar shown by default; an in-app dialog
+    component, never `window.prompt`); a native primitive is allowed only where the
+    export itself shows the native affordance. The verifier asserts the designed
+    markers render (e.g. the poster + `.vplay` + badge are present before any
+    `<video>` mounts; no `window.prompt|confirm|alert` on a screen the export gives
+    a dialog). The interaction-side twin of the U1–U4 look assertions.
 
 ## Regression Ledger — a fixed UI defect NEVER comes back
 

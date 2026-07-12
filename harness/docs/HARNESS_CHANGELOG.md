@@ -1,7 +1,28 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.10**.
+templates). Per-project state never lives here. Current version: **v6.11**.
+
+## v6.11 — 2026-07-12 — a working native primitive is not the adopted design; and a transcode ladder never upscales
+
+P7 shipped a video area that *worked* — but the operator caught it rendering a
+native `<video controls>` grey bar (the frozen export shows a designed player:
+poster + green center play + "HLS {res} · {dur} · CDN R2" badge) and a
+`window.prompt()` for rich-text image insert (the export shows an in-app dialog +
+real upload). It passed because "it works" — the exact loose-glance gap approach-B
+is meant to close. Separately the HLS ladder force-upscaled a 480p source into fake
+720p/1080p renditions.
+
+- **U8 (visual-fidelity auto-block 15):** a native browser primitive substituted
+  for a designed export control — native `<video controls>`, `window.prompt/
+  confirm/alert`, bare `<select>` where the export shows a custom one — is
+  redraw-by-omission, not adoption. Adopt the designed control (poster-then-play;
+  in-app dialog, never `window.prompt`); native is allowed only where the export
+  itself shows it. The interaction-side twin of the U1–U4 look assertions.
+- **media-pipeline: never upscale.** The 480/720/1080 rungs are a *maximum*, not a
+  fixed ladder — probe the source height and emit only rungs ≤ source (≤480 → one
+  480p rung, no fake 720/1080; gate asserts the upscaled files are absent from
+  storage). Badge/DB carry the actual max height.
 
 ## v6.10 — 2026-07-12 — authz isn't done at the API: the Security floor grows a UI-gating leg + an RBAC self-lockout guard
 

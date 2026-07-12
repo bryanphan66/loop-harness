@@ -57,6 +57,17 @@ updates job progress the player polls (`status(jobId)`).
 if this doc and that file ever disagree, the file wins. Renditions (label /
 height / bitrates) are `HLS_RENDITIONS` in the same file.
 
+**Never upscale — the ladder is capped by the source.** The 480/720/1080 rungs are
+the *maximum* ladder, not a fixed one. The transcode job MUST probe the source
+height (an ffprobe `probe-height` sibling to probe-audio/probe-duration) and emit
+ONLY rungs whose height ≤ source; a 480p source yields a single 480p rung (never
+fake 720/1080), a 720p source yields 480+720, a below-480 source yields one rung at
+its own height. Always ≥1 rung. Upscaling a low-res master into higher renditions
+ships blurry files + wastes storage/CPU and lies to the player's ABR. The gate
+asserts at source: a ≤480p input produces exactly one 480p rung with **no** 720p/
+1080p files in storage; a 1080p+ input produces all three. The player badge/DB
+carry the **actual** max rendition height, not the ladder's nominal top.
+
 Shape of the generated command (source is a **local file path** — the worker
 downloads the signed-GET source to a tmp file before invoking ffmpeg, so a
 long transcode can't 403 on a source URL expiring mid-run; see Atomicity
