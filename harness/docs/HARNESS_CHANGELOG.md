@@ -1,7 +1,33 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.9**.
+templates). Per-project state never lives here. Current version: **v6.10**.
+
+## v6.10 — 2026-07-12 — authz isn't done at the API: the Security floor grows a UI-gating leg + an RBAC self-lockout guard
+
+The operator opened an admin screen where the "Delete" action still showed for a
+role whose Delete grant was unticked, and asked the load-bearing question: *is the
+permission model actually applied to the modules, or only seeded?* Verified answer:
+the API enforced it (every route guarded, delete=D, publish=W — real 403s), but
+**the UI rendered every action button unconditionally** and the permission matrix
+had **no self-lockout guard** — the operator had unticked the ceiling-defining ADM
+role's own grant, dropped the ceiling below Delete, and locked everyone (incl.
+themselves) out of ever re-granting it. Two gaps the "API is guarded" checkmark hid.
+
+Security floor (Leg-6, v6.7) gains two clauses:
+- **UI reflects authz.** A route guard is necessary, not sufficient. Every admin
+  screen gates its mutating controls (delete/publish/create) on the caller's fresh
+  grant — hide by default — read from the same authoritative source the guard uses
+  (surface the caller's grant map on `/auth/me`), never a divergent copy. Verifier
+  asserts both layers: control hidden AND API still 403s.
+- **RBAC self-lockout guard.** A permission-editing matrix must refuse an edit that
+  lowers the ceiling-defining role's OWN grant below its current level (client +
+  save-API, defense-in-depth), with a documented recovery (idempotent boot seed
+  restores spec on restart). Raising always allowed.
+
+Same shape as the run's other lessons: a defect the human found once becomes a
+per-phase floor the machine proves — here the floor is "a guarded route is only
+half of authz; the screen must show the truth too."
 
 ## v6.9 — 2026-07-11 — the status surface splits in two: internal ops-board + curated client-facing roadmap
 

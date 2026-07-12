@@ -102,6 +102,24 @@ app**, never by reading the diff and assuming:
    frameguard). This moves authz + secret + abuse-control coverage from the 2.9
    security sign-off (where one forgotten guard hides for the remaining phases)
    into the phase that adds the route.
+   **Authz is not complete until the UI reflects it.** A route guard (403) is
+   necessary but NOT sufficient — a screen that renders a mutating control
+   (delete, publish, create) the caller has no grant for is a defect: it invites
+   a 403 dead-end and reads as "the permission model isn't applied." Every phase
+   that ships an admin screen **gates its action controls on the caller's grant**
+   (hide by default; disabled-with-reason only where hiding breaks layout), read
+   from the SAME authoritative source the guard uses (the caller's fresh grant
+   map, e.g. surfaced on `/auth/me`) — never a second, divergent copy. The
+   verifier asserts: a caller lacking the grant does not see the control, and the
+   API still 403s it (both layers, not either/or).
+   **RBAC matrices carry a self-lockout guard.** When a permission-editing screen
+   lets a grant be lowered — especially the role that DEFINES the ceiling (the top
+   admin whose own grants bound everyone else's) — an operator can drop the
+   ceiling below the level needed to raise it again and lock the whole system out.
+   The matrix (and the save API, defense-in-depth) must refuse an edit that lowers
+   the ceiling-defining role's own grant below its current level, with a clear
+   reason; and a documented recovery path exists (e.g. the idempotent boot seed
+   restores the spec grants on restart). Raising is always allowed.
 7. **Index discipline (`crud` phases)** — any schema change indexes every
    foreign-key scalar + the common filter/sort columns; a schema-lint fails a
    relation scalar with no index. Keeps p95 (`NFR.PERF`) from degrading silently
