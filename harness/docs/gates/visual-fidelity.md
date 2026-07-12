@@ -283,6 +283,22 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     default. The verifier asserts each enum value renders its correct content
     surface (no video frame on a text/pdf lesson). Read from build-manifest 2.3:
     when a phase's entity has a type enum, its screens must be checked per value.
+17. **A ported screen ships REDUCED — the gist, not the whole design** (U10 RED) —
+    the export defines a screen with a full toolbar (a filter row of search + N
+    selects), a full chrome (a utility top-strip + a multi-column footer), and a
+    component that has variants (a nav that is light OR dark) — and the build ships
+    a stripped version: the filter loses its selects, the footer collapses to a
+    copyright line, the nav renders the WRONG variant (dark where the export is
+    light). Each omission "looks close" in isolation, so it slips — but adopt-
+    export means porting the WHOLE screen, not a lossy summary. Rules: (a) every
+    control the export's toolbar/filter row shows is present and wired (a missing
+    select is a dropped feature, not a style nit); (b) shared chrome (top-strip,
+    footer) is ported at full fidelity — a multi-column footer is not a copyright
+    stub; (c) when a kit component takes a variant flag (`ink`/light-dark,
+    size, tone), the screen uses the SAME variant the export picked for THAT screen
+    — don't default to one. The glance checks the ported screen against the export
+    as a WHOLE (toolbar controls, chrome, variant), not just "the main content is
+    there." A size-S phase is not licence to ship a reduced port.
 
 ## Regression Ledger — a fixed UI defect NEVER comes back
 

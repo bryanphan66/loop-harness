@@ -1,7 +1,22 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.12**.
+templates). Per-project state never lives here. Current version: **v6.13**.
+
+## v6.13 — 2026-07-12 — a ported screen must be the WHOLE design, not a reduced gist
+
+The public course catalog (a size-S phase) shipped a stripped port: the filter row
+lost its three selects (level/price/sort — only search survived), the multi-column
+`SiteFooter` collapsed to a copyright line, and the nav rendered the DARK `on-ink`
+variant where the export's catalog page uses the LIGHT/white nav + a utility
+top-strip. Each omission "looked close" alone, so it passed a loose glance.
+**U10 (visual-fidelity auto-block 17):** adopt-export means porting the whole
+screen — every toolbar/filter control present + wired (a missing select is a
+dropped feature), shared chrome (top-strip, footer) at full fidelity (not a stub),
+and a kit component used in the SAME variant the export picked for that screen (not
+defaulted). The glance compares the ported screen to the export as a whole —
+toolbar, chrome, variant — not just "the main content is there." Size-S is not
+licence to ship a lossy summary.
 
 ## v6.12 — 2026-07-12 — a typed entity must render per-type, not the one variant the prototype drew
 
