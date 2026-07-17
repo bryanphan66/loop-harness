@@ -299,6 +299,39 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     — don't default to one. The glance checks the ported screen against the export
     as a WHOLE (toolbar controls, chrome, variant), not just "the main content is
     there." A size-S phase is not licence to ship a reduced port.
+18. **A screen renders but does not INTERACT — state + convention not wired**
+    (U11 RED) — a ported/self-designed screen looks right (pixels pass) but its
+    interactions are dead: a tabbed page seeded its active tab from `?tab=` into a
+    local `useState` **once at mount**, so the sidebar deep-links (`?tab=orders`,
+    `?tab=certs`) changed the URL but the mounted component ignored the param
+    change → clicking the nav didn't switch the tab (URL said one thing, screen
+    showed another). The fidelity gate proves the tab STRIP exists; it does not
+    prove clicking it changes the page. Rules: (a) screen state that a URL can
+    address is **derived from the URL each render** (`useSearchParams()` /
+    route param), not copied into local state once — writes go through
+    `router.replace`/`push` so nav item + control + URL + shell active-state stay
+    in sync; (b) deep-link + browser back/forward land on the right state; (c) the
+    active-nav highlight matches the rendered content; (d) a mutation uses the
+    app's **established feedback convention** (the shared `toast` every other save
+    uses — not a bespoke inline banner the user reads as "no feedback"). The
+    verifier drives the interaction (click the deep-link, press Back, save a form)
+    and asserts the observable state changed — a screen whose nav/tab/deep-link
+    does not actually switch content is a RED block, even at pixel-perfect look.
+19. **A ported screen keeps its PRIMARY region but drops SECONDARY ones** (U12 RED,
+    sharpens U10) — U10 blocks a *reduced* toolbar/chrome; U12 blocks the subtler
+    miss where the hero table/form is faithfully ported but the screen's secondary
+    regions are silently dropped though their DATA exists: a KPI **StatCard row**
+    above a list, a **composite card** (recent-orders + coaching-slot), **Pagination**
+    (and, worse, ignoring the `page` param so results truncate past page 1), a
+    secondary **tab** (a lesson's "Tài nguyên"/resources attachments), per-row
+    **metadata** (per-lesson/chapter durations, an updated-date) and an **accordion
+    collapse** the export shows. Each reads as "small" alone and recurs across
+    screens. Rule: the fidelity check diffs the ENTIRE screen's **region inventory**
+    — stat rows, composite cards, pagination (with its param actually paging the
+    data), tabs, per-row metadata, secondary CTAs — not just "the hero table/form
+    is present." "Primary element present" is not "screen ported." The screen's
+    required-element checklist (2.3) enumerates every region the export draws, and
+    a dropped secondary region is a RED test exactly like a dropped primary one.
 
 ## Regression Ledger — a fixed UI defect NEVER comes back
 

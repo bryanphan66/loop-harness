@@ -48,6 +48,35 @@ that intentionally runs on placeholders — it'd crash-loop it; keep the hardeni
 branch un-deployed until the cutover. **(e)** the prod deploy is an explicit,
 named-endpoint human decision an agent surfaces, never fires silently.
 
+**(3) Runtime & fidelity legs consolidated from the P0–P16 build.** Five more
+elearning-surfaced defects, each landed in the gate/playbook that owns it: **Boot
+smoke** — `validate:quick` compiles + unit-tests but never boots the real AppModule,
+so runtime DI/wiring + fail-closed-config errors shipped GREEN and crash-looped prod
+(a fail-closed secret that threw at boot; a service with an un-`@Optional()` optional
+collaborator not in its module → "Nest can't resolve dependencies"). The gate now
+boots the full AppModule (`Test.createTestingModule({imports:[AppModule]})`) and any
+optional-collaborator ctor param carries `@Optional()` — landed in `build-execution.md`
+§ Validate Bootstrap + `phase-acceptance.md` Leg-1 security floor + a `dod-build.md`
+Core leg. **Media-delivery proxy** — a playback URL handed to a browser must be an
+entitlement-gated HTTP **proxy route**, never a raw storage signed-URL: a `file://`
+local-driver URL (or a relative child playlist that loses its presign) spins hls.js
+forever; `signManifest` returns a root-relative path so children resolve into the
+same guarded route, + a client watchdog; verify by driving the STUDENT path
+(OTP-login → HTTP not `file://` → `#EXTM3U` → `.ts` 200 `video/mp2t`) — landed in
+`media-pipeline.md` category 3 + the `phase-acceptance.md` media leg. **Interaction-
+completeness** (visual-fidelity **U11**) — a screen that renders but doesn't interact
+(a tab seeded from `?tab=` into local `useState` once → sidebar deep-links changed the
+URL but not the page); URL-addressable state is derived from the URL each render, and
+mutations use the app's shared `toast` convention. **Screen-region completeness**
+(visual-fidelity **U12**, sharpens U10) — the hero table/form is ported but secondary
+regions (StatCard row, composite cards, Pagination + its `page` param, a resources
+tab, per-row durations, accordion) are silently dropped though the data exists; the
+gate diffs the whole region inventory. **Fetch-all pageSize cap** — a grid that
+fetches-all for client-side sort/filter must size its fetch ≤ the endpoint's
+`pageSize.max` (a 200-vs-max-100 request 422'd the page while a default-size `curl`
+200'd) — landed in `build-execution.md` guardrails + the `phase-acceptance.md` grid
+floor.
+
 ## v6.16 — 2026-07-12 — grid completeness floor: every data grid ships pagination + filter + sort (operator elevated from per-feature to universal)
 
 Pagination was already universal (NFR.PERF.08); filter + sort were only per-feature

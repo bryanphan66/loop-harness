@@ -65,10 +65,16 @@ app**, never by reading the diff and assuming:
      no automatic stage→atomic-publish — so gating on job state, not "the key
      exists", is what makes this atomic in practice); a forced upload failure
      leaves no orphaned renditions under the output prefix; the manifest is served
-     via signed-URL/CDN (unentitled fetch denied); progress/status surfaced;
+     via signed-URL/CDN **through an entitlement-gated HTTP proxy route, NOT a raw
+     storage signed-URL handed to the player** (a `file://` local-driver URL or a
+     relative child playlist that loses its presign spins the player forever) —
+     `signManifest` returns a root-relative path so child playlists/segments resolve
+     into the same guarded route; unentitled fetch denied; progress/status surfaced;
      renditions cleaned on delete; **streaming NFR asserted HERE — player
      first-byte within budget, signed-URL entitlement, multi-bitrate present**
-     (not deferred to 2.11) (`docs/playbooks/media-pipeline.md`).
+     (not deferred to 2.11). Verify by driving the STUDENT path (OTP-login enrolled
+     → `playback-url` is HTTP not `file://` → `master.m3u8` is `#EXTM3U` → a `.ts`
+     is 200 `video/mp2t`), not just the editor preview (`docs/playbooks/media-pipeline.md`).
    - `external-integration` — sandbox credentials on the test path (no prod key
      reachable); an unsigned webhook is rejected before any DB read; a duplicate
      callback is idempotent; a failed outbound surfaces the real provider error
@@ -105,6 +111,23 @@ app**, never by reading the diff and assuming:
    sandbox default lands in `docker-compose.*.yml` (staging boots; real creds
    override) or the phase report lists it under "deploy env the control must set
    before deploying" — a new required secret with neither is an incomplete phase.
+   **Boot smoke — the gate boots the real AppModule, not just compiles it.**
+   `validate:quick` compiles + unit-tests, but unit tests inject positionally and
+   mock modules, so a **runtime DI/boot error ships green and only surfaces as a
+   prod crash-loop** (health 404). Two real incidents: a fail-closed config threw
+   at boot when a prod secret was absent; and a Nest DI crash — a service took an
+   optional collaborator (`verifier?: X` + a function default) **without
+   `@Optional()`**, so Nest tried to resolve it as a provider that wasn't in the
+   module and `AppModule` boot threw "Nest can't resolve dependencies of …". The
+   gate MUST add a **boot-smoke step** that instantiates the full AppModule
+   (`Test.createTestingModule({imports:[AppModule]}).compile()` or a `--dry-run`
+   bootstrap against a throwaway DB) so DI/boot errors fail the GATE, not the
+   deploy. Code corollary: any constructor param that is an optional collaborator
+   with a runtime default (test-injected stub, config-built instance, a plain
+   function) MUST carry `@Optional()` — Nest ignores the TS `?`/default and resolves
+   by type otherwise. Verify-at-source after any deploy that touches API modules:
+   `curl API/health` == `{status:ok}` — a health 404/502 is a boot crash, not
+   transient.
    Baseline hardening the
    app carries once (asserted present, not re-added per phase): **per-IP
    rate-limit** — shared across instances (Redis-backed, never in-memory on a
@@ -148,7 +171,12 @@ app**, never by reading the diff and assuming:
    permission grid) is NOT a data grid and is exempt; the floor is for record
    lists. The verifier asserts each new record-list screen carries the pagination
    + filter + sort controls, wired (not decorative) — a list phase missing them is
-   FAIL. (Project NFR: `NFR.UXC.09`.)
+   FAIL. (Project NFR: `NFR.UXC.09`.) **A grid that fetches-all for client-side
+   sort/filter/paginate must size its fetch ≤ the endpoint's max pageSize** — one
+   page set `FETCH_SIZE=200` against a `pageSize.max(100)` DTO → HTTP 422 → the
+   page's error state, and a plain `curl` (default page size) 200s so the earlier
+   verify missed it; the verifier drives the PAGE's own request, or switches the
+   grid to true server-side pagination.
 
 The verifier returns a **verdict block**:
 

@@ -151,8 +151,22 @@ fi
 Before 2.6 starts, the project MUST have at least `validate:quick` runnable. The
 2.2 stack decision picks the framework; this playbook produces the script.
 
-Minimum `validate:quick`: `format → lint → typecheck → unit tests → architecture
-check (if any)`.
+Minimum `validate:quick`: `format → lint → typecheck → unit tests → **boot smoke**
+→ architecture check (if any)`.
+
+**Boot smoke (non-negotiable for a DI-framework backend).** Compile + unit tests do
+NOT boot the app — unit tests inject positionally and mock modules, so a runtime
+DI/wiring or fail-closed-config error passes the gate green and only surfaces as a
+prod **crash-loop** (health 404). Add a step that instantiates the **real
+AppModule** — Nest `Test.createTestingModule({ imports: [AppModule] }).compile()`,
+or a `--dry-run` bootstrap against a throwaway DB — so a boot error fails the GATE,
+not the deploy. Code corollary: any constructor param that is an *optional
+collaborator with a runtime default* (a test-injected stub, a config-built
+instance, a plain function default) MUST carry `@Optional()` — the framework
+ignores the TS `?`/default and tries to resolve it by type, throwing "can't resolve
+dependencies" at boot. (Evidence: two elearning deploys took the whole API down with
+a green gate — a fail-closed secret that threw at boot, and a service with an
+un-`@Optional()` optional collaborator not in its module.)
 
 | Stack | `validate:quick` shape |
 |---|---|
@@ -330,6 +344,12 @@ agent reading this at the start of 2.6:
   never a generic "something went wrong" that swallows it. Generic-swallow is a
   2.7 review floor block (`code-review-scoring.md`).
 - Input validation at the boundary.
+- **A fetch-all grid respects the endpoint's max pageSize.** A list screen that
+  pulls every row to sort/filter/paginate client-side must set its fetch size ≤ the
+  API's `pageSize.max(...)` — a page that requested 200 against a `max(100)` DTO got
+  HTTP 422 and rendered its error state, while a plain `curl` at the default page
+  size 200'd (so a naive verify missed it). Cap the fetch to the endpoint max, or
+  switch to true server-side pagination.
 - **Systemic fix = full sweep.** When a change fixes an instance of a systemic
   pattern (error handling, model/tier resolution, auth, quota, permission
   checks), grep ALL call-sites of that pattern and cover every sibling in the

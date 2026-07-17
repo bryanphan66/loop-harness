@@ -124,9 +124,31 @@ verifier (`phase-acceptance.md`) exercises each against the running preview:
    confirms all three renditions + the master exist ONLY once `status(jobId)`
    is `completed`, and confirms nothing remains under `outputPrefix` after a
    forced upload failure.
-3. **HLS manifest via signed-URL / CDN** — the master + segment URLs are served
-   through signed GETs or a CDN, NOT a public bucket; an unentitled fetch is denied
-   (inherits `object-storage` entitlement).
+3. **HLS manifest via signed-URL / CDN, delivered through a PROXY route — never a
+   raw storage signed-URL handed to the browser.** The master + segment URLs are
+   entitlement-protected (signed GET / CDN, NOT a public bucket; an unentitled fetch
+   is denied — inherits `object-storage` entitlement). **But the URL the player
+   receives is an app HTTP proxy route, not the driver's raw signed URL.** Two ways
+   the raw-signed-URL shortcut silently breaks playback: (a) on `STORAGE=local`
+   (what a box runs when R2/S3 isn't wired — a "CDN R2" badge can be cosmetic), the
+   local driver's `signedGetUrl` returns a **`file://` URL** the browser cannot
+   fetch → hls.js spins forever on an infinite spinner; (b) even on S3/R2 a **relative
+   child playlist** inside the master loses the presign query string, so the child
+   `.m3u8`/`.ts` 403s. Correct shape (uniform across drivers): an **entitlement-gated
+   HTTP proxy** route streams the manifest + segments (each child request re-checks
+   entitlement), and `signManifest` returns a **root-relative** path
+   (`/lessons/:id/video/hls-stream/master.m3u8`) so hls.js resolves child playlists
+   and segments **relatively into the same guarded route** — never an absolute
+   presigned URL. Add a client **watchdog** (≈15s with no `loadedmetadata` → error
+   state) so a broken manifest surfaces an error instead of spinning forever. The
+   editor/preview player often works while the student delivery hangs precisely
+   because the editor already streams through such a proxy and the student path
+   handed over the raw `signedGetUrl` — check the STUDENT delivery, not the editor.
+   **Verify-at-source (the video actually plays, not "the endpoint 200s"):**
+   OTP-login as an *enrolled* student (passwordless — `POST /auth/otp/request`, read
+   the code from Mailpit `/api/v1/messages`, `POST /auth/otp/verify` → bearer), then:
+   `playback-url` returns an **HTTP path (not `file://`)`; `hls-stream/master.m3u8`
+   returns `#EXTM3U`; a `.ts` segment is **HTTP 200 `video/mp2t`** with real bytes.
 4. **Progress / status surfaced** — the upload-processing screen polls
    `status(jobId)` and shows real progress (e.g. `248MB → HLS, 72%`) and terminal
    success/failure — the real failure cause on error.

@@ -32,6 +32,7 @@ half; this checklist is the judgment half.
 - [ ] **Security sign-off** — STRIDE+OWASP, **red-team required**; 0 Critical/High open (step 2.9).
 - [ ] **QA evidence** — real-browser QA with video; human approval recorded (step 2.10). *Lite/internal:* [ ] cleared · [ ] N/A by decision — `<reason> (<date>)` (scripted real-browser evidence — Playwright traces/screenshots + register rows — substitutes for video + human approval).
 - [ ] **User manual** — field-by-field + video produced. *Lite/internal:* video portion [ ] cleared · [ ] N/A by decision — `<reason> (<date>)`; the written field-by-field manual is NOT waivable.
+- [ ] **Boot smoke green** — `validate:quick` boots the real AppModule (`Test.createTestingModule({imports:[AppModule]}).compile()` or a `--dry-run` bootstrap), so a DI/wiring or fail-closed-config error fails the gate, not the deploy; every optional-collaborator constructor param carries `@Optional()`. Confirmed at source after deploy: `curl API/health` == `{status:ok}`.
 - [ ] **Verification register green** — no `Result: fail`, no `never-run` on the stage-close commit.
 
 ## Conditional Enterprise Gate Toggles
