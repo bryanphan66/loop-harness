@@ -91,6 +91,8 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 | [code-review-scoring.md](code-review-scoring.md) | 2.7 | 6-dim rubric (correctness 3 / security 2 / quality 2 / perf 1 / maint 1 / tests 1); pass ≥7, any 0 auto-blocks; floor rules: design-system, visual fidelity, no generic error-swallow; systemic-pattern sweep. Engine `ck-code-review`. |
 | [canonical-e2e-flow-playbook.md](canonical-e2e-flow-playbook.md) | 2.8 | Phase-typed E2E (form / workflow / readonly / mixed) from BA acceptance criteria; mints **TC-NNN**; Mandatory Coverage Rules: negative-path for every failable op (real cause surfaces) + every auth method login→data-load + cookie hygiene. Engine `ck-e2e-flow`. |
 | [e2e-qa-field-by-field-verify-with-report.md](e2e-qa-field-by-field-verify-with-report.md) | 2.10 | Field-by-field verify + `correct/incorrect/manual/not-found` report + user-guide video → DoD evidence. Engine `ck-qa`. |
+| [config-driven-identity.md](config-driven-identity.md) | 2.6 + 2.10 sweep | Business identity (brand / company legal entity / tax / contact / canonical URL / SEO provider / copyright) renders from `site_configs`, never a code literal — cert/invoice/email/json-ld/chrome. Go-live grep sweep + flip-a-Settings-value proof; marketing numbers wired-real or kept-by-decision. DoD leg. Engine `ck-scout` · `backend-development`. |
+| [go-live-deploy-verify.md](go-live-deploy-verify.md) | 2.11–2.12 | Deploy + verify-at-source: build-time env as build ARG (not cached redeploy); confirm by health + content marker (not CI/200/version); placeholder-default bypasses fail-closed; hardening→real-prod not demo box; deploy is a named-endpoint human decision. DoD leg. Engine `devops` · `ck-deploy`. |
 
 ### Macro-Stage 3 — Post-Build
 

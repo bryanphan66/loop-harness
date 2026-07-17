@@ -1,7 +1,52 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.16**.
+templates). Per-project state never lives here. Current version: **v6.17**.
+
+## v6.17 — 2026-07-17 — Go-live hardening: config-driven business identity floor + deploy-verify-at-source playbook (the "Go-live" half of Macro 2, filled from elearning's hardcode sweep + prod deploys)
+
+Macro-Stage 2 is "Build & **Go-live**", but the go-live half had no playbook — deploy
+lived only in a template + the DoD prose, and "no hardcode" only covered design
+tokens. Elearning's go-live surfaced a cluster of real defects that a DoD-passed
+build still shipped, so v6.17 gives the go-live half two floors + two DoD legs.
+
+**(1) Config-driven business identity** (`playbooks/config-driven-identity.md`, new;
+DoD Core leg). Every piece of business identity — brand/site name, company legal
+name + tax code + address + contact, support email, canonical URL, SEO provider,
+copyright — must render from the settings/`site_configs` store, never a code
+literal. The failure mode is that a hardcoded brand **passes the demo glance**
+because the seeded config value equals the literal, then breaks the instant the
+client edits Settings: the cert PDF, invoice seller block, email footer, json-ld
+`provider`, and copyright still show the old identity. Offenders found: a cert
+renderer with a baked navy/gold layout ignoring the admin-designed template
+(`fields_config` + design asset); an invoice seller typed as a literal; six email
+templates greeting with the brand literal; json-ld `provider:{name,url}` hardcoded;
+copyright with a dead year. Fix pattern: a **cached, worker-reachable** config loader
+(documents + emails render in the worker, not the API), fail-soft to the current
+identity. Go-live **sweep** at 2.10: grep the identity literals repo-wide (incl.
+`apps/worker` + PDF/email builders), every hit in a document/email/SEO/chrome
+surface is a defect, then flip a staging Settings value and confirm it reflects.
+Marketing social-proof numbers ("9.000+ students") are NOT hardcode — wire to a real
+count or keep by recorded owner decision, never silently downgrade to the raw value.
+
+**(2) Go-live deploy & verify-at-source** (`playbooks/go-live-deploy-verify.md`, new;
+DoD Core leg). Five rules proven on the elearning prod deploys: **(a)** build-time-
+inlined env (`NEXT_PUBLIC_*`, `sitemap.ts`/canonical/OG/json-ld) is a Docker **build
+ARG**, never only a runtime env, and a redeploy of the SAME commit reuses the image
+cache so the value won't change without a source-changing rebuild — the symptom was
+prod still emitting `localhost:3000` after the domain env was "set". **(b)** Verify at
+the **source** by health `.status==ok` **+ a content marker only the new build
+produces** — never CI-green, HTTP-200 (can be the old container), or a version
+string (`commitSha` was `local-dev` on the box); and pick the marker deliberately (a
+literal that lives in seeded DATA never flips → false negative). **(c)** extends v6.14:
+a compose `${MONEY_SECRET:-non-empty-placeholder}` default is WORSE than missing — it
+passes the presence-only fail-closed check so prod boots GREEN on a **fake** money
+config (payments to account `0000000001`, sandbox key never confirms); money/identity/
+legal guards must reject KNOWN placeholders, not just empty. **(d)** a fail-closed
+hardening ships to REAL prod (real creds set first), never to the shared demo box
+that intentionally runs on placeholders — it'd crash-loop it; keep the hardening
+branch un-deployed until the cutover. **(e)** the prod deploy is an explicit,
+named-endpoint human decision an agent surfaces, never fires silently.
 
 ## v6.16 — 2026-07-12 — grid completeness floor: every data grid ships pagination + filter + sort (operator elevated from per-feature to universal)
 
