@@ -6,7 +6,7 @@
 > demo / UAT** — it converts the eyeball-QA a human otherwise does (clicking every
 > control, submitting every form, checking every image) into an **agent self-check**.
 > It is the runnable companion to the machine gates: `docs/gates/phase-acceptance.md`
-> (Legs 9–14 + Leg-5 clause U-img) and `docs/gates/visual-fidelity.md` (U13–U19).
+> (Legs 9–27 + Leg-5 clause U-img) and `docs/gates/visual-fidelity.md` (U13–U19).
 > Every item has an explicit pass/fail predicate — a FAIL is fixed before a human
 > ever sees the build. Applies at 2.10 (pre-ACCEPTANCE) and before any demo record.
 
@@ -42,6 +42,7 @@ under `plans/reports/`.
 - [ ] **C2 Status exhaustiveness (U16):** for every status/type enum, drive EACH value on BOTH list and detail — badge label+color match across the two and are distinct per value. FAIL = two values collapse to one badge, or a value falls to a generic/'pending' fallback.
 - [ ] **C3 Lifecycle (Leg-13):** re-open the create surface twice → ONE open row + same QR/token; force one open row past TTL → status flips to `expired` and shows in list filter + badge; a fresh row can then mint. FAIL = duplicate-on-remount, no expiry path, or terminal status absent from filters.
 - [ ] **C4 Empty/error states present (Leg-5):** each list/detail renders its loading, empty, and error state (not just the happy path).
+- [ ] **C5 Domain state-field integrity (Leg-15):** grep domain time-diff logic — no reminder/SLA/"days-since" clock reads `updatedAt`/`createdAt`; no cap column (`capacity`/`maxSeats`) is `UPDATE`d; no constant sentinel string sits in a free-text/notes column; no column is written with two different meanings from two modules. Drive: exhaust a capacity to 0 → the 'slot ready'/promote/sold-out predicate flips; request an email/phone change → the live field + its verified flag stay unchanged until the OTP confirm. FAIL = a clock on `updatedAt`, a mutated cap, a predicate reading the cap not the live counter, a sentinel in free-text, or a value published before its confirm.
 
 ### D. Config-reflection & seed fidelity
 - [ ] **D1 Catalog count-exact (Leg-10c):** each public catalog/marketing page returns the frozen prototype's EXACT item set (real slugs, no demo/lorem); hero/badge copy byte-identical to the export (`toHaveText(FROZEN_STRING)`).
@@ -66,6 +67,16 @@ under `plans/reports/`.
 
 ### G. Responsive (375px, EVERY route)
 - [ ] **G1 No sideways scroll (U14):** at 375px on every route incl. admin/builder/landing, `document.documentElement.scrollWidth <= window.innerWidth` AND every multi-column layout grid computed a single column. FAIL = any route scrolls sideways or keeps 2+ columns.
+
+### H. Security & backend integrity (verifier-driven — the backend stratum hasi-hub surfaced)
+- [ ] **H1 Object-level authz / IDOR (Leg-16):** for each id/slug/token-addressed endpoint, log in as a SECOND same-role user and request the first user's object id — including devtools-editing the scoped id in the body/query (`eventId`/`partyId`/`ticketTypeId`) → 403/404, no PII/QR/token in the response; each such endpoint ships a deny test, not happy-path only. FAIL = B reads/mutates A's row, a status/QR page returns a full record on a raw id, a client-supplied id is the authz key, or a raw Prisma model ships internal fields on the wire.
+- [ ] **H2 Per-route throttle (Leg-17):** every `@Public()` PII/verify/resend route, every paid-outbound (SMS/ZNS/email), and every mutating side-effect route carries its OWN `@Throttle` (paid-outbound per-actor/per-target, NOT per-IP), or `@SkipThrottle`+reason; every poll's `60000/interval × tabs` fits under its route limit. FAIL = an unthrottled public/paid/mutating route, a per-IP-only cap on a paid send, or a poll out-running its bucket.
+- [ ] **H3 Session revoke & OTP-purpose (Leg-18):** disable a user with a refresh token + trusted device → old token 401s AND that device still asks OTP; a credential change 401s other sessions; impersonation claim survives a refresh; two-purpose OTPs on one user/channel don't clobber; a real-browser silent refresh actually sends the cookie (Path prefixes the full endpoint) and rotates 200.
+- [ ] **H4 Canonical validator + identity key (Leg-19):** each shared field (phone/email/slug/tax-code) has exactly ONE validator imported by every write path; the same value via self-edit and admin-edit accepts/rejects identically; every upsert has a real unique constraint (not a racy find-then-create).
+- [ ] **H5 Concurrency & atomicity (Leg-20):** a double-submit / two-pod race on a limited resource (last seat, unique claim, balance) dedupes to one side-effect via a DB constraint or transaction, not a check-then-act; assert exactly one winner under two concurrent requests.
+- [ ] **H6 Resilience & multi-instance (Leg-21/22):** a provider timeout/500 surfaces a real error + retries/dead-letters (no hung request); in-memory state (cache, rate-counter, lock, cron leader) works across ≥2 instances (Redis/DB-backed, not per-pod memory); a cron runs once cluster-wide, not per-pod.
+- [ ] **H7 Prod-image boot (Leg-27):** build the REAL pruned prod image, boot it in an isolated container (no repo bind-mount) → every runtime require resolves, `/health` ok from a sibling container, server binds `0.0.0.0`, every runbook/CMD/backfill command exists in the image. FAIL = `Cannot find module`, localhost-only bind, or a missing `tsx`/`pg_restore`.
+- [ ] **H8 Plan-anchor resolution (build-execution Pre-flight):** before writing phase code, every cited symbol/path/import/id-type resolves at HEAD — no phantom guard, no `npm i` of a guessed dep, no edit on a nonexistent path, no `string` id against a numeric `ParseIntPipe` PK.
 
 ## Residual — what this checklist does NOT catch (stays human-glance)
 

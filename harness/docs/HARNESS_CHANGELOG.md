@@ -1,7 +1,46 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.19**.
+templates). Per-project state never lives here. Current version: **v6.20**.
+
+## v6.20 — 2026-07-18 — the backend/security stratum: a second retrospective (hasi-hub, 166 reports) folds the security · concurrency · resilience · prod-packaging layer the UI-heavy elearning run never modelled
+
+A second multi-agent retrospective ran the same mine→cluster→design→adversarial-verify
+pass over **hasi-hub** — a payments + multi-tenant + auth + cron + multi-pod backend, a
+very different app than elearning. It mined **~149 defect instances across 23 classes**,
+deduped against v6.19, and confirmed **14 NET-NEW machine-checkable gates**. This is a
+LARGE net-new layer, not a "v6.19 already covers it" result — and honestly so: elearning
+(v6.19's source) is content/UI/media-heavy, so its gates never had to model the
+security/concurrency/resilience/prod-packaging stratum a backend-mature app lives in.
+Importantly, **6 classes / ~39 instances hasi hit were ALREADY caught by v6.19+earlier
+gates** (route/role authz→Leg-6, refactor-coverage→Leg-9/U13, i18n/enum→Leg-14/U16,
+fail-open secret→v6.14/v6.17, webhook→v6.15, missing FK→Leg-7) — validating that the
+elearning-derived gates generalize for the classes hasi shared.
+
+**Thirteen new phase-acceptance legs (15–27)** — all backend/data, no visual-fidelity
+block (hasi's residue is not UI): **Leg-15** domain state-field integrity (a domain
+clock/cap/flag lives in its own single-meaning column; no reminder clock on `updatedAt`,
+no mutated cap, no sentinel in free-text, no pre-confirm mutation); **Leg-16** object-level
+authz / IDOR (ownership derived server-side, scope predicate IN the query, a per-endpoint
+negative-authz test — absorbs response-projection overexposure); **Leg-17** per-route
+rate-limit classification (public/paid-outbound/mutating/poll-backing each need their own
+scoped throttle — the global per-IP bucket is a floor, and a per-IP cap provably doesn't
+stop one authed admin firing 10k paid sends); **Leg-18** session-lifecycle & OTP-purpose
+integrity (revoke ALL vectors incl. trusted-device on disable, credential-change logs out
+others, claims survive rotate(), OTP keyed by purpose, cookie-Path prefixes the real
+endpoint); **Leg-19** canonical validator + identity-key; **Leg-20** concurrency &
+write-path atomicity (no check-then-act on a limited resource); **Leg-21** process/request
+resilience; **Leg-22** multi-instance state safety (no per-pod memory for cache/lock/cron);
+**Leg-23** FE↔BE contract fidelity; **Leg-24** seed reseed-idempotency; **Leg-25**
+notification/template render + fan-out integrity; **Leg-26** test-integrity; **Leg-27**
+prod-image packaging + runtime-capability (build + boot the PRUNED image in isolation —
+every runtime require resolves, binds `0.0.0.0`, every runbook command exists — catches
+the `Cannot find module` / localhost-bind crash-loop BEFORE the box does, not reactively
+at go-live). Plus a **build-execution Phase Pre-flight** rule: before writing a phase's
+code, resolve every cited symbol/path/import/id-type against HEAD — a phantom guard, an
+`npm i` of a guessed dep, an edit on a nonexistent path, or a `string` id against a numeric
+`ParseIntPipe` PK is a FAIL, not an improvise-it invitation. The pre-demo self-QA checklist
+gains group **H** (security & backend integrity, H1–H8) + item C5 (Leg-15).
 
 ## v6.19 — 2026-07-18 — retrospective enrichment: 182 human-caught elearning defects → 13 machine-gates + a pre-demo self-QA checklist (converting eyeball-QA into agent self-check)
 
