@@ -1,7 +1,44 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.17**.
+templates). Per-project state never lives here. Current version: **v6.18**.
+
+## v6.18 — 2026-07-18 — user-facing product media is REAL (device-framed screenshots), and a demo VIDEO is a product-tour, not a step-by-step tutorial (elearning UAT-media)
+
+Two linked lessons from producing elearning's UAT hand-off media — both a variant
+of the harness's core "adopt the real thing, don't re-draw" discipline, now applied
+to docs + demo video, not just UI.
+
+**(1) User-facing product imagery must be REAL screenshots in a device frame, not
+hand-drawn mockups.** The first HDSD (user guide) shipped hand-drawn **schematic SVG
+mockups** (grey rectangles + a green dot) inside a macOS window frame — they "looked
+like the app" but weren't it, so a reader can't map the guide to what they see. Fix:
+keep the device frame, replace the interior with **real captured screenshots**
+(`.webp`, one per guide section, fall back to the schematic only where a shot is
+missing). The user-manual deliverable's imagery is held to the same fidelity as the
+UI itself — a schematic stand-in is redraw-by-omission. (Also fixed a sidebar that
+scrolled its active item out of view — a nav must keep the current section visible.)
+
+**(2) A customer demo VIDEO is a narrated product-tour, not a step-by-step
+recording — pick the style FIRST.** The demo video was first built as a Playwright
+`recordings` run: one flow per spec with a `narrate()` subtitle on **every
+micro-step** — the **user-guide** style, which reads as a dry click tutorial, wrong
+for a demo. New playbook `demo-video-production.md` names the **three** styles and
+when each applies: **(1) user-guide recording** (Playwright, per-step subtitles — for
+docs), **(2) product-tour video** (Remotion: the real app in a device frame + motion
++ a continuous voiceover + storyline **big→small** — for a client demo/show-off),
+**(3) live demo script** (a cheat-sheet a person reads while demoing live — not a
+rendered file). The tool looks similar across 1 and 2; the difference is the
+**script**, so confirm the style with the owner before rendering. Verified
+product-tour recipe: an **isolated Remotion project** outside the app workspace
+(never enters `validate`/build), **reuse the same real screenshots** the device-frame
+guide captured (no burnt-in subtitles), an **offline neural TTS** voiceover (proven:
+piper `vi_VN-vais1000-medium` — no cloud key, deterministic, re-renderable), a
+**timeline driven by the measured VO length** (`ffprobe` → scene durations) so
+picture and narration stay in sync, rendered as **per-part MP4 + one stitched
+master**, binaries gitignored + output outside the repo. Enhancement hooks (music
+bed, hero clips, human-VO swap, brand-themed frame, EN variant, 3-min cut) are listed
+for the next iteration.
 
 ## v6.17 — 2026-07-17 — Go-live hardening: config-driven business identity floor + deploy-verify-at-source playbook (the "Go-live" half of Macro 2, filled from elearning's hardcode sweep + prod deploys)
 
