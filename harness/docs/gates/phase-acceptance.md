@@ -93,6 +93,31 @@ app**, never by reading the diff and assuming:
    end-of-manifest gate (where they silently accrue across phases and surface in
    a batch — the exact anti-pattern this gate exists to kill) into every phase,
    by a mechanism screens inherit, not a checklist authors re-copy.
+   **Clause U-img (public image integrity — every screen that renders an
+   `<img>`/next `Image` for a cover, thumbnail, avatar, logo, or funnel/landing
+   graphic).** The universal fixture asserts, in a REAL browser, that every
+   rendered image is DECODED not broken (`img.complete && img.naturalWidth > 0`
+   for every element of `document.images`) — the only check that catches the
+   failures a `curl` 200 hides: a 404-after-redeploy (asset written to the
+   container's ephemeral fs with no volume/R2, gone on the next deploy), a helmet
+   `crossOriginResourcePolicy:'same-origin'` that makes the browser refuse a
+   cross-origin asset while curl still 200s, and a dead/wrong src — and that the
+   image is not UPSCALED (`naturalWidth >= renderedCSSpx * devicePixelRatio`, ≥1
+   real rung) so a 400px master isn't blown up blurry. Static companion greps
+   (RED lint over `screens-*.jsx`/JSX + seed): (a) NO `<img src>`/`Image src`
+   points at an EXTERNAL absolute host (hotlink, e.g. `nhatnghe.net`) — public
+   assets are seeded local / R2 under the project's OWN asset origin, never
+   another site's URL; (b) every `<img>` whose src is user- or remote-derived
+   carries an `onError` placeholder fallback (no browser broken-glyph on a dead
+   src); (c) a MUTABLE asset URL (re-uploadable cover/avatar) is cache-busted by
+   `?v=<updated_at>` (or a content hash) so re-uploading to the same key doesn't
+   serve the stale CDN/browser copy; (d) uploaded-then-served assets persist on
+   R2/S3 or a mounted volume, never the API container's ephemeral fs. A
+   broken/CORP-blocked/upscaled image, or a hotlinked / onError-less /
+   non-cache-busted / ephemeral-fs asset src, is a phase FAIL — image integrity
+   is a floor, not a cosmetic nit. Distinct from the v6.17 media-delivery proxy
+   leg (that is video *playback* `file://`→HTTP-proxy; this is `<img>` decode +
+   host + persistence).
 6. **Security floor (every phase that adds or touches an API route)** — authz is
    **default-deny**: a route with no `@Public` / `@RequireGrant(...)` /
    `@SelfScope(...)` metadata is denied (403), enforced by a global guard, not
@@ -177,6 +202,122 @@ app**, never by reading the diff and assuming:
    page's error state, and a plain `curl` (default page size) 200s so the earlier
    verify missed it; the verifier drives the PAGE's own request, or switches the
    grid to true server-side pagination.
+9. **Route reachability floor — no orphan routes, no dead internal links (every
+   phase that adds/touches a route, nav item, or link).** The verifier builds the
+   app's route graph and asserts it is connected both ways. (a) **Every internal
+   link target resolves** — each `<Link href>`/`router.push`/`redirect`/nav-config
+   entry/CTA/copy-share URL the phase ships points to a route that EXISTS and
+   renders (no 404, no blank), including dynamic segments: a `:slug`/`:code`
+   deep-link has an index/handler route not just the leaf (`'Vào học'→
+   /student/learn/:slug` needs an index route); a copy-share button emits the
+   app's REAL public path (`/certificates/verify/{code}`, NOT a guessed
+   `/certificates/{code}`); a marketing CTA points at the real page (`'Đăng ký
+   học'→/auth/register` must render, not 404); About/Classes nav resolve to their
+   pages, never a stub `/`. (b) **Every built user-facing route is reachable** — a
+   page a phase adds is linked from nav/sidebar/tab or another reachable page; a
+   route in code with zero inbound links is an orphan (built-but-unreachable —
+   `/reports/funnel`, `/reports/email`, `/marketing/suppression` shipped with no
+   nav/tab) and MUST be wired into nav or explicitly marked
+   `internal-only`/`programmatic-entry` in the phase block. (c) **A nav item lands
+   on the intended first destination** — a zone/section entry resolves to that
+   zone's first tab in spec order, not an arbitrary sub-route. The verifier drives
+   a **link crawl** from the app root (BFS-click every sidebar/nav/tab item + every
+   primary CTA/share link), asserts no target 404s or renders blank, and that every
+   route the phase's screen-inventory lists is in the reachable set. A 404/blank on
+   click, an orphan route, or a nav landing on the wrong sub-tab is a RED block —
+   pixel-perfect look does not waive it (distinct from visual-fidelity U11, which
+   only proves a resolving nav switches content; and U6 breadcrumbs, ancestor trail).
+10. **Seed coherence + prototype fidelity floor (every phase that seeds
+    demo/default content or ships a public catalog/marketing screen)** — the seed
+    must be COHERENT and FAITHFUL, not merely FK-valid (FK order + determinism is
+    `seed-data-pattern.md`; this is a distinct floor). Three machine checks against
+    the seeded DB + running app: (a) **cross-entity invariants hold** — every
+    business invariant between seeded rows is asserted by a SQL/API query returning
+    0 violations: an enrolled student with no `paid` order (37 enrolled all-`pending`
+    broke order-history), an order line with no product, a published course with no
+    lessons, a paid order with no invoice; non-zero → FAIL. (b) **seed UPSERTS
+    singleton/default content, not insert-if-absent** — any default/singleton row
+    the prototype defines (a `gioi-thieu`/about page, hero/landing settings, a
+    content block) is re-derived from the frozen export on EVERY seed run and
+    OVERWRITES a dirty row; a `findOrCreate` leaving a stale `Nháp` draft is a
+    defect (verifier: hand-dirty the row, re-run seeder, assert row == frozen). (c)
+    **public catalog + default copy match the frozen prototype EXACTLY, count-exact**
+    — the frozen public list (`GET /courses`, `/blog`) returns exactly the
+    prototype's item set (real slugs), never leftover demo/lorem, and default
+    marketing copy equals the export string VERBATIM (byte-exact incl. em-dash vs
+    hyphen), asserted `toHaveText(FROZEN_STRING)` from the export. A non-zero
+    invariant, a stale singleton, a catalog count/slug-set ≠ frozen, or a copy
+    byte-mismatch is a FAIL exactly like a functional AC.
+11. **Build & migration hygiene (every phase — extends the boot-smoke past the API
+    AppModule; runs against the RUNNING preview at Leg-1, not the throwaway
+    boot-smoke DB).** Green typecheck + unit + AppModule boot prove neither that the
+    deliverable BUILDS for production nor that the RUNNING DB matches the committed
+    schema. The verifier additionally asserts, in-phase: (a) **production frontend
+    build passes** — `pnpm build` (`next build`, NOT `dev`) exits 0, so a
+    `'use client'` page reading context/`window` during static prerender fails the
+    GATE not the deploy; (b) **no schema drift at the target** — `prisma migrate
+    status` up-to-date (or `migrate diff` empty) against the SAME DB the
+    preview/deploy uses, so a committed-but-unapplied migration (a column the code
+    reads but the box lacks → runtime 500) blocks in-phase; (c) **custom queue /
+    external IDs are slug-safe** — every `enqueue(..,{jobId})`/idempotency-key
+    matches `^[A-Za-z0-9_-]+$` (a BullMQ `jobId` with `:` throws at enqueue → 500);
+    (d) **worktree base correct** — an isolated worktree/branch was cut from the
+    branch carrying prior phases' code (`git merge-base --is-ancestor`), not a
+    stale/empty base. Any of (a)–(d) failing is a phase FAIL.
+12. **Create/edit dialog payload satisfies the server DTO — every create/edit form
+    round-trips 2xx, no guaranteed-422 and no silent no-op.** For each create/edit
+    dialog, the verifier DRIVES the real form to a successful submit against the
+    running app and asserts the entity persists (reload/list shows it) — never
+    assumed from the diff. It kills three shapes, all seen: (a) a required field
+    sent empty/`||''`/`null` against a DTO `min(1)`/required-enum/NON-NULL column →
+    422 on EVERY submit (`triggerType||''`; `graph_json:null` vs Zod
+    `{entry,nodes}`); (b) a structured-JSON payload missing a Zod-required key so
+    the save-guard returns SILENTLY — no error, no persistence (data loss reading as
+    success); (c) a required enum/select the UI never validates, submit enabled
+    before it's set → guaranteed 422. Machine-check BOTH: (1) submit DISABLED until
+    every DTO-required field is set (blocked client-side, never sent-and-422'd); (2)
+    a filled submit returns 2xx AND the entity re-reads with the submitted values (a
+    save that leaves the row unchanged is the silent-guard FAIL). Derive the required
+    set by grepping the DTO/Zod schema, not the form's optional-looking defaults.
+    **Seed corollary:** every seeded row that later flows through a save/validation
+    path must satisfy that SAME Zod/DTO schema, not merely be FK-valid (a seeded
+    `graph_json {edges,nodes}` missing `entry` passed FK but tripped the guard).
+    Distinct from Leg-8's read-side `pageSize.max` 422 (an oversized GET query-param;
+    this is a create/edit request BODY vs the create DTO).
+13. **Record-lifecycle floor (any phase creating a row with a status/lifecycle
+    enum — order, enrollment, invite, send-record, job)** — idempotency legs cover
+    only INBOUND callbacks; this covers the CLIENT write-path, driven against the
+    preview: (a) **reuse-or-create, not mint-on-remount** — re-entering the create
+    surface (re-open checkout, re-mount form) while an OPEN row exists for
+    (actor, subject) REUSES it: exactly one open row + the same QR/token, never a
+    fresh pending per mount; (b) **idempotency scoped to accidental double-submit,
+    NOT repeatable actions** — a deliberately repeatable action (resend test,
+    re-export, re-invite) acts EVERY time OR is throttled with a VISIBLE cooldown; a
+    stable key turning the 2nd deliberate click into a SILENT no-op is a FAIL, while
+    a true double-submit still dedupes; (c) **TTL + terminal state are real** — force
+    the clock/sweep so an open row past TTL flips to `expired`/terminal via an actual
+    job, that status is a real enum value present in lifecycle filters + badges +
+    counts, and a fresh row can then mint; (d) **no phantom rows on partial fan-out**
+    — a forced mid-loop failure leaves NO row stuck non-terminal with no backing
+    job (transactional batch or a reconciler recovers orphans; assert zero
+    unrecoverable `queued`/`processing` after the injected fault). Any of (a)–(d) is
+    a FAIL. (The terminal-status-in-filters requirement pairs with U16.)
+14. **i18n catalog + export integrity (every phase touching a message catalog, an
+    enum-labeled table, or a data export; runs against the RUNNING preview + a real
+    file download at Leg-1).** A machine lint blocks the phase when: (a) **a message
+    fails to ICU-compile** — literal `{{name}}` (Handlebars braces) or an unescaped
+    bare `{`/`}` throws next-intl `INVALID_MESSAGE`; lint = compile EVERY catalog
+    entry through the ICU parser (grep `{{` is the fast pre-check); (b) **a dead key
+    exists** — a `messages/*.json` key no source `t('…')` references, OR a rendered
+    key missing from the catalog (both directions RED); (c) **a target-locale value
+    equals its source-locale value** for a translatable string (`vi.json` keeps
+    `"Automation"`/`"Drip"`) — RED unless on a proper-noun/brand whitelist; (d) **a
+    user-facing export is not localized** — a CSV/XLSX/PDF writing raw enum codes
+    (`STU`/`GV`/`ADM`) or ISO timestamps instead of the SAME localized labels +
+    active-locale dates the on-screen table renders. On-screen untranslated strings
+    are already caught by Leg-5 + visual-fidelity block 11; this leg catches the
+    surfaces those cannot see — the parse-crash, the never-referenced key,
+    English-in-locale on an unsampled screen, and the downloaded file.
 
 The verifier returns a **verdict block**:
 

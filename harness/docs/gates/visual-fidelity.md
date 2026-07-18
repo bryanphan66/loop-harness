@@ -332,6 +332,128 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     is present." "Primary element present" is not "screen ported." The screen's
     required-element checklist (2.3) enumerates every region the export draws, and
     a dropped secondary region is a RED test exactly like a dropped primary one.
+20. **A styled-clickable element is a dead affordance — no handler, no href, no
+    effect** (U13 RED) — a screen renders an element that LOOKS actionable (a
+    `.btn`/`.btn-link`-styled `<span>`/`<div>`, a `cursor-pointer` table `<tr>`, a
+    faux-`<select>` span mimicking a dropdown, a "Xem toàn bộ N →" more-link) but
+    carries NO `onClick`/`href`/`onChange`/`role`+handler — clicking does nothing.
+    It survives the look glance and even slips U11 (no wired state to desync — the
+    interaction was never wired at all). This is the PRIMITIVE twin of U11: U11 =
+    wired-but-not-synced, U13 = not-wired-at-all. Rules: (a) any element the design
+    draws as actionable is a REAL control (`<button>`/`<a href>`/`<Link>` or a
+    `role` + keyboard-focusable handler), never a decorative span; (b) a faux-select
+    is a real `<select>`/menu whose `onChange` changes state (generalizes the grid
+    page-size case beyond the NFR.UXC.09 floor); (c) a navigable row/card routes on
+    click, whole-row target, keyboard-reachable; (d) a placeholder action (`mailto:`,
+    `href="#"`, `javascript:void`, empty `onClick`) is a DROPPED feature. Machine
+    tooth is DUAL: a lint (`scripts/check-dead-affordance.mjs`, `lint:gates`) fails
+    any button/link/select/cursor-pointer-styled element with no
+    `onClick|href|onChange|role`+handler (opt out `// static-ok: <reason>`); a
+    Playwright drive clicks every actionable-looking element and asserts an
+    observable effect (URL change, DOM mutation, opened menu, network request) — a
+    click with zero effect is RED even at pixel-perfect look.
+21. **A layout grid can't reflow to 1-col on mobile — inline grid-template beats
+    @media** (U14 RED, sibling of U7) — a multi-track grid set via inline React
+    `style={{ gridTemplateColumns: '1fr 320px' }}` always beats a stylesheet
+    `@media (max-width:768px)` rule (inline specificity), so it NEVER collapses to
+    one column on a phone → horizontal page scroll at 375px. Twins: (a) a class grid
+    (`.grid4`/`.stat-card` row) declares its tracks but ships NO `≤768px` 1-col
+    rule; (b) a hero leaves `img`/`iframe` uncapped (no `max-width:100%`, no
+    `overflow-x` guard). Root cause, recurs across admin/builder/landing that the
+    student-facing responsive floor (block 11) never scopes. **One machine guard
+    over the whole tree** (like U7): a lint (`scripts/check-inline-grid-reflow.mjs`,
+    `lint:gates`) FAILS when (1) a `.tsx` sets a MULTI-TRACK
+    `gridTemplateColumns`/fixed multi-column width via inline `style=` (move to a
+    class), (2) a class layout grid (2+ tracks) has no `@media (max-width:768px)`
+    1-col rule, (3) a hero/media element lacks `max-width:100%` under an
+    `overflow-x`-guarded container. Runtime twin: the universal fixture asserts
+    `document.scrollWidth ≤ clientWidth` + each grid computes a single column at
+    375px on EVERY route (admin/builder/landing incl.), not only student-facing.
+    Opt out `// grid-reflow-ok: <reason>`.
+22. **A name-keyed asset renders SILENTLY when its key is absent, or one hardcoded
+    key serves every type** (U15 RED, registry-completeness twin of U9) — a
+    component looks up a visual by string name (`<Icon n="send"/>` → `ICON_PATHS`,
+    `<GuideIllustration archetype=…>`). Two silent failures: (a) **absent key** —
+    `n="send|refresh|copy"` has no registry entry, lookup returns `undefined`, the
+    component renders nothing / a fallback glyph (passes compile + loose glance); (b)
+    **one key for all types** — a `.map()` over N typed rows passes a constant
+    literal (`'zap'`) or shared archetype, so N types wear one icon. Rules: (a)
+    registry completeness is a static lint (`scripts/check-icon-registry-coverage.mjs`,
+    `lint:gates`): collect every literal passed as `n=`/`icon=`/`archetype=`, diff
+    against the registry's keys, FAIL on any absent key; the component throws/RED in
+    dev on a missing key, never renders empty/silent-fallback (opt out
+    `// icon-fallback-ok: <reason>`); (b) an icon in a `.map()` over typed data is
+    keyed off the row's own `type`/`id`/`slug`, not a constant — a per-type map with
+    an entry per enum value. Verifier asserts (i) coverage lint green and (ii) a
+    mapped list renders ≥2 DISTINCT icon paths. U9 branches CONTENT per type; U15
+    guarantees the per-type ICON + no silent no-render.
+23. **A status/enum is not mapped exhaustively, or list and detail diverge** (U16
+    RED, sibling of U9) — an entity carries an enum with N values
+    (`paid|pending|shipped|cancelled|refunded|failed`) but the render is a
+    hand-rolled `if/else` branching only 2-3, so the rest fall to a wrong catch-all
+    `else` (3 of 6 statuses show as 'pending'); OR the LIST uses a shared
+    `StatusBadge`+map while the DETAIL hand-rolls its own → the two disagree on the
+    same status; OR a status-derived count binds to the wrong aggregate ('đang mở'
+    wired to `tabCounts.all`). Rule: (a) status→{label,color,icon} lives in ONE
+    shared map BOTH list and detail import; (b) the map is EXHAUSTIVE (every DB/SRS
+    value has an entry; an unknown value renders a visible fallback, never collapses
+    onto a real status); (c) a status-derived label/count binds to the aggregate it
+    names. The verifier reads the enum from the ERD/`status-flow-<entity>.md`, drives
+    EACH value, asserts its own distinct label+color on BOTH list and detail, and
+    greps that no branch uses a catch-all `else` mapping unhandled values onto a
+    named status. U9 = type→content; U16 = status→badge exhaustiveness + list↔detail
+    single-source. (Pairs with Leg-13(c): terminal status must appear in filters.)
+24. **Copy drifts from the frozen prototype — separators re-typed, strings not
+    byte-exact** (U17 RED) — the export's real code carries specific glyphs (`·` `—`
+    `–`) in a badge/subtitle/message entry; a re-draw or hand-retyped i18n message
+    substitutes ASCII `-`/` - `/`,` so the string reads close but is NOT the frozen
+    copy (207 such drifts across the elearning catalog + JSX; the courses hero badge
+    shipped a hyphen where prototype A1 uses an em-dash; the invoice used `,` where
+    the prototype uses `·`). Pixels + element-presence pass, so it slips — but
+    adopt-export means the STRING is verbatim. One machine guard over the whole
+    ported string surface (like the U7 lint): `scripts/check-prototype-copy-verbatim.mjs`
+    (`lint:gates`) builds the frozen copy corpus from the export JSX + catalog, then
+    fails when any ported public/catalog string is not byte-exact in that corpus —
+    esp. an ASCII `-`/`,`-separator where the corpus uses `·`/`—`/`–`. Opt out
+    `// copy-ok: <reason>`. Carve-out: brand/company/SEO/`© <year>` identity literals
+    are a DIFFERENT class (they flip via `config-driven-identity.md`); this is glyph
+    fidelity of frozen marketing copy, not identity de-hardcoding. (Runtime
+    seeded-catalog twin is Leg-10(c).)
+25. **A shared primitive is clobbered at its ONE source and ships wrong on every
+    screen** (U18 RED) — a reused primitive (PageHead/tabs, the Select, StatCard,
+    Button) is mis-styled in its single definition, so the defect propagates
+    everywhere it mounts. Three mechanisms: (a) an inline `style` uses a CSS
+    **shorthand** (`font`, `background`, `border`, `margin`, `flex`, `transition`)
+    which resets ALL longhands and clobbers a class the design system owns
+    (`font:'inherit'` on a tab reset `font-weight` and killed
+    `.tab.active{font-weight:600}` on every Zone-E screen); (b) a shared control
+    hardcodes its own layout dimension inline (`width:'100%'`) so it fills/breaks
+    the row it's dropped into (the filter Select's inline `width:'100%'` made every
+    filter/pagination control eat a full row); (c) content in the WRONG slot (a
+    StatCard icon rendered into `.stat-label` not the `.stat-ico` badge). Rules: an
+    inline `style` on a shared primitive uses LONGHANDS only (`fontWeight`, never
+    `font`); a shared control never hardcodes its own layout width/height (sizing is
+    the container's job); every slot holds its designed content. Machine tooth = a
+    primitive-level assertion run ONCE per primitive (states/storybook or one
+    representative screen): active tab computes `font-weight:600`; the filter
+    toolbar's N controls share ONE row (equal `offsetTop`); the StatCard icon
+    resolves in `.stat-ico`. Plus a lint over `src/components/**`
+    (`scripts/check-primitive-inline-style.mjs`, `lint:gates`) failing an inline
+    `style` with a CSS-shorthand key OR a hardcoded layout `width`/`height` (opt out
+    `// primitive-style-ok: <reason>`). Per U7: a defect that rides in with a SHARED
+    component is fixed at the component and asserted against it once, never per screen.
+26. **A toast breaks the app's notification convention** (U19 RED) — error toasts
+    ship `duration:Infinity` so they never auto-dismiss and pile up (recurred 3+
+    times), or a raw server `err.message`/response body is leaked verbatim into a
+    toast (internal detail + untranslated), or a mutate uses a bespoke inline banner
+    where the app's convention is a `toast` (read as "no feedback"). Rule: error
+    toasts auto-dismiss on the app's standard timeout (~8000ms), never
+    `duration:Infinity`; a user-facing toast shows a mapped/localized message, never
+    a raw server string; a mutate uses the app's shared `toast` (not a bespoke
+    banner). Lint (`scripts/check-toast-convention.mjs`, `lint:gates`): RED on
+    `duration:Infinity` on a `toast.error`, on a raw `err.message`/response body
+    passed to a toast, requires the standard auto-dismiss (opt out
+    `// toast-ok: <reason>`). (Pairs with U11's reuse-the-app-feedback-convention.)
 
 ## Regression Ledger — a fixed UI defect NEVER comes back
 

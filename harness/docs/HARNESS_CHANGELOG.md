@@ -1,7 +1,55 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.18**.
+templates). Per-project state never lives here. Current version: **v6.19**.
+
+## v6.19 — 2026-07-18 — retrospective enrichment: 182 human-caught elearning defects → 13 machine-gates + a pre-demo self-QA checklist (converting eyeball-QA into agent self-check)
+
+Elearning reached ~7.5/10 but only after a HUMAN caught a long tail of "small"
+defects screenshot-by-screenshot — the harness had folded the big structural
+lessons (v6.13–v6.18) but the recurring trivial classes leaked, so the next run
+would still need the same heavy human-QA. A multi-agent retrospective pass mined
+**182 defects** from **83 build/fix/QA reports**, clustered them into **23 classes**,
+found **9 already folded** and **14 gaps** (recurring + machine-checkable + not
+gated), and adversarially confirmed **13** to fold. Result: 22/23 classes now have a
+machine tooth; the 1 remaining machine-checkable class (toast) is folded too (U19);
+2 non-lintable visual classes stay in the human glance + Regression Ledger.
+
+**Six new phase-acceptance legs (9–14)** + a Leg-5 clause: **Leg-9 route
+reachability** (no orphan route, no dead internal link — a link crawl asserts every
+`<Link>`/CTA/share/deep-link resolves and every built route is reachable; caught
+`'Đăng ký học'→404`, orphan `/reports/*`, slug deep-link with no index route);
+**Leg-10 seed coherence + prototype fidelity** (cross-entity invariants = 0, seed
+UPSERTS singletons over dirty rows, public catalog + default copy count-/byte-exact
+to the frozen prototype — caught 37-enrolled-all-pending, 23-demo-vs-7-frozen
+courses, a stale `Nháp` about-page); **Leg-11 build & migration hygiene** (`next
+build` exits 0, `prisma migrate status` clean at the target, `jobId` slug-safe,
+worktree base correct — extends the v6.17 AppModule boot-smoke past DI); **Leg-12
+create/edit DTO round-trip** (every form submits 2xx and persists — no
+guaranteed-422 and no silent no-op; submit disabled until DTO-required fields set);
+**Leg-13 record-lifecycle** (reuse-or-create not mint-on-remount, real TTL→terminal,
+no phantom rows on partial fan-out); **Leg-14 i18n catalog + export** (ICU-compile,
+0 dead keys, no vi=en, localized downloads); and **Leg-5 clause U-img** (public
+image integrity in a real browser — decode not broken, no upscale, no hotlink,
+onError fallback, cache-bust, persistent-fs — the checks a curl 200 hides).
+
+**Seven new visual-fidelity auto-blocks (U13–U19):** U13 dead-affordance
+(styled-clickable with no handler), U14 inline-grid-reflow (inline gridTemplate
+beats @media → mobile scroll), U15 icon-registry-coverage (silent no-render / one
+icon for all types), U16 enum-status-exhaustive (list↔detail single-source, no
+catch-all `else`), U17 prototype-copy-verbatim (separator glyph byte-fidelity — 207
+drifts), U18 shared-primitive-clobber (CSS-shorthand reset / hardcoded layout width /
+wrong slot), U19 toast-convention (`duration:Infinity`, raw server message, bespoke
+banner). Plus **six `lint:gates` scripts** (dead-affordance, inline-grid-reflow,
+icon-registry-coverage, prototype-copy-verbatim, primitive-inline-style,
+toast-convention), each with a `// <name>-ok: <reason>` opt-out.
+
+**The keystone deliverable is `playbooks/pre-demo-self-qa-checklist.md`** — a
+runnable 7-group checklist (nav/interaction, links/routing, grids/lifecycle,
+config/seed, conventions/i18n, media-real, responsive) the agent drives against the
+running preview BEFORE any human handoff, each item an explicit pass/fail. It is
+what turns the human's screenshot-by-screenshot review into an agent self-check, so
+the next run catches these classes at build time, not at the demo.
 
 ## v6.18 — 2026-07-18 — user-facing product media is REAL (device-framed screenshots), and a demo VIDEO is a product-tour, not a step-by-step tutorial (elearning UAT-media)
 
