@@ -7,12 +7,22 @@
 # Layer (stage-boundary commits), docs/TRACE_SPEC.md (token chain), and the
 # Verification Register format in docs/TEST_MATRIX.md.
 #
-# Four gates run on every invocation:
+# A self-check FAILS CLOSED when the gate is not armed (core.hooksPath does not
+# resolve to this repo's .githooks and no husky hook chains this script) — a gate
+# that can silently disarm is not a gate.
+#
+# Gates run per invocation:
 #   1. Lint / typecheck / quick-validate — auto-detected per stack
-#      (npm / yarn / pnpm / make / cargo / none). Blocks on failure.
+#      (npm / yarn / pnpm / make / cargo / none). Blocks on failure. On a project
+#      scaffolded from the stack template this resolves to `validate`, which runs
+#      `lint:gates` (the shipped fidelity/index/width checks) + lint + typecheck.
+#   1b. Test suite — on PUSH only (pre-push), runs the project's `test` script so
+#      a green lint can't stand in for green behaviour. e2e/Playwright-fidelity
+#      need a running app → left to CI + the phase verifier (recorded in Gate 2).
 #   2. Verification Register integrity (docs/TEST_MATRIX.md) — blocks on any
 #      `Result: fail` row; on a stage-close commit (STAGE.md staged) it also
-#      blocks any `never-run` row.
+#      blocks any `never-run` row AND blocks a ZERO-row register (a stage cannot
+#      close having recorded no verification, unless marked `verify-exempt`).
 #   3. Stage-boundary atomicity — when STAGE.md is staged (a stage-close
 #      commit), ROADMAP.md must be staged in the SAME commit. They advance
 #      together or not at all.
@@ -47,12 +57,35 @@ say() { printf '%s\n' "$*" >&2; }
 # .githooks). Anything else (empty/other) means only a manual invocation ran
 # this gate — the next commit may run with NO gate at all.
 hooks_path="$(git config core.hooksPath 2>/dev/null || true)"
-if [ -d .githooks ] && [ "$hooks_path" != ".githooks" ]; then
-  say "  [self-check] WARNING: core.hooksPath is '${hooks_path:-unset}' (expected .githooks)."
-  case "$hooks_path" in
-    .husky*) say "  [self-check] husky owns the hook path (a pnpm install re-arms it); the .husky hooks must chain this gate. Restore with: git config core.hooksPath .githooks" ;;
-    *)       say "  [self-check] the harness gate is NOT armed as a git hook — future commits will skip it. Fix now: git config core.hooksPath .githooks" ;;
-  esac
+if [ -d .githooks ]; then
+  # ARMED if the configured hooks dir resolves to this repo's .githooks — accept
+  # the literal ".githooks" AND an absolute/relative path that points at it (a
+  # `git config core.hooksPath "$PWD/.githooks"` install is still correctly armed).
+  armed=0
+  if [ -n "$hooks_path" ]; then
+    resolved="$(cd "$hooks_path" 2>/dev/null && pwd || true)"
+    { [ "$hooks_path" = ".githooks" ] || [ "$resolved" = "$repo_root/.githooks" ]; } && armed=1
+  fi
+  # FAIL-CLOSED when not armed: a gate that can silently disarm is not a gate.
+  # `.husky` is tolerated ONLY if a husky hook actually chains this script;
+  # anything else means the NEXT commit runs with NO gate — block now so the
+  # human fixes the arming instead of unknowingly shipping ungated commits.
+  if [ "$armed" -ne 1 ]; then
+    case "$hooks_path" in
+      .husky*|*/.husky*|*/_/husky*)
+        if grep -rqs "harness-verify-gate" .husky 2>/dev/null; then
+          say "  [self-check] WARNING: core.hooksPath is husky ('$hooks_path'); a .husky hook chains this gate — armed. Prefer restoring: git config core.hooksPath .githooks"
+        else
+          say "  [self-check] BLOCKED: core.hooksPath='$hooks_path' (husky) but NO .husky hook chains harness-verify-gate.sh — the gate would not fire on the next commit."
+          say "  [self-check] Fix: git config core.hooksPath .githooks  (or add 'bash scripts/harness-verify-gate.sh pre-commit' to .husky/pre-commit and chain pre-push too)."
+          fail=1
+        fi ;;
+      *)
+        say "  [self-check] BLOCKED: the harness gate is NOT armed (core.hooksPath='${hooks_path:-unset}') — future commits would skip it entirely."
+        say "  [self-check] Fix now: git config core.hooksPath .githooks"
+        fail=1 ;;
+    esac
+  fi
 fi
 
 # --- Gate 1: lint / typecheck / quick validate ------------------------------
@@ -99,6 +132,31 @@ run_validate() {
     return 0
   fi
   say "  [lint] FAILED — fix the errors above (do not bypass with --no-verify)"
+  return 1
+}
+
+# --- Gate 1b: test suite on PUSH (heavier; pre-push only) --------------------
+# Gate 1 (lint:gates + lint + typecheck) runs every commit and stays fast. The
+# test suite is heavier, so it gates the PUSH boundary ("share it") rather than
+# every commit — this closes the hole where a green lint proves nothing about
+# behaviour. e2e / Playwright-fidelity need a running app, so they stay in CI +
+# the phase verifier (recorded in the register, Gate 2); the hook does not boot
+# an app. A project with no `test` script is skipped (bare project stays runnable).
+run_tests_push() {
+  [ "$mode" = "pre-push" ] || return 0
+  [ -f package.json ] || return 0
+  local pm="npm"; [ -f yarn.lock ] && pm="yarn"; [ -f pnpm-lock.yaml ] && pm="pnpm"
+  if command -v jq >/dev/null 2>&1; then
+    jq -e '.scripts.test' package.json >/dev/null 2>&1 || { say "  [test] no test script — skipped"; return 0; }
+  else
+    grep -qE '"test"[[:space:]]*:' package.json || { say "  [test] no test script — skipped"; return 0; }
+  fi
+  local cmd="npm test --silent"
+  [ "$pm" = "yarn" ] && cmd="yarn test"
+  [ "$pm" = "pnpm" ] && cmd="pnpm run test"
+  say "  [test] running (pre-push): $cmd"
+  if eval "$cmd" >&2; then say "  [test] passed"; return 0; fi
+  say "  [test] FAILED — fix before pushing (do not bypass with --no-verify)"
   return 1
 }
 
@@ -167,6 +225,31 @@ check_register() {
     say "           $matrix § Verification Register, or document why none exists"
     say "           (pure-docs, design-only, or a MANUAL: checkpoint the human signed)."
     return 1
+  fi
+  # A stage-close must SHOW verification. An empty register (zero data rows) on a
+  # stage-close commit is NOT "clean" — it means nothing was recorded and the
+  # stage would pass having proven nothing. Block unless the stage is explicitly
+  # marked `verify-exempt` (pure-docs / design-only) in the register or STAGE.md.
+  if [ "$stage_close" -eq 1 ]; then
+    local rows
+    rows="$(awk '
+      /^## / && !/^## Verification Register/ { inreg=0 }
+      /^## Verification Register/ { inreg=1; next }
+      inreg && /^\|/ {
+        n = split($0, a, "|"); if (n < 4) next;
+        result = a[n-1]; rl = tolower(result); gsub(/[`*_ \t]/, "", rl);
+        if (rl == "pass" || rl == "fail" || rl == "never-run") c++;
+      }
+      END { print c + 0 }
+    ' "$matrix")"
+    if [ "${rows:-0}" -eq 0 ] && ! grep -qs "verify-exempt" "$matrix" STAGE.md 2>/dev/null; then
+      say "  [verify] Stage-close BLOCKED: the Verification Register has ZERO recorded rows."
+      say "           A stage cannot close having proven nothing. Record at least one"
+      say "           'Result: pass' row (per REQ-ID / screen this stage delivered), or mark"
+      say "           the stage 'verify-exempt' (pure-docs / design-only) with a reason in"
+      say "           STAGE.md — an honest exemption is fine; a silent empty register is not."
+      return 1
+    fi
   fi
   say "  [verify] register clean"
   return 0
@@ -274,8 +357,9 @@ check_design_system() {
 
 # --- Run gates --------------------------------------------------------------
 say "harness verify gate ($mode):"
-run_validate   || fail=1
-check_register || fail=1
+run_validate    || fail=1
+run_tests_push  || fail=1
+check_register  || fail=1
 check_atomicity || fail=1
 check_design_system || fail=1
 
