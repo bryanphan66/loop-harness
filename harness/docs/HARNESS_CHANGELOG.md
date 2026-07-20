@@ -79,9 +79,13 @@ icon for all types), U16 enum-status-exhaustive (list↔detail single-source, no
 catch-all `else`), U17 prototype-copy-verbatim (separator glyph byte-fidelity — 207
 drifts), U18 shared-primitive-clobber (CSS-shorthand reset / hardcoded layout width /
 wrong slot), U19 toast-convention (`duration:Infinity`, raw server message, bespoke
-banner). Plus **six `lint:gates` scripts** (dead-affordance, inline-grid-reflow,
-icon-registry-coverage, prototype-copy-verbatim, primitive-inline-style,
-toast-convention), each with a `// <name>-ok: <reason>` opt-out.
+banner). NOTE (corrected 2026-07-20): the U13–U19 dead-affordance / inline-grid-reflow /
+icon-registry-coverage / prototype-copy-verbatim / primitive-inline-style /
+toast-convention checks are **SPECIFIED but NOT YET SHIPPED as `lint:gates` scripts** —
+they are enforced manually via `pre-demo-self-qa-checklist.md`. The scripts actually
+shipped in `lint:gates` are **three**: `check-universal-fidelity-imports.mjs`,
+`check-prisma-fk-indexes.mjs`, `check-admin-screen-width-caps.mjs`. Do not rely on the
+six as auto-blocks until they ship. (Was overstated as "six lint:gates scripts".)
 
 **The keystone deliverable is `playbooks/pre-demo-self-qa-checklist.md`** — a
 runnable 7-group checklist (nav/interaction, links/routing, grids/lifecycle,

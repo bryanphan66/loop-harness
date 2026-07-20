@@ -1,5 +1,19 @@
 # Gate — Visual Fidelity (built screen vs frozen prototype)
 
+> ⚠️ **ENFORCEMENT STATUS (read first — honest scope of the "auto-block").**
+> Auto-enforced TODAY in the shipped template's `lint:gates` = exactly **three**
+> scripts: `scripts/check-universal-fidelity-imports.mjs`,
+> `check-prisma-fk-indexes.mjs`, `check-admin-screen-width-caps.mjs` (run by the
+> verify-gate hook via the `validate` script). The per-screen **Playwright
+> fidelity assertions** are real but only gate if the project wires its
+> `apps/web/e2e-ui/*.fidelity.ts` specs into a run the hook/CI executes.
+> The U13–U19 `scripts/check-dead-affordance.mjs`, `check-inline-grid-reflow.mjs`,
+> `check-icon-registry-coverage.mjs`, `check-prototype-copy-verbatim.mjs`,
+> `check-primitive-inline-style.mjs`, `check-toast-convention.mjs` cited below are
+> **SPECIFIED, NOT YET SHIPPED as scripts** — today they are enforced **manually**
+> via `docs/playbooks/pre-demo-self-qa-checklist.md`, not by auto-lint. Do **not**
+> treat U13–U19 as auto-blocks until those scripts ship into `lint:gates`.
+
 > **Type:** internal HARD gate (auto-block), countersignable, **per-screen**.
 > **Read by:** the per-phase acceptance leg at step **2.6**, code-review as a
 > **floor-rule auto-block** at step **2.7**, and **DoD** at step **2.10**.
