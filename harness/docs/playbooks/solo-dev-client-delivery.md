@@ -194,3 +194,17 @@ delete the original shape.)
   `payment-integration.md` — Build & Go-live (next-increment detail).
 - `session-retrospective.md` — end-of-session capture.
 - `docs/decisions/ck-skill-engine-not-vendored.md` — D1 rationale.
+
+## Addendum (2026-07-22) — client-deliverable pitfalls
+
+- **Confirm the artifact TYPE before building it.** "UAT checklist" can mean an XLSX
+  file, a PM-tool page (wiki), or per-feature tracker issues — these are different
+  artifacts. Ask/confirm the format first; building the wrong one is pure rework.
+- **The client-facing acceptance content comes from the per-AC user-guide (HDSD)
+  blocks** (each AC's operator steps + expected result + deep-link anchor + demo),
+  not just the feature-register's one-line AC text. The guide is the richer source.
+- **Plan client authentication on staging up front.** A passwordless-OTP app on
+  staging routes all mail to an internal catcher (Mailpit) with no public route — the
+  client cannot self-receive an OTP for a demo account. Decide the access path
+  BEFORE handing over: social login (e.g. Google) for the self-serve role, an
+  auth-protected public webmail for OTP retrieval, or operator-supplied OTPs.

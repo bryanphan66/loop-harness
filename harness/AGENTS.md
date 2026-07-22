@@ -273,3 +273,29 @@ A task is done only when:
   marked **N/A by decision**.
 - A **session trace** is recorded per `docs/TRACE_SPEC.md`.
 - The final response says what changed and what was not attempted.
+
+## Addendum (2026-07-22) — shared-branch safety + background-session hygiene
+
+### Git safety on the shared branch
+- **Never push directly to a shared branch (dev/main).** If branches are
+  unprotected a direct push silently clobbers others' commits. Always land through a
+  **PR into the branch**; let a human (or an explicit approval) merge it.
+- **Force-pushing a shared branch is a human decision.** The auto-mode classifier
+  blocks it; do not work around it. Surface it and let the user run the one command.
+- **Prepare-branch, hold-push pattern for client deploys.** Build the change on a
+  branch, get it VERIFIED-GREEN (full build+test), open the PR, and STOP. Do not push
+  to the deploy branch until the operator approves — merging the PR is the deploy.
+
+### Background-session hygiene (control plane)
+- **Isolation hazard.** Dispatching multiple `--bg` sessions with OVERLAPPING file
+  scope produces divergence + duplicated work that must later be reconciled into ONE
+  verified-green branch (expensive). Give each bg task a non-overlapping scope; when
+  overlap is unavoidable, plan the reconcile step up front.
+- **Base worktrees off `origin/<branch>` (fetched), never the local checkout.** A bg
+  session that branches off a stale local ref produces a PR that conflicts with the
+  real base. Always `git fetch` then base on the remote ref.
+- **A bg task that COMMITS must set up the full env first** (`pnpm install` +
+  `prisma generate` + build workspace `packages/*`) or the verify gate fails on
+  missing generated types / node_modules — an environmental failure, not a code one.
+  Note the gate runs the full validate+build at BOTH pre-commit AND pre-push (double
+  cost); budget time accordingly and do not `--no-verify`.

@@ -84,3 +84,15 @@ number — that's a business/marketing call for the owner, surfaced, not auto-ap
 - Config loader that lives in the API only, so the worker's documents/emails hardcode.
 - Copyright with a literal year, or a hardcoded support `mailto:`.
 - Auto-lowering a marketing social-proof number to the raw DB value without asking.
+
+## Addendum (2026-07-22) — secrets flow + OAuth verify (Kamal example)
+
+- **Split config by sensitivity.** Non-secret identity values (OAuth client id,
+  redirect URI, public URLs) go in the deploy config's `env.clear` (committed).
+  Secrets (client secret, DB URL, JWT keys) are listed by NAME in `env.secret`, with
+  the VALUE stored as a CI/repo secret and materialized into the gitignored
+  `.kamal/secrets` by a CI step at deploy time. Never commit a secret value.
+- **Verify OAuth landed (not the dev-stub).** After deploy, `GET /auth/google`
+  must 302 to `accounts.google.com/...` with the real `client_id` + `redirect_uri`.
+  If the env vars are unset the app silently falls back to a dev-stub — a 200/"button
+  present" check is not enough; assert the redirect target.

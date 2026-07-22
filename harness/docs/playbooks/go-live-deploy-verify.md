@@ -113,3 +113,29 @@ blocker: name the endpoint, then ship.)
 - A compose `${MONEY_SECRET:-plausible-placeholder}` default. (Rule 3.)
 - Shipping a fail-closed hardening to the demo box that runs on placeholders. (Rule 4.)
 - An agent auto-firing a prod deploy with no named endpoint. (Rule 5.)
+
+## Addendum (2026-07-22) — two-environment model + mechanism-specific verify
+
+A project commonly runs **two deploy environments with different tools**. Do not
+assume one deploy path.
+
+| Env | Tool | Branch | Verify-at-source |
+|---|---|---|---|
+| DEV | Dokploy (docker compose) | dev-env branch | behavioral route/asset probe |
+| STAGING (client UAT) | Kamal 2 + GitHub Actions | staging branch | container name carries git SHA |
+
+- **`redeploy` != `deploy`.** Dokploy `compose.redeploy` only RESTARTS the existing
+  containers (old image) — new code 404s. Use `compose.deploy` to pull + rebuild
+  from git. Same trap shape exists on any tool that separates "restart" from "rebuild".
+- **Verify-at-source depends on the mechanism.** Kamal names containers with the
+  deployed git SHA (`<service>-web-<sha>`) — SSH `docker ps`, match the tag to the
+  merged commit. The health `commitSha` field is frequently useless (`local-dev` /
+  `unknown` because the build never injected it) — do NOT trust it. When no reliable
+  version stamp exists, verify **behaviorally**: probe a route/asset that exists ONLY
+  in the new commit and confirm 404 -> 200. Never trust CI-green or an HTTP 200 alone.
+- **DNS has no wildcard by default.** `app.example` and `api.app.example` resolving
+  does NOT mean `mail.app.example` resolves — each subdomain is an explicit record.
+  Exposing a new accessory (webmail, admin tool) needs a DNS record from ops first.
+- **Cold-start after deploy:** the first hit to each dynamic route after a fresh
+  deploy can take several seconds (server warms the route); subsequent hits are fast.
+  See `build-execution.md` (ISR) for the fix, and diagnose before blaming auth.

@@ -1,7 +1,45 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.20**.
+templates). Per-project state never lives here. Current version: **v6.21**.
+
+## v6.21 — 2026-07-22 — the delivery-and-deploy stratum: lessons from taking elearning through client UAT + Kamal staging (issue/AC/demo chain, two-env deploy, shared-branch safety)
+
+A working session that carried elearning from red-team fixes to a client-facing UAT
+package deployed on a real Kamal staging box surfaced eight generalizable lessons the
+build-centric harness had not codified. Two are NET-NEW playbooks; six extend existing
+docs. No gate math changes — these are operating-model + deploy + delivery knowledge.
+
+- **NEW `playbooks/feature-issue-ac-demo-standard.md`** — the full Feature -> Issue ->
+  AC -> Demo-media chain: feature-register as SoT (durable F-NNN), idempotent
+  GitHub-issue sync (hidden `<!-- feat-id -->` marker, non-clobber body template),
+  F-only 1:1 client UAT board (tickable AC task-list, PM-tool API caveats), and the
+  load-bearing rule: **one Playwright spec per AC is the single source for BOTH the
+  demo video AND the guide screenshot** (video record -> ffmpeg one frame -> webp; one
+  run refreshes both; text-only edits never touch Playwright). Extends `TRACE_SPEC.md`.
+- **NEW `playbooks/user-guide-hdsd-standard.md`** — the in-app user guide (HDSD) must
+  be **route-based `/huong-dan/[slug]` SSG** (registry + [slug] page + sidebar/pager),
+  one route per section, not a single page split by `#anchors`; visible labels never
+  carry internal codes (AC/REQ-ID). Mirrors the hasi reference implementation.
+- **`go-live-deploy-verify.md`** += two-environment model (DEV Dokploy/compose vs
+  STAGING Kamal/CI), `redeploy != deploy` (restart vs rebuild-from-git),
+  mechanism-specific verify-at-source (Kamal container name carries the git SHA;
+  `commitSha` health field often useless -> verify behaviorally 404->200), DNS has no
+  wildcard.
+- **`AGENTS.md`** += shared-branch safety (never push a shared branch directly; PR-in
+  only; force-push is a human decision; prepare-branch-hold-push for client deploys) +
+  background-session hygiene (isolation hazard -> reconcile to one verified-green
+  branch; base worktrees off `origin/<branch>`; a committing bg task needs full env,
+  and the gate runs full validate+build at BOTH pre-commit and pre-push).
+- **`solo-dev-client-delivery.md`** += confirm the client artifact TYPE before building
+  (XLSX vs PM page vs issues); AC source is the per-AC HDSD blocks; plan client auth on
+  staging (OTP -> internal mail catcher; use social login / auth-gated webmail / operator OTP).
+- **`build-execution.md`** += public hot pages = ISR + on-demand revalidate, not
+  `force-dynamic` (cold-start tax); diagnose "slow" by isolating API vs SSR TTFB and
+  cold-vs-warm hits before blaming a suspect.
+- **`config-driven-identity.md`** += secrets flow (non-secret in `env.clear`, secret
+  name in `env.secret` + CI-materialized `.kamal/secrets`); verify OAuth landed by the
+  `/auth/google` 302 target, not a button-present check.
 
 ## v6.20 — 2026-07-18 — the backend/security stratum: a second retrospective (hasi-hub, 166 reports) folds the security · concurrency · resilience · prod-packaging layer the UI-heavy elearning run never modelled
 
