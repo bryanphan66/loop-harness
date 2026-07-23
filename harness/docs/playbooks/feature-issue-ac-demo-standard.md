@@ -43,7 +43,22 @@ A sync script (shape of `scripts/feature-issues-sync.mjs`) reconciles register -
   <!-- feat-id: F-NNN -->
   ```
 - **`--rebuild` overwrites the body ONLY when the issue was not hand-edited** — never
-  clobber human edits. Section (with emoji) maps to a stable module slug for the label.
+  clobber human edits.
+- **Labels = a fixed 5-set, repo-wide (do NOT proliferate per-module labels).**
+  Module lives in the **body** (`**Module:** {module}`), never as a label — a growing
+  `module:*` label list is noise the client and team must scroll past, and it drifts
+  from the register. The only labels any project carries:
+  | Label | Use |
+  |---|---|
+  | `feature` | every F-NNN feature issue (the default) |
+  | `bug` | defect issues |
+  | `enhancement` | improvement on a shipped feature |
+  | `plane` | mirror this issue to the PM-tool UAT board |
+  | `phase-1.5` (or `phase-N`) | out of the current UAT scope; do later |
+  The sync script applies `feature` to every synced issue and leaves the other four for
+  humans. Reconciling an existing repo: add `feature` to every `module:*` issue first,
+  THEN delete the `module:*` labels (deletion cascades off all issues) so no feature is
+  left label-less. Test-artifact / scratch issues are closed, not label-parked.
 
 ## 3. PM-tool Issues = client UAT (1:1 with GitHub F-NNN)
 

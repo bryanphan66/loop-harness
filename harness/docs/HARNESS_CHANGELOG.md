@@ -1,7 +1,21 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.21**.
+templates). Per-project state never lives here. Current version: **v6.22**.
+
+## v6.22 — 2026-07-23 — GitHub label discipline: a fixed 5-label set, module in the body not the label
+
+Standing up elearning's tracker had auto-created a `module:*` label per domain (12 of
+them) plus `test`/`plane`/`phase-1.5` — ~18 labels the client and team had to scroll
+past, drifting from the register. Corrected to a **repo-wide fixed 5-set**: `feature`
+(default on every F-NNN), `bug`, `enhancement`, `plane` (mirror to PM-tool UAT), and
+`phase-N` / `phase-1.5` (out of current UAT scope). Module now lives only in the issue
+**body** (`**Module:** {module}`), never as a label.
+
+- **Extends `playbooks/feature-issue-ac-demo-standard.md` §2** with the 5-label table +
+  the safe reconcile order: add `feature` to every `module:*` issue FIRST, THEN delete
+  the `module:*` labels (deletion cascades off all issues) so no feature ends up
+  label-less; test-artifact issues get closed, not label-parked.
 
 ## v6.21 — 2026-07-22 — the delivery-and-deploy stratum: lessons from taking elearning through client UAT + Kamal staging (issue/AC/demo chain, two-env deploy, shared-branch safety)
 
