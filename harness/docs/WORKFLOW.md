@@ -81,9 +81,10 @@ MACRO 2 — BUILD & GO-LIVE
   → 2.10 QA (DoD) → 2.11 go-live readiness
   → 2.12 UAT + sign-off (ACCEPTANCE, CLIENT) → 2.13 release
         ▼
-MACRO 3 — POST-BUILD
+MACRO 3 — POST-BUILD   (steady-state: switches to the issue-pipeline, not /stage-next — see OPERATING-MODES.md)
   3.1 handover (HANDOVER, CLIENT) → 3.2 hypercare → 3.3 steady-state
   → 3.4 maintenance proposal → 3.5 change-control (always-on) → 3.6 retro
+  ↳ 3.3 + 3.5 are CONTINUOUS = the issue-pipeline (Mode B), not linear stage steps
 ```
 
 ---

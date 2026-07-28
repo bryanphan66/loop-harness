@@ -1,0 +1,36 @@
+# Sổ tay bài học & sai lầm
+
+CONTROL bồi đắp mỗi lần vấp. Mỗi mục: triệu chứng -> nguyên nhân gốc -> luật rút ra. Mới nhất trên cùng.
+
+## 2026-07-28
+
+**L8 - Pre-push gate flaky (test integration redis/BullMQ).**
+Pre-commit chạy `validate` (gồm test) PASS, nhưng pre-push chạy lại cùng bộ test lại FAIL 1 lần rồi push lại là xanh. Có test integration real-redis/BullMQ phụ thuộc timing.
+-> Luật: docs/script-only mà pre-push đỏ ở test integration thì **retry push 1-2 lần** trước khi nghi lỗi thật; đừng bypass gate. Cần dọn flaky test riêng (debugger đã flag "dev CI quality-gate fail lặp lại" = pre-existing).
+
+**L7 - Harness đang over-constrain (bài context-engineering Anthropic).**
+Model mới (Opus 4.8/5, Fable 5) phán đoán tốt hơn; Anthropic bỏ hơn 80% system prompt Claude Code không giảm eval. Harness của ta (CLAUDE.md khổng lồ + nhiều rule + WORKFLOW dài) là kiểu nhồi-hết-lên-đầu.
+-> Luật: CLAUDE.md/WORKFLOW nhẹ + gotcha; chi tiết đẩy sang skill/script/test (reference nạp đúng lúc); để agent tự phán đoán; ưu tiên reference-dạng-code hơn văn xuôi. Gõ /doctor để soi quá tải. Không tự cắt quyết định đã chốt.
+
+**L6 - Plane Page: API không đọc/ghi được, TRỪ page đã publish.**
+Public API v1 (X-API-Key) không có endpoint pages (404); internal API cần cookie web (401). Kể cả key đúng workspace.
+-> Nhưng page **publish (Spaces)** đọc được: `GET /api/public/anchor/<anchor>/pages/` trả `description_html`. Ghi thì vẫn không. Nên tri thức CONTROL cần cập nhật phải ở file repo; Plane Page chỉ để người đọc, chia sẻ cho CONTROL bằng link /spaces/.
+
+**L5 - Chart rỗng = lỗi CSS render, KHÔNG phải data (issue #239).**
+KPI "Học viên mới=20" nhưng biểu đồ tuần rỗng. Review code tĩnh (TS + query) thấy đúng hết, tưởng mâu thuẫn. Thực ra bar có `height:N%` nhưng ô cha `.col` bị co bằng nội dung (flex-end) -> `%` không có gốc -> mọi bar 0px bất kể data.
+-> Luật: lỗi "rỗng/không hiển thị" ở UI phải ĐO trên trình duyệt thật (headless-chromium), review code tĩnh không bắt được lỗi layout CSS. Data-fix đúng vẫn có thể bị chặn ở tầng render.
+
+**L4 - QC fail: happy-fail vs ngoài-AC (luật vàng).**
+Rối vì lúc tạo issue mới (#213->#260), lúc lùi In Dev (#239).
+-> Luật DUY NHẤT: lỗi trong AC của issue -> lùi In Dev sửa issue cũ; lỗi ngoài AC -> issue mới (issue cũ đi tiếp độc lập). Bỏ cách phân "happy vs biên".
+
+**L3 - Auto-close nằm ở COMMIT MESSAGE, không chỉ PR body (issue #225).**
+Sửa PR body `Closes`->`Refs` vẫn bị đóng nhầm khi merge, vì commit của coder ghi `Closes #225`; squash-merge gộp commit body -> auto-close.
+-> Luật: `Refs`/`Part of` phải áp cho CẢ commit message; trước khi merge PR cũ, grep commit message (`gh api .../commits/<sha> --jq .commit.message`) tìm keyword đóng.
+
+**L2 - Gate elearning fail vì worktree mới thiếu node_modules.**
+Pre-commit chạy full `validate` (lint+typecheck+test+build); worktree mới -> `eslint: not found` -> gate đỏ, không được bypass.
+-> Luật: commit tài liệu/script nhỏ từ **checkout chính** (đã có deps) trên branch off dev; nếu typecheck thiếu export của `@nhat-nghe/database` thì rebuild nó trước (`pnpm --filter @nhat-nghe/database build` -> làm mới `out/`).
+
+**L1 - Verify-at-source bằng SHA container, không tin CI xanh.**
+-> Sau deploy staging: SSH vps02, `docker ps` tên container `elearning-web-web-<sha>` phải == dev HEAD. Health `commitSha`="unknown" vô dụng. CI xanh / HTTP 200 không đủ.

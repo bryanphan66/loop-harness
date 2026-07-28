@@ -11,6 +11,11 @@ MACRO 2 — BUILD        ERD → stack → BUILD MANIFEST → walking skeleton �
 MACRO 3 — POST-BUILD   handover → hypercare → maintenance → change control → retro
 ```
 
+The harness runs a project in **two modes** (`harness/docs/OPERATING-MODES.md`):
+**Mode A — Build** (Macro 1-2, driven by `/stage-next`, tracked in `STAGE.md`) and
+**Mode B — Steady-state** (Macro 3, driven by the **issue-pipeline**, tracked on the
+issue board). A project **graduates** A → B at **go-live**.
+
 The harness is the **control plane** (stage tracker, gates, verify-git-hooks,
 orchestration commands); your global agents/skills are the engine. It runs on a
 bare agent + git + bash — `ck-*` skills only accelerate it (Independence
