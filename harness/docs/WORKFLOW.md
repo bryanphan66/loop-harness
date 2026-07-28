@@ -99,6 +99,19 @@ clear.
 **before** the bao-gia (1.14), so the quote anchors to a frozen visual contract
 — the #1 defense against scope dispute.
 
+**DEFAULT LANE = Lite (slim). Run the heavy Full lane ONLY for a large external
+paid client where a scope-dispute is a real commercial risk.** Pre-Build's job is
+to freeze scope + a prototype, not to mint a document museum — a bloated Macro 1
+(232 REQ-IDs, 200+ scenarios, a v1→v3 prototype grind) is the #1 way to sa lầy
+before any code exists. Slim principles (apply in both lanes; the Lite route below
+is the mechanism):
+- **REQ-ID per feature-AREA, not per micro-behaviour.** Aim for tens, not hundreds.
+- **Scenarios (1.8) only for high-risk reqs** (money / auth / async / destructive) — skip the rest with one recorded line.
+- **Traceability folds into the feature register** — no separate RTM file in Lite; GAP-NNN optional (token chain may start at REQ-ID).
+- **Prototype = ONE round then freeze** (1.12→1.13). No v1→v2→v3 grind unless the client explicitly re-scopes.
+- **No separate Vision / Glossary / BPMN files unless a specific req needs one** — keep them as sections, or skip and record the skip.
+The invariants that STAY non-negotiable even in Lite: REQ-ID grammar, screen-inventory floorplan classification, the freeze gates (PB-G2/G3), stage-boundary commits, the verify-gate, N/A-by-decision recording.
+
 ### BLOCK A — PM Intake
 
 | # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
