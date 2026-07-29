@@ -1,20 +1,15 @@
 # videcode-harness
 
-A reusable **agent-driven delivery harness**: install it into a fresh directory,
-feed it a spec, and drive one project from raw idea to a **running, deployable
-app** (pnpm monorepo · NestJS + Prisma + Postgres API · Next.js web · CI · e2e)
-through three gated macro-stages:
+A reusable **agent-driven delivery harness** built around a **loop**. It takes a project
+from a spec to a **running, deployable app** (pnpm monorepo, NestJS + Prisma + Postgres,
+Next.js, CI, e2e), then runs the loop that keeps it evolving. **Value converges in the
+loop, not the paperwork** — so the linear build stays a *lean on-ramp*. Two modes
+(`harness/docs/OPERATING-MODES.md`):
 
-```text
-MACRO 1 — PRE-BUILD    spec → frozen scope + frozen prototype (+ contract, Full lane)
-MACRO 2 — BUILD        ERD → stack → BUILD MANIFEST → walking skeleton → phase loop → review/security/QA → UAT → release
-MACRO 3 — POST-BUILD   handover → hypercare → maintenance → change control → retro
-```
+- **Mode A - Build:** a lean, gated on-ramp (Macro 1 Pre-Build -> Macro 2 Build), driven by `/stage-next` + `STAGE.md`, default lane Lite. Job: reach go-live fast.
+- **Mode B - Steady-state = THE LOOP** (Macro 3): discover -> dispatch -> verify -> recover -> persist -> decide-next, repeating on the issue board. **Where quality converges** (per-AC + human checklist).
 
-The harness runs a project in **two modes** (`harness/docs/OPERATING-MODES.md`):
-**Mode A — Build** (Macro 1-2, driven by `/stage-next`, tracked in `STAGE.md`) and
-**Mode B — Steady-state** (Macro 3, driven by the **issue-pipeline**, tracked on the
-issue board). A project **graduates** A → B at **go-live**.
+Graduate A -> B at **go-live**. Our own trials say it plainly: the project stuck in Mode A underdelivered (auto-script); the one that reached the loop came out solid (elearning).
 
 The harness is the **control plane** (stage tracker, gates, verify-git-hooks,
 orchestration commands); your global agents/skills are the engine. It runs on a
@@ -90,8 +85,9 @@ Dockerfiles). That checklist is the acceptance test for the harness itself.
 
 ## Key docs (read in this order)
 
-1. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
-2. `harness/docs/WORKFLOW.md` — the 3-macro map, step tables, gates, lanes
-3. `harness/docs/STAGE_GOALS.md` — per-step executable goal text
-4. `harness/docs/TRACE_SPEC.md` — token grammar (`GAP → REQ-ID → SC → TC`, `CR`)
-5. `harness/docs/playbooks/README.md` + `harness/docs/templates/README.md` — recipes + scaffolds
+1. `harness/docs/OPERATING-MODES.md` — the two modes + the loop (the harness's center of gravity — READ FIRST)
+2. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
+3. `harness/docs/WORKFLOW.md` — the 3-macro map, step tables, gates, lanes
+4. `harness/docs/STAGE_GOALS.md` — per-step executable goal text
+5. `harness/docs/TRACE_SPEC.md` — token grammar (`GAP → REQ-ID → SC → TC`, `CR`)
+6. `harness/docs/playbooks/README.md` + `harness/docs/templates/README.md` — recipes + scaffolds

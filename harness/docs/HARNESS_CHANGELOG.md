@@ -1,7 +1,16 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v6.22**.
+templates). Per-project state never lives here. Current version: **v7.0**.
+
+## v7.0 — 2026-07-29 — re-centered on the LOOP (Loop Engineering): a lean linear build feeds a self-correcting steady-state loop
+
+Reframed the harness identity: it is a **loop-engineering system with a lean linear build on-ramp**, not a document-heavy staged process. Evidence from our own trials — auto-script stuck in the linear front underdelivered; elearning reached the steady-state loop (per-AC + human checklist, repeating) and came out solid — so the loop, not the paperwork, is where quality converges.
+
+- **New spine `OPERATING-MODES.md`**: Mode A (Build, `/stage-next`) vs Mode B (Steady-state = the loop, issue-pipeline); graduation at go-live; the 6 loop primitives (discover/dispatch/verify/recover/persist/decide); recover + autonomy frontiers; framed with the context/harness/loop layers. README re-anchored loop-first.
+- **Mode-B kit packaged** at `templates/steady-state/` (generalized `issue-state.mjs` + `qc-checklist.mjs`, bug-report + regression templates) + `playbooks/steady-state-issue-pipeline.md` — a fresh project gets the loop out of the box.
+- **Macro-1 slimmed to Lite-by-default** — Full lane only for large paid clients; slim principles cap the REQ-ID / scenario / prototype-round explosion (freeze gates + REQ-ID grammar stay non-negotiable).
+- **Scope-hygiene**: flow/ctl demoted to personal convenience (not harness canon; ship-standard = per-repo `release.sh` + CI/CD; control role loads from the repo's own `CLAUDE.md`).
 
 ## v6.22 — 2026-07-23 — GitHub label discipline: a fixed 5-label set, module in the body not the label
 
