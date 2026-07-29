@@ -44,21 +44,21 @@ A sync script (shape of `scripts/feature-issues-sync.mjs`) reconciles register -
   ```
 - **`--rebuild` overwrites the body ONLY when the issue was not hand-edited** — never
   clobber human edits.
-- **Labels = a fixed 5-set, repo-wide (do NOT proliferate per-module labels).**
-  Module lives in the **body** (`**Module:** {module}`), never as a label — a growing
-  `module:*` label list is noise the client and team must scroll past, and it drifts
-  from the register. The only labels any project carries:
-  | Label | Use |
+- **GitHub labels = ONLY `github` + `plane`** (source + PM-tool-mirror markers). Everything
+  else that used to be a label is now a proper field, NOT a label:
+  | What | Where it lives (NOT a label) |
   |---|---|
-  | `feature` | every F-NNN feature issue (the default) |
-  | `bug` | defect issues |
-  | `enhancement` | improvement on a shipped feature |
-  | `plane` | mirror this issue to the PM-tool UAT board |
-  | `phase-1.5` (or `phase-N`) | out of the current UAT scope; do later |
-  The sync script applies `feature` to every synced issue and leaves the other four for
-  humans. Reconciling an existing repo: add `feature` to every `module:*` issue first,
-  THEN delete the `module:*` labels (deletion cascades off all issues) so no feature is
-  left label-less. Test-artifact / scratch issues are closed, not label-parked.
+  | Feature / Bug / Enhancement | **Issue Type** field (org-level) |
+  | Module | the issue **body** (`**Module:** {module}`) |
+  | Phase | **Milestone** |
+  Rationale: a growing `module:*` (or type/phase) label list is noise that drifts from the
+  register; the fields carry it correctly + filterably. Reconciling an old repo: set each
+  issue's Issue Type / Milestone / body-Module, then **delete every label except `github`
+  and `plane`** (deletion cascades off all issues). Test-artifact / scratch issues are
+  closed, not label-parked. (Historical note: an earlier "fixed 5-label set"
+  feature/bug/enhancement/plane/phase was superseded on 2026-07-24 when GitHub gained
+  native Issue Type + Milestone. Plane keeps Feature/Bug/Enhancement as labels because it
+  has no native Type — an intentional GitHub↔Plane asymmetry.)
 
 ## 3. PM-tool Issues = client UAT (1:1 with GitHub F-NNN)
 
