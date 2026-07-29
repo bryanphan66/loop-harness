@@ -42,7 +42,7 @@ Cái gì trong, cái gì ngoài.
 | **Assignee** | ✅ | `--assignee {user}` |
 | **Milestone** = Phase (số nguyên) | ✅ nếu biết | `--milestone "Phase {n}"` |
 | **Parent** (sub-issue) | ✅ bug/task = con của feature cha đúng domain | `POST /repos/{o}/{r}/issues/{parent}/sub_issues -F sub_issue_id={child rest id}` |
-| **Labels** | ✅ bộ CỐ ĐỊNH | chỉ dùng: `feature`/`bug`/`enhancement` + `plane` (mirror PM-tool) + `phase-N`. **KHÔNG đẻ label `module:*`** (Module ở body). |
+| **Labels** | ✅ CHỈ 2 nhãn nguồn/mirror | **`github` + `plane`** (đánh dấu nguồn GitHub + đồng bộ sang PM-tool). **KHÔNG dùng label cho loại/module/phase** — Feature/Bug/Enhancement = **Issue Type field**; Module = body; Phase = Milestone. Không đẻ label khác. |
 | **States** | ❌ để mặc định = **Backlog** | (pipeline chuyển sau bằng `issue-state.mjs`) |
 | **Priority** (Urgent/High/Medium/Low) | ⚠️ triage | org custom-field, set khi PM triage (xem §4) |
 
@@ -54,16 +54,17 @@ States / Module-field / Priority là **org-level single-select Issue Fields** (k
 
 ## Anti-patterns (issue "chưa chuẩn" trông như thế nào)
 - Không có AC, hoặc AC không test được ("làm cho đẹp hơn").
-- Module làm label thay vì body; đẻ `module:*` labels.
+- **Loại (Feature/Bug/Enhancement) làm LABEL** thay vì Issue Type field; hay **Module/Phase làm label**. Chỉ `github` + `plane` là label; loại = Issue Type, module = body, phase = Milestone.
 - Tiêu đề dính code/plan ref (F13, phase-2, audit).
 - Bug mồ côi (không gán feature cha).
-- Thiếu Type / tạo mà chưa BA-validate business-sensitive.
+- Thiếu Issue Type / tạo mà chưa BA-validate business-sensitive.
 - (PR sau này) dùng `Closes/Fixes` -> auto-close sớm; phải `Refs #N` ở cả commit + PR.
 
 ## Checklist tạo 1 issue (dán cho agent)
 - [ ] BA-validate: technical hay business-sensitive? (sensitive -> Tech Lead chốt trước)
 - [ ] Title imperative, không code/plan ref (feature: `[F-NNN]`)
 - [ ] Body: Bối cảnh + Scope + **AC checkbox testable** + `**Module:**`
-- [ ] Type + Assignee + Milestone(Phase) + Labels(bộ cố định) + Parent(nếu là con feature)
+- [ ] Issue Type (Feature/Bug/Enhancement) + Assignee + Milestone(Phase) + Parent(nếu là con feature)
+- [ ] Labels: CHỈ `github` + `plane` (loại ở Issue Type, không phải label)
 - [ ] States để Backlog; Priority để triage
-- [ ] Sanity: external_id = số issue; không đẻ module-label
+- [ ] Sanity: external_id = số issue; không đẻ label loại/module/phase
