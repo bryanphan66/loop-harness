@@ -1,6 +1,6 @@
 stack-pnpm-nest-next template
-version: 0.2.2
-verified: 2026-07-11 (Dokploy deploy hardening, from elearning-platform findings)
+version: 0.2.3
+verified: 2026-07-29 (proof-run: fresh sample scaffolded, booted, seeded-admin login + a bookmarks feature built through the verify gate)
 install: install, lint, typecheck, unit, build all green across all workspaces incl.
 apps/worker + packages/queue-core + packages/storage-core (incl. new tests: no-audio
 transcode, no-var_stream_map-a:N-without-audio, source-download-before-ffmpeg,
@@ -56,6 +56,14 @@ Design decisions:
   order needs no change.
 
 History:
+- 0.2.3 (2026-07-29): proof-run found + fixed a shipped-but-undeclared dep — the
+  universal fidelity fixture (apps/web/e2e-ui/_universal.fidelity.ts) imports
+  @axe-core/playwright, but it was never declared in apps/web/package.json; since
+  apps/web/tsconfig globs **/*.ts, a fresh clone's `tsc --noEmit`/`pnpm validate`
+  failed on the missing module (blocking the very first commit gate). Added
+  `@axe-core/playwright: ^4.12.1` to apps/web devDeps + gitignored next-env.d.ts
+  (a `next build` artifact that otherwise shows as untracked). Same "shipped-but-
+  undeclared" class the lint:gates scripts once hit.
 - 0.2.2 (2026-07-11): three fixes baked in after deploying elearning-platform
   (built from this template) to Dokploy hit them for real: (1) web's
   docker-compose.yml build args now resolve NEXT_PUBLIC_API_URL from the

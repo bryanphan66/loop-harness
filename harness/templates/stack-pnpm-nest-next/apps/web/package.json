@@ -23,6 +23,7 @@
     "tailwind-merge": "^3.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.50.0",
     "@__PROJECT_SLUG__/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.0.0",
