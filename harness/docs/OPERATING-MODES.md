@@ -5,8 +5,8 @@ How this harness runs a project — framed with the **Loop Engineering** maturit
 ## The three engineering layers (the harness's vocabulary)
 | Layer | What it designs | Where this harness embodies it |
 |---|---|---|
-| **Context engineering** | which instructions/data/tools reach the model, minimizing excess | slim `~/.claude/rules` (950→188) + on-demand skills + progressive disclosure; per-repo control briefs; `CLAUDE.md` = gotchas only |
-| **Harness engineering** | the executable environment around the model (files, git, gates, memory, feedback) | `flow`/`control` CLI, the non-bypassable `harness-verify-gate.sh`, the pnpm stack template, `STAGE.md`, gates (PB-G/DoR/DoD), auto-memory |
+| **Context engineering** | which instructions/data/tools reach the model, minimizing excess | slim `~/.claude/rules` (950→188) + on-demand skills + progressive disclosure; the repo's own `CLAUDE.md` (control role + gotchas), auto-loaded by cwd |
+| **Harness engineering** | the executable environment around the model (files, git, gates, memory, feedback) | the non-bypassable `harness-verify-gate.sh`, the pnpm stack template, `STAGE.md`, gates (PB-G/DoR/DoD), per-repo `scripts/release.sh` + the project's CI/CD, auto-memory |
 | **Loop engineering** | how the system repeatedly **observe → act → verify → recover → persist → decide-next**, on a schedule or until a goal | **Mode B** (below) is the loop; the control session running `task → poll → ship`; verify-at-source; cron routines |
 
 These are additive layers, not alternatives — the harness needs all three. Today's work has been mostly context (the slim) + loop (this doc).
