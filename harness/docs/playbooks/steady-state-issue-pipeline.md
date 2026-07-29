@@ -40,12 +40,12 @@ Set state: `node scripts/issue-state.mjs <N> "<state>"`.
 Three recover points, one per place the loop actually broke (see `lessons-log.md`):
 
 - **R1 — dispatch (`BLOCKED` / `NEEDS_CONTEXT`).** The control session auto-escalates instead of asking the human each time: **+context -> narrow scope -> stronger model -> human**. Cap **3 escalations**, then hand to a human with the trail. (Behavioural — bake into the dispatch loop, no script.)
-- **R2 — gate (flaky pre-push).** Integration flake (redis/BullMQ timing) fails a green pre-commit at push. **Retry the push <=2x** on an integration-only failure, then flag. Script: `ship.sh`.
-- **R3 — deploy (verify-at-source mismatch).** After deploy, if the running container SHA != the shipped commit, or health != ok: **re-trigger the deploy 1x**; still wrong -> **open a follow-up issue + flag** (prod -> auto-rollback per the deploy standard). Script: `ship-and-verify.sh`.
+- **R2 — gate (flaky pre-push).** The flake bites at **`git push`** (the pre-push gate runs the full suite), not at merge (merge is server-side). **Retry the push <=2x** on the flaky signature only (real failures like `rejected` never retry), then fail-closed. Script: `push-retry.sh`.
+- **R3 — deploy (verify-at-source mismatch).** After merge, if the running container SHA != the shipped commit, or health != ok: **re-trigger the deploy 1x**; still wrong -> **open a follow-up issue + flag** (prod -> auto-rollback per the deploy standard). Script: `ship-and-verify.sh`.
 
-### Script contracts (build + dogfood on a live project; not shipped here)
-- **`ship.sh <branch>`** — merge the branch's PR to the integration branch; on an integration-only gate failure, retry the push up to 2x; exit non-zero (no merge) if it still fails. Idempotent.
-- **`ship-and-verify.sh <issue> <commit>`** — after merge: poll the deploy run -> SSH/health check that the running artifact carries `<commit>` -> on mismatch re-trigger deploy once -> on 2nd mismatch `gh issue create` a "deploy-drift" follow-up linked to `<issue>` and exit non-zero. Reads staging from `git config deploy.stagingurl`; repo from `gh repo view`.
+### Script contracts (built + dogfooded on `elearning-platform/scripts/`; back-port here once stable)
+- **`push-retry.sh [<git push args>]`** — `git push`, retried <=2x ONLY on the flaky-integration signature (redis/BullMQ/timeout); a deterministic failure (rejected/network) exits immediately; fail-closed after the cap. Used at push time (e.g. in the coder's dispatch).
+- **`ship-and-verify.sh <issue> [<commit>]`** — after merge: poll the deploy run -> **verify-at-source** (SSH the running web container's git SHA == `<commit>`) -> on mismatch re-trigger deploy once -> on 2nd mismatch `gh issue create` a "deploy-drift" follow-up `Refs #<issue>` and exit non-zero. Repo from `gh repo view`; deploy target/branch via env (`DEPLOY_SSH`/`DEPLOY_BRANCH`/`DEPLOY_WORKFLOW`).
 
 **Do NOT:** infinite retry; auto-retry a *deterministic* failure (only flaky/transient); close the issue while recover is unresolved; make R1 autonomous before R2/R3 are proven (a fragile loop must not self-drive).
 
