@@ -61,7 +61,7 @@ A finite "current step" tracker in a live product is the smell that a project gr
 ## Loop maturity — where we are, where to grow
 The loop is strong on **discover / dispatch / verify / persist / decide**. Two frontiers make it a *fuller* loop (the two steps Loop Engineering emphasizes that the harness is thinnest on):
 
-**Frontier 1 — Recover (self-healing).** Verify catches failure; recover should act on it automatically:
+**Frontier 1 — Recover (self-healing).** Verify catches failure; recover should act on it automatically (design spec: `playbooks/steady-state-issue-pipeline.md` § Recover — R1 dispatch, R2 gate, R3 deploy, bounded-retry then fail-closed):
 - auto **re-dispatch on `BLOCKED`/`NEEDS_CONTEXT`** (more context -> simpler task -> stronger model) instead of waiting for a human.
 - auto **retry flaky gates** (pre-push integration flake) a bounded number of times before flagging.
 - auto **open a follow-up issue** when verify-at-source finds a deployed-but-wrong artifact.
