@@ -1,6 +1,6 @@
 stack-pnpm-nest-next template
-version: 0.2.3
-verified: 2026-07-29 (proof-run: fresh sample scaffolded, booted, seeded-admin login + a bookmarks feature built through the verify gate)
+version: 0.2.4
+verified: 2026-07-29 (proof-run END-TO-END: fresh sample scaffolded, booted, seeded-admin login, a bookmarks feature built through the verify gate, AND deployed as prod docker images — prod stack up, login through the prod container returns a JWT, web serves)
 install: install, lint, typecheck, unit, build all green across all workspaces incl.
 apps/worker + packages/queue-core + packages/storage-core (incl. new tests: no-audio
 transcode, no-var_stream_map-a:N-without-audio, source-download-before-ffmpeg,
@@ -56,6 +56,18 @@ Design decisions:
   order needs no change.
 
 History:
+- 0.2.4 (2026-07-29): the proof-run's DEPLOY step (docker prod build + run) surfaced two
+  more artifact bugs that the template's CI (install/lint/typecheck/unit/build) never
+  exercised. (1) apps/api `postinstall: prisma generate` ran during the Dockerfile's
+  deps-only install layer (before the source/schema is copied) -> `schema.prisma: file
+  not found` failed the build; guarded to `[ -f prisma/schema.prisma ] && prisma generate
+  || true` (Docker skips at install, the Dockerfile's own line-16 generate does it after
+  the source copy; local dev still generates). (2) docker-compose.prod.yml's api `command`
+  was written for cwd=/repo (`--filter ./apps/api` + `node apps/api/dist/main.js`) but the
+  Dockerfile's runtime WORKDIR is /repo/apps/api -> paths doubled to /repo/apps/api/apps/api
+  -> "No projects matched" + MODULE_NOT_FOUND crash-loop; command corrected to the
+  WORKDIR-relative `pnpm db:migrate:nodotenv && node dist/main.js`. After both, the prod
+  stack boots and login through the prod container returns a JWT.
 - 0.2.3 (2026-07-29): proof-run found + fixed a shipped-but-undeclared dep — the
   universal fidelity fixture (apps/web/e2e-ui/_universal.fidelity.ts) imports
   @axe-core/playwright, but it was never declared in apps/web/package.json; since

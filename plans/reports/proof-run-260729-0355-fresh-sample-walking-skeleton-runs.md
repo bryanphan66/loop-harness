@@ -24,8 +24,20 @@ Ran one Macro-2 build-phase (a dispatched coder executing the /build-phase logic
 ### Harness bug found + FIXED by this proof-run (the point of a proof-run)
 The stack-template's `pnpm validate` was RED out of the box: `apps/web/e2e-ui/_universal.fidelity.ts` imports `@axe-core/playwright`, undeclared in `apps/web/package.json`; `tsconfig` globs `**/*.ts` so a fresh clone's `tsc --noEmit` fails, blocking the FIRST commit gate. **Fixed in template v0.2.3:** added `@axe-core/playwright ^4.12.1` to apps/web devDeps + gitignored `next-env.d.ts`.
 
-## NOT proven (honest)
-- **Actual deploy:** structure is there (Dockerfiles, compose.prod/dokploy); not deployed to a live env in this run.
+## Deploy — PROVEN (prod docker images)
+Built the prod images and ran the prod compose stack (`docker-compose.prod.yml`, prod Dockerfiles) on the host:
+- `docker compose -f docker-compose.prod.yml up -d --build` -> db (healthy) + api + web up; api migrates on boot.
+- **Verify-at-source through the prod containers:** api `GET /health` -> `{status:ok,db:up}`; **`POST /auth/login` -> HTTP 200 + JWT** (prod-built container, not dev); web serves `<title>bookmarks</title>`.
+=> "deploy duoc" = YES (the harness output builds + runs as prod containers + serves + auth works).
+
+### Three template DEPLOY bugs found + FIXED (template v0.2.3 -> v0.2.4)
+Only surfaced by actually building/running the deploy artifacts (the template CI never did a docker prod build):
+1. **@axe-core/playwright undeclared** (v0.2.3) — the fidelity fixture's dep; blocked the first `pnpm validate`/commit gate on a fresh clone.
+2. **prisma postinstall in Docker** (v0.2.4) — `postinstall: prisma generate` fired in the deps-only install layer before the schema is copied -> build failed; guarded to skip when no schema.
+3. **compose.prod command vs Dockerfile WORKDIR** (v0.2.4) — command used cwd=/repo paths but the runtime WORKDIR is /repo/apps/api -> doubled paths -> crash-loop; corrected to WORKDIR-relative.
+
+## Cleanup note
+Prod stack torn down after verify (`docker compose down -v`); ports freed.
 
 ## Cleanup
 `docker compose down -v` (port/db freed). Sample lives in the session scratchpad (throwaway).
