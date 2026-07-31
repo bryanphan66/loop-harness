@@ -15,9 +15,10 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 |---|---|
 | **Mode A — Build** | Chế độ dựng app: hữu hạn, 1 chiều (spec → app chạy được). Driver = `/stage-next`. |
 | **Mode B — Steady-state = the loop** | Chế độ nuôi app sau go-live: vòng lặp vô hạn trên bảng issue. Nơi **chất lượng hội tụ**. |
-| **the loop** | 6 nhịp: discover → dispatch → verify → recover → persist → decide-next. |
+| **the loop** (vòng lặp) | **Đồ vật cụ thể** = chu trình vận hành Mode B. Trả lời "mỗi vòng LÀM GÌ": 6 **nhịp** discover → dispatch → verify → recover → persist → decide-next. Dùng khi **vận hành** dự án live. |
+| **Loop Engineering** (kỹ nghệ vòng lặp) | **Bộ môn / bậc thang** (framing). Trả lời "hệ trưởng thành TỚI ĐÂU": 4 **bậc** prompt → context → harness → loop. Dùng khi **thiết kế/định vị** harness. |
+| **the loop ⟂ Loop Engineering** | KHÔNG cạnh tranh: *Loop Engineering* = cái **thang** (dọc, 4 bậc); *the loop* = thứ nằm ở **đỉnh** thang đó (ngang, 6 nhịp). Ẩn dụ: Loop Engineering = ngành cơ khí; the loop = cỗ động cơ ngành đó chế ra. |
 | **go-live (graduation)** | Điểm chuyển A→B: app deploy lên env thường trực đầu tiên. |
-| **Loop Engineering** | Bậc thang trưởng thành: prompt → context → harness → loop. 3 tầng kỹ thuật (context/harness/loop). |
 
 ## B. Quy trình Build (Mode A)
 > Owner: [`WORKFLOW.md`](./WORKFLOW.md) (bước + gate), [`STAGE_GOALS.md`](./STAGE_GOALS.md) (mục tiêu từng bước).
