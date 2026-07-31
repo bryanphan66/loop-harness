@@ -87,10 +87,11 @@ Dockerfiles). That checklist is the acceptance test for the harness itself.
 
 ## Key docs (read in this order)
 
-0. `harness/docs/KEYWORD-MAP.md` — glossary/navigation map of every loop-harness concept + where it lives (start here to orient)
-1. `harness/docs/OPERATING-MODES.md` — the two modes + the loop (the harness's center of gravity — READ FIRST)
-2. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
-3. `harness/docs/WORKFLOW.md` — the 3-macro map, step tables, gates, lanes
-4. `harness/docs/STAGE_GOALS.md` — per-step executable goal text
-5. `harness/docs/TRACE_SPEC.md` — token grammar (`GAP → REQ-ID → SC → TC`, `CR`)
-6. `harness/docs/playbooks/README.md` + `harness/docs/templates/README.md` — recipes + scaffolds
+0. `harness/docs/UNDERSTANDING-loop-harness.md` — narrative onboarding: what it is, how it runs, and an honest scorecard (PROVEN/PATCHED/ASPIRATIONAL) of each part — **read this first**
+1. `harness/docs/KEYWORD-MAP.md` — glossary/navigation map of every loop-harness concept + where it lives
+2. `harness/docs/OPERATING-MODES.md` — the two modes + the loop (the precise spec of the single spine)
+3. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
+4. `harness/docs/WORKFLOW.md` — step tables (1.x/2.x/3.x inside the two modes), gates, lanes
+5. `harness/docs/STAGE_GOALS.md` — per-step executable goal text
+6. `harness/docs/TRACE_SPEC.md` — token grammar (`GAP → REQ-ID → SC → TC`, `CR`)
+7. `harness/docs/playbooks/README.md` + `harness/docs/templates/README.md` — recipes + scaffolds
