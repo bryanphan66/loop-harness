@@ -83,6 +83,6 @@ These are development directions, not yet built — do them under Frontier 1 fir
 | **Loop engineering** | how the system repeatedly **discover → dispatch → verify → recover → persist → decide-next**, on a schedule or until a goal | **Mode B** is the loop; verify-at-source; cron routines (Recover R1 still thin = this rung not yet full) |
 
 ## Reference implementation + packaged kit
-Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human playbook: `loop-harness/docs/team-playbook-human-agent.md`.
+Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human operating playbook (in the loop-harness workshop, not shipped): `plans/team-playbook-human-agent.md`.
 
 **Packaged into the harness (reusable):** the project-agnostic Mode-B kit lives at **`harness/templates/steady-state/`** + the operating manual **`harness/docs/playbooks/steady-state-issue-pipeline.md`**. Copy it in at graduation and set `git config deploy.stagingurl`; the scripts resolve the repo dynamically (`gh repo view`) so they are not project-bound.

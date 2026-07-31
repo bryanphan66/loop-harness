@@ -5,23 +5,23 @@ Cây thư mục THẬT + vai trò từng phần, để biết **sửa/đọc fil
 ## Cây repo (2 tầng)
 
 ```
-loop-harness/
-├── README.md ············ cửa vào: harness là gì, cài, chạy loop
-├── CLAUDE.md ··········· brief control-session (vai trò orchestrator; nạp tự động theo cwd)
-├── docs/ ··············· [PHÁT TRIỂN harness — KHÔNG cài vào dự án]
-│   ├── lessons-log.md ······· sổ bài học L1..Ln (vấp → nguyên nhân → luật)
-│   └── team-playbook-human-agent.md ·· playbook người + agent (Trung follow)
-├── plans/ ············· [PHÁT TRIỂN harness] kế hoạch + reports lịch sử
-└── harness/ ··········· ⭐ BỘ CÀI ĐƯỢC — thứ install-harness.sh bê vào dự án mới
+loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN PHẨM] trong harness/
+├── README.md ············ [workshop] cửa vào: harness là gì, cài, chạy loop
+├── CLAUDE.md ··········· [workshop] brief control-session (nạp tự động theo cwd)
+├── .gitignore ·········· ignore .claude phiên-dev (worktrees/settings.local/agent-memory)
+├── .claude/ ············ [workshop, dev-local] config phiên Claude Code làm việc TRÊN repo này
+│                          (KHÁC harness/.claude — quy ước Claude Code, phần cá nhân bị gitignore)
+├── plans/ ············· [workshop] kế hoạch + reports + lessons-log/team-playbook của HARNESS
+└── harness/ ··········· ⭐ [SẢN PHẨM] tự-đủ — install-harness.sh bê nguyên cây này vào dự án mới
     ├── AGENTS.md ········· operating model cho agent (task loop + gate + thứ tự đọc)
-    ├── docs/ ············· tri thức harness (bảng bên dưới)
-    ├── .claude/ ········· tự động hoá: commands + agent + hooks
+    ├── docs/ ············· tri thức harness (bảng bên dưới) — DUY NHẤT 1 cây docs được-track
+    ├── .claude/ ········· tự động hoá SHIP: commands + agent + hooks
     ├── scripts/ ········· install-harness.sh + harness-verify-gate.sh
     ├── .githooks/ ······· pre-commit + pre-push (gate fail-closed, không bypass)
-    └── templates/ ······· 2 scaffold: stack (Mode A) + steady-state (Mode B)
+    └── templates/ ······· scaffold: stack (Mode A) + steady-state (Mode B) + doc-stubs (gồm lessons-log)
 ```
 
-> **2 cây `docs/`:** top-level `docs/` = tài liệu để PHÁT TRIỂN harness (không cài đi). `harness/docs/` = tri thức ĐƯỢC CÀI vào dự án. Sửa tri thức tái dùng → `harness/docs/`.
+> **Ranh giới cứng (chuẩn dài hạn):** `harness/` là SẢN PHẨM, **tự-đủ tuyệt đối** — docs trong đó KHÔNG `../../` ra ngoài cây; khi cài đi đâu cũng chạy. Mọi thứ ở root là XƯỞNG (làm ra harness): `plans/` chứa lessons-log + team-playbook + reports CỦA harness; `.claude/` là config phiên dev (gitignore phần cá nhân). Tri thức "cho dự án" (VD lessons-log của dự án) là 1 **template** trong `harness/docs/templates/`, không phải lessons-log dev của harness.
 
 ## `harness/docs/` — tri thức (3 lớp)
 
@@ -71,5 +71,5 @@ loop-harness/
 |---|---|---|
 | **playbook** | `harness/docs/playbooks/` | cách làm chung, tái dùng mọi dự án |
 | **runbook** | `docs/runbook/` của TỪNG dự án (VD elearning) | vận hành riêng dự án (deploy/config/cicd/seed) |
-| **lessons-log** | `docs/lessons-log.md` (top-level) | sai lầm → luật |
+| **lessons-log** | mỗi dự án: `docs/lessons-log.md` (template ở `harness/docs/templates/`). Của chính harness: `plans/lessons-log.md` | sai lầm → luật |
 | **memory** | `~/.claude/projects/<key>/memory/` | fact bền qua phiên; **fact riêng dự án ở key dự án đó, không ở key harness** |

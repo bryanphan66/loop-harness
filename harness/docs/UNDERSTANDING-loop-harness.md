@@ -53,7 +53,7 @@ spec → REQ-ID → BUILD MANIFEST → stack template → walking skeleton → /
 
 ## 4. Mode B — the loop (chi tiết + nhãn)
 
-Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hàng đợi issue ở nhiều state song song**. Đây là **phần VỮNG NHẤT** của harness vì mỗi luật = 1 lần bị đau đã kiểm chứng trên elearning (xem [`../../docs/lessons-log.md`](../../docs/lessons-log.md)).
+Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hàng đợi issue ở nhiều state song song**. Đây là **phần VỮNG NHẤT** của harness vì mỗi luật = 1 lần bị đau đã kiểm chứng thực chiến (ghi ở lessons-log của dự án — `docs/lessons-log.md`).
 
 **6 nhịp vòng lặp** `PROVEN` (trừ recover): discover (bug/change → 1 issue) → dispatch (1 coder/issue, worktree riêng) → verify (verify-at-source + gate + QC checklist) → **recover** → persist (bảng 10-state) → decide-next (QC pass thì tiến, fail theo luật vàng). Bản đầy đủ: [`playbooks/steady-state-issue-pipeline.md`](./playbooks/steady-state-issue-pipeline.md).
 
@@ -74,7 +74,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 |---|---|---|---|
 | **playbook** `PROVEN` | công thức **TÁI DÙNG** mọi dự án | *cách deploy verify-at-source, cách wire S3, mẫu R2/R3* | `harness/docs/playbooks/` + `harness/templates/steady-state/scripts/` |
 | **runbook** `PROVEN` | thủ tục vận hành **RIÊNG 1 dự án** | elearning's **deploy Kamal, release channel, verify-at-source, rollback, restore-drill** | `elearning-platform/docs/runbook/` (mẫu chuẩn có sẵn) |
-| **lessons-log** `PROVEN` | sai lầm→nguyên nhân→luật | *chart rỗng = lỗi CSS không phải data* | `loop-harness/docs/lessons-log.md` |
+| **lessons-log** `PROVEN` | sai lầm→nguyên nhân→luật | *chart rỗng = lỗi CSS không phải data* | `docs/lessons-log.md` của dự án (template ở `templates/`) |
 | **memory** `PROVEN` | fact bền của CONTROL qua phiên | *elearning deploy 2 env Dokploy+Kamal* | `~/.claude/.../memory/` |
 
 **Chốt R2 cho hết mơ hồ:** *mẫu tái dùng* R2/R3 ở **harness** (playbook/template); *R2 đã wire thật của elearning* ở **repo elearning** (runbook). "Cách làm chung" ở harness; "cấu hình cụ thể 1 dự án" ở repo dự án đó.

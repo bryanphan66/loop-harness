@@ -75,6 +75,7 @@ Updated in every stage-boundary commit; never derived once. English-only.
 | [decision.md](decision.md) | Always-on (key: 2.1 ERD, 2.2 stack/threat-model) | no | ADR shape. Filename is a **stable slug**, never a number. Referenced by slug elsewhere. |
 | [code-standards.md](code-standards.md) | 2.2 (after stack-selection) | no | One-page conventions keyed to the stack-selection decision (by slug). Lands at `docs/code-standards.md`. |
 | [deployment-guide.md](deployment-guide.md) | 2.4 seeds → 2.13 finalize | no | Environments + env vars + build + deploy + rollback + observability/SLO + conditional DR/RTO-RPO + runbook. Lands at `docs/deployment-guide.md`. |
+| [lessons-log.md](lessons-log.md) | go-live onward (Mode B) | no | Empty starter for the project's own lessons-log (one of the 4 knowledge stores): symptom → root-cause → rule, newest on top. Lands at `docs/lessons-log.md`. |
 
 ## Bilingual Surfaces (D4)
 

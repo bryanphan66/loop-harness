@@ -25,7 +25,7 @@ Bản gọn, có chủ đích (theo tinh thần slim + progressive disclosure c�
 
 - SOP agent đọc: `elearning-platform/docs/WORKFLOW.md`.
 - Đổi state: `scripts/issue-state.mjs`. Sinh QC checklist: `scripts/qc-checklist.mjs`. Regression: `docs/qc/regression-checklist.md`. Mẫu bug: `.github/ISSUE_TEMPLATE/bug-report.md`.
-- Sổ tay bài học: `loop-harness/docs/lessons-log.md` (CONTROL bồi đắp; Trung đọc/paste sang Plane nếu muốn team xem).
+- Sổ tay bài học của harness: `plans/lessons-log.md` (CONTROL bồi đắp; Trung đọc/paste sang Plane nếu muốn team xem). Mỗi dự án con giữ lessons-log riêng ở `docs/lessons-log.md`.
 
 ## Nguyên tắc giữ harness gọn (slim + progressive disclosure)
 

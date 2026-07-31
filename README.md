@@ -28,12 +28,14 @@ third model. Full detail + honest scorecard: **`harness/docs/UNDERSTANDING-loop-
 
 ## Repo layout
 
+**Hard boundary: the product is `harness/` (self-contained); everything at root is the workshop that builds it.**
+
 | Path | What | Installed into a project? |
 |---|---|---|
-| `harness/` | The installable skeleton: `AGENTS.md`, `docs/`, `.claude/` (commands + stage-runner agent + hooks), `scripts/` + `.githooks/` (non-bypassable verify gate), `templates/` | **yes** |
-| `docs/` | Harness-development docs: `lessons-log.md`, `team-playbook-human-agent.md` | no |
-| `plans/` | Harness development plans + reports | no |
-| `CLAUDE.md` | Control-session brief (role, auto-loaded by cwd) | no |
+| `harness/` | **The product** — the installable skeleton (self-contained, never references outside its own tree): `AGENTS.md`, `docs/`, `.claude/` (commands + stage-runner agent + hooks), `scripts/` + `.githooks/` (non-bypassable verify gate), `templates/` | **yes** |
+| `plans/` | Workshop: harness-development plans + reports + the harness's own `lessons-log.md` + `team-playbook-human-agent.md` | no |
+| `CLAUDE.md` | Workshop: control-session brief (role, auto-loaded by cwd) | no |
+| `.claude/` | Workshop, dev-local: Claude Code session config for working ON this repo (personal parts gitignored). NOT the shipped `harness/.claude/`. | no |
 
 Full file-by-file map with each part's role: **`harness/docs/STRUCTURE.md`**.
 
