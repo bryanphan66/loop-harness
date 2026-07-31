@@ -2,22 +2,22 @@
 
 Đây là bản **dẫn dắt tường minh** cho người mới (dev hoặc chính bạn khi quên). Đọc 1 mạch là nắm toàn cảnh: loop-harness LÀ GÌ, chạy THẾ NÀO, phần nào **đã chứng minh** vs **còn nợ**. Khác 2 file kia: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md) = từ điển tra cứu; [`OPERATING-MODES.md`](./OPERATING-MODES.md) = đặc tả chính xác 2 mode. File này = **câu chuyện + đánh giá thành thật**, trỏ về 2 file đó khi cần chi tiết.
 
-> **Sự thật cần biết trước:** loop-harness được **bồi đắp sau mỗi dự án + đúc kết kinh nghiệm**, KHÔNG phải chuẩn thiết kế sạch từ đầu. Nên có phần rất vững (đã dogfood), có phần còn nặng/vay mượn, có phần chưa build. File này gắn nhãn rõ để bạn biết tin phần nào tới đâu.
+> **Sự thật cần biết trước:** loop-harness được **bồi đắp sau mỗi dự án + đúc kết kinh nghiệm**, KHÔNG phải chuẩn thiết kế sạch từ đầu. Nên có phần rất vững (đã dogfood — tự dùng sản phẩm mình làm để kiểm), có phần còn nặng/vay mượn, có phần chưa build. File này gắn nhãn rõ để bạn biết tin phần nào tới đâu.
 
 ## Nhãn thành thật (đọc mọi mục theo nhãn này)
-- **PROVEN** — đã chạy thật, kiểm chứng trên dự án (elearning/hasi-hub). Tin được.
-- **PATCHED** — sinh ra từ 1 lần bị đau rồi vá thành luật; đúng nhưng có thể còn nặng/đặc thù.
-- **ASPIRATIONAL** — mới thiết kế, **chưa build**. Đừng tưởng đã có.
+- **PROVEN** (đã kiểm chứng) — đã chạy thật, kiểm chứng trên dự án (elearning/hasi-hub). Tin được.
+- **PATCHED** (vá-từ-bài-học) — sinh ra từ 1 lần bị đau rồi vá thành luật; đúng nhưng có thể còn nặng/đặc thù.
+- **ASPIRATIONAL** (chưa-làm) — mới thiết kế, **chưa build**. Đừng tưởng đã có.
 
 ---
 
 ## 1. loop-harness là gì (1 đoạn)
 
-Một **harness** (khung vận hành cho AI agent) biến 1 spec thành app chạy được, rồi nuôi app đó tiến hoá. **Đích thành công**: sản phẩm ngang chất lượng hasi-hub (pnpm monorepo, NestJS+Prisma+Postgres, Next.js, CI xanh, deploy được). Nó chạy trên **agent + git + bash trần** — skill chỉ tăng tốc, không bắt buộc.
+Một **harness** (khung vận hành cho AI agent) biến 1 spec (đặc tả yêu cầu) thành app chạy được, rồi nuôi app đó tiến hoá. **Đích thành công**: sản phẩm ngang chất lượng hasi-hub (pnpm monorepo, NestJS+Prisma+Postgres, Next.js, CI (Continuous Integration — tự động tích hợp) xanh, deploy được). Nó chạy trên **agent + git + bash trần** — skill chỉ tăng tốc, không bắt buộc.
 
 ## 2. XƯƠNG SỐNG DUY NHẤT: 2 chế độ, cắt tại go-live
 
-Trước đây harness mô tả vòng đời bằng **3 cách chồng nhau** (3-macro, 2-mode, 4-bậc) → gây rối. **Từ nay lấy 2-mode làm xương sống chính**; 2 cái kia hạ vai (xem §6).
+Trước đây harness mô tả vòng đời bằng **3 cách chồng nhau** (3-macro, 2-mode, 4-bậc) → gây rối. **Từ nay lấy 2-mode (mode = chế độ) làm xương sống chính**; 2 cái kia hạ vai (xem §6).
 
 ```
    MODE A — BUILD (hữu hạn)                 ┃  MODE B — THE LOOP (vô hạn)
@@ -29,7 +29,7 @@ Trước đây harness mô tả vòng đời bằng **3 cách chồng nhau** (3-
                     (app deploy lên env thường trực đầu tiên = điểm tốt nghiệp)
 ```
 
-**Điểm dễ lẫn NHẤT — nhớ kỹ:** *"quy tắc tạo issue theo AC từng module"* nằm ở **Mode B**, KHÔNG ở Mode A. Mode A chạy theo **phase**, không theo issue. Chỉ sau go-live mọi thay đổi mới thành issue.
+**Điểm dễ lẫn NHẤT — nhớ kỹ:** *"quy tắc tạo issue theo AC (Acceptance Criteria — tiêu chí nghiệm thu) từng module"* nằm ở **Mode B**, KHÔNG ở Mode A. Mode A chạy theo **phase** (pha/giai đoạn build), không theo issue (phiếu việc/vấn đề trên bảng theo dõi). Chỉ sau go-live (thời điểm app lên môi trường thật) mọi thay đổi mới thành issue.
 
 ---
 
@@ -41,30 +41,30 @@ Dòng chảy 1 chiều biến spec thành app. **Đây là chỗ "3-macro" cũ s
 ```
 spec → REQ-ID → BUILD MANIFEST → stack template → walking skeleton → /build-phase lặp
 ```
-1. **REQ-ID / token chain** `PATCHED` — đánh số bền mỗi yêu cầu (`CM.CRUD.01`), truy vết `GAP→REQ-ID→SC→TC` (owner [`TRACE_SPEC.md`](./TRACE_SPEC.md)). *Phản biện: đúng cho việc-có-hợp-đồng (chứng minh với khách); với tool nội bộ là nghi thức thừa → dùng **Lane Lite** để bỏ bớt.*
-2. **BUILD MANIFEST** `PROVEN` — `docs/build-manifest.md`, xếp mọi REQ-ID vào các phase P0..PN theo thứ tự thi công. Biến "đống spec" thành "hàng đợi phase".
-3. **stack template** `PROVEN (design) / PATCHED (bug)` — `harness/templates/stack-pnpm-nest-next/`, bộ khung code mẫu hình hasi-hub. *Phản biện: 3 bug chỉ lộ khi dogfood proof-run → template chỉ đáng tin SAU khi bị ép chạy thật, không phải vì có mặt.*
-4. **walking skeleton** `PROVEN` — app tối thiểu **chạy thật đầu-cuối** (login + 1 CRUD + seed + CI xanh) dựng ở bước 2.4. Chứng minh đường ống thông TRƯỚC khi đắp thịt.
+1. **REQ-ID (mã yêu cầu) / token chain (chuỗi truy vết yêu cầu)** `PATCHED` — đánh số bền mỗi yêu cầu (`CM.CRUD.01`), truy vết `GAP→REQ-ID→SC→TC` (owner [`TRACE_SPEC.md`](./TRACE_SPEC.md)). *Phản biện: đúng cho việc-có-hợp-đồng (chứng minh với khách); với tool nội bộ là nghi thức thừa → dùng **Lane Lite** để bỏ bớt.*
+2. **BUILD MANIFEST (bản kê thi công — danh sách pha)** `PROVEN` — `docs/build-manifest.md`, xếp mọi REQ-ID vào các phase P0..PN theo thứ tự thi công. Biến "đống spec" thành "hàng đợi phase".
+3. **stack template (khung code mẫu)** `PROVEN (design) / PATCHED (bug)` — `harness/templates/stack-pnpm-nest-next/`, bộ khung code mẫu hình hasi-hub. *Phản biện: 3 bug chỉ lộ khi dogfood proof-run → template chỉ đáng tin SAU khi bị ép chạy thật, không phải vì có mặt.*
+4. **walking skeleton (bộ xương biết đi — app tối thiểu chạy được đầu-cuối)** `PROVEN` — app tối thiểu **chạy thật đầu-cuối** (login + 1 CRUD + seed + CI xanh) dựng ở bước 2.4. Chứng minh đường ống thông TRƯỚC khi đắp thịt.
 5. **`/build-phase`** `PROVEN` — vòng lặp code 1 phase (code → `validate:quick` → e2e smoke → ghi verification-register → commit). Lặp tới hết manifest.
 
-**Gate Mode A** `PROVEN`: verify-gate (git-hook không bypass), PB-G1..G4 (paging khách/chủ), DoR/DoD, phase-acceptance. Chi tiết: [`WORKFLOW.md`](./WORKFLOW.md).
+**Gate (chốt kiểm) Mode A** `PROVEN`: verify-gate (cổng kiểm chứng không bỏ qua được; git-hook không bypass), PB-G1..G4 (paging khách/chủ), DoR/DoD (Definition of Ready/Done — điều kiện sẵn-sàng/hoàn-thành), phase-acceptance. Chi tiết: [`WORKFLOW.md`](./WORKFLOW.md).
 
-**Lane Full vs Lite** `PATCHED` — Full = việc khách trả tiền (BA đầy đủ); Lite = nội bộ (SRS-lite 1 file, bỏ REQ-ID nặng). *Phản biện: sự tồn tại của Lite là bằng chứng base process quá nặng nên phải bịa lối tắt.*
+**Lane (làn quy trình) Full vs Lite** `PATCHED` — Full = việc khách trả tiền (BA (Business Analyst — phân tích nghiệp vụ) đầy đủ); Lite = nội bộ (SRS (Software Requirements Specification — đặc tả yêu cầu phần mềm)-lite 1 file, bỏ REQ-ID nặng). *Phản biện: sự tồn tại của Lite là bằng chứng base process quá nặng nên phải bịa lối tắt.*
 
 ## 4. Mode B — the loop (chi tiết + nhãn)
 
-Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hàng đợi issue ở nhiều state song song**. Đây là **phần VỮNG NHẤT** của harness vì mỗi luật = 1 lần bị đau đã kiểm chứng thực chiến (ghi ở lessons-log của dự án — `docs/lessons-log.md`).
+Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hàng đợi issue ở nhiều state song song**. Đây là **phần VỮNG NHẤT** của harness vì mỗi luật = 1 lần bị đau đã kiểm chứng thực chiến (ghi ở lessons-log (sổ bài học) của dự án — `docs/lessons-log.md`).
 
-**6 nhịp vòng lặp** `PROVEN` (trừ recover): discover (bug/change → 1 issue) → dispatch (1 coder/issue, worktree riêng) → verify (verify-at-source + gate + QC checklist) → **recover** → persist (bảng 10-state) → decide-next (QC pass thì tiến, fail theo luật vàng). Bản đầy đủ: [`playbooks/steady-state-issue-pipeline.md`](./playbooks/steady-state-issue-pipeline.md).
+**6 nhịp vòng lặp** `PROVEN` (trừ recover): discover (phát hiện việc: bug/change → 1 issue) → dispatch (giao việc cho agent: 1 coder/issue, worktree riêng) → verify (xác minh: verify-at-source + gate + QC (Quality Control — kiểm thử chất lượng) checklist) → **recover** (tự-sửa khi lỗi) → persist (lưu trạng thái: bảng 10-state) → decide-next (quyết việc kế: QC pass thì tiến, fail theo luật vàng (golden rule)). Bản đầy đủ: [`playbooks/steady-state-issue-pipeline.md`](./playbooks/steady-state-issue-pipeline.md).
 
 **Luật đã đổ máu** (nhớ kỹ, mỗi cái từng gây bug thật):
 - **10-state** `PROVEN/⚠️` — Backlog→Ready for Dev→In Dev→Deploying→Ready for Test→QC Testing→Ready for UAT→UAT Testing→Done (+Cancelled). Issue **chỉ đóng ở Done**. *Phản biện: 10 state hơi nhiều cho 1 QC solo; nhiều nhóm dùng 4-5.*
 - **Luật vàng QC fail** `PROVEN` — lỗi TRONG AC → lùi In Dev sửa issue cũ; lỗi NGOÀI AC → issue mới.
-- **Refs-not-Closes** `PROVEN` — tham chiếu `Refs #N` ở CẢ PR body VÀ commit message (squash gộp keyword → `Closes` đóng nhầm).
-- **verify-at-source** `PROVEN` — sau deploy, container đang chạy phải mang đúng commit. Không tin CI-xanh/HTTP-200.
+- **Refs-not-Closes** `PROVEN` — tham chiếu `Refs #N` ở CẢ PR body VÀ commit message (squash (gộp các commit thành một khi merge) gộp keyword → `Closes` đóng nhầm).
+- **verify-at-source (xác minh tại nguồn — kiểm cái đang CHẠY, không tin CI xanh)** `PROVEN` — sau deploy, container đang chạy phải mang đúng commit. Không tin CI-xanh/HTTP-200.
 - **Issue Type vs Label** `PROVEN` — Feature/Bug/Enhancement = **Issue Type**; label CHỈ `github`+`plane`; Module=body; Phase=Milestone. Chuẩn tạo issue: [`playbooks/github-issue-standard.md`](./playbooks/github-issue-standard.md).
 
-**Recover (Frontier 1):** R2 `push-retry.sh` `PROVEN` (retry push flaky), R3 `ship-and-verify.sh` `PROVEN` (verify SHA staging, re-trigger 1 lần, mở drift issue), **R1 auto re-dispatch khi BLOCKED** `ASPIRATIONAL` (chưa build — đừng tưởng đã có).
+**Recover (tự-sửa khi lỗi) (Frontier 1):** R2 `push-retry.sh` `PROVEN` (retry push flaky), R3 `ship-and-verify.sh` `PROVEN` (verify SHA staging, re-trigger 1 lần, mở drift issue), **R1 auto re-dispatch khi BLOCKED** `ASPIRATIONAL` (chưa build — đừng tưởng đã có).
 
 ## 5. Kho tri thức — kinh nghiệm/CICD/R2 lưu ở ĐÂU
 
@@ -82,15 +82,15 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 ### 5b. Chuẩn RUNBOOK — đã có mẫu `PROVEN` ở elearning (đính chính)
 **Đính chính thành thật:** trước đó tôi nói runbook là "phần harness đang nợ / ASPIRATIONAL" — **SAI, do chưa nhìn kỹ**. Thực tế **elearning đã có sẵn runbook tier trưởng thành**, dùng làm **MẪU CHUẨN**. Chuẩn = đúng hình dạng thật của elearning (`elearning-platform/docs/runbook/`):
 - Thư mục `docs/runbook/` + `README.md` nêu **quy tắc đặt tên + quy tắc nội dung**.
-- **1 file = 1 THỦ TỤC vận hành** (procedure), kebab-case — KHÔNG phải 1 file / 1 chủ đề tuỳ hứng. Bộ có sẵn: `deploy-and-rollback.md`, `incident-response.md`, `backup-restore-drill.md`, `monitoring-review.md`.
-- **Quy tắc nội dung:** mỗi runbook là thủ tục **đánh số, chạy được**: preconditions → steps → verification → rollback. Rollback release = 1 dòng (`kamal rollback` / `IMAGE_TAG`) nơi hỗ trợ.
-- Tham chiếu đọc ngay: `deploy-and-rollback.md` (env, deploy Kamal, release channel = CI/CD, config/deploy.yml + tên secret, verify-at-source, rollback prod).
+- **1 file = 1 THỦ TỤC vận hành** (procedure — quy trình thao tác), kebab-case (đặt tên nối bằng gạch ngang) — KHÔNG phải 1 file / 1 chủ đề tuỳ hứng. Bộ có sẵn: `deploy-and-rollback.md`, `incident-response.md`, `backup-restore-drill.md`, `monitoring-review.md`.
+- **Quy tắc nội dung:** mỗi runbook là thủ tục **đánh số, chạy được**: preconditions (điều kiện tiên quyết) → steps → verification → rollback (quay lui về bản trước). Rollback release = 1 dòng (`kamal rollback` / `IMAGE_TAG`) nơi hỗ trợ.
+- Tham chiếu đọc ngay: `deploy-and-rollback.md` (env, deploy Kamal, release channel = CI/CD (Continuous Integration/Delivery — tự động tích hợp/giao hàng), config/deploy.yml + tên secret, verify-at-source, rollback prod).
 > Runbook = sổ vận hành RIÊNG dự án (thủ tục cụ thể của HẠ TẦNG dự án đó). Playbook = cách làm chung tái dùng ở harness. Khi 1 runbook lặp ở nhiều dự án → cất lên thành playbook. **KHÔNG tạo file trùng cạnh runbook có sẵn** (VD `deploy.md` cạnh `deploy-and-rollback.md`) — cập nhật file sở hữu chủ đề đó.
 
 ## 6. Hai xương sống cũ giờ ở đâu (không xoá, chỉ hạ vai)
 
 - **3-macro (Pre/Build/Post)** — hạ thành **số thứ tự bước bên trong Mode A/B** (1.x/2.x = Mode A; 3.x = go-live + Mode B). KHÔNG còn là mô hình ngang hàng. *Phản biện: đây là tầng cũ nhất, nặng nhất; giữ số bước cho tiện tra WORKFLOW, bỏ vai "xương sống".*
-- **Loop Engineering (4 bậc: prompt→context→harness→loop)** — hạ thành **hộp tư duy để CHẨN ĐOÁN** "harness trưởng thành tới đâu, thiếu tầng nào" (VD Recover yếu = bậc loop chưa đầy). Là **cái kính nhìn**, không phải bước phải chạy. *Phản biện: mới thêm tuần trước, chủ yếu dán nhãn lại; hữu ích để định vị, đừng để ngang hàng mô hình vận hành.*
+- **Loop Engineering (kỹ nghệ vòng lặp) (4 bậc: prompt→context→harness→loop)** — hạ thành **hộp tư duy để CHẨN ĐOÁN** "harness trưởng thành tới đâu, thiếu tầng nào" (VD Recover yếu = bậc loop chưa đầy). Là **cái kính nhìn**, không phải bước phải chạy. *Phản biện: mới thêm tuần trước, chủ yếu dán nhãn lại; hữu ích để định vị, đừng để ngang hàng mô hình vận hành.*
 
 ## 7. Scorecard thành thật (đưa dev khác xem cái này)
 
@@ -102,7 +102,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 | stack template (sau khi dogfood) | Loop Engineering (dán nhãn lại) | |
 
 ## 8. Dev mới bắt đầu thế nào
-1. Mở session: `cd ~/Desktop/Workspace/loop-harness && claude` (context tự nạp từ `CLAUDE.md`).
+1. Mở session (phiên làm việc): `cd ~/Desktop/Workspace/loop-harness && claude` (context tự nạp từ `CLAUDE.md`).
 2. Đọc theo thứ tự: file này → [`OPERATING-MODES.md`](./OPERATING-MODES.md) → [`WORKFLOW.md`](./WORKFLOW.md) → [`playbooks/README.md`](./playbooks/README.md).
 3. Dựng dự án mới: `harness/scripts/install-harness.sh --bootstrap --spec ./spec.md ./my-project` → chạy `/stage-next` lặp tới go-live → chuyển sang vòng lặp issue.
 4. Tra nhanh 1 keyword: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md).
