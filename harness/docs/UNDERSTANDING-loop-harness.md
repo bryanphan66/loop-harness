@@ -73,19 +73,19 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 | Kho | Chứa | Ví dụ R2/CICD | Ở đâu |
 |---|---|---|---|
 | **playbook** `PROVEN` | công thức **TÁI DÙNG** mọi dự án | *cách deploy verify-at-source, cách wire S3, mẫu R2/R3* | `harness/docs/playbooks/` + `harness/templates/steady-state/scripts/` |
-| **runbook** `ASPIRATIONAL` | cấu hình/kinh nghiệm **RIÊNG 1 dự án** | elearning's **CICD thật, bucket R2 thật, deploy host, biến `deploy.*`** | trong repo dự án đó (`docs/` + `scripts/` + `git config`) |
+| **runbook** `PROVEN` | thủ tục vận hành **RIÊNG 1 dự án** | elearning's **deploy Kamal, release channel, verify-at-source, rollback, restore-drill** | `elearning-platform/docs/runbook/` (mẫu chuẩn có sẵn) |
 | **lessons-log** `PROVEN` | sai lầm→nguyên nhân→luật | *chart rỗng = lỗi CSS không phải data* | `loop-harness/docs/lessons-log.md` |
 | **memory** `PROVEN` | fact bền của CONTROL qua phiên | *elearning deploy 2 env Dokploy+Kamal* | `~/.claude/.../memory/` |
 
 **Chốt R2 cho hết mơ hồ:** *mẫu tái dùng* R2/R3 ở **harness** (playbook/template); *R2 đã wire thật của elearning* ở **repo elearning** (runbook). "Cách làm chung" ở harness; "cấu hình cụ thể 1 dự án" ở repo dự án đó.
 
-### 5b. Chuẩn hoá RUNBOOK (phần harness đang NỢ — `ASPIRATIONAL`)
-Hiện runbook **chưa có định nghĩa + index**, nằm rải rác trong docs mỗi dự án → đây chính là "chấp vá" bạn cảm nhận. Chuẩn từ nay: **mỗi dự án phải có thư mục `docs/runbook/`** với tối thiểu:
-- `deploy.md` — env nào, deploy bằng gì, verify-at-source cách nào, rollback 1-dòng.
-- `config.md` — biến môi trường + secret NAMES (không value), object-storage/R2 bucket, external key names.
-- `cicd.md` — pipeline chạy gì, gate nào chặn, cách chạy lại.
-- `seed-and-data.md` — seed thế nào, reset thế nào, tài khoản mẫu.
-> Runbook = "sổ vận hành riêng của dự án này". Playbook = "cách làm chung ai cũng dùng". Khi 1 runbook lặp lại ở nhiều dự án → cất lên thành playbook.
+### 5b. Chuẩn RUNBOOK — đã có mẫu `PROVEN` ở elearning (đính chính)
+**Đính chính thành thật:** trước đó tôi nói runbook là "phần harness đang nợ / ASPIRATIONAL" — **SAI, do chưa nhìn kỹ**. Thực tế **elearning đã có sẵn runbook tier trưởng thành**, dùng làm **MẪU CHUẨN**. Chuẩn = đúng hình dạng thật của elearning (`elearning-platform/docs/runbook/`):
+- Thư mục `docs/runbook/` + `README.md` nêu **quy tắc đặt tên + quy tắc nội dung**.
+- **1 file = 1 THỦ TỤC vận hành** (procedure), kebab-case — KHÔNG phải 1 file / 1 chủ đề tuỳ hứng. Bộ có sẵn: `deploy-and-rollback.md`, `incident-response.md`, `backup-restore-drill.md`, `monitoring-review.md`.
+- **Quy tắc nội dung:** mỗi runbook là thủ tục **đánh số, chạy được**: preconditions → steps → verification → rollback. Rollback release = 1 dòng (`kamal rollback` / `IMAGE_TAG`) nơi hỗ trợ.
+- Tham chiếu đọc ngay: `deploy-and-rollback.md` (env, deploy Kamal, release channel = CI/CD, config/deploy.yml + tên secret, verify-at-source, rollback prod).
+> Runbook = sổ vận hành RIÊNG dự án (thủ tục cụ thể của HẠ TẦNG dự án đó). Playbook = cách làm chung tái dùng ở harness. Khi 1 runbook lặp ở nhiều dự án → cất lên thành playbook. **KHÔNG tạo file trùng cạnh runbook có sẵn** (VD `deploy.md` cạnh `deploy-and-rollback.md`) — cập nhật file sở hữu chủ đề đó.
 
 ## 6. Hai xương sống cũ giờ ở đâu (không xoá, chỉ hạ vai)
 
@@ -97,7 +97,7 @@ Hiện runbook **chưa có định nghĩa + index**, nằm rải rác trong docs
 | Vững (PROVEN, tin được) | Còn nặng/đặc thù (PATCHED) | Chưa build (ASPIRATIONAL) |
 |---|---|---|
 | Mode B loop + 6 luật đổ máu | 3-macro legacy (đã hạ vai) | R1 auto re-dispatch khi BLOCKED |
-| build-manifest, walking skeleton | REQ-ID nặng cho nội bộ (→Lane Lite) | runbook tier (định nghĩa ở §5b) |
+| build-manifest, walking skeleton, runbook tier (mẫu elearning §5b) | REQ-ID nặng cho nội bộ (→Lane Lite) | — |
 | R2/R3, verify-at-source | 10-state hơi nhiều cho QC solo | proof deploy qua pipeline từ xa (mới chỉ prod-stack local) |
 | stack template (sau khi dogfood) | Loop Engineering (dán nhãn lại) | |
 
