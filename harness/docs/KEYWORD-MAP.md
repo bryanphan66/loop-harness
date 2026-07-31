@@ -2,6 +2,8 @@
 
 Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm gì, mỗi cái ở đâu**. Mỗi keyword = 1 dòng nghĩa + trỏ file **owner** (nơi giải thích đầy đủ). Nguyên tắc DRY: file này KHÔNG giải thích lại chi tiết — nó là mục lục.
 
+> Repo: **loop-harness** (đổi từ `videcode-harness` 2026-07-31; GitHub redirect slug cũ nên clone cũ vẫn chạy).
+>
 > **loop-harness là gì (1 câu):** một *harness* (khung vận hành cho agent) nhận spec → dựng app chạy được (**Mode A – Build**) → rồi chạy **vòng lặp tự-sửa** nuôi app tiến hoá (**Mode B – the loop**). Điểm khác biệt = **the loop**, không phải tài liệu.
 
 ---

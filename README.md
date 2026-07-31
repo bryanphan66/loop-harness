@@ -1,6 +1,6 @@
 # loop-harness
 
-> Product name: **loop-harness** — a loop-engineering delivery harness (the differentiator is *the loop*, not the paperwork). Repo slug stays `videcode-harness` for now (install URLs + remotes unchanged).
+> Product name & repo slug: **loop-harness** — a loop-engineering delivery harness (the differentiator is *the loop*, not the paperwork). Renamed from `videcode-harness` 2026-07-31; GitHub auto-redirects the old slug, so stale clones keep working.
 
 A reusable **agent-driven delivery harness** built around a **loop**. It takes a project
 from a spec to a **running, deployable app** (pnpm monorepo, NestJS + Prisma + Postgres,
@@ -33,8 +33,8 @@ Principle, `harness/docs/HARNESS.md`).
 harness/scripts/install-harness.sh --bootstrap --spec ./your-spec.md ./my-project
 
 # remote (no clone): set HARNESS_REPO explicitly
-curl -fsSL https://raw.githubusercontent.com/<owner>/videcode-harness/main/harness/scripts/install-harness.sh \
-  | HARNESS_REPO=<owner>/videcode-harness bash -s -- --bootstrap --spec ./your-spec.md ./my-project
+curl -fsSL https://raw.githubusercontent.com/<owner>/loop-harness/main/harness/scripts/install-harness.sh \
+  | HARNESS_REPO=<owner>/loop-harness bash -s -- --bootstrap --spec ./your-spec.md ./my-project
 ```
 
 The bootstrap copies the skeleton, drops your spec into `docs/discovery/`,
