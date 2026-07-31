@@ -235,21 +235,7 @@ Tailwind by "reading" the export.** Full method: `prototype-export-adoption.md`.
    loading/empty/error states — into the adopted markup. Everything visual came
    from the export; the build adds only what the export could not carry.
 
-**Why adopt-as-code, NOT re-draw (failure evidence):** an earlier rule said
-"port the export markup/structure/styles as the *reference*, reconcile to Tier-2
-tokens, rebuild in the app's own Tailwind". Re-implementing a frozen
-Claude-Design export by *reading* it into fresh Tailwind reproduced the
-functional skeleton but landed at **~80%**: dropped elements (logo, the
-"Đăng ký học" link, the VI/EN toggle), the **wrong theme** (dark instead of the
-export's light-first), a washed-out primary button, and a broken **OTP input**
-(backspace did not delete + step back) — all requiring heavy manual eye-tuning
-and still diverging (elearning-platform P1/P2/P3). The fix that reached **~99%
-by construction** did the opposite: it brought the export's real `tokens.css` +
-`components.css` in, ported the kit components keeping their classNames, and
-rebuilt the screens from `screens-*.jsx` — wiring only real data (elearning
-commit `re-base auth screens on the frozen prototype export`). The client froze
-the *prototype code*; adopt it, don't re-approximate it. **An LLM re-drawing a
-design from a screenshot or a JSX read is the fidelity-loss step — remove it.**
+**Why adopt-as-code, NOT re-draw:** re-implementing a frozen export in fresh Tailwind lands at ~80% (dropped elements, wrong theme, broken interactions, heavy eye-tuning); adopting the export code reaches ~99% by construction. Full failure evidence + the fix: `prototype-export-adoption.md`.
 
 Adopting the export does NOT waive the design-system contract — it composes:
 - The export's `tokens.css` **is** the Tier-2 token layer for this project (its

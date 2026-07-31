@@ -57,6 +57,8 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 | [session-retrospective.md](session-retrospective.md) | Post-Build 3.6 + always-on | End-of-session cross-task insight capture; promotes `experimental` playbooks to `verified`. |
 | [pre-demo-self-qa-checklist.md](pre-demo-self-qa-checklist.md) | 2.10 + pre-2.12 | Runnable 7-group checklist (nav/interaction · links/routing · grids/lifecycle · config/seed · conventions/i18n · media-real · responsive) the agent drives against the preview BEFORE any human handoff — turns eyeball-QA into agent self-check. Runnable companion to phase-acceptance Legs 9–14 + visual-fidelity U13–U19. Engine `ck-web-testing` + `lint:gates`. |
 | [status-surfaces-ops-and-client.md](status-surfaces-ops-and-client.md) | the two status Artifacts | Internal ops-board (team) + curated client-facing roadmap (PM-owned, CS-forwarded). Same verified facts, two readers; phase→value-bucket recipe + curation checklist. Composes `bilingual-delivery-template-pattern.md` (D4). |
+| [steady-state-issue-pipeline.md](steady-state-issue-pipeline.md) | Mode B / Macro 3 (the loop) | The steady-state issue-loop after go-live: 10-state model, golden AC-rule, Refs-not-Closes (commit+PR), verify-at-source, Recover R2/R3; the reusable kit at `templates/steady-state/`. |
+| [github-issue-standard.md](github-issue-standard.md) | issue authoring (PM/CS) | How to author ONE standard issue: BA-validate first, title/AC/body, fields set-at-create vs triage, labels = `github`+`plane` only (type=Issue Type, module=body, phase=Milestone), parent-at-creation. |
 
 ### Macro-Stage 1 — Pre-Build *(built fully)*
 

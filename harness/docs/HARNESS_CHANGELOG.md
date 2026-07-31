@@ -14,6 +14,8 @@ Reframed the harness identity: it is a **loop-engineering system with a lean lin
 
 ## v6.22 — 2026-07-23 — GitHub label discipline: a fixed 5-label set, module in the body not the label
 
+> **SUPERSEDED 2026-07-24:** the "fixed 5-label set" below is no longer current. GitHub labels are now **`github` + `plane` ONLY**; Feature/Bug/Enhancement moved to the **Issue Type** field, Phase to **Milestone**, Module stays in the body. Current rule: `playbooks/github-issue-standard.md` + `feature-issue-ac-demo-standard.md`. (Plane keeps Feature/Bug/Enhancement labels — it has no native Issue Type — an intentional GitHub↔Plane asymmetry.)
+
 Standing up elearning's tracker had auto-created a `module:*` label per domain (12 of
 them) plus `test`/`plane`/`phase-1.5` — ~18 labels the client and team had to scroll
 past, drifting from the register. Corrected to a **repo-wide fixed 5-set**: `feature`
