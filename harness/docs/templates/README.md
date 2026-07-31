@@ -28,6 +28,16 @@ and code fences stay English even inside a VN fork.
 | [status-flow.md](status-flow.md) | 1.11 | status-flow coverage; re-checked at ACCEPTANCE | **yes** | Per-entity Mermaid state machine + transition table. Every transition cites a `REQ-ID`. |
 | [proposal-sow.md](proposal-sow.md) | 1.14 → 1.15 | **PB-G4 (CLIENT)** contract + deposit | **yes** | EN SOW; pairs with the VN `docs/bao-gia/` set. Every § 4 line ↔ 1 feature-register line. PROTOTYPE-THEN-QUOTE. |
 
+### Pre-Build — design & prototype loop
+
+| File | Step | Gate | locale-vi fork? | Notes |
+| --- | --- | --- | --- | --- |
+| [screen-inventory.md](screen-inventory.md) | 1.11 | floorplan classification (every grid/form screen); re-checked at 2.6/2.7 | no (internal) | Screen list × §4 floorplan class — the build's per-screen source of truth (highest machinery use). |
+| [prototype-build-prompt.md](prototype-build-prompt.md) | 1.12 | feeds PB-G3 | no (internal) | In-repo "Claude Code + taste skill" board-mode build prompt (versioned in repo). |
+| [prototype-build-prompt-external.md](prototype-build-prompt-external.md) | 1.12 | feeds PB-G3 | no (internal) | Short pointer convention for external design tools (Claude Design/Stitch): attach repo + paste a one-liner. |
+| [prototype-feedback-round.md](prototype-feedback-round.md) | 1.13 | **PB-G3** prototype frozen | no (internal) | Per-round feedback capture; mints `CR-NN` when feedback changes a feature. >2 rounds = scope problem. |
+| [process-annex.md](process-annex.md) | 1.13 | PB-G3 (process-complex features) | no (internal) | Process-flow annex for features whose behaviour must be confirmed vs a flow diagram. |
+
 ### Build & Go-live + Post-Build
 
 | File | Step | Gate | locale-vi fork? | Notes |
@@ -39,6 +49,15 @@ and code fences stay English even inside a VN fork.
 | [release-note.md](release-note.md) | 2.13 | release smoke | **yes** | Every released `REQ-ID` appears; each cites the `TC-NNN` that proved it. Pre/post-deploy smoke + rollback + client update. |
 | [change-request-log.md](change-request-log.md) | 3.5 (always-on) | impact + approval before code | **yes** | Mints `CR-NN`; approved CRs mint new `REQ-ID`s re-entering the chain. Classification, severity, 5 reply templates. |
 | [maintenance-proposal.md](maintenance-proposal.md) | 3.4 | tier proposed | **yes** | SLA tiers (Basic/Standard/Premium), severity, scope in/out, SLA exclusions. SLA terms hypercare (3.2) depends on. |
+
+### Closure packets (multi-file, copied as a set)
+
+Each packet has an `overview.md` index; copied whole at its ceremony.
+
+| Packet | Step | Gate | locale-vi fork? | Notes |
+| --- | --- | --- | --- | --- |
+| [delivery-closure-story/](delivery-closure-story/overview.md) | 2.12 → 2.13 | **ACCEPTANCE (CLIENT)** | partial (`locale-vi/delivery-closure-story/`) | Client-acceptance packet: `01-uat-plan` + `02-signoff` + `03-client-update`. Engines ck-uat / ck-signoff. |
+| [project-closure-story/](project-closure-story/overview.md) | 3.1 | **HANDOVER (CLIENT)** | partial (`locale-vi/project-closure-story/`) | Handover packet: `01-handover-docs` + `02-credentials-handover` + `03-knowledge-transfer`. Engine ck-handover. |
 
 ### Living trackers — whole-project state (internal)
 
