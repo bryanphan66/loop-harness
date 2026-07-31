@@ -110,7 +110,7 @@ build). If it happens: `rm -rf apps/web/.next` and restart `next dev`.
 - Commit `pnpm-lock.yaml` after your first install (`--frozen-lockfile` in CI expects it).
 - DB image is `pgvector/pgvector:pg16` (postgres:16 superset + pgvector). Any
   postgres-16-compatible image works — swap in compose + CI if pulls are slow.
-- Git hooks: under the videcode-harness, `.githooks/` owns `core.hooksPath`, but
+- Git hooks: under the loop-harness, `.githooks/` owns `core.hooksPath`, but
   `pnpm install` runs `prepare: husky` which re-points it to `.husky/_`. The
   shipped `.husky/pre-commit` + `.husky/pre-push` therefore chain
   `scripts/harness-verify-gate.sh` FIRST, so the harness gate fires under either

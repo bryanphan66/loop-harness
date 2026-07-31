@@ -1,6 +1,6 @@
 # Macro 2 — BUILD & GO-LIVE (usage guide)
 
-**videcode-harness** turns a frozen spec into a **running, deployable app** through
+**loop-harness** turns a frozen spec into a **running, deployable app** through
 three gated macro-stages. This guide covers **Macro 2 — Build & Go-live**: the part
 that converts the frozen ERD + build-manifest into working, verified, deployed code,
 one phase at a time, with a machine gate between every phase so a defect born in

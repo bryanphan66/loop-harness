@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install-harness.sh — one-command bootstrap of the videcode-harness skeleton
+# install-harness.sh — one-command bootstrap of the loop-harness skeleton
 # into a NEW (or existing) project directory.
 #
 # What it does (see AGENTS.md + docs/HARNESS.md for the operating model):
@@ -47,7 +47,7 @@ usage() {
   cat <<'EOF'
 Usage: install-harness.sh [options] [path]
 
-Bootstrap the videcode-harness skeleton into a target project directory.
+Bootstrap the loop-harness skeleton into a target project directory.
 
 Options:
   -d, --directory <path>  Target directory. Defaults to the current directory.
@@ -411,13 +411,13 @@ ensure_harness_dir_gitignored() {
     # the file's last existing line.
     [ -s "$gi" ] && [ -z "$(tail -c1 "$gi" 2>/dev/null)" ] || printf '\n' >> "$gi"
     {
-      printf '\n# videcode-harness — embedded stack template (harness-owned, never project source)\n'
+      printf '\n# loop-harness — embedded stack template (harness-owned, never project source)\n'
       printf '%s\n' "$entry"
     } >> "$gi"
     log "gitignore: appended '$entry' to .gitignore"
   else
     {
-      printf '# videcode-harness — embedded stack template (harness-owned, never project source)\n'
+      printf '# loop-harness — embedded stack template (harness-owned, never project source)\n'
       printf '%s\n' "$entry"
     } > "$gi"
     log "gitignore: created .gitignore with '$entry'"
@@ -443,7 +443,7 @@ materialize_remote_source() {
   [ -n "$repo" ] || fail "no local harness clone found and HARNESS_REPO is unset. Run from a clone (harness/scripts/install-harness.sh) or export HARNESS_REPO=owner/repo."
   command -v tar >/dev/null 2>&1 || fail "tar is required for remote installation."
 
-  HARNESS_TMP="$(mktemp -d "${TMPDIR:-/tmp}/videcode-harness.XXXXXX")" \
+  HARNESS_TMP="$(mktemp -d "${TMPDIR:-/tmp}/loop-harness.XXXXXX")" \
     || fail "could not create a temp dir for the remote fetch."
   trap cleanup_harness_tmp EXIT INT TERM
 
@@ -658,7 +658,7 @@ if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../AGENTS.md" ] && [ -f "$SCRIPT_DI
 fi
 
 if [ "$YES" -eq 0 ] && can_prompt; then
-  prompt_tty "Install videcode-harness into [$TARGET_INPUT]: "
+  prompt_tty "Install loop-harness into [$TARGET_INPUT]: "
   REPLY_TARGET="$(read_tty)"
   [ -n "$REPLY_TARGET" ] && TARGET_INPUT="$REPLY_TARGET"
 fi
@@ -993,7 +993,7 @@ SETTINGSJSON
     if (cd "$TARGET_DIR" && git rev-parse --verify HEAD >/dev/null 2>&1); then
       log "  baseline commit: SKIPPED — HEAD already exists"
     else
-      commit_msg="chore: bootstrap videcode-harness skeleton"
+      commit_msg="chore: bootstrap loop-harness skeleton"
       if [ "${SPEC_COPIED:-0}" -gt 0 ]; then
         if [ "$SPEC_COPIED" -eq 1 ]; then
           commit_msg="$commit_msg + initial discovery spec"

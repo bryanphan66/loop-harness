@@ -2,7 +2,7 @@
 
 **Project: <project name — fill at bootstrap>.** <One-paragraph product
 description: who it serves, what it does, where it came from.> This project runs
-on the **videcode-harness** operating model — a bootstrapped project, not the
+on the **loop-harness** operating model — a bootstrapped project, not the
 harness itself.
 
 Check `STAGE.md` first (Current step + **Lane**: Full | Lite). The 3-macro flow

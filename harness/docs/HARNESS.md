@@ -1,6 +1,6 @@
 # Harness
 
-The **videcode-harness** is a reusable operating model that lets a solo dev (with
+The **loop-harness** is a reusable operating model that lets a solo dev (with
 agents) turn a raw client lead into safe, validated, accepted, maintained
 software across **3 macro-stages** — Pre-Build, Build & Go-live, Post-Build.
 

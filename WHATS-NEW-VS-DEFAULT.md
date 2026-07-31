@@ -1,6 +1,6 @@
 # What's new vs the default harness
 
-This document is the **review map** for `videcode-harness`: exactly what was
+This document is the **review map** for `loop-harness`: exactly what was
 **added** and **changed** relative to the original embedded harness, so a
 reviewer can see the delta without diffing two trees by hand.
 
@@ -8,7 +8,7 @@ reviewer can see the delta without diffing two trees by hand.
   project `auto-script` (the original vibecode-harness). Everything below is the
   delta of **`harness/`** in this repo against that baseline.
 - **How this list was produced**: a real file-by-file `diff -rq` of
-  `videcode-harness/harness/{docs,.claude,scripts,AGENTS.md}` against
+  `loop-harness/harness/{docs,.claude,scripts,AGENTS.md}` against
   `auto-script/{docs,.claude,scripts,AGENTS.md}` — not hand-authored.
 - **Authoritative, version-by-version record**: `harness/docs/HARNESS_CHANGELOG.md`
   (811 lines, up to **v6.20**). This file is the summary; the changelog is the detail.

@@ -77,6 +77,6 @@ The loop is strong on **discover / dispatch / verify / persist / decide**. Two f
 These are development directions, not yet built — do them under Frontier 1 first (a self-healing loop is safer to make autonomous than a fragile one).
 
 ## Reference implementation + packaged kit
-Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human playbook: `videcode-harness/docs/team-playbook-human-agent.md`.
+Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human playbook: `loop-harness/docs/team-playbook-human-agent.md`.
 
 **Packaged into the harness (reusable):** the project-agnostic Mode-B kit lives at **`harness/templates/steady-state/`** + the operating manual **`harness/docs/playbooks/steady-state-issue-pipeline.md`**. Copy it in at graduation and set `git config deploy.stagingurl`; the scripts resolve the repo dynamically (`gh repo view`) so they are not project-bound.
