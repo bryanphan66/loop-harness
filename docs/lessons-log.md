@@ -2,6 +2,12 @@
 
 CONTROL bồi đắp mỗi lần vấp. Mỗi mục: triệu chứng -> nguyên nhân gốc -> luật rút ra. Mới nhất trên cùng.
 
+## 2026-07-31
+
+**L9 - Doc knowledge-base phình vì LẶP NỘI DUNG giữa file, không phải vì file thừa.**
+Audit de-dup (1 subagent đọc HẾT 35 playbook + doc top): **0 file cần xoá** — mọi playbook distinct (mỗi cái sở hữu 1 bước macro / phân-tầng có chủ đích). Nhưng ~14KB TRÙNG: HARNESS.md nhồi nguyên changelog history (−43% khi cắt), prototype-fidelity evidence ở 2 nơi, 3-macro flow ở 3 nơi, 10-state+luật-vàng ở 3 nơi, luật label ở 2 nơi. Còn 1 chỗ STALE (changelog v6.22 ghi "5-label set" đã bị thay 2026-07-24 mà không có entry ghi nhận) + index thiếu 2 dòng.
+-> Luật: **1 rule = 1 owner (single source of truth); file khác TRỎ tới, không chép lại.** Khi thêm doc mới đừng restate cái file khác đã sở hữu (chính tôi vi phạm: `github-issue-standard` chép lại label rule của `feature-issue-ac-demo`). Đánh giá "thừa" phải ĐỌC nội dung (subagent), không xoá theo tên. Định kỳ chạy dedup-audit khi kho doc lớn. Bảo thủ khi XOÁ file (chỉ cắt trùng/chết thật đã verify), mạnh tay khi gom-về-1-nguồn.
+
 ## 2026-07-28
 
 **L8 - Pre-push gate flaky (test integration redis/BullMQ).**
