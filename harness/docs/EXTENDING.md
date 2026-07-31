@@ -6,7 +6,7 @@ File này trả lời 3 câu: (1) harness vận hành thế nào — nhìn 1 mà
 
 ## 1. Vận hành trong 1 màn hình
 
-loop-harness = harness (khung cho AI agent) biến spec → app chạy được → nuôi app tiến hoá. **1 xương sống = 2 mode, cắt tại go-live:**
+loop-harness = harness (khung vận hành cho AI agent) biến **spec** (specification — đặc tả: SRS + prototype đã chốt + data model = nguồn-tin-duy-nhất/single source of truth) → app chạy được → nuôi app tiến hoá. **1 xương sống = 2 mode, cắt tại go-live (thời điểm app lên môi trường thật):**
 
 ```
 MODE A — BUILD (hữu hạn)            │  MODE B — THE LOOP (vô hạn)
@@ -16,7 +16,9 @@ lệnh: /stage-next · /build-phase    │  vòng: discover→dispatch→verify�
 ──────────────────── GO-LIVE ────────────────────
 ```
 
-Chạy trên **agent + git + bash trần**; gate `harness-verify-gate.sh` fail-closed không bypass; tri thức tái dùng ở `playbooks/`; scaffold ở `templates/`.
+Chạy trên **agent + git + bash trần**; gate (chốt kiểm) `harness-verify-gate.sh` **fail-closed** (mặc định CHẶN khi nghi ngờ/lỗi — thà chặn nhầm còn hơn cho lọt; ngược với fail-open = lỗi vẫn cho qua) và không bypass (không tắt được); tri thức tái dùng ở `playbooks/`; **scaffold** (khung code dựng sẵn) ở `templates/`.
+
+**Spec đến từ đâu?** Chính **Mode A / Macro 1 (Pre-Build)** tạo ra nó từ input thô: intake (tiếp nhận) → discovery (phỏng vấn khai thác) → gap analysis (phân tích thiếu-hụt) → **SRS** (đặc tả yêu cầu, đánh mã REQ-ID) → feature-register (chốt danh sách tính năng) → **nạp design/prototype** (công cụ ngoài export code, adopt-as-code) → freeze (đóng băng). Xem `WORKFLOW.md` bước 1.1-1.13; template `srs-lite`/`feature-register`/`screen-inventory`; playbook `discovery-interview`/`gap-analysis`/`design-system-3-tier`/`prototype-export-adoption`. `install-harness.sh --spec` chỉ nhận input thô làm hạt giống — Macro 1 mới cày thành spec hoàn chỉnh (2 lane: Full đầy đủ / Lite 1-file `srs-lite`).
 
 ---
 
@@ -26,7 +28,7 @@ Chạy trên **agent + git + bash trần**; gate `harness-verify-gate.sh` fail-c
 
 | Bạn vừa có... | Cất vào | Đường dẫn | Được tái dùng thế nào |
 |---|---|---|---|
-| **Cách làm 1 việc, dùng lại ở MỌI dự án** (VD "cách wire object-storage", "cách deploy verify-at-source") | **playbook** (tạo mới / sửa cái có sẵn) | `harness/docs/playbooks/*.md` + thêm dòng vào `playbooks/README.md` | Agent mở đúng playbook khi gặp domain đó; cài vào mọi dự án |
+| **Cách làm 1 việc, dùng lại ở MỌI dự án** (VD "cách wire (đấu nối) object-storage (lưu trữ file/ảnh)", "cách deploy verify-at-source (xác minh tại nguồn)") | **playbook** (tạo mới / sửa cái có sẵn) | `harness/docs/playbooks/*.md` + thêm dòng vào `playbooks/README.md` | Agent mở đúng playbook khi gặp domain (lĩnh vực) đó; cài vào mọi dự án |
 | **Một lần bị đau → rút ra luật** ("chart rỗng = lỗi CSS không phải data") | **lessons-log** | dự án: `docs/lessons-log.md` · của chính harness: `plans/lessons-log.md` | Phiên sau đọc trước khi lặp lại sai lầm |
 | **Cấu hình/vận hành RIÊNG 1 dự án** (deploy host, bucket R2, biến env, CI/CD của dự án đó) | **runbook** (của dự án, KHÔNG phải harness) | `<dự-án>/docs/runbook/{deploy,config,cicd,seed-and-data}.md` | Người vận hành dự án đó đọc; KHÔNG lẫn vào harness |
 | **Fact bền CONTROL cần nhớ qua phiên, KHÔNG suy được từ repo** (slug đổi, key/host, quyết định business) | **memory** | `~/.claude/projects/<key>/memory/` (fact riêng dự án → key dự án đó) | Tự nạp vào context phiên sau |
@@ -63,6 +65,6 @@ Bê nguyên cây `harness/` (self-contained) + init git + bật verify-gate + đ
 ---
 
 ## 5. Giữ sạch khi mở rộng (đừng để chấp vá quay lại)
-- **Self-containment:** thêm gì vào `harness/` thì KHÔNG trỏ `../../` ra ngoài cây harness (sẽ chết khi cài vào dự án).
+- **Self-containment (tự-đủ):** thêm gì vào `harness/` thì KHÔNG trỏ `../../` ra ngoài cây harness (link sẽ chết khi cài vào dự án khác).
 - **Bảo thủ khi xoá:** nghi 2 file trùng → ĐỌC nội dung (hoặc giao subagent) rồi mới quyết; phần lớn "nghi trùng" là biên-giới có chủ ý.
 - **Định kỳ dedup-audit** khi kho doc phình: scan(tên+ref-count) → cluster → đọc-hết → verify.
