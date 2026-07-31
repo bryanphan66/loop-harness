@@ -1,10 +1,13 @@
 # Workflow
 
-The **3-macro-stage** delivery map for solo-dev (agent-driven) product work:
-**(1) Pre-Build**, **(2) Build & Go-live**, **(3) Post-Build**, each driven by
-named SDLC roles. All three macro-stages are **built fully** — every step has a
-goal block in `docs/STAGE_GOALS.md` and can be run by `/stage-next` (and, for
-2.6, the `/build-phase` loop).
+The **step map** for solo-dev (agent-driven) product work. The operating spine is
+the **two modes** (`OPERATING-MODES.md`): **Mode A — Build** = macro-stages
+**(1) Pre-Build** + **(2) Build & Go-live**, driven by `/stage-next`; **Mode B —
+the loop** = macro-stage **(3) Post-Build**'s continuous parts (3.3/3.5), driven
+by the issue-pipeline, NOT `/stage-next`. The three "macro-stages" below are just
+this file's **grouping of the numbered steps inside those modes** — not a third
+model. Every step has a goal block in `docs/STAGE_GOALS.md` and can be run by
+`/stage-next` (and, for 2.6, the `/build-phase` loop).
 
 **Authority:** this file. Per-step goal text: `docs/STAGE_GOALS.md`. Current
 stage: read `STAGE.md` at repo root — updated at every stage-boundary commit.

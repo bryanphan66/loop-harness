@@ -2,16 +2,11 @@
 
 > This harness's product name and repo slug is **loop-harness**. The name reflects its center of gravity: value converges in **the loop** (Mode B), not the linear build.
 
-How this harness runs a project — framed with the **Loop Engineering** maturity ladder (`prompt → context → harness → loop`; the shift from prompting an agent turn-by-turn to designing a *system that discovers work, dispatches it, verifies, recovers, persists state, and decides the next action until a goal is met*).
+How this harness runs a project. **The single operating spine is the two modes below (Mode A → go-live → Mode B).** Two older framings are kept but SUBORDINATE — not parallel models competing with the spine:
+- the **3 macro-stages** (Pre-Build / Build / Post-Build) are just the *step grouping inside the modes* — Mode A = macro 1→2, Mode B = macro 3's continuous parts (`WORKFLOW.md` details the numbered steps);
+- **Loop Engineering** (the `prompt → context → harness → loop` maturity ladder) is a *diagnostic lens*, demoted to the box near the end — use it to ask "which layer is thin", not as a thing to run.
 
-## The three engineering layers (the harness's vocabulary)
-| Layer | What it designs | Where this harness embodies it |
-|---|---|---|
-| **Context engineering** | which instructions/data/tools reach the model, minimizing excess | slim `~/.claude/rules` (950→188) + on-demand skills + progressive disclosure; the repo's own `CLAUDE.md` (control role + gotchas), auto-loaded by cwd |
-| **Harness engineering** | the executable environment around the model (files, git, gates, memory, feedback) | the non-bypassable `harness-verify-gate.sh`, the pnpm stack template, `STAGE.md`, gates (PB-G/DoR/DoD), per-repo `scripts/release.sh` + the project's CI/CD, auto-memory |
-| **Loop engineering** | how the system repeatedly **observe → act → verify → recover → persist → decide-next**, on a schedule or until a goal | **Mode B** (below) is the loop; the control session running `task → poll → ship`; verify-at-source; cron routines |
-
-These are additive layers, not alternatives — the harness needs all three. Today's work has been mostly context (the slim) + loop (this doc).
+New readers: start at `UNDERSTANDING-loop-harness.md` (narrative + honest PROVEN/PATCHED/ASPIRATIONAL scorecard).
 
 ## Two modes
 The harness runs a project in **two distinct modes** with different drivers, trackers, and gates. Conflating them is what let elearning's `STAGE.md` fossilize (it kept naming a "current step 1.13" for a project already live and moved to a queue).
@@ -75,6 +70,17 @@ The loop is strong on **discover / dispatch / verify / persist / decide**. Two f
 - keep the human as the **business gate**: BA-sensitive issues, UAT sign-off, prod releases.
 
 These are development directions, not yet built — do them under Frontier 1 first (a self-healing loop is safer to make autonomous than a fragile one).
+
+## Framing (diagnostic lens): the Loop Engineering maturity ladder
+> This is a **lens for diagnosing the harness, not the operating spine** (the spine is the two modes above). Use it to ask "which layer is thin right now?" — e.g. Recover being weak = the *loop* layer is thin. It mostly re-labels things that already exist; do not treat the 4 rungs as steps to execute.
+
+`prompt → context → harness → loop` — climbing this ladder = moving from prompting an agent turn-by-turn to designing a *system that discovers work, dispatches it, verifies, recovers, persists state, and decides the next action until a goal is met*. loop-harness embodies rungs 2–4:
+
+| Layer (rung) | What it designs | Where this harness embodies it |
+|---|---|---|
+| **Context engineering** | which instructions/data/tools reach the model, minimizing excess | slim `~/.claude/rules` + on-demand skills + progressive disclosure; the repo's own `CLAUDE.md`, auto-loaded by cwd |
+| **Harness engineering** | the executable environment around the model (files, git, gates, memory, feedback) | the non-bypassable `harness-verify-gate.sh`, the pnpm stack template, `STAGE.md`, gates (PB-G/DoR/DoD), per-repo CI/CD, auto-memory |
+| **Loop engineering** | how the system repeatedly **discover → dispatch → verify → recover → persist → decide-next**, on a schedule or until a goal | **Mode B** is the loop; verify-at-source; cron routines (Recover R1 still thin = this rung not yet full) |
 
 ## Reference implementation + packaged kit
 Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human playbook: `loop-harness/docs/team-playbook-human-agent.md`.
