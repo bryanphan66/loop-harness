@@ -87,6 +87,7 @@ Dockerfiles). That checklist is the acceptance test for the harness itself.
 
 ## Key docs (read in this order)
 
+0. `harness/docs/KEYWORD-MAP.md` — glossary/navigation map of every loop-harness concept + where it lives (start here to orient)
 1. `harness/docs/OPERATING-MODES.md` — the two modes + the loop (the harness's center of gravity — READ FIRST)
 2. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
 3. `harness/docs/WORKFLOW.md` — the 3-macro map, step tables, gates, lanes
