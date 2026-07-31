@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 /** Request log line per call: METHOD url status duration. */
 @Injectable()

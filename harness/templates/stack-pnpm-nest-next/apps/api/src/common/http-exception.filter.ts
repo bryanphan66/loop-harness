@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 /** Normalizes every error into { statusCode, message, ... } and logs unexpected 500s. */
 @Catch()

@@ -1,5 +1,5 @@
 stack-pnpm-nest-next template
-version: 0.2.4
+version: 0.2.5
 verified: 2026-07-29 (proof-run END-TO-END: fresh sample scaffolded, booted, seeded-admin login, a bookmarks feature built through the verify gate, AND deployed as prod docker images — prod stack up, login through the prod container returns a JWT, web serves)
 install: install, lint, typecheck, unit, build all green across all workspaces incl.
 apps/worker + packages/queue-core + packages/storage-core (incl. new tests: no-audio
@@ -56,6 +56,16 @@ Design decisions:
   order needs no change.
 
 History:
+- 0.2.5 (2026-07-31): static-hygiene audit (no behaviour change; toolchain stays green by
+  construction). (1) `apps/api` logging.interceptor.ts + http-exception.filter.ts imported
+  `Request`/`Response` from `express` as a VALUE while `express` is only declared transitively
+  (via `@nestjs/platform-express`) and only `@types/express` is a direct dep — same
+  shipped-but-undeclared class as 0.2.3's @axe-core. The uses are type-only
+  (`getRequest<Request>()`), so switched to `import type { Request, Response }` — resolved by
+  the declared `@types/express`, erased at runtime, immune to a future pnpm strict-hoisting
+  change (no new runtime dep). (2) `.env.example` now documents the tier-2 worker
+  `FFMPEG_PATH`/`FFPROBE_PATH` override knobs (read at apps/worker/src/config/env.ts, PATH
+  defaults) that were consumed but undocumented.
 - 0.2.4 (2026-07-29): the proof-run's DEPLOY step (docker prod build + run) surfaced two
   more artifact bugs that the template's CI (install/lint/typecheck/unit/build) never
   exercised. (1) apps/api `postinstall: prisma generate` ran during the Dockerfile's
