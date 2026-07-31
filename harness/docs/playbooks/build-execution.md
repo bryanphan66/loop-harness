@@ -214,28 +214,12 @@ per-screen `screens-*.jsx`. **When a frozen client-approved export exists, the
 build ADOPTS that code verbatim — it does NOT re-implement the look in fresh
 Tailwind by "reading" the export.** Full method: `prototype-export-adoption.md`.
 
-**The rule (adopt, don't re-approximate):**
-
-1. **Bring the export's real CSS into the app** — copy `tokens.css` +
-   `components.css` (+ `components-<domain>.css`) into
-   `apps/web/src/styles/prototype/` and import them globally. The theme + spacing
-   + component look now hold **by construction**, not by an agent re-deriving
-   them.
-2. **Port the kit components KEEPING the exact classNames** — each `kit.jsx`
-   component becomes a real app component (`Button`/`Input`/`Logo`/`AuthShell`/
-   `OtpInput`/`Badge`/…) that renders **the same class names** the imported CSS
-   targets. Same classes → the CSS applies → the component looks right with zero
-   eye-tuning. Changing the markup/classes to "clean it up" breaks the CSS
-   binding — don't.
-3. **Rebuild each screen from its `screens-*.jsx` structure** — same element
-   tree, same components, same classes as the export screen; then wire real
-   data / routing / API into that structure. Content changes; structure + look
-   do not.
-4. **Wire ONLY the real data / behaviour** — routing, API calls, form state,
-   loading/empty/error states — into the adopted markup. Everything visual came
-   from the export; the build adds only what the export could not carry.
-
-**Why adopt-as-code, NOT re-draw:** re-implementing a frozen export in fresh Tailwind lands at ~80% (dropped elements, wrong theme, broken interactions, heavy eye-tuning); adopting the export code reaches ~99% by construction. Full failure evidence + the fix: `prototype-export-adoption.md`.
+**The rule, in brief:** bring the export's `tokens.css` + `components.css` into the
+app, port each `kit.jsx` component KEEPING its exact classNames, rebuild each screen
+from its `screens-*.jsx` element tree, then wire ONLY real data/behaviour. The full
+4-step method, the **~80% (re-draw) vs ~99% (adopt)** failure evidence, and the
+export-freshness / stale-export check live in **`prototype-export-adoption.md`
+(single source — not restated here).**
 
 Adopting the export does NOT waive the design-system contract — it composes:
 - The export's `tokens.css` **is** the Tier-2 token layer for this project (its
