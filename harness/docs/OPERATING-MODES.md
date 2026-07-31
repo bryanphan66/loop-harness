@@ -1,5 +1,7 @@
 # Operating Modes & the Loop
 
+> This harness's product name is **loop-harness** (repo slug: `videcode-harness`). The name reflects its center of gravity: value converges in **the loop** (Mode B), not the linear build.
+
 How this harness runs a project — framed with the **Loop Engineering** maturity ladder (`prompt → context → harness → loop`; the shift from prompting an agent turn-by-turn to designing a *system that discovers work, dispatches it, verifies, recovers, persists state, and decides the next action until a goal is met*).
 
 ## The three engineering layers (the harness's vocabulary)

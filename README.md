@@ -1,4 +1,6 @@
-# videcode-harness
+# loop-harness
+
+> Product name: **loop-harness** — a loop-engineering delivery harness (the differentiator is *the loop*, not the paperwork). Repo slug stays `videcode-harness` for now (install URLs + remotes unchanged).
 
 A reusable **agent-driven delivery harness** built around a **loop**. It takes a project
 from a spec to a **running, deployable app** (pnpm monorepo, NestJS + Prisma + Postgres,
