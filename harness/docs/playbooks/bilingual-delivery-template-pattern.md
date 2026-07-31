@@ -98,7 +98,10 @@ The REQ-ID (`IF.RBAC`), test IDs (`TC-001`), and HTTP status codes stay English
   looks tidy until a third locale appears. (Exception: the `GLOSSARY.md` term table
   is intentionally bilingual by design — it IS the translation contract.)
 - **Translating playbook content.** Playbooks are agent-facing; translating them
-  creates dialects an agent cannot cross-reference.
+  creates dialects an agent cannot cross-reference. **Carve-out:** a playbook whose
+  reader is a **human-facing PM/CS agent** (e.g. `github-issue-standard.md`) may be
+  authored in Vietnamese — the build agent never cross-references it, so no dialect
+  problem arises.
 
 ## Variant Tracking
 

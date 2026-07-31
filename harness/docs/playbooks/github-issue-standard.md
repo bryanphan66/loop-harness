@@ -1,5 +1,13 @@
 # Chuẩn tạo GitHub Issue (dùng chung — nạp cho agent PM + CS)
 
+**Lifecycle:** verified · **First use:** elearning 2026-07 · **Verified by:** elearning issue-pipeline
+
+**Macro-stage / step:** Steady-state (Mode B) — issue authoring (feeds Ready-for-Dev). **Gate it serves:** DoR (issue complete: fields + AC set before dispatch).
+
+## Engine
+- **Đường nhanh (fast path):** agent PM/CS làm BA-validate rồi `gh issue create` rồi điền field org (States/Module/Type/Parent).
+- **Fallback (agent trần):** agent chung đọc chuẩn này, tạo issue, set field.
+
 Cách tạo một issue để vòng lặp xử-lý-issue chạy được ngay, không phải làm lại. Dùng chung mọi dự án: giá trị cụ thể (danh sách Module, Phase, tên org) là chỗ trống `{...}` mỗi dự án tự điền; cấu trúc thì cố định. Phần feature `[F-NNN]` và đồng bộ register xem `feature-issue-ac-demo-standard.md` (file này không lặp lại). Vòng lặp tiêu thụ issue: `steady-state-issue-pipeline.md`.
 
 ## 0. BA-validate (phản biện nghiệp vụ) TRƯỚC khi issue ra đời

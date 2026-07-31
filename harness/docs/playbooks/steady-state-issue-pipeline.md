@@ -1,5 +1,13 @@
 # Playbook — Steady-state issue-pipeline (Mode B)
 
+**Lifecycle:** verified · **First use:** elearning steady-state (2026-07) · **Verified by:** elearning issue-pipeline (R2/R3 dogfooded)
+
+**Macro-stage / step:** Post-Build (Macro 3) — 3.3 steady-state + 3.5 change-control (the loop). **Gate it serves:** verify-at-source + QC-vs-AC on every issue.
+
+## Engine
+- **Fast path:** control session dispatches one async coder per issue (own worktree) + the `steady-state/scripts/*` kit.
+- **Bare-agent fallback:** the global agent runs the loop by hand (discover -> dispatch -> verify -> recover -> persist -> decide-next).
+
 How the harness runs a project **after go-live**. This operationalizes `WORKFLOW.md` Macro 3 steps **3.3 steady-state** + **3.5 change-control**. Model + when-to-switch: `../OPERATING-MODES.md`.
 
 ## Install (once, at graduation to Mode B)
