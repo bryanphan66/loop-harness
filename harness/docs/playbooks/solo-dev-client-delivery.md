@@ -40,23 +40,7 @@ become lightweight self-SOWs: scope + deadlines + done-when, no price.
 
 ## The Flow — 3 Macro-Stages
 
-```text
-MACRO 1 — PRE-BUILD   (no build code until PB-G4)
-  1.1 capture → 1.2 intake brief ......................... PB-G1 (internal capture)
-  1.3 discovery → 1.4 gap → 1.5 SRS → 1.6 validate
-  → 1.7 BA core bundle → 1.8 scenarios → 1.9 feature register PB-G2 (CLIENT: scope frozen)
-  1.10 brand → 1.11 screen map → 1.12 prototype → 1.13 freeze PB-G3 (CLIENT: prototype frozen)
-  1.14 bao-gia → 1.15 contract + deposit .................. PB-G4 (CLIENT: hard line)
-       │ invariant: PROTOTYPE-THEN-QUOTE — PB-G3 before 1.14
-MACRO 2 — BUILD & GO-LIVE   [next-increment detail]
-  2.1 ERD freeze (SA) → 2.2 stack + threat-model (Tech Lead) → 2.3 DoR
-  → 2.4 env/CI/obs → 2.5 seed → 2.6 code → 2.7 review → 2.8 E2E
-  → 2.9 security sign-off → 2.10 QA (DoD) → 2.11 readiness
-  → 2.12 UAT + sign-off (ACCEPTANCE, CLIENT) → 2.13 release
-MACRO 3 — POST-BUILD        [next-increment detail]
-  3.1 handover (HANDOVER, CLIENT) → 3.2 hypercare → 3.3 steady-state
-  → 3.4 maintenance proposal → 3.5 change-control (always-on) → 3.6 retro
-```
+The full step-by-step 3-macro flow (steps + gates + the PROTOTYPE-THEN-QUOTE invariant) is in `WORKFLOW.md` § TL;DR Flow — not repeated here. This playbook only maps the **commercial** steps (bao-gia / contract / deposit / client-paging) onto that flow.
 
 ## Macro-Stage 1 — Pre-Build *(built fully)*
 

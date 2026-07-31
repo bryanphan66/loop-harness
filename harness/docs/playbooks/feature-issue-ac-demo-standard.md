@@ -44,21 +44,7 @@ A sync script (shape of `scripts/feature-issues-sync.mjs`) reconciles register -
   ```
 - **`--rebuild` overwrites the body ONLY when the issue was not hand-edited** — never
   clobber human edits.
-- **GitHub labels = ONLY `github` + `plane`** (source + PM-tool-mirror markers). Everything
-  else that used to be a label is now a proper field, NOT a label:
-  | What | Where it lives (NOT a label) |
-  |---|---|
-  | Feature / Bug / Enhancement | **Issue Type** field (org-level) |
-  | Module | the issue **body** (`**Module:** {module}`) |
-  | Phase | **Milestone** |
-  Rationale: a growing `module:*` (or type/phase) label list is noise that drifts from the
-  register; the fields carry it correctly + filterably. Reconciling an old repo: set each
-  issue's Issue Type / Milestone / body-Module, then **delete every label except `github`
-  and `plane`** (deletion cascades off all issues). Test-artifact / scratch issues are
-  closed, not label-parked. (Historical note: an earlier "fixed 5-label set"
-  feature/bug/enhancement/plane/phase was superseded on 2026-07-24 when GitHub gained
-  native Issue Type + Milestone. Plane keeps Feature/Bug/Enhancement as labels because it
-  has no native Type — an intentional GitHub↔Plane asymmetry.)
+- **Labels + fields:** GitHub labels = `github` + `plane` ONLY; Feature/Bug/Enhancement = **Issue Type**, Module = **body**, Phase = **Milestone**. Full authoring rule + reconcile steps: `github-issue-standard.md` §3-4 (the owner). (Plane keeps Feature/Bug/Enhancement labels — no native Type — intentional asymmetry.)
 
 ## 3. PM-tool Issues = client UAT (1:1 with GitHub F-NNN)
 

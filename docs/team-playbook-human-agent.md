@@ -9,20 +9,10 @@ Bản gọn, có chủ đích (theo tinh thần slim + progressive disclosure c�
 - **Agent CS + Agent Tech Lead =** làm việc với nhau **BA-validate (phân tích nghiệp vụ) TRƯỚC khi tạo issue**. Nên issue tới tay đã sạch nghiệp vụ -> Trung KHÔNG validate lại.
 - **Coder/Debugger/Reviewer agent =** code / fix / review theo AC.
 
-## Vòng đời issue (10 state)
+## Vòng đời issue + luật vàng (bản đầy đủ + Recover: `../harness/docs/playbooks/steady-state-issue-pipeline.md`)
 
-Backlog -> Ready for Dev -> In Dev -> Deploying -> Ready for Test -> QC Testing -> Ready for UAT -> UAT Testing -> Done. (+ Cancelled).
-- Issue **chỉ đóng ở Done**. Mọi state trước đều để **mở**.
-- Đổi state bằng 1 lệnh: `node scripts/issue-state.mjs <N> "<state>"` (repo elearning). Chi tiết ai-chuyển-khi-nào: xem `elearning-platform/docs/WORKFLOW.md` (bản agent đọc).
-
-## Luật vàng khi QC fail (DUY NHẤT, bỏ cách phân "happy vs biên")
-
-Phân theo: **lỗi đó có nằm trong Acceptance Criteria (tiêu chí nghiệm thu) của CHÍNH issue này không?**
-
-- **Trong AC** (dù happy hay biên) -> issue chưa done -> **lùi In Dev, sửa trên issue cũ**. KHÔNG tạo issue mới.
-- **Ngoài AC** (vấn đề khác) -> **tạo issue mới**; issue đang QC **cứ đi tiếp, không chờ nhau**.
-
-Hệ quả: 2 issue tách biệt thì **độc lập** (issue cũ tự lên UAT/Done, không khóa chờ issue mới).
+- **10 state:** Backlog -> Ready for Dev -> In Dev -> Deploying -> Ready for Test -> QC Testing -> Ready for UAT -> UAT Testing -> Done (+ Cancelled). Issue **chỉ đóng ở Done**. Đổi state: `node scripts/issue-state.mjs <N> "<state>"`.
+- **Luật vàng QC fail:** lỗi TRONG Acceptance Criteria (tiêu chí nghiệm thu) của issue -> lùi In Dev sửa issue cũ; lỗi NGOÀI AC -> issue mới (issue cũ đi tiếp độc lập). Không phân "happy vs biên".
 
 ## QC như thế nào
 
