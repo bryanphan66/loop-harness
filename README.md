@@ -104,9 +104,10 @@ acceptance test for the harness itself.
 ## Key docs (read in this order)
 
 1. `harness/docs/UNDERSTANDING-loop-harness.md` — narrative onboarding + honest scorecard — **read first**
-2. `harness/docs/KEYWORD-MAP.md` — glossary of every concept + where it lives
-3. `harness/docs/STRUCTURE.md` — file-by-file directory map
-4. `harness/docs/OPERATING-MODES.md` — the two modes + the loop (the spine's precise spec)
-5. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
-6. `harness/docs/WORKFLOW.md` — step tables (inside the two modes), gates, lanes
-7. `harness/docs/TRACE_SPEC.md` — token grammar · `harness/docs/playbooks/README.md` — 35 recipes
+2. `harness/docs/EXTENDING.md` — how it operates in one screen + **where new knowledge goes** (decision table) + how to reuse/share
+3. `harness/docs/KEYWORD-MAP.md` — glossary of every concept + where it lives
+4. `harness/docs/STRUCTURE.md` — file-by-file directory map
+5. `harness/docs/OPERATING-MODES.md` — the two modes + the loop (the spine's precise spec)
+6. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
+7. `harness/docs/WORKFLOW.md` — step tables (inside the two modes), gates, lanes
+8. `harness/docs/TRACE_SPEC.md` — token grammar · `harness/docs/playbooks/README.md` — 35 recipes
