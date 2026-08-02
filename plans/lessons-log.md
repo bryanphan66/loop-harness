@@ -2,7 +2,11 @@
 
 CONTROL bồi đắp mỗi lần vấp. Mỗi mục: triệu chứng -> nguyên nhân gốc -> luật rút ra. Mới nhất trên cùng.
 
-## 2026-07-31 → 08-02 — đợt audit-dọn loop-harness (5 lần rà: top-level · playbook · template · stack · docs)
+## 2026-07-31 → 08-02 — đợt audit-dọn loop-harness (6 lần rà: top-level · playbook · template · stack · docs · phân-khu-zone)
+
+**L13 - Soi "thừa" trên doc đã-ổn định thường lòi ra THIẾU / DRIFT, không phải phình — hướng-fix là THÊM, không cắt.**
+Đợt phân-khu (mở từng zone harness để học) chạy soi-thừa 2 lần trên vùng tưởng "lộn xộn/phình": (1) `STRUCTURE.md` index bỏ sót 3/14 file loose -> `ls docs/` nhìn "loose lộn xộn" thực ra là **index chưa phủ**, không phải cần foldering; (2) `scripts/README.md` kể THIẾU 3 tính năng chặn code đã có (test-suite-on-push, chặn register 0-dòng, self-check fail-closed khi hooksPath drift) -> C7 vi phạm ngay trong doc của chính cổng. Cả 2 lần: doc kể THIẾU so với thực tế -> sửa = **bổ sung cho khớp**, không cắt.
+-> Luật: khi nghi 1 zone "phình/lộn xộn", đo 2 blind-spot TRƯỚC khi nghĩ tới cắt/foldering: **(a) index-coverage** (mọi file/tính năng có được liệt kê đúng?) + **(b) doc↔code drift** (mô tả có khớp code/hành-vi thật?). Foldering/cắt = bản-năng sai; phủ-index + đồng-bộ-doc = fix thật. Nối tiếp L12: không chỉ "không phình" mà hướng ngược = THÊM. Phản-ví-dụ chuẩn C1 để soi các file dùng-chung: `design-system/design-rules.md` (0 rò tên dự án, thuần structure/behavior, có version-pin) = mức mọi artifact "giống hệt mọi dự án" phải đạt.
 
 **L12 - Nghi "phình / thừa / chấp vá" thường SAI — ĐO, đừng cắt theo cảm giác.**
 Cả đợt nghi harness phình nhiều lần (big-refactor mọi file · 26 playbook unproven · 6 meta-doc). Đo thật: **3/4 lần "không phải"** — playbook/template/stack phân-chia trách-nhiệm kỷ luật; grep OVER-COUNT (đếm chuỗi không hiểu ngữ cảnh: "control-plane" khớp "plane", CHANGELOG cite nơi dogfood, `First use: elearning` = nhãn-bằng-chứng hợp lệ); gate 500 dòng = mỗi dòng 1 leg nghiệm thu THẬT (đặc, không verbose). Chỉ **1 lần ĐÚNG** = cụm explainer TÔI vừa đẻ (chép sơ-đồ/bảng/thứ-tự qua lại).
