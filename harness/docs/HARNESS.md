@@ -160,32 +160,7 @@ transcript or opening files. That page is a **status Artifact** (bản trạng t
 hosted dashboard, anchored to the session, that the operator bookmarks and the
 team can be shown.
 
-Practice:
-
-- **Stand it up early** (once the dev preview is live / the first real phase
-  lands), not at the end — its value is watching the build *in progress*.
-- **Refresh it at every milestone** — each gate cleared, each phase deployed,
-  each harness-version bump. Re-publish the SAME file so the URL is stable; the
-  operator's bookmark never breaks.
-- **Contents** (a UI to scan, not a doc to read): live service checks (verified
-  at source (xác minh tại nguồn — kiểm cái đang CHẠY, không tin CI xanh), not a
-  CI badge — each service URL a **clickable link that opens the
-  live app in a new tab**, so the operator jumps straight from the dashboard to
-  the running thing), delivered capabilities with state chips
-  (live / building / parked), the harness lessons locked this run, run parameters
-  (repo, branch, stack, current SHA, blockers). Summary before detail; state
-  encoded in form (dots, chips) so what needs attention reads at a glance.
-- **It mirrors truth, never narrates ahead of it** — a capability is "live" only
-  when its live check passes, matching the verify-at-source rule (FC6). It is a
-  view over the same facts the gates enforce, not a second source.
-
-- **Speak the operator's language.** The status Artifact is read by the human, so
-  it is written in *their* language, not the codebase's English — glossing
-  technical/English terms inline when the operator is still learning them. (The
-  reports and code stay in the project's canonical language.)
-
-The status Artifact is the operator's cockpit; the reports are the flight
-recorder. Both are kept; they serve different readers.
+Practice (brief): stand it up **early** (not at the end), **refresh at every milestone** (re-publish the SAME file so the URL/bookmark stays stable), **mirror truth, never narrate ahead** (a capability is "live" only when its verify-at-source check passes — **FC6**), and write it in the **operator's language** (gloss jargon). Full contents checklist + curation recipe: the playbook `playbooks/status-surfaces-ops-and-client.md` (the HOW) — this section is the authority (the WHY).
 
 ### Two surfaces — internal ops-board vs client-facing roadmap
 
@@ -210,28 +185,7 @@ truth, filtered and reframed for the buyer:
 | Blockers | Every FC / OQ, technical | Only the ones **the client must act on**, phrased as a courteous action item |
 | Control | Raw, mirrors truth | **Curated** — the delivery side decides what the client sees |
 
-Curation rules (so the client surface stays honest AND clean):
-- **Never inflate.** The % and "delivered" states are the same verified facts as
-  the ops-board (FC6). Reframing is allowed; lying is not.
-- **Group by value, not by phase.** Collapse the P-list into business buckets the
-  client recognizes (accounts, courses, payments, certificates, …). A bucket's
-  state is the roll-up of its phases (delivered / in-progress / upcoming / waiting).
-- **Strip the machine.** No phase numbers, commit SHAs, harness versions, gate
-  names, or stack nouns (HLS, authz, dnd-kit…) — say the capability, not the tech.
-- **Surface only client-owed blockers**, as a "what we need from you" callout
-  (e.g. legacy-DB credentials for migration), framed so it does not read as our delay.
-- **Timeline in SOW dates**, milestone-level.
-- **Separate file → separate URL**, published + kept stable independently of the
-  ops-board; refreshed at the same milestones.
-
-**Ownership / handoff (bàn giao) (team model).** The client roadmap is a
-**PM-role (Project Manager — quản lý dự án)
-deliverable**: the PM compiles it from the same verified state, and the **CS
-(customer-success — chăm sóc khách hàng) role forwards it to the client** as the
-progress attachment.
-The PM controls curation; CS controls delivery. In a solo run the operator wears
-both hats but the two surfaces stay distinct — the internal board is never the
-thing sent out.
+Curation rules, the phase→value-bucket recipe, and ownership (PM compiles the client roadmap, CS forwards it to the client) live in the playbook `playbooks/status-surfaces-ops-and-client.md` (the HOW). Both surfaces mirror the SAME verified facts — the client is never handed the internal board.
 
 ## Locked Decisions
 
