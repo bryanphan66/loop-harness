@@ -50,7 +50,6 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 |---|---|---|
 | [solo-dev-client-delivery.md](solo-dev-client-delivery.md) | the whole flow | Meta-playbook mapping the 3 macro-stages onto harness artifacts. Pointers only; composes, never duplicates. |
 | [bilingual-delivery-template-pattern.md](bilingual-delivery-template-pattern.md) | D4 forks | `locale-vi/` fork pattern for all client-facing surfaces; IDs/paths/code stay EN. |
-| [playbook-composition-pattern.md](playbook-composition-pattern.md) | authoring | When to wrap playbooks into a meta-playbook (and when NOT). Hand-off contract + freshness `.meta.json`. |
 | [patch-extension-protocol.md](patch-extension-protocol.md) | org extension | Non-destructive `HARNESS:EXT` markers for org-local additions. Operating-model docs stay fork-not-patch. |
 | [template.md](template.md) | new playbooks | Canonical shape for a new playbook (Engine + step + Variant). |
 | [design-system-3-tier.md](design-system-3-tier.md) | cross-stage (1.10–1.12 + 2.6–2.10) | Owns 3-tier UI enforcement: Tier-1 floorplans/behavior (`docs/design-system/design-rules.md`), Tier-2 tokens + Tier-3 components (via `ui-design-system-contract.md`), screen-inventory classification (via `visual-and-behavioral-modeling.md` 1.11). HARD gate. |

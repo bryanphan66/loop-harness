@@ -68,3 +68,9 @@ Bê nguyên cây `harness/` (self-contained) + init git + bật verify-gate + đ
 - **Self-containment (tự-đủ):** thêm gì vào `harness/` thì KHÔNG trỏ `../../` ra ngoài cây harness (link sẽ chết khi cài vào dự án khác).
 - **Bảo thủ khi xoá:** nghi 2 file trùng → ĐỌC nội dung (hoặc giao subagent) rồi mới quyết; phần lớn "nghi trùng" là biên-giới có chủ ý.
 - **Định kỳ dedup-audit** khi kho doc phình: scan(tên+ref-count) → cluster → đọc-hết → verify.
+
+## 6. Khi nào GỘP nhiều playbook thành 1 (composition)
+Gộp nhiều playbook thành 1 **meta-playbook** (playbook-cha điều phối chuỗi) **CHỈ khi cả 3 đúng:** (1) cùng 3+ playbook chạy cùng thứ tự ở **2+ dự án**; (2) output bước này = input bước kia; (3) đã **ĐO** được friction (người hay quên thứ tự / bỏ bước / sai). Thiếu 1 điều → **giữ ATOMIC** (rời từng cái).
+- **Đừng pre-build meta-playbook cho "gọn"** — aggregator (cái gom) nảy ra từ friction THẬT đo được, không phải instinct "trông cho ngăn nắp". Pre-compose làm ẩn điểm-quyết-định + khó recovery khi lỗi.
+- Mỗi bước trong meta-playbook phải khai **Hand-Off Contract** (giao kèo bàn giao): **Input** (artifact cần để bắt đầu) · **Output** (artifact đẻ ra, đặt tên để bước sau grep) · **Skip-when** (điều kiện được bỏ qua, VD "output <7 ngày + input không đổi").
+- Meta-playbook DUY NHẤT hiện có = `playbooks/solo-dev-client-delivery.md` (gom cả flow thương mại; compose chứ không chép).
