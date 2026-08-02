@@ -1,5 +1,7 @@
 # Chuẩn tạo GitHub Issue (dùng chung — nạp cho agent PM + CS)
 
+**When To Run (mở khi nào):** agent PM/CS soạn 1 GitHub issue mới để giao coder. **Skip when (bỏ qua khi):** mới là ghi chú/yêu cầu thô nội bộ, chưa qua BA-validate để thành task giao coder.
+
 **Lifecycle:** verified · **First use:** elearning 2026-07 · **Verified by:** elearning issue-pipeline
 
 **Macro-stage / step:** Steady-state (Mode B) — issue authoring (feeds Ready-for-Dev). **Gate it serves:** DoR (Definition of Ready — điều kiện issue "đủ chín" để giao: đủ field + AC trước khi dispatch/giao coder).

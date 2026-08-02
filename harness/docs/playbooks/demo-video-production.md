@@ -1,5 +1,7 @@
 # Demo Video Production
 
+**When To Run:** producing a video of the built product for a client demo, UAT hand-off, or marketing. **Skip when:** no demo-video deliverable was requested.
+
 **Lifecycle:** verified · **First use:** elearning UAT Phase-1 (2026-07) · **Verified by:** rendered Remotion product-tour (4×MP4 1080p, VN AI voiceover)
 
 > How to produce a **video** of the built product for a client demo, UAT hand-off,

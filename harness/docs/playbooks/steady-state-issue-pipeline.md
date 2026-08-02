@@ -1,5 +1,7 @@
 # Playbook — Steady-state issue-pipeline (Mode B)
 
+**When To Run:** after go-live — running the perpetual issue loop (Mode B: discover → dispatch → verify → recover → persist → decide-next). **Skip when:** the project is still in Mode A (pre-go-live build).
+
 **Lifecycle:** verified · **First use:** elearning steady-state (2026-07) · **Verified by:** elearning issue-pipeline (R2/R3 dogfooded)
 
 **Macro-stage / step:** Post-Build (Macro 3) — 3.3 steady-state + 3.5 change-control (the loop). **Gate it serves:** verify-at-source + QC-vs-AC on every issue.

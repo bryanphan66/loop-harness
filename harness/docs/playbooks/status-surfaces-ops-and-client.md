@@ -1,5 +1,7 @@
 # Status Surfaces — Ops-Board + Client Roadmap
 
+**When To Run:** standing up or updating the two status trackers — the internal ops-board (team) and the client-facing roadmap (buyer). **Skip when:** no external client and no status-tracking need.
+
 **Lifecycle:** experimental · **First use:** 2026-07-11 (Nhất Nghệ eLearning) · **Verified by:** none
 
 > Owns the **two hosted status Artifacts** a run keeps: the **internal ops-board**

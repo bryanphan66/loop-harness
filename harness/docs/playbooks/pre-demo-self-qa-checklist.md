@@ -1,5 +1,7 @@
 # Pre-Demo Self-QA Checklist
 
+**When To Run:** the agent finished a feature/phase, BEFORE any human handoff / demo / UAT — self-QA the running preview (click every control, submit every form, check every image). **Skip when:** never — run before every handoff.
+
 **Lifecycle:** verified · **First use:** elearning retrospective enrichment (2026-07) · **Verified by:** 182 mined human-caught defects across the P0–P16 build
 
 > The agent runs this **against the running preview, BEFORE any human handoff /

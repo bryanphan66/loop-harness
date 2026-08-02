@@ -1,5 +1,7 @@
 # Build Manifest Compilation
 
+**When To Run:** at Build step 2.3 — turning the frozen Pre-Build spec into the ordered phase list (`build-manifest.md`) the build loop executes. **Skip when:** never for a real build (every build needs a manifest).
+
 **Lifecycle:** experimental · **First use:** TBD · **Verified by:** none
 
 > Compiles the frozen Pre-Build spec into `docs/build-manifest.md` — the

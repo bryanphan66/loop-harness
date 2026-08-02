@@ -1,5 +1,7 @@
 # E2E QA Field-By-Field Verify With Report
 
+**When To Run:** QA step (2.10) — verifying a persisted record field-by-field after a form submit, emitting a `correct | incorrect | manual | not-found` matrix report. **Skip when:** the feature has no form or persisted record to inspect.
+
 **Lifecycle:** experimental · **First use:** TBD · **Verified by:** none
 
 > An E2E spec that must (a) fill a long form like a real user, (b) on the

@@ -1,5 +1,7 @@
 # Go-Live Deploy & Verify-at-Source
 
+**When To Run:** pushing a phase's output onto a running host / going live — deploy + prove the running artifact carries the released commit (verify-at-source). **Skip when:** nothing is deployed yet (still building locally).
+
 **Lifecycle:** verified · **First use:** elearning Macro-2 go-live (2026-07) · **Verified by:** elearning prod deploys (cert-PDF + brand batch, dokploy)
 
 > The **Go-live** half of Macro-Stage 2: moving a DoD-passed build onto a running

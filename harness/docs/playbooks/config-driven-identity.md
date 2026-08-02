@@ -1,5 +1,7 @@
 # Config-Driven Business Identity
 
+**When To Run:** a surface shows brand / company legal entity / contact / canonical URL / SEO identity — render it from config, never a code literal (a go-live floor). **Skip when:** a purely internal tool with no public-facing identity.
+
 **Lifecycle:** verified · **First use:** elearning Macro-2 hardcode sweep (2026-07) · **Verified by:** elearning cert-PDF/invoice/email/SEO de-hardcode batch
 
 > A go-live **floor**: every piece of **business identity** renders from CONFIG (a
