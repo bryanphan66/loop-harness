@@ -8,13 +8,7 @@ File này trả lời 3 câu: (1) harness vận hành thế nào — nhìn 1 mà
 
 loop-harness = harness (khung vận hành cho AI agent) biến **spec** (specification — đặc tả: SRS + prototype đã chốt + data model = nguồn-tin-duy-nhất/single source of truth) → app chạy được → nuôi app tiến hoá. **1 xương sống = 2 mode, cắt tại go-live (thời điểm app lên môi trường thật):**
 
-```
-MODE A — BUILD (hữu hạn)            │  MODE B — THE LOOP (vô hạn)
-spec → app deploy được             │  nuôi app sống, mỗi thay đổi = 1 issue
-đơn vị: 1 PHASE                     │  đơn vị: 1 ISSUE (có AC)
-lệnh: /stage-next · /build-phase    │  vòng: discover→dispatch→verify→recover→persist→decide-next
-──────────────────── GO-LIVE ────────────────────
-```
+**Mode A** (đơn vị = 1 PHASE, lệnh `/stage-next`) → **go-live** → **Mode B** (đơn vị = 1 ISSUE, vòng lặp issue). Sơ đồ đầy đủ: [`OPERATING-MODES.md`](./OPERATING-MODES.md).
 
 Chạy trên **agent + git + bash trần**; gate (chốt kiểm) `harness-verify-gate.sh` **fail-closed** (mặc định CHẶN khi nghi ngờ/lỗi — thà chặn nhầm còn hơn cho lọt; ngược với fail-open = lỗi vẫn cho qua) và không bypass (không tắt được); tri thức tái dùng ở `playbooks/`; **scaffold** (khung code dựng sẵn) ở `templates/`.
 
@@ -54,11 +48,7 @@ Bê nguyên cây `harness/` (self-contained) + init git + bật verify-gate + đ
 
 ## 4. Phổ biến cho dev khác
 
-**Dev mới đọc theo thứ tự (10 phút hiểu toàn cảnh):**
-1. [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) — narrative + scorecard thành thật (cái gì PROVEN/PATCHED/chưa-build).
-2. File này (`EXTENDING.md`) — vận hành + cất tri thức ở đâu.
-3. [`KEYWORD-MAP.md`](./KEYWORD-MAP.md) — tra keyword khi vướng.
-4. [`STRUCTURE.md`](./STRUCTURE.md) — cây thư mục khi cần sửa.
+**Thứ tự đọc cho dev mới:** xem [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) §8 (Dev mới bắt đầu) — 1 nguồn duy nhất, file này không lặp lại.
 
 **Dev đóng góp ngược lại:** làm dự án bằng harness → gặp bài học/công thức mới → theo Bảng §2 cất vào đúng chỗ (playbook nếu tái dùng được, lessons-log nếu là luật) → commit vào repo loop-harness → `git push`. Kho tri thức lớn dần, mọi dự án sau hưởng.
 

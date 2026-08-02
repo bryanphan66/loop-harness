@@ -90,9 +90,5 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 
 ---
 
-## Thứ tự đọc để "thấm" loop-harness
-1. [`OPERATING-MODES.md`](./OPERATING-MODES.md) — 2 mode + the loop (trọng tâm).
-2. [`HARNESS.md`](./HARNESS.md) — operating model + Independence Principle.
-3. [`WORKFLOW.md`](./WORKFLOW.md) — bản đồ 3-macro, bước, gate, lane.
-4. [`playbooks/steady-state-issue-pipeline.md`](./playbooks/steady-state-issue-pipeline.md) — vận hành Mode B (vòng lặp).
-5. [`playbooks/README.md`](./playbooks/README.md) — mục lục 35 playbook.
+## Thứ tự đọc
+Xem [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) §8 (Dev mới bắt đầu) — 1 nguồn duy nhất, file này không lặp lại.

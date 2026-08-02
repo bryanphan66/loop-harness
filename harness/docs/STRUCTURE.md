@@ -66,10 +66,10 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 - `stack-pnpm-nest-next/`: khung app **Mode A (chế độ A — Build)** (walking skeleton (bộ xương biết đi) — NestJS+Prisma+Postgres+Next.js+CI+e2e+docker). Dùng ở bước 2.4.
 - `steady-state/` (trạng thái vận hành ổn định sau go-live): kit (bộ đồ nghề) **Mode B** — `issue-state.mjs`, `qc-checklist.mjs`, `push-retry.sh` (Recover (tự-sửa khi lỗi) R2), `ship-and-verify.sh` (Recover R3), `bug-report.md`, `regression-checklist.md`. Copy vào dự án khi go-live (thời điểm app lên môi trường thật).
 
-## 4 kho tri thức (ai lưu gì ở đâu)
-| Kho | Ở đâu | Chứa |
-|---|---|---|
-| **playbook** | `harness/docs/playbooks/` | cách làm chung, tái dùng mọi dự án |
-| **runbook** | `docs/runbook/` của TỪNG dự án (VD elearning) | vận hành riêng dự án (deploy/config/cicd/seed) |
-| **lessons-log** | mỗi dự án: `docs/lessons-log.md` (template ở `harness/docs/templates/`). Của chính harness: `plans/lessons-log.md` | sai lầm → luật |
-| **memory** | `~/.claude/projects/<key>/memory/` | fact bền qua phiên; **fact riêng dự án ở key dự án đó, không ở key harness** |
+## 4 kho tri thức — VỊ TRÍ ("cất gì vào đâu" xem [`EXTENDING.md`](./EXTENDING.md) §2)
+| Kho | Ở đâu |
+|---|---|
+| **playbook** | `harness/docs/playbooks/` |
+| **runbook** | `docs/runbook/` của TỪNG dự án |
+| **lessons-log** | mỗi dự án `docs/lessons-log.md`; của chính harness `plans/lessons-log.md` |
+| **memory** | `~/.claude/projects/<key>/memory/` (fact riêng dự án ở key dự án đó, không ở key harness) |

@@ -19,15 +19,7 @@ Một **harness** (khung vận hành cho AI agent) biến 1 spec (đặc tả y�
 
 Trước đây harness mô tả vòng đời bằng **3 cách chồng nhau** (3-macro, 2-mode, 4-bậc) → gây rối. **Từ nay lấy 2-mode (mode = chế độ) làm xương sống chính**; 2 cái kia hạ vai (xem §6).
 
-```
-   MODE A — BUILD (hữu hạn)                 ┃  MODE B — THE LOOP (vô hạn)
-   spec → app chạy được, deploy được        ┃  nuôi app sống, mỗi thay đổi = 1 issue
-   đơn vị việc: 1 PHASE                      ┃  đơn vị việc: 1 ISSUE (có AC)
-   lệnh: /stage-next, /build-phase           ┃  lệnh: dispatch coder/issue → QC → đổi state
-   theo dõi: STAGE.md "bước hiện tại"        ┃  theo dõi: bảng issue (10 state)
-   ───────────────────────── GO-LIVE ─────────────────────────
-                    (app deploy lên env thường trực đầu tiên = điểm tốt nghiệp)
-```
+Tóm: **Mode A** = spec→app chạy được, đơn vị = 1 **PHASE**, lệnh `/stage-next`+`/build-phase`. **Mode B** = nuôi app sống, đơn vị = 1 **ISSUE**, vòng lặp trên bảng issue. Cắt tại **go-live**. → **Sơ đồ đầy đủ (drivers/trackers/gates) ở [`OPERATING-MODES.md`](./OPERATING-MODES.md)** — file này không vẽ lại.
 
 **Điểm dễ lẫn NHẤT — nhớ kỹ:** *"quy tắc tạo issue theo AC (Acceptance Criteria — tiêu chí nghiệm thu) từng module"* nằm ở **Mode B**, KHÔNG ở Mode A. Mode A chạy theo **phase** (pha/giai đoạn build), không theo issue (phiếu việc/vấn đề trên bảng theo dõi). Chỉ sau go-live (thời điểm app lên môi trường thật) mọi thay đổi mới thành issue.
 
@@ -68,14 +60,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 
 ## 5. Kho tri thức — kinh nghiệm/CICD/R2 lưu ở ĐÂU
 
-4 kho, mỗi kho 1 vai. Đây là chỗ hay nhầm "chấp vá" — thực ra chỉ cần nhớ ranh giới:
-
-| Kho | Chứa | Ví dụ R2/CICD | Ở đâu |
-|---|---|---|---|
-| **playbook** `PROVEN` | công thức **TÁI DÙNG** mọi dự án | *cách deploy verify-at-source, cách wire S3, mẫu R2/R3* | `harness/docs/playbooks/` + `harness/templates/steady-state/scripts/` |
-| **runbook** `PROVEN` | thủ tục vận hành **RIÊNG 1 dự án** | elearning's **deploy Kamal, release channel, verify-at-source, rollback, restore-drill** | `elearning-platform/docs/runbook/` (mẫu chuẩn có sẵn) |
-| **lessons-log** `PROVEN` | sai lầm→nguyên nhân→luật | *chart rỗng = lỗi CSS không phải data* | `docs/lessons-log.md` của dự án (template ở `templates/`) |
-| **memory** `PROVEN` | fact bền của CONTROL qua phiên | *elearning deploy 2 env Dokploy+Kamal* | `~/.claude/.../memory/` |
+**4 kho tri thức = playbook (tái dùng mọi dự án) · runbook (thủ tục riêng 1 dự án) · lessons-log (sai lầm→luật) · memory (fact bền qua phiên).** Bảng quyết-định "học gì → cất kho nào" ở **[`EXTENDING.md`](./EXTENDING.md) §2** (chủ) — file này không lặp lại.
 
 **Chốt R2 cho hết mơ hồ:** *mẫu tái dùng* R2/R3 ở **harness** (playbook/template); *R2 đã wire thật của elearning* ở **repo elearning** (runbook). "Cách làm chung" ở harness; "cấu hình cụ thể 1 dự án" ở repo dự án đó.
 
