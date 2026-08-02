@@ -4,6 +4,10 @@ CONTROL bồi đắp mỗi lần vấp. Mỗi mục: triệu chứng -> nguyên 
 
 ## 2026-08-02
 
+**L14 - File do CHÍNH auditor mới tạo = nguồn accretion số 1.**
+Cả session 3 lần nghi-phình playbook đo ra "không phải" (L10/L12/L13). Nhưng nghi-phình cụm 6 meta-doc onboarding lại LÀ THẬT (chép sơ-đồ 2-mode ×3, bảng 4-kho ×4, thứ-tự-đọc ×4) — vì 5/6 file đó tôi vừa đẻ 3 ngày trước.
+-> Luật: **audit đồ MÌNH vừa viết NẶNG TAY nhất + giao mắt độc lập (subagent) để né bias-bảo-vệ.** Đồ cũ-đã-verified thì bảo thủ; đồ mình-mới-thêm thì NGHI TRƯỚC. (Cụm docs explainer dễ đẻ trùng hơn code/playbook vì không có toolchain/step chặn.)
+
 **L13 - "unproven / experimental" KHÁC "thừa" — đo bằng 3 trục, load-bearing-check TRƯỚC.**
 Nghi ngờ: 26/34 playbook là `experimental · First use TBD · Verified none` (chưa từng chạy dự án thật) -> "chấp vá thừa, tôi bảo cần hết là over-claim". Nghi CHÍNH ĐÁNG (ép test cái tôi bỏ sót), nhưng necessity-audit cho ra: **25 GIỮ · 1 HẠ-CẤP · 0 CẮT.** Vì mỗi playbook **SỞ HỮU đúng 1 bước WORKFLOW đã định nghĩa** (WORKFLOW/gate/CONTEXT_RULES trỏ thẳng); "unproven" = bước đó chưa có dự án chạy tới (elearning mới chạy Mode-B/build/deploy, chưa chạm full Macro-1 + non-CRUD infra), KHÔNG phải rác. Cắt = phá công thức của 1 bước quy trình.
 -> Luật: phân biệt **3 TRỤC riêng, đừng lẫn**: (a) **dedup** — có trùng file khác? (b) **necessity** — có bước/flow nào ĐÃ ĐỊNH NGHĨA cần nó? (c) **provenance** — đã dùng thật chưa? File **unproven (c) NHƯNG load-bearing (b) -> GIỮ**. Đo necessity = **LOAD-BEARING CHECK TRƯỚC** (grep WORKFLOW/gates/CONTEXT_RULES/STAGE_GOALS trỏ tới nó -> giữ dù chưa chạy), CHỈ xét cắt khi vừa-không-ai-trỏ vừa-speculative/meta-về-meta. Ứng viên cắt thật hiếm: file **tự cãi sự tồn tại** (`playbook-composition-pattern` viết "đừng pre-build meta-playbook" -> chính nó speculative) = hạ-cấp gộp vào owner. **Đây là lần thứ 3 một "nghi phình" đo ra "không phải"** (L10 dedup 0-xoá · L12 grep-noise · L13 unproven≠thừa) -> mặc định: nghi phình thì ĐO 3 trục, đừng cắt theo cảm giác.
