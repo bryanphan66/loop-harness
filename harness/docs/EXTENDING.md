@@ -36,7 +36,7 @@ Chạy trên **agent + git + bash trần**; gate (chốt kiểm) `harness-verify
 | **Một chốt chặn / luật cứng mới** (điều kiện phải PASS) | **gate** hoặc **WORKFLOW** | `harness/docs/gates/*.md` / `WORKFLOW.md` | verify-gate + review đọc, chặn khi vi phạm |
 | **Đổi bản thân harness** (thêm/sửa cơ chế, version) | **HARNESS_CHANGELOG** | `harness/docs/HARNESS_CHANGELOG.md` | Ghi nhận tiến hoá harness qua version |
 
-**Bẫy hay gặp (từ [`../../plans/lessons-log.md`](../../plans/lessons-log.md) L9/L10):**
+**Bẫy hay gặp (rút từ lessons-log của chính harness, L9/L10):**
 - Đừng chép luật của file A sang file B — file B chỉ **TRỎ** tới A.
 - Tri thức "cho dự án" ≠ "của harness": lessons-log DỰ ÁN ở `docs/`, lessons-log HARNESS ở `plans/`.
 - Fact riêng dự án (elearning) KHÔNG cất vào memory của harness — cất vào key của dự án đó.
