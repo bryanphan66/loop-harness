@@ -46,8 +46,9 @@ Cái gì trong, cái gì ngoài.
 
 **Module:** {module}
 
-## Định nghĩa hoàn thành (Definition of Done - DoD)   <-- CỐ ĐỊNH · thuần NFR/process · GIỐNG mọi task · KHÔNG mô tả tính năng
-> Mỗi mục xong đính thông số hoặc link chứng minh. (Dự án có catalog SRS/NFR thì gắn mã trace của mình vào mỗi dòng, vd `DP.DEPLOY.05`.)
+## Định nghĩa hoàn thành (Definition of Done - DoD)   <-- CỐ ĐỊNH · GIỐNG mọi task · 1 dòng gộp AC + còn lại thuần NFR/process · KHÔNG mô tả tính năng
+> Mỗi mục xong đính thông số hoặc link chứng minh. Luồng: xong hết AC -> qua các "ĐK lên staging" (kỹ thuật/NFR) -> deploy staging -> QC pass -> UAT pass -> mới Done. (Dự án có catalog SRS/NFR thì gắn mã trace của mình vào mỗi dòng, vd `DP.DEPLOY.05`.)
+- [ ] Xong toàn bộ AC ở trên (mỗi AC QC-pass được trên staging)
 - [ ] Lint pass (CI) - (link)
 - [ ] Unit test pass, coverage đạt ngưỡng - (link)
 - [ ] Integration test pass - (link)
@@ -57,9 +58,9 @@ Cái gì trong, cái gì ngoài.
 - [ ] Mobile 375px + WCAG AA (nếu có UI) - (link)
 - [ ] HDSD tính năng (user guide) - (link)
 - [ ] Cập nhật tài liệu liên quan trong source - (commit)
-- [ ] QC pass (human) - (ghi chú)
-- [ ] UAT khách đạt (mirror sang PM-tool) - (link)
 - [ ] Deploy staging + verify-at-source (health ok, SHA == commit đã merge) - (link)
+- [ ] QC pass (human) - (ghi chú)
+- [ ] UAT khách đạt (mirror sang PM-tool) - (link)  -> mới chuyển Done
 
 ## Liên kết
 - Commit / PR: dùng `Refs #N` (hoặc `[F-NNN]`) trong commit — TUYỆT ĐỐI không `Closes/Fixes/Resolves`. Chỉ chuyển **Done**/Close sau khi QC + UAT pass (không đóng sớm).
