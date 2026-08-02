@@ -74,7 +74,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 | Chốt chặn / luật cứng mới (phải PASS) | **gate / WORKFLOW** | `gates/*.md` / `WORKFLOW.md` | verify-gate + review chặn khi vi phạm |
 | Đổi bản thân harness (cơ chế, version) | **HARNESS_CHANGELOG** | `HARNESS_CHANGELOG.md` | Ghi tiến hoá harness |
 
-**Bẫy (từ lessons-log L9/L10):** đừng chép luật file A sang B (B chỉ TRỎ) · lessons-log DỰ ÁN ở `docs/`, HARNESS ở `plans/` · fact riêng dự án KHÔNG vào memory harness.
+**Bẫy (từ lessons-log):** đừng chép luật file A sang B (B chỉ TRỎ) · lessons-log DỰ ÁN ở `docs/`, HARNESS ở `plans/` · fact riêng dự án KHÔNG vào memory harness.
 
 **Chốt R2 cho hết mơ hồ:** *mẫu tái dùng* R2/R3 ở **harness** (playbook/template); *R2 đã wire thật của elearning* ở **repo elearning** (runbook). "Cách làm chung" ở harness; "cấu hình cụ thể 1 dự án" ở repo dự án đó.
 
