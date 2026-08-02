@@ -51,7 +51,7 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 |---|---|---|---|
 | `playbooks/` | 33 | công thức TÁI DÙNG (1 bước macro / 1 domain) | `playbooks/README.md` |
 | `gates/` | 10 | định nghĩa gate (PB-G, DoR, DoD, phase-acceptance, visual-fidelity…) | `gates/README.md` |
-| `templates/` | 28 | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…) | `templates/README.md` |
+| `templates/` | 27 (25 file + 2 packet) | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…); `locale-vi/` = bản dịch, không tính | `templates/README.md` |
 | `design-system/` | 3 | quy tắc UI 3-tier (floorplan/action/modal) | `design-system/README.md` |
 
 **④ Meta / tham chiếu — HỖN HỢP (không thuộc xương sống lẫn máy-móc):**
