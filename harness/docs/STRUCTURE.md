@@ -44,21 +44,21 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 | `ROLE_MAP.md` | Vai trò SDLC (Software Development Life Cycle — vòng đời phát triển phần mềm) theo bước (được ~6 file máy móc tham chiếu). |
 | `TEST_MATRIX.md` | Register (sổ đăng ký) test/verify (đọc ở mỗi 2.x close; ~8 file tham chiếu). |
 
-**③ Thư viện (thư mục):**
-| Thư mục | Số | Vai trò |
-|---|---|---|
-| `playbooks/` | 35 | công thức TÁI DÙNG (1 bước macro / 1 domain); index `playbooks/README.md` |
-| `gates/` | 10 | định nghĩa gate (PB-G, DoR, DoD, phase-acceptance, visual-fidelity…) |
-| `templates/` | 28 | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…); index `templates/README.md` |
-| `design-system/` | 3 | quy tắc UI 3-tier (floorplan/action/modal) |
+**③ Thư viện (thư mục) — MỖI zone có `README.md` liệt kê từng file 1-dòng. Không hiểu file nào → mở README của zone đó.**
+| Thư mục | Số | Vai trò | Index (mở để biết từng file là gì) |
+|---|---|---|---|
+| `playbooks/` | 33 | công thức TÁI DÙNG (1 bước macro / 1 domain) | `playbooks/README.md` |
+| `gates/` | 10 | định nghĩa gate (PB-G, DoR, DoD, phase-acceptance, visual-fidelity…) | `gates/README.md` |
+| `templates/` | 28 | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…) | `templates/README.md` |
+| `design-system/` | 3 | quy tắc UI 3-tier (floorplan/action/modal) | `design-system/README.md` |
 
-## `harness/.claude/` — tự động hoá
+## `harness/.claude/` — tự động hoá (index: `.claude/README.md`)
 - `commands/`: **`/stage-next`** (chạy bước kế), **`/build-phase`** (vòng code phase), **`/gate-check`**.
 - `agents/stage-runner.md`: subagent (agent con) chạy 1 bước trong context riêng (isolated — cô lập).
 - `hooks/`: `stage-deliver`, `qa-deliver`, `context-monitor` (cảnh báo 40/60/80/95% token), `notify`.
 - `settings.json` + `scripts/notifier-send.sh`.
 
-## `harness/scripts/` + `.githooks/` — gate + cài đặt
+## `harness/scripts/` + `.githooks/` — gate + cài đặt (index: `scripts/README.md`)
 - `install-harness.sh`: bê toàn bộ `harness/` vào dự án mới + init git + bật verify-gate (cổng kiểm chứng không bỏ qua được).
 - `harness-verify-gate.sh` + `pre-commit`/`pre-push`: **gate fail-closed (mặc định CHẶN khi nghi ngờ/lỗi) không bypass (không bỏ qua được)** (chặn commit lỗi lint/typecheck/register).
 
