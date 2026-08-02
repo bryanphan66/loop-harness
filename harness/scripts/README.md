@@ -8,7 +8,7 @@ Harness install + verify-gate machinery. Two scripts plus the git hooks under
 | `install-harness.sh` | One-command bootstrap of the harness skeleton into a new (or existing) project. |
 | `harness-verify-gate.sh` | The non-bypassable Pre-Close Verification Gate. Invoked by the git hooks. |
 | `../.githooks/pre-commit` | Runs the verify gate at commit time (lint + register + atomicity). |
-| `../.githooks/pre-push` | Runs the verify gate at push time (lint + register). |
+| `../.githooks/pre-push` | Runs the verify gate at push time (lint + **test suite** + register). |
 
 ---
 
@@ -95,17 +95,32 @@ gh api repos/<owner>/<repo>/contents/harness/scripts/install-harness.sh \
 ## harness-verify-gate.sh — the gate
 
 The mechanical Pre-Close Verification Gate. Git invokes it via the hooks;
-it exits non-zero to **block** the commit/push. Three gates run on every call:
+it exits non-zero to **block** the commit/push.
 
-1. **Lint / typecheck / quick-validate** — auto-detected per stack:
+**Self-check (fail-closed) runs first.** Before any gate, the script verifies it
+is actually **armed**: `core.hooksPath` must resolve to the harness `.githooks`
+(path-normalized, so an absolute `.githooks` still counts). If a `husky` install
+re-pointed `core.hooksPath` to `.husky/_`, the gate stays armed only when a
+`.husky` hook chains it — otherwise the gate **BLOCKS** rather than let a future
+commit silently skip it. An unarmed/undetectable gate is treated as a failure,
+never a pass.
+
+Gates that run:
+
+1. **Lint / typecheck / quick-validate** (every call) — auto-detected per stack:
    `npm` / `yarn` / `pnpm` (script `validate` > `lint` > `typecheck` > `check`),
    `make` (`validate` / `lint` / `check`), `cargo` (`clippy -D warnings`), or
    **none** (skipped — the harness stays runnable on a bare project). Blocks on
    failure.
+1b. **Test suite — on PUSH only.** pre-push additionally runs the project's
+   `test` script (e2e / Playwright-fidelity included) so a green lint can't stand
+   in for green behaviour. Kept off pre-commit so commits stay fast; the push is
+   the last backstop before work is shared.
 2. **Verification Register integrity** — parses
    `docs/TEST_MATRIX.md` § Verification Register. Blocks on any `Result: fail`
    row. On a **stage-close commit** (`STAGE.md` staged) it also blocks any
-   `never-run` row — a stage cannot close with unproven behavior.
+   `never-run` row **and a zero-row register** — a stage cannot close with
+   unproven (or entirely absent) behavior.
 3. **Stage-boundary atomicity** — on a stage-close commit, `docs/ROADMAP.md`
    must be staged in the **same** commit as `STAGE.md`. The current-stage pointer
    and module progress advance together or not at all
@@ -114,8 +129,8 @@ it exits non-zero to **block** the commit/push. Three gates run on every call:
 Run it by hand any time:
 
 ```bash
-bash scripts/harness-verify-gate.sh pre-commit   # full: + atomicity check
-bash scripts/harness-verify-gate.sh pre-push     # lint + register only
+bash scripts/harness-verify-gate.sh pre-commit   # lint + register + atomicity
+bash scripts/harness-verify-gate.sh pre-push     # lint + test suite + register
 ```
 
 ### Bypass policy — humans only
