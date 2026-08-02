@@ -23,9 +23,11 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 
 > **Ranh giới cứng (chuẩn dài hạn):** `harness/` là SẢN PHẨM, **tự-đủ tuyệt đối** (self-contained — không trỏ/phụ thuộc ra ngoài chính nó) — docs trong đó KHÔNG `../../` ra ngoài cây; khi cài đi đâu cũng chạy. Mọi thứ ở root là XƯỞNG (workshop — làm ra harness): `plans/` chứa lessons-log (sổ bài học) + team-playbook (công thức tái dùng của team) + reports CỦA harness; `.claude/` là config phiên dev (gitignore phần cá nhân). Tri thức "cho dự án" (VD lessons-log của dự án) là 1 **template** (khung mẫu) trong `harness/docs/templates/`, không phải lessons-log dev của harness.
 
-## `harness/docs/` — tri thức (3 lớp)
+## `harness/docs/` — tri thức (4 nhóm, phân theo VAI TRÒ + AI ĐỌC)
 
-**① Xương sống (đọc theo thứ tự này):**
+> `ls docs/` ra nhiều file loose (rời, không nằm trong thư mục con) là bình thường: chúng KHÔNG gom vào 1 folder (foldering = sửa ~250 path máy-móc tham chiếu, lợi 0 hành vi) mà gom bằng bảng dưới đây. Mỗi nhóm ghi rõ **ai đọc** để tra ngay "file này là gì, cho ai". 14 file loose = ① 6 + ② 5 + ④ 3.
+
+**① Xương sống — NGƯỜI đọc (onboarding — nhập môn, theo thứ tự này):**
 | File | Vai trò |
 |---|---|
 | `UNDERSTANDING-loop-harness.md` | Narrative (kể chuyện) onboarding (nhập môn) + scorecard (bảng điểm) thành thật (PROVEN/PATCHED/ASPIRATIONAL = đã kiểm chứng / vá-từ-bài-học / chưa-làm). **Đọc đầu.** |
@@ -35,7 +37,7 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 | `HARNESS.md` | Operating model (mô hình vận hành) + Independence Principle (nguyên tắc độc lập) + quyết định đã khoá. |
 | `STRUCTURE.md` | (file này) bản đồ cấu trúc. |
 
-**② Chi tiết bước (load-bearing — máy móc harness đọc):**
+**② Chi tiết bước — MÁY đọc (hook/command nạp đúng lúc; load-bearing — trụ chịu lực, không bỏ được):**
 | File | Vai trò |
 |---|---|
 | `STAGE_GOALS.md` | Text mục tiêu chạy được của từng bước (dùng bởi `/stage-next`). |
@@ -51,6 +53,13 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 | `gates/` | 10 | định nghĩa gate (PB-G, DoR, DoD, phase-acceptance, visual-fidelity…) | `gates/README.md` |
 | `templates/` | 28 | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…) | `templates/README.md` |
 | `design-system/` | 3 | quy tắc UI 3-tier (floorplan/action/modal) | `design-system/README.md` |
+
+**④ Meta / tham chiếu — HỖN HỢP (không thuộc xương sống lẫn máy-móc):**
+| File | Vai trò | Ai đọc |
+|---|---|---|
+| `README.md` | Crosswalk (bảng ánh xạ): process-folder của harness → doc trong `CLAUDE.md` toàn cục + thứ tự đọc doc. | người + máy |
+| `DOC-STANDARD.md` | Rubric (thước đo) C1-C10 để viết/refactor bất kỳ doc; có When-To-Run. | người (tác giả doc) |
+| `HARNESS_CHANGELOG.md` | Version log (nhật ký phiên bản) của CHÍNH mô hình harness (docs/playbook/gate/template); hiện v7.0. State dự án KHÔNG ở đây. | tham chiếu |
 
 ## `harness/.claude/` — tự động hoá (index: `.claude/README.md`)
 - `commands/`: **`/stage-next`** (chạy bước kế), **`/build-phase`** (vòng code phase), **`/gate-check`**.
