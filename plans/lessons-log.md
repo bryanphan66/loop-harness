@@ -2,6 +2,12 @@
 
 CONTROL bồi đắp mỗi lần vấp. Mỗi mục: triệu chứng -> nguyên nhân gốc -> luật rút ra. Mới nhất trên cùng.
 
+## 2026-08-02
+
+**L11 - Discoverability của kho "gặp gì mở nấy" nằm ở TRIGGER + INDEX, KHÔNG ở tên file.**
+34 playbook "mở khi cần" chỉ chạy được nếu TÌM đúng cái lúc gặp tình huống. Cám dỗ: thêm prefix taxonomy vào tên (ba-/build-/qa-/infra-) cho "dễ nhận biết". Phản biện + bác: (1) churn cao — đổi tên 34 file phá refs ở WORKFLOW/CONTEXT_RULES/gates/cross-ref/2 index = đúng "chấp vá cải tổ" đang dọn; (2) lợi ít — agent KHÔNG `ls` thư mục, nó đọc README index hoặc bị WORKFLOW/CONTEXT_RULES TRỎ thẳng tới 1 file; prefix chỉ giúp người-lướt-ls. Taxonomy đã sống ở INDEX (README nhóm theo domain + KEYWORD-MAP §F), nhân đôi vào tên file = trùng.
+-> Luật: **discoverability = (a) dòng trigger "When To Run" trong mỗi file + (b) index nhóm-theo-domain; KHÔNG phải prefix tên file.** Cải thiện discovery = vá cho ĐỦ trigger (thêm dòng, không đổi tên, 0 phá ref), nuôi index — KHÔNG rename hàng loạt. **Đừng đồng-phục-hoá trigger:** biến thể chính xác (`When To Fork`/`When To Compose`/`When It Applies`/"Use when") TỐT HƠN "When To Run" chung chung — grep `When` vẫn ra hết. Phụ: **audit "thiếu" phải dùng grep pattern CHẶT** — pattern lỏng (`When To|## When|Mở khi`) đếm nhầm "9 thiếu" trong khi thực tế là 9-thiếu-hẳn + phần-còn-lại-dùng-biến-thể; verify lại bằng token đúng.
+
 ## 2026-07-31
 
 **L10 - Audit dọn cấu trúc TOÀN repo: chấp vá tập trung ở RANH GIỚI + rìa, KHÔNG ở nội dung lõi.**
