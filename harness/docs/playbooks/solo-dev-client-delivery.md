@@ -6,7 +6,7 @@
 > the harness's **3 macro-stages** — Pre-Build, Build & Go-live, Post-Build. Maps
 > each commercial step to an existing harness artifact + the playbook that
 > produces it. **Pointers only — no new mechanics.** Honors
-> `../EXTENDING.md` § 6 (composition): this composes, it never duplicates.
+> `../UNDERSTANDING-loop-harness.md` § 10 (composition): this composes, it never duplicates.
 
 **Authority:** `docs/WORKFLOW.md` (step tables) + the locked decisions D1–D6
 (`docs/HARNESS.md` § Locked Decisions). The map below is a commercial wrapper
@@ -167,7 +167,7 @@ delete the original shape.)
 - `docs/WORKFLOW.md` — the authoritative 3-macro step map this composes.
 - `docs/TRACE_SPEC.md` — token grammar (`GAP→REQ→SC→TC`, `CR`).
 - `docs/ROLE_MAP.md` — role → agent + skill engine binding (SA vs Tech Lead, D5).
-- `../EXTENDING.md` § 6 (composition) — composition rules this honors.
+- `../UNDERSTANDING-loop-harness.md` § 10 (composition) — composition rules this honors.
 - `bilingual-delivery-template-pattern.md` — locale fork pattern (D4).
 - `ba-core-doc-bundle.md` — step 1.7 (the load-bearing BA spine).
 - `discovery-interview-playbook.md` · `gap-analysis.md` ·

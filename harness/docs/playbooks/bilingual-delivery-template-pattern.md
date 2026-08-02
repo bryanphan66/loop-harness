@@ -125,5 +125,5 @@ delete the original split rule.)
 - Locked decision D4 (`docs/HARNESS.md` § Locked Decisions) — the bilingual split this implements.
 - `docs/README.md` § Bilingual Surfaces — the harness crosswalk of VN forks.
 - `ba-core-doc-bundle.md` — the GLOSSARY VN fork (the bilingual term contract).
-- `../EXTENDING.md` § 6 (composition) — composition rules the client-facing chains
+- `../UNDERSTANDING-loop-harness.md` § 10 (composition) — composition rules the client-facing chains
   honor.

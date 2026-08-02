@@ -1,4 +1,6 @@
-# Hiểu loop-harness (đọc từ trên xuống)
+# loop-harness — Hiểu, vận hành & mở rộng (đọc ĐẦU TIÊN)
+
+*Gồm cả phần "cất tri thức mới ở đâu + tái dùng + mở rộng" (trước ở EXTENDING.md, đã gộp về đây).*
 
 Đây là bản **dẫn dắt tường minh** cho người mới (dev hoặc chính bạn khi quên). Đọc 1 mạch là nắm toàn cảnh: loop-harness LÀ GÌ, chạy THẾ NÀO, phần nào **đã chứng minh** vs **còn nợ**. Khác 2 file kia: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md) = từ điển tra cứu; [`OPERATING-MODES.md`](./OPERATING-MODES.md) = đặc tả chính xác 2 mode. File này = **câu chuyện + đánh giá thành thật**, trỏ về 2 file đó khi cần chi tiết.
 
@@ -60,7 +62,19 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 
 ## 5. Kho tri thức — kinh nghiệm/CICD/R2 lưu ở ĐÂU
 
-**4 kho tri thức = playbook (tái dùng mọi dự án) · runbook (thủ tục riêng 1 dự án) · lessons-log (sai lầm→luật) · memory (fact bền qua phiên).** Bảng quyết-định "học gì → cất kho nào" ở **[`EXTENDING.md`](./EXTENDING.md) §2** (chủ) — file này không lặp lại.
+**Học được gì mới → cất vào đâu?** Nguyên tắc: 1 tri thức = 1 chủ; chọn ĐÚNG 1 dòng theo bản chất cái bạn học.
+
+| Bạn vừa có... | Cất vào | Đường dẫn | Tái dùng thế nào |
+|---|---|---|---|
+| Cách làm 1 việc, dùng lại MỌI dự án (VD wire object-storage, deploy verify-at-source) | **playbook** | `playbooks/*.md` + dòng `playbooks/README.md` | Agent mở đúng cái khi gặp domain đó |
+| Một lần bị đau → rút ra luật ("chart rỗng = lỗi CSS") | **lessons-log** | dự án: `docs/lessons-log.md` · harness: `plans/lessons-log.md` | Phiên sau đọc trước khi lặp sai |
+| Cấu hình/vận hành RIÊNG 1 dự án (deploy host, R2 bucket, env, CI/CD) | **runbook** (của dự án) | `<dự-án>/docs/runbook/*.md` | Người vận hành dự án đó đọc; KHÔNG lẫn vào harness |
+| Fact bền CONTROL cần nhớ, không suy từ repo (slug/key/host, quyết định business) | **memory** | `~/.claude/projects/<key>/memory/` (key theo dự án) | Tự nạp context phiên sau |
+| Loại FILE mới harness kỳ vọng dự án có | **template** | `templates/*.md` + `templates/README.md` | scaffold copy vào dự án |
+| Chốt chặn / luật cứng mới (phải PASS) | **gate / WORKFLOW** | `gates/*.md` / `WORKFLOW.md` | verify-gate + review chặn khi vi phạm |
+| Đổi bản thân harness (cơ chế, version) | **HARNESS_CHANGELOG** | `HARNESS_CHANGELOG.md` | Ghi tiến hoá harness |
+
+**Bẫy (từ lessons-log L9/L10):** đừng chép luật file A sang B (B chỉ TRỎ) · lessons-log DỰ ÁN ở `docs/`, HARNESS ở `plans/` · fact riêng dự án KHÔNG vào memory harness.
 
 **Chốt R2 cho hết mơ hồ:** *mẫu tái dùng* R2/R3 ở **harness** (playbook/template); *R2 đã wire thật của elearning* ở **repo elearning** (runbook). "Cách làm chung" ở harness; "cấu hình cụ thể 1 dự án" ở repo dự án đó.
 
@@ -91,3 +105,16 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 2. Đọc theo thứ tự: file này → [`OPERATING-MODES.md`](./OPERATING-MODES.md) → [`WORKFLOW.md`](./WORKFLOW.md) → [`playbooks/README.md`](./playbooks/README.md).
 3. Dựng dự án mới: `harness/scripts/install-harness.sh --bootstrap --spec ./spec.md ./my-project` → chạy `/stage-next` lặp tới go-live → chuyển sang vòng lặp issue.
 4. Tra nhanh 1 keyword: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md).
+
+**Dev đóng góp ngược lại:** làm dự án bằng harness → gặp bài học/công thức mới → theo bảng §5 cất đúng chỗ → commit vào repo loop-harness → `git push`. Kho lớn dần, mọi dự án sau hưởng.
+
+## 9. Giữ sạch khi mở rộng (đừng để chấp vá quay lại)
+- **Self-containment (tự-đủ):** thêm gì vào `harness/` thì KHÔNG trỏ `../../` ra ngoài cây harness (link chết khi cài vào dự án khác).
+- **Bảo thủ khi xoá:** nghi 2 file trùng → ĐỌC (hoặc giao subagent) rồi mới quyết; phần lớn "nghi trùng" là biên-giới có chủ ý.
+- **Định kỳ dedup-audit** khi kho doc phình: scan(tên+ref-count) → cluster → đọc-hết → verify. Chuẩn viết doc: [`DOC-STANDARD.md`](./DOC-STANDARD.md).
+
+## 10. Khi nào GỘP nhiều playbook thành 1 (composition)
+Gộp thành 1 **meta-playbook** (playbook-cha điều phối chuỗi) **CHỈ khi cả 3 đúng:** (1) cùng 3+ playbook chạy cùng thứ tự ở **2+ dự án**; (2) output bước này = input bước kia; (3) đã **ĐO** được friction (quên thứ tự / bỏ bước / sai). Thiếu 1 → **giữ ATOMIC** (rời).
+- **Đừng pre-build meta-playbook cho "gọn"** — aggregator nảy ra từ friction THẬT, không phải instinct "trông ngăn nắp". Pre-compose ẩn điểm-quyết-định + khó recovery.
+- Mỗi bước khai **Hand-Off Contract:** Input (artifact cần) · Output (artifact đẻ ra, đặt tên để bước sau grep) · Skip-when (điều kiện bỏ qua).
+- Meta-playbook DUY NHẤT hiện có = `playbooks/solo-dev-client-delivery.md`.

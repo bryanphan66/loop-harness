@@ -6,7 +6,7 @@
 > path (large upload → async multi-bitrate HLS transcode → object storage + CDN →
 > signed-URL player), audio, or any "upload → process → stream" flow. This is a
 > **meta-playbook**: it composes `async-job-queue.md` + `object-storage.md` + ffmpeg
-> per `../EXTENDING.md` § 6 (composition). Applies during Build & Go-live **step
+> per `../UNDERSTANDING-loop-harness.md` § 10 (composition). Applies during Build & Go-live **step
 > 2.6** when a phase's REQ-ID carries a media signal (grep: `transcode`, `HLS`,
 > `stream`, `bitrate`, `ffmpeg`, `video`, `player`, `CDN`).
 
@@ -38,7 +38,7 @@ Skip when the "media" is a single small image with no processing — that is a p
 ## Composition (hand-off contract)
 
 This meta-playbook chains three steps; each declares Input / Output / Skip-when per
-`../EXTENDING.md` § 6 (composition):
+`../UNDERSTANDING-loop-harness.md` § 10 (composition):
 
 | Step | Playbook | Input | Output | Skip-when |
 |---|---|---|---|---|
@@ -178,7 +178,7 @@ screens, ported from their prototype exports.
 ## Related
 
 - `async-job-queue.md` · `object-storage.md` — the two primitives this composes.
-- `../EXTENDING.md` § 6 (composition) — the hand-off-contract discipline this honors.
+- `../UNDERSTANDING-loop-harness.md` § 10 (composition) — the hand-off-contract discipline this honors.
 - `docs/gates/phase-acceptance.md` — the per-phase gate (incl. the streaming NFR).
 - `docs/templates/build-manifest.md` — the `Phase-type: media-pipeline` block shape.
 - `media-processing` (engine) — FFmpeg ladder + thumbnails.
