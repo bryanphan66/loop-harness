@@ -360,7 +360,7 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     page-size case beyond the NFR.UXC.09 floor); (c) a navigable row/card routes on
     click, whole-row target, keyboard-reachable; (d) a placeholder action (`mailto:`,
     `href="#"`, `javascript:void`, empty `onClick`) is a DROPPED feature. Machine
-    tooth is DUAL: a lint (`scripts/check-dead-affordance.mjs`, `lint:gates`) fails
+    tooth is DUAL: a lint (`scripts/check-dead-affordance.mjs` — PLANNED, not yet shipped; see Enforcement Status) will fail
     any button/link/select/cursor-pointer-styled element with no
     `onClick|href|onChange|role`+handler (opt out `// static-ok: <reason>`); a
     Playwright drive clicks every actionable-looking element and asserts an
@@ -375,8 +375,8 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     rule; (b) a hero leaves `img`/`iframe` uncapped (no `max-width:100%`, no
     `overflow-x` guard). Root cause, recurs across admin/builder/landing that the
     student-facing responsive floor (block 11) never scopes. **One machine guard
-    over the whole tree** (like U7): a lint (`scripts/check-inline-grid-reflow.mjs`,
-    `lint:gates`) FAILS when (1) a `.tsx` sets a MULTI-TRACK
+    over the whole tree** (like U7): a lint (`scripts/check-inline-grid-reflow.mjs`
+    — PLANNED, not yet shipped) is specified to FAIL when (1) a `.tsx` sets a MULTI-TRACK
     `gridTemplateColumns`/fixed multi-column width via inline `style=` (move to a
     class), (2) a class layout grid (2+ tracks) has no `@media (max-width:768px)`
     1-col rule, (3) a hero/media element lacks `max-width:100%` under an
@@ -392,8 +392,8 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     component renders nothing / a fallback glyph (passes compile + loose glance); (b)
     **one key for all types** — a `.map()` over N typed rows passes a constant
     literal (`'zap'`) or shared archetype, so N types wear one icon. Rules: (a)
-    registry completeness is a static lint (`scripts/check-icon-registry-coverage.mjs`,
-    `lint:gates`): collect every literal passed as `n=`/`icon=`/`archetype=`, diff
+    registry completeness is a static lint (`scripts/check-icon-registry-coverage.mjs`
+    — PLANNED, not yet shipped): collect every literal passed as `n=`/`icon=`/`archetype=`, diff
     against the registry's keys, FAIL on any absent key; the component throws/RED in
     dev on a missing key, never renders empty/silent-fallback (opt out
     `// icon-fallback-ok: <reason>`); (b) an icon in a `.map()` over typed data is
@@ -426,7 +426,7 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     the prototype uses `·`). Pixels + element-presence pass, so it slips — but
     adopt-export means the STRING is verbatim. One machine guard over the whole
     ported string surface (like the U7 lint): `scripts/check-prototype-copy-verbatim.mjs`
-    (`lint:gates`) builds the frozen copy corpus from the export JSX + catalog, then
+    (PLANNED, not yet shipped) builds the frozen copy corpus from the export JSX + catalog, then
     fails when any ported public/catalog string is not byte-exact in that corpus —
     esp. an ASCII `-`/`,`-separator where the corpus uses `·`/`—`/`–`. Opt out
     `// copy-ok: <reason>`. Carve-out: brand/company/SEO/`© <year>` identity literals
@@ -452,7 +452,7 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     representative screen): active tab computes `font-weight:600`; the filter
     toolbar's N controls share ONE row (equal `offsetTop`); the StatCard icon
     resolves in `.stat-ico`. Plus a lint over `src/components/**`
-    (`scripts/check-primitive-inline-style.mjs`, `lint:gates`) failing an inline
+    (`scripts/check-primitive-inline-style.mjs` — PLANNED, not yet shipped) failing an inline
     `style` with a CSS-shorthand key OR a hardcoded layout `width`/`height` (opt out
     `// primitive-style-ok: <reason>`). Per U7: a defect that rides in with a SHARED
     component is fixed at the component and asserted against it once, never per screen.
@@ -464,7 +464,7 @@ enforced at 2.6 (acceptance leg) and 2.7 with the design-system floor rule's
     toasts auto-dismiss on the app's standard timeout (~8000ms), never
     `duration:Infinity`; a user-facing toast shows a mapped/localized message, never
     a raw server string; a mutate uses the app's shared `toast` (not a bespoke
-    banner). Lint (`scripts/check-toast-convention.mjs`, `lint:gates`): RED on
+    banner). Lint (`scripts/check-toast-convention.mjs` — PLANNED, not yet shipped): RED on
     `duration:Infinity` on a `toast.error`, on a raw `err.message`/response body
     passed to a toast, requires the standard auto-dismiss (opt out
     `// toast-ok: <reason>`). (Pairs with U11's reuse-the-app-feedback-convention.)

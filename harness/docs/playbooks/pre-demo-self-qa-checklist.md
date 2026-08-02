@@ -53,7 +53,7 @@ under `plans/reports/`.
 - [ ] **D4 Config drives identity (config-driven-identity):** flip a brand/company value in Settings → cert/invoice/email/json-ld/copyright reflect it. FAIL = a surface still shows the old literal.
 
 ### E. Conventions (static + i18n)
-- [ ] **E1 Copy verbatim (U17):** `check-prototype-copy-verbatim.mjs` green — every ported public/catalog string byte-matches the corpus, no ASCII `-`/`,` where the export uses `·`/`—`/`–`.
+- [ ] **E1 Copy verbatim (U17):** check by hand (lint `check-prototype-copy-verbatim.mjs` is PLANNED, not yet shipped) — every ported public/catalog string byte-matches the corpus, no ASCII `-`/`,` where the export uses `·`/`—`/`–`.
 - [ ] **E2 i18n catalog (Leg-14):** every message ICU-compiles (0 `{{…}}` braces), 0 dead keys, no `vi` value identical to its `en` value (outside brand whitelist).
 - [ ] **E3 Export localized (Leg-14d):** download every CSV/XLSX/PDF — cells show the localized label + active-locale date the table shows, not raw codes (STU/GV/ADM) or ISO dates.
 - [ ] **E4 Toast convention (U19):** no `duration:Infinity` on `toast.error`, no raw server `err.message` in a toast, mutates use the shared `toast` not a bespoke banner.
