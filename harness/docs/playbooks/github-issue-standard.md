@@ -13,7 +13,7 @@
 Cách tạo một issue để vòng lặp xử-lý-issue chạy được ngay, không phải làm lại. Dùng chung mọi dự án: giá trị cụ thể (danh sách Module, Phase, tên org) là chỗ trống `{...}` mỗi dự án tự điền; cấu trúc thì cố định. Phần feature `[F-NNN]` và đồng bộ register xem `feature-issue-ac-demo-standard.md` (file này không lặp lại). Vòng lặp tiêu thụ issue: `steady-state-issue-pipeline.md`.
 
 ## Dự án cung cấp (nạp sẵn cho agent để điền các chỗ trống `{...}`)
-Mỗi dự án đưa agent 5 giá trị này; cấu trúc bên dưới giữ nguyên, chỉ thay giá trị:
+Mỗi dự án đưa agent 5 giá trị này; cấu trúc bên dưới giữ nguyên, chỉ thay giá trị. **Điền/nạp sẵn 5 giá trị này TRƯỚC khi giao CS/PM** (kẻo họ không biết module/staging của dự án); giá trị dự án sống ở runbook/CLAUDE.md của dự án, KHÔNG hardcode vào file chung này (giữ repo-agnostic):
 - **Org/repo** = `{o}/{r}` (chủ + tên repo trên GitHub, VD `RenoAI-Labs/elearning-platform`).
 - **Module list** = danh sách module hợp lệ (điền vào dòng `**Module:**` trong body).
 - **Phase list** = các Milestone (mốc), đặt tên `Phase 1`, `Phase 2`…
@@ -47,10 +47,10 @@ Cái gì trong, cái gì ngoài.
 **Module:** {module}
 
 ## Định nghĩa hoàn thành (Definition of Done - DoD)   <-- CỐ ĐỊNH · GIỐNG mọi task · 1 dòng gộp AC + còn lại thuần NFR/process · KHÔNG mô tả tính năng
-> Mỗi mục xong đính thông số hoặc link chứng minh. Luồng: xong hết AC -> qua các "ĐK lên staging" (kỹ thuật/NFR) -> deploy staging -> QC pass -> UAT pass -> mới Done. (Dự án có catalog SRS/NFR thì gắn mã trace của mình vào mỗi dòng, vd `DP.DEPLOY.05`.)
+> Mỗi mục xong đính thông số hoặc link chứng minh. Mục KHÔNG áp dụng (vd task backend không có Mobile/WCAG; fix vặt không đẻ E2E mới; task nội bộ không có UAT khách): ghi `N/A - <lý do>`, ĐỪNG bỏ trống và ĐỪNG xoá dòng — giữ khối đồng nhất + trung thực. Luồng: xong hết AC -> qua các "ĐK lên staging" (kỹ thuật/NFR) -> deploy staging -> QC pass -> UAT pass -> mới Done. (Dự án có catalog SRS/NFR thì gắn mã trace của mình vào mỗi dòng, vd `DP.DEPLOY.05`.)
 - [ ] Xong toàn bộ AC ở trên (mỗi AC QC-pass được trên staging)
 - [ ] Lint pass (CI) - (link)
-- [ ] Unit test pass, coverage đạt ngưỡng - (link)
+- [ ] Unit test pass, coverage đạt ngưỡng (dự án tự đặt) - (link)
 - [ ] Integration test pass - (link)
 - [ ] E2E test pass - (link)
 - [ ] Security test (OWASP / NFR bảo mật) - (link)
@@ -63,7 +63,7 @@ Cái gì trong, cái gì ngoài.
 - [ ] UAT khách đạt (mirror sang PM-tool) - (link)  -> mới chuyển Done
 
 ## Liên kết
-- Commit / PR: dùng `Refs #N` (hoặc `[F-NNN]`) trong commit — TUYỆT ĐỐI không `Closes/Fixes/Resolves`. Chỉ chuyển **Done**/Close sau khi QC + UAT pass (không đóng sớm).
+- Commit / PR: dùng `Refs #N` (hoặc `[F-NNN]`) trong commit - TUYỆT ĐỐI không `Closes/Fixes/Resolves`. Chỉ chuyển **Done**/Close sau khi QC + UAT pass (không đóng sớm).
 - PM-task (Plane...): đồng bộ 1-1 với issue.
 - Link staging của tính năng liên quan; issue/PR liên quan.
 - (Chỉ feature) marker ẩn `<!-- feat-id: F-NNN -->` để đồng bộ idempotent (chạy đồng bộ lại nhiều lần vẫn ra 1 kết quả, không tạo trùng).
@@ -71,7 +71,7 @@ Cái gì trong, cái gì ngoài.
 
 **AC là dòng sống còn.** Issue không có AC dạng checkbox kiểm-được = issue chưa chuẩn (QC không có gì để tick, coder không biết "xong" là gì).
 
-**DoD là khối CỐ ĐỊNH cho mọi issue** — các mục NFR/process trên **y hệt nhau** cho mọi task (kỹ thuật hay nghiệp vụ), giống nhau, mỗi mục đính bằng chứng. **DoD KHÔNG mô tả tính năng** — tính năng nằm ở AC. AC = "xong CÁI GÌ" (riêng từng issue, mô tả tính năng cụ thể); DoD = "xong THẾ NÀO" (thuần NFR — chuẩn chất lượng/phi-chức-năng chung). Issue thiếu khối DoD, hoặc DoD nhét mô tả tính năng = chưa chuẩn.
+**DoD là khối CỐ ĐỊNH cho mọi issue** — các mục NFR/process trên **y hệt nhau** cho mọi task (kỹ thuật hay nghiệp vụ), giống nhau, mỗi mục đính bằng chứng. Mục nào **không áp dụng** cho task cụ thể thì ghi `N/A - <lý do>` (KHÔNG xoá dòng, KHÔNG bỏ trống) — khối vẫn đồng nhất, và "bỏ qua" là quyết định trung thực có ghi lý do chứ không phải âm thầm drop. **DoD KHÔNG mô tả tính năng** — tính năng nằm ở AC. AC = "xong CÁI GÌ" (riêng từng issue, mô tả tính năng cụ thể); DoD = "xong THẾ NÀO" (thuần NFR — chuẩn chất lượng/phi-chức-năng chung). Issue thiếu khối DoD, hoặc DoD nhét mô tả tính năng = chưa chuẩn.
 
 > **Giải nghĩa thuật ngữ trong khối DoD (cho người đọc — KHÔNG chép mấy dòng giải nghĩa này vào issue):** `NFR` (Non-Functional Requirement — yêu cầu phi chức năng: hiệu năng/bảo mật/khả dụng/khả bảo trì…) · `QC` (Quality Control — kiểm thử chất lượng) · `staging` (bản chạy thử, giống thật, để kiểm trước khi ra khách) · `coverage` (độ phủ test — % code được test chạy qua) · `Integration/E2E test` (kiểm tích hợp / kiểm đầu-cuối cả luồng người dùng) · `OWASP` (bộ chuẩn lỗ hổng bảo mật web phổ biến) · `WCAG AA` (chuẩn khả dụng cho người khuyết tật, mức AA) · `regression` (hồi quy — sửa cái này làm hỏng cái đang chạy) · `HDSD` (hướng dẫn sử dụng — user guide) · `verify-at-source` (xác minh tại nguồn — kiểm container đang chạy mang đúng commit đã merge, không tin CI xanh suông) · `UAT` (User Acceptance Testing — khách nghiệm thu) · `Refs #N` (chỉ THAM CHIẾU issue, KHÁC `Closes/Fixes` là tự-đóng-issue — dùng Refs để không đóng sớm) · `CI` (Continuous Integration — máy tự động chạy lint/build/test mỗi lần push).
 
@@ -100,6 +100,7 @@ States / Module / Priority là **org-level single-select Issue Fields** (trườ
 - Không có AC, hoặc AC không kiểm được ("làm cho đẹp hơn").
 - **Thiếu khối DoD**, hoặc mỗi issue một kiểu DoD (các mục NFR/process phải giống nhau mọi task).
 - **DoD nhét mô tả tính năng** (DoD chỉ thuần NFR/process; tính năng nằm ở AC), hoặc DoD-item không đính bằng chứng (link/thông số).
+- **Xoá dòng / bỏ trống DoD-item không áp dụng** thay vì ghi `N/A - <lý do>` (mất tính đồng nhất + không rõ đã cân nhắc hay quên).
 - **Loại (Feature/Bug/Enhancement) làm LABEL** thay vì Issue Type; hay **Module/Phase làm label**. Chỉ `github` + `plane` là label; loại = Issue Type, module = body, phase = Milestone.
 - Tiêu đề dính code/plan ref (F13, phase-2, audit).
 - Bug mồ côi (không gán feature cha).
