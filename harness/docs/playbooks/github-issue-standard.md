@@ -17,7 +17,7 @@ Mỗi dự án đưa agent 5 giá trị này; cấu trúc bên dưới giữ ngu
 - **Org/repo** = `{o}/{r}` (chủ + tên repo trên GitHub, VD `RenoAI-Labs/elearning-platform`).
 - **Module list** = danh sách module hợp lệ (điền vào dòng `**Module:**` trong body).
 - **Phase list** = các Milestone (mốc), đặt tên `Phase 1`, `Phase 2`…
-- **Org field IDs** = id các trường States (trạng thái) / Module / Priority (ưu tiên) — để script `issue-state.mjs` set (xem §4).
+- **Org field IDs** = tên/id các trường States (trạng thái) / Module / Priority (ưu tiên). Lưu ý: `issue-state.mjs` **tự resolve theo TÊN**, KHÔNG cần cấp id sẵn; giá trị này chỉ cần khi admin tạo/khởi field lần đầu (xem §4).
 - **Staging URL** = link môi trường staging (bản chạy thử để QC/khách nghiệm thu) — dán vào AC và link cuối issue.
 
 ## 0. BA-validate (phản biện nghiệp vụ) TRƯỚC khi issue ra đời
@@ -85,13 +85,15 @@ Cái gì trong, cái gì ngoài.
 | **Milestone** = Phase (số nguyên) | Có nếu biết | `--milestone "Phase {n}"` |
 | **Parent** (sub-issue) | Bug/task = con của feature cha đúng domain | `POST /repos/{o}/{r}/issues/{parent}/sub_issues -F sub_issue_id={child rest id}` |
 | **Label** | CHỈ 2 nhãn nguồn/mirror | **`github` + `plane`** (đánh dấu nguồn GitHub + đồng bộ sang PM-tool). Loại = Issue Type (không phải label); Module = body; Phase = Milestone. Không đẻ label khác. |
-| **States** | Để mặc định = **Backlog** | (vòng lặp chuyển sau bằng `issue-state.mjs`) |
+| **States** | Để mặc định = **Backlog** | Vòng lặp/pipeline chuyển sau bằng `scripts/issue-state.mjs` (script TRONG repo, KHÔNG thuộc file này); CS/PM tạo issue KHÔNG chạy |
 | **Priority** (Urgent/High/Medium/Low) | Để triage | org custom-field, set khi PM triage (xem §4) |
 
 > **Generic hoá `plane`:** `plane` là tên nhãn **mirror sang PM-tool** (RENO đang dùng Plane). Dự án dùng PM-tool khác thì **đổi tên nhãn này** cho khớp — cấu trúc "`github` (nguồn) + `{pm-mirror}`" giữ nguyên, chỉ tên nhãn thứ 2 thay theo tool.
 
 ## 4. Cơ chế custom Issue Fields (thành thật — chỗ hay sai)
 States / Module / Priority là **org-level single-select Issue Fields** (trường tuỳ-biến cấp tổ-chức, mỗi trường chọn-1-giá-trị — KHÁC Projects v2, KHÁC label). Đọc value = `GET /repos/{o}/{r}/issues/{n}` header `Accept: application/vnd.github.full+json` -> `.issue_field_values[]`. Set value = `PATCH .../issues/{n}` body `{"issue_field_values":[{"field_id":ID,"value":"<tên option>"}]}` — **DECLARATIVE (khai báo): gửi trường nào thì các trường khác BỊ XOÁ, nên phải gửi lại tất cả cùng lúc** (dùng `scripts/issue-state.mjs`, nó tự gửi lại Module + Priority kèm States). Option chỉ tạo được lúc tạo field (cần quyền admin:org). -> **Agent CS/PM lúc tạo issue chỉ lo: Title / Body / AC / Module-trong-body / Issue Type / Assignee / Milestone / Parent / Label.** States tự Backlog; Priority + Module-field để triage/vòng-lặp set bằng script (đừng tự PATCH declarative kẻo wipe nhầm trường khác).
+
+> **Field gắn theo Issue Type (chỗ hay quên) + script ở đâu:** States/Module/Priority **gắn theo TỪNG Issue Type** — hiện Feature/Bug/Enhancement đều mang đủ 3. Thêm/đổi Issue Type phải gắn đủ 3 field cho type mới, kẻo field không hiện trên issue + `issue-state.mjs` (resolve theo TÊN) không set được. Script này nằm ở `scripts/issue-state.mjs` của repo (seed từ harness `templates/steady-state/scripts/`), thuộc vòng lặp `steady-state-issue-pipeline.md`, **KHÔNG kèm trong file chuẩn này** — gửi riêng file này thì người đọc xem script ở repo, và người tạo issue không cần chạy nó.
 
 ## 5. external_id + PM-tool
 `external_id` (khoá nối sang PM-tool như Plane) = **số issue GitHub**. `[F-NNN]` chỉ là mã phụ trong tiêu đề, không phải khoá nối. Item PM-tool nối 1:1 với issue GitHub (khách nghiệm thu ở đó nếu có).
