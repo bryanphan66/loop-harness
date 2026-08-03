@@ -41,7 +41,7 @@ Khách báo "bug" nhiều khi là hành vi hiện tại mới đúng. **CS + Tec
 Cái gì trong, cái gì ngoài.
 
 ## Tiêu chí nghiệm thu (Acceptance Criteria - AC)   <-- QUAN TRỌNG NHẤT (dev + QC + UAT cùng kiểm)
-- [ ] Given <bối cảnh> When <thao tác> Then <kết quả kiểm được>.  Demo: <link> | HDSD: <link>
+- [ ] Given <bối cảnh> When <thao tác> Then <kết quả kiểm được>.  Demo: <link> | HDSD: <link>  (2 link điền khi dev/QC xong, KHÔNG cần lúc tạo issue)
 - [ ] ... (mỗi tiêu chí PHẢI kiểm được trên staging; đây là cái QC + demo bám vào)
 
 **Module:** {module}
@@ -54,9 +54,9 @@ Cái gì trong, cái gì ngoài.
 - [ ] Integration test pass - (link)
 - [ ] E2E test pass - (link)
 - [ ] Security test (OWASP / NFR bảo mật) - (link)
-- [ ] Regression - không phá chức năng/số liệu liên quan (UAT agent chạy sau)
+- [ ] Regression - không phá chức năng/số liệu liên quan (kiểm hồi quy sau khi lên staging)
 - [ ] Mobile 375px + WCAG AA (nếu có UI) - (link)
-- [ ] HDSD tính năng (user guide) - (link)
+- [ ] HDSD tính năng đầy đủ (user guide cả tính năng; khác `HDSD:` per-AC ở trên chỉ trỏ mục tương ứng) - (link)
 - [ ] Cập nhật tài liệu liên quan trong source - (commit)
 - [ ] Deploy staging + verify-at-source (health ok, SHA == commit đã merge) - (link)
 - [ ] QC pass (human) - (ghi chú)
