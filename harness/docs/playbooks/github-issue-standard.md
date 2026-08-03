@@ -84,11 +84,11 @@ Cái gì trong, cái gì ngoài.
 | **Assignee** | Có | `--assignee {user}` |
 | **Milestone** = Phase (số nguyên) | Có nếu biết | `--milestone "Phase {n}"` |
 | **Parent** (sub-issue) | Bug/task = con của feature cha đúng domain | `POST /repos/{o}/{r}/issues/{parent}/sub_issues -F sub_issue_id={child rest id}` |
-| **Label** | CHỈ 2 nhãn nguồn/mirror | **`github` + `plane`** (đánh dấu nguồn GitHub + đồng bộ sang PM-tool). Loại = Issue Type (không phải label); Module = body; Phase = Milestone. Không đẻ label khác. |
+| **Label** | CHỈ 1 nhãn mirror | **`plane`** (marker đồng bộ sang PM-tool). Loại = Issue Type field (KHÔNG phải label); Module = body; Phase = Milestone. Không đẻ label khác. |
 | **States** | Để mặc định = **Backlog** | Vòng lặp/pipeline chuyển sau bằng `scripts/issue-state.mjs` (script TRONG repo, KHÔNG thuộc file này); CS/PM tạo issue KHÔNG chạy |
 | **Priority** (Urgent/High/Medium/Low) | Để triage | org custom-field, set khi PM triage (xem §4) |
 
-> **Generic hoá `plane`:** `plane` là tên nhãn **mirror sang PM-tool** (RENO đang dùng Plane). Dự án dùng PM-tool khác thì **đổi tên nhãn này** cho khớp — cấu trúc "`github` (nguồn) + `{pm-mirror}`" giữ nguyên, chỉ tên nhãn thứ 2 thay theo tool.
+> **Generic hoá `plane`:** `plane` là tên nhãn **mirror sang PM-tool** (RENO đang dùng Plane). Dự án dùng PM-tool khác thì **đổi tên nhãn này** cho khớp (`{pm-mirror}`). Nhãn `github` cũ đã bỏ - nó không có chức năng trong sync (chỉ `plane` mới trigger mirror).
 
 ## 4. Cơ chế custom Issue Fields (thành thật — chỗ hay sai)
 States / Module / Priority là **org-level single-select Issue Fields** (trường tuỳ-biến cấp tổ-chức, mỗi trường chọn-1-giá-trị — KHÁC Projects v2, KHÁC label). Đọc value = `GET /repos/{o}/{r}/issues/{n}` header `Accept: application/vnd.github.full+json` -> `.issue_field_values[]`. Set value = `PATCH .../issues/{n}` body `{"issue_field_values":[{"field_id":ID,"value":"<tên option>"}]}` — **DECLARATIVE (khai báo): gửi trường nào thì các trường khác BỊ XOÁ, nên phải gửi lại tất cả cùng lúc** (dùng `scripts/issue-state.mjs`, nó tự gửi lại Module + Priority kèm States). Option chỉ tạo được lúc tạo field (cần quyền admin:org). -> **Agent CS/PM lúc tạo issue chỉ lo: Title / Body / AC / Module-trong-body / Issue Type / Assignee / Milestone / Parent / Label.** States tự Backlog; Priority + Module-field để triage/vòng-lặp set bằng script (đừng tự PATCH declarative kẻo wipe nhầm trường khác).
@@ -103,7 +103,7 @@ States / Module / Priority là **org-level single-select Issue Fields** (trườ
 - **Thiếu khối DoD**, hoặc mỗi issue một kiểu DoD (các mục NFR/process phải giống nhau mọi task).
 - **DoD nhét mô tả tính năng** (DoD chỉ thuần NFR/process; tính năng nằm ở AC), hoặc DoD-item không đính bằng chứng (link/thông số).
 - **Xoá dòng / bỏ trống DoD-item không áp dụng** thay vì ghi `N/A - <lý do>` (mất tính đồng nhất + không rõ đã cân nhắc hay quên).
-- **Loại (Feature/Bug/Enhancement) làm LABEL** thay vì Issue Type; hay **Module/Phase làm label**. Chỉ `github` + `plane` là label; loại = Issue Type, module = body, phase = Milestone.
+- **Loại (Feature/Bug/Enhancement) làm LABEL** thay vì Issue Type; hay **Module/Phase làm label**. Chỉ `plane` là label; loại = Issue Type field, module = body, phase = Milestone.
 - Tiêu đề dính code/plan ref (F13, phase-2, audit).
 - Bug mồ côi (không gán feature cha).
 - Thiếu Issue Type / tạo mà chưa BA-validate nhạy cảm nghiệp vụ.
@@ -114,6 +114,6 @@ States / Module / Priority là **org-level single-select Issue Fields** (trườ
 - [ ] Title mệnh lệnh, không code/plan ref (feature: `[F-NNN]`)
 - [ ] Body: Bối cảnh + Phạm vi + **AC checkbox kiểm-được** (kèm Demo/HDSD) + `**Module:**` + **DoD thuần NFR** (các mục NFR/process giống mọi task, mỗi mục đính bằng chứng) + **Liên kết** (Refs #N, PM-task)
 - [ ] Issue Type (Feature/Bug/Enhancement) + Assignee + Milestone(Phase) + Parent (nếu là con feature)
-- [ ] Label: CHỈ `github` + `plane` (loại ở Issue Type, không phải label)
+- [ ] Label: CHỈ `plane` (loại ở Issue Type field, không phải label)
 - [ ] States để Backlog; Priority để triage
 - [ ] Rà: external_id = số issue; không đẻ label loại/module/phase
