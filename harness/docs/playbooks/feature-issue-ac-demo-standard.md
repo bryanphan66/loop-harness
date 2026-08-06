@@ -37,14 +37,14 @@ A sync script (shape of `scripts/feature-issues-sync.mjs`) reconciles register -
 - **Body template:**
   ```
   **Mục tiêu (User story):** {goal}
-  **REQ-ID:** {reqids}   (Module = nhãn `Module: <Tên>`, Phase = nhãn `Phase: <N>` — đều là nhãn, không ghi body)
+  **Phase:** {phase}  |  **REQ-ID:** {reqids}   (Module = nhãn `Module: <Tên>`, không ghi body; Phase = Milestone)
 
   <acceptance-criteria checklist>
   <!-- feat-id: F-NNN -->
   ```
 - **`--rebuild` overwrites the body ONLY when the issue was not hand-edited** — never
   clobber human edits.
-- **Labels + fields:** GitHub labels = `plane` + `Module: <Tên>` + `Phase: <N>`; Feature/Bug/Enhancement = **Issue Type**, Module = **nhãn `Module: <Tên>` cấp repo**, Phase = **nhãn `Phase: <N>` cấp repo** (cả hai per-repo, KHÔNG org field/Milestone, KHÔNG body — §3.1 owner). Full authoring rule + reconcile steps: `github-issue-standard.md` §3-4 (the owner). (Plane keeps Feature/Bug/Enhancement labels — no native Type — intentional asymmetry.)
+- **Labels + fields:** GitHub labels = `plane` + `Module: <Tên>`; Feature/Bug/Enhancement = **Issue Type**, Module = **nhãn `Module: <Tên>` cấp repo** (per-repo, KHÔNG org field, KHÔNG body — §3.1 owner), Phase = **Milestone**. Full authoring rule + reconcile steps: `github-issue-standard.md` §3-4 (the owner). (Plane keeps Feature/Bug/Enhancement labels — no native Type — intentional asymmetry.)
 
 ## 3. PM-tool Issues = client UAT (1:1 with GitHub F-NNN)
 
