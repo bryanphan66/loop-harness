@@ -7,8 +7,9 @@
 **Macro-stage / step:** Steady-state (Mode B) — issue authoring (feeds Ready-for-Dev). **Gate it serves:** DoR (Definition of Ready — điều kiện issue "đủ chín" để giao: đủ field + AC trước khi dispatch/giao coder).
 
 ## Engine
-- **Đường nhanh (fast path):** agent PM/CS làm BA-validate rồi `gh issue create` rồi gắn Issue Type + nhãn `Module: <Tên>` + Milestone(Phase) + Parent (States/Priority là org field, set sau bằng script).
-- **Fallback (agent trần):** agent chung đọc chuẩn này, tạo issue, set field.
+- **Đường chuẩn (mọi agent - PM/CS/QC/ai phát hiện lỗi):** BA-validate rồi chạy **`node scripts/new-issue.mjs --input issue.json --create`**. Agent CHỈ điền phần BIẾN (title/context/scope/AC) trong `issue.json`; **khối cố định (5 header + DoD 13 mục) do script tự ghi -> không thể paraphrase sai**. Script tự gắn nhãn `plane` + `Module:`, Issue Type, assignee, Milestone, rồi **tự `--check` lại (fail-closed)**. Còn thiếu: gắn Parent (sub-issue) nếu là bug con của feature. States để Backlog; Priority triage sau.
+- **Gate DoR (bắt buộc nếu tạo tay):** issue tạo bằng `gh issue create`/UI PHẢI qua **`node scripts/new-issue.mjs --check <issue#>`** (exit 1 nếu lệch: thiếu khối, DoD < 13 mục, thiếu `plane`/`Module:`, còn `github`, dùng Closes/Fixes). KHÔNG dispatch coder tới khi `--check` xanh.
+- **Khung nguồn:** GitHub UI dùng `.github/ISSUE_TEMPLATE/bug-report.md` (đã đồng bộ khung chuẩn này); nhưng agent nên dùng script, không gõ tay.
 
 Cách tạo một issue để vòng lặp xử-lý-issue chạy được ngay, không phải làm lại. Dùng chung mọi dự án: giá trị cụ thể (danh sách Module, Phase, tên org) là chỗ trống `{...}` mỗi dự án tự điền; cấu trúc thì cố định. Phần feature `[F-NNN]` và đồng bộ register xem `feature-issue-ac-demo-standard.md` (file này không lặp lại). Vòng lặp tiêu thụ issue: `steady-state-issue-pipeline.md`.
 
