@@ -1,7 +1,17 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v7.0**.
+templates). Per-project state never lives here. Current version: **v7.1**.
+
+## v7.1 — 2026-08-06 — Module = repo label (not org field), Phase stays Milestone; issue-field hygiene
+
+Fixed a real cross-repo defect: **Module was an org-level GitHub Issue Field** — one shared option list for EVERY repo in the org, wrong because module taxonomy is per-project. Moved Module to a **repo-level label `Module: <Name>`** (readable, e.g. `Module: Course Management`); each repo defines its own set. **Phase stays a Milestone** (`Phase 1/2/3`) — briefly trialled as a `Phase: N` label then reverted (milestones are already per-repo, and removing them lost nothing but risked churn).
+
+- **`github-issue-standard.md` §3.1 + `feature-issue-ac-demo-standard.md`**: Module = label `Module: <Name>`; Phase = Milestone; allowed labels = `plane` + `Module: <Name>` (Type = Issue Type field, not a label). Supersedes the v6.22 "module in the body" rule.
+- **`issue-state.mjs`**: no longer re-sends Module (drops the retired org-field value on next state change).
+- **Per-project value list** lives in the repo's `runbook`/`CLAUDE.md` (Org/repo, Module label set, Phase milestones, org fields = States/Priority only, staging URL).
+- **elearning adoption**: 13 `Module:` labels applied to 107 issues; org Module field **deleted** (needs `admin:org`); redundant `bug`/`enhancement`/`feature` labels removed (Type lives in the Issue Type field), `github`+`plane` kept; `feature-issues-sync.mjs` now maps its 23 register sections onto the 13 canonical module names and attaches the label (was writing `**Module:**` to the body).
+- **Known follow-ups**: module is section-level in the register (coarse — e.g. login/RBAC under an infra section land on `Platform & Integrations`); GitHub→Plane cron backfill was retired (kept as a future rebuild, not running).
 
 ## v7.0 — 2026-07-29 — re-centered on the LOOP (Loop Engineering): a lean linear build feeds a self-correcting steady-state loop
 
