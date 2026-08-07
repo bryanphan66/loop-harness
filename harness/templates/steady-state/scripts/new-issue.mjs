@@ -145,6 +145,15 @@ if (d.type && num) {
     console.log(`[type] #${num} -> ${d.type}`);
   } catch (e) { console.error(`[canh bao] set Issue Type that bai: ${e.message}`); }
 }
+// Set States khoi tao (org field KHONG tu dien default) qua issue-state.mjs sibling.
+// Issue moi tao vao pipeline o "Backlog" (default); override bang --state neu can.
+if (num) {
+  const stateName = argOf('--state') || 'Backlog';
+  const stateScript = process.argv[1].replace(/[^/]+$/, '') + 'issue-state.mjs';
+  try {
+    execFileSync(process.argv[0], [stateScript, num, stateName, '--repo', REPO], { stdio: 'inherit' });
+  } catch (e) { console.error(`[canh bao] set States="${stateName}" that bai (chay tay issue-state.mjs): ${e.message}`); }
+}
 // Tu kiem lai (fail-closed): tao xong PHAI dung chuan
 if (num) {
   try { execFileSync(process.argv[0], [process.argv[1], '--check', num, '--repo', REPO], { stdio: 'inherit' }); }
