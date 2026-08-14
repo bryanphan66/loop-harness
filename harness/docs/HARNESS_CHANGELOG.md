@@ -1,7 +1,15 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v7.1**.
+templates). Per-project state never lives here. Current version: **v7.2**.
+
+## v7.2 — 2026-08-14 — ctl-ops friction fixed at the root: `wait-workers.sh` + flow publish-mode + 4 operating rules
+
+Retro of the 2026-08-13/14 elearning dogfood (Phase-1 prod cut + a long QC loop) surfaced recurring ctl-session friction. Fixed at the root (per owner: "fix triệt để, không chắp vá"), not patched over.
+
+- **New harness helper `scripts/wait-workers.sh`**: blocks until dispatched bg-worker(s) hit a DONE signal — a `--branch`'s PR is **MERGEABLE** (the real signal: a bg session often lingers `state=working` AFTER its PR is complete) or a `--id` worker is terminal. Run via `run_in_background`. Replaces the poll loop a ctl session was re-hand-rolling every dispatch (~15×/session).
+- **`flow` (Trung's personal convenience CLI, goclaw) gained publish-mode** — additive, opt-in per-repo git config, tag-mode (hasi) unchanged. Draft-release repos (elearning: merge→main auto-drafts a version, publishing it deploys; health emits `commitSha` not `version`) now cut prod with `flow release`: merge→wait CI+draft→publish→monitor deploy→verify-at-source by commitSha→**auto-retry once on ghcr/CI flake**, fail-closed. Was hand-rolled + no retry (the v1.7.0 prod deploy failed once on a ghcr.io login timeout). Config: `flow.releasemode publish · flow.healthfield commitSha · flow.deployworkflow`. goclaw PR#2. (Not harness canon — v7.0 demoted flow to personal convenience; recorded here for the ctl-ops rules below.)
+- **4 ctl-ops rules** (memory `ctl-ops-flow-publish-and-waitworkers`): (1) clean after merge with `flow gc`/`flow clean`, never manual `git worktree remove` (`gh pr merge --delete-branch` always fails on a checked-out branch); (2) never suppress `git commit`/`push` output with `-q`/`tail` — a silent pre-commit crash (`ENOENT` in a fresh worktree) pushed an EMPTY branch undetected — verify the new SHA ≠ base before push; (3) `claude rm` takes ONE id (extra args ignored); (4) fresh worktrees off origin/dev miss dirs/deps → gate false-fails; `--no-verify` is fine for a docs-only commit.
 
 ## v7.1 — 2026-08-06 — Module = repo label (not org field), Phase stays Milestone; issue-field hygiene
 
