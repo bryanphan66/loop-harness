@@ -13,8 +13,9 @@
  *
  * QUAN TRONG - value PATCH la DECLARATIVE (khai bao): gui len issue_field_values
  * nao thi GitHub thay THE toan bo, cac field khong gui bi XOA. Vi vay script
- * DOC gia tri hien tai cua issue (Module, Priority, ...) roi GUI LAI cung voi
- * States moi, tranh xoa nham cac field khac.
+ * DOC gia tri hien tai cua issue (Priority, ...) roi GUI LAI cung voi States
+ * moi, tranh xoa nham cac field khac. (Module da chuyen sang nhan `module:` cap
+ * repo -> script KHONG re-send Module nua; xem block resolve o duoi.)
  *
  * Field id KHONG hardcode - resolve dong theo ten "States" qua
  * gh api /orgs/<org>/issue-fields (id hien tai 44755813 nhung co the doi).
@@ -54,13 +55,18 @@ const gh = (ghArgs, input) => execFileSync('gh', ghArgs, {
 });
 
 // ---- 1. Resolve field "States" (id + danh sach option hop le) DONG -----------
-let statesFieldId, validStates;
+// Module da chuyen sang nhan `module:<slug>` cap repo (khong con la org field).
+// Resolve id Module (neu org field cu con ton tai) de KHONG re-send -> PATCH
+// declarative se drop gia tri org field Module cu con sot lai.
+let statesFieldId, validStates, moduleFieldId = null;
 try {
   const fields = JSON.parse(gh(['api', `/orgs/${ORG}/issue-fields`]));
   const states = fields.find((f) => f.name === 'States');
   if (!states) die(`org ${ORG} chua co issue-field ten "States".`);
   statesFieldId = states.id;
   validStates = (states.options || []).map((o) => o.name);
+  const moduleField = fields.find((f) => f.name === 'Module');
+  moduleFieldId = moduleField ? moduleField.id : null;
 } catch (e) {
   die(`khong doc duoc /orgs/${ORG}/issue-fields (gh loi hoac chua login?): ${e.message}`);
 }
@@ -96,6 +102,7 @@ for (const fv of existing) {
     statesReplaced = true;
     continue;
   }
+  if (moduleFieldId && fv.issue_field_id === moduleFieldId) continue; // Module -> nhan module: cap repo, khong re-send (drop gia tri org field cu)
   const v = valueOf(fv);
   if (v !== null && v !== undefined && v !== '') {
     payloadValues.push({ field_id: fv.issue_field_id, value: v }); // giu nguyen field khac

@@ -7,17 +7,18 @@
 **Macro-stage / step:** Steady-state (Mode B) — issue authoring (feeds Ready-for-Dev). **Gate it serves:** DoR (Definition of Ready — điều kiện issue "đủ chín" để giao: đủ field + AC trước khi dispatch/giao coder).
 
 ## Engine
-- **Đường nhanh (fast path):** agent PM/CS làm BA-validate rồi `gh issue create` rồi điền field org (States/Module/Type/Parent).
-- **Fallback (agent trần):** agent chung đọc chuẩn này, tạo issue, set field.
+- **Đường chuẩn (mọi agent - PM/CS/QC/ai phát hiện lỗi):** BA-validate rồi chạy **`node scripts/new-issue.mjs --input issue.json --create`**. Agent CHỈ điền phần BIẾN (title/context/scope/AC) trong `issue.json`; **khối cố định (5 header + DoD 13 mục) do script tự ghi -> không thể paraphrase sai**. Script tự gắn nhãn `plane` + `Module:`, Issue Type, assignee, Milestone, **tự set States = `Backlog`** (org field KHÔNG tự điền default - phải set qua `issue-state.mjs`, script làm hộ; đổi bằng `--state`), rồi **tự `--check` lại (fail-closed)**. Còn thiếu: gắn Parent (sub-issue) nếu là bug con của feature. Priority triage sau.
+- **Gate DoR (bắt buộc nếu tạo tay):** issue tạo bằng `gh issue create`/UI PHẢI qua **`node scripts/new-issue.mjs --check <issue#>`** (exit 1 nếu lệch: thiếu khối, DoD < 13 mục, thiếu `plane`/`Module:`, còn `github`, dùng Closes/Fixes). KHÔNG dispatch coder tới khi `--check` xanh.
+- **Khung nguồn:** GitHub UI dùng `.github/ISSUE_TEMPLATE/bug-report.md` (đã đồng bộ khung chuẩn này); nhưng agent nên dùng script, không gõ tay.
 
 Cách tạo một issue để vòng lặp xử-lý-issue chạy được ngay, không phải làm lại. Dùng chung mọi dự án: giá trị cụ thể (danh sách Module, Phase, tên org) là chỗ trống `{...}` mỗi dự án tự điền; cấu trúc thì cố định. Phần feature `[F-NNN]` và đồng bộ register xem `feature-issue-ac-demo-standard.md` (file này không lặp lại). Vòng lặp tiêu thụ issue: `steady-state-issue-pipeline.md`.
 
 ## Dự án cung cấp (nạp sẵn cho agent để điền các chỗ trống `{...}`)
 Mỗi dự án đưa agent 5 giá trị này; cấu trúc bên dưới giữ nguyên, chỉ thay giá trị. **Điền/nạp sẵn 5 giá trị này TRƯỚC khi giao CS/PM** (kẻo họ không biết module/staging của dự án); giá trị dự án sống ở runbook/CLAUDE.md của dự án, KHÔNG hardcode vào file chung này (giữ repo-agnostic):
 - **Org/repo** = `{o}/{r}` (chủ + tên repo trên GitHub, VD `RenoAI-Labs/elearning-platform`).
-- **Module list** = danh sách module hợp lệ (điền vào dòng `**Module:**` trong body).
+- **Module list** = danh sách nhãn `Module: <Tên>` hợp lệ CỦA REPO (mỗi repo tự định nghĩa bộ riêng — Module là chuyện riêng dự án, KHÔNG dùng chung org; xem §3.1).
 - **Phase list** = các Milestone (mốc), đặt tên `Phase 1`, `Phase 2`…
-- **Org field IDs** = tên/id các trường States (trạng thái) / Module / Priority (ưu tiên). Lưu ý: `issue-state.mjs` **tự resolve theo TÊN**, KHÔNG cần cấp id sẵn; giá trị này chỉ cần khi admin tạo/khởi field lần đầu (xem §4).
+- **Org field IDs** = tên/id các trường States (trạng thái) / Priority (ưu tiên). Lưu ý: `issue-state.mjs` **tự resolve theo TÊN**, KHÔNG cần cấp id sẵn; giá trị này chỉ cần khi admin tạo/khởi field lần đầu (xem §4).
 - **Staging URL** = link môi trường staging (bản chạy thử để QC/khách nghiệm thu) — dán vào AC và link cuối issue.
 
 ## 0. BA-validate (phản biện nghiệp vụ) TRƯỚC khi issue ra đời
@@ -43,8 +44,6 @@ Cái gì trong, cái gì ngoài.
 ## Tiêu chí nghiệm thu (Acceptance Criteria - AC)   <-- QUAN TRỌNG NHẤT (dev + QC + UAT cùng kiểm)
 - [ ] Given <bối cảnh> When <thao tác> Then <kết quả kiểm được>.  Demo: <link> | HDSD: <link>  (2 link điền khi dev/QC xong, KHÔNG cần lúc tạo issue)
 - [ ] ... (mỗi tiêu chí PHẢI kiểm được trên staging; đây là cái QC + demo bám vào)
-
-**Module:** {module}
 
 ## Định nghĩa hoàn thành (Definition of Done - DoD)   <-- CỐ ĐỊNH · GIỐNG mọi task · 1 dòng gộp AC + còn lại thuần NFR/process · KHÔNG mô tả tính năng
 > Mỗi mục xong đính thông số hoặc link chứng minh. Mục KHÔNG áp dụng (vd task backend không có Mobile/WCAG; fix vặt không đẻ E2E mới; task nội bộ không có UAT khách): ghi `N/A - <lý do>`, ĐỪNG bỏ trống và ĐỪNG xoá dòng — giữ khối đồng nhất + trung thực. Luồng: xong hết AC -> qua các "ĐK lên staging" (kỹ thuật/NFR) -> deploy staging -> QC pass -> UAT pass -> mới Done. (Dự án có catalog SRS/NFR thì gắn mã trace của mình vào mỗi dòng, vd `DP.DEPLOY.05`.)
@@ -79,21 +78,29 @@ Cái gì trong, cái gì ngoài.
 | Trường | Set khi tạo? | Cách |
 |---|---|---|
 | **Title / Body / AC** | Bắt buộc | `gh issue create` |
-| **Module** | Ghi trong BODY (`**Module:** {module}`), KHÔNG làm label | dòng body |
+| **Module** | Có — **nhãn `Module: <Tên>` cấp repo** (xem §3.1) | `--label "Module: Course Management"` |
 | **Issue Type** (Feature/Bug/Enhancement) | Có | `gh api --method PATCH /repos/{o}/{r}/issues/{n} -f type=Bug` |
 | **Assignee** | Có | `--assignee {user}` |
 | **Milestone** = Phase (số nguyên) | Có nếu biết | `--milestone "Phase {n}"` |
 | **Parent** (sub-issue) | Bug/task = con của feature cha đúng domain | `POST /repos/{o}/{r}/issues/{parent}/sub_issues -F sub_issue_id={child rest id}` |
-| **Label** | CHỈ 1 nhãn mirror | **`plane`** (marker đồng bộ sang PM-tool). Loại = Issue Type field (KHÔNG phải label); Module = body; Phase = Milestone. Không đẻ label khác. |
+| **Label** | `plane` (mirror PM-tool) + **`Module: <Tên>`** (nhóm chức năng) | `--label plane --label "Module: Course Management"`. Loại = Issue Type field (KHÔNG phải label); Phase = Milestone. Ngoài `plane` + `Module:` thì không đẻ label khác. |
 | **States** | Để mặc định = **Backlog** | Vòng lặp/pipeline chuyển sau bằng `scripts/issue-state.mjs` (script TRONG repo, KHÔNG thuộc file này); CS/PM tạo issue KHÔNG chạy |
 | **Priority** (Urgent/High/Medium/Low) | Để triage | org custom-field, set khi PM triage (xem §4) |
 
 > **Generic hoá `plane`:** `plane` là tên nhãn **mirror sang PM-tool** (RENO đang dùng Plane). Dự án dùng PM-tool khác thì **đổi tên nhãn này** cho khớp (`{pm-mirror}`). Nhãn `github` cũ đã bỏ - nó không có chức năng trong sync (chỉ `plane` mới trigger mirror).
 
-## 4. Cơ chế custom Issue Fields (thành thật — chỗ hay sai)
-States / Module / Priority là **org-level single-select Issue Fields** (trường tuỳ-biến cấp tổ-chức, mỗi trường chọn-1-giá-trị — KHÁC Projects v2, KHÁC label). Đọc value = `GET /repos/{o}/{r}/issues/{n}` header `Accept: application/vnd.github.full+json` -> `.issue_field_values[]`. Set value = `PATCH .../issues/{n}` body `{"issue_field_values":[{"field_id":ID,"value":"<tên option>"}]}` — **DECLARATIVE (khai báo): gửi trường nào thì các trường khác BỊ XOÁ, nên phải gửi lại tất cả cùng lúc** (dùng `scripts/issue-state.mjs`, nó tự gửi lại Module + Priority kèm States). Option chỉ tạo được lúc tạo field (cần quyền admin:org). -> **Agent CS/PM lúc tạo issue chỉ lo: Title / Body / AC / Module-trong-body / Issue Type / Assignee / Milestone / Parent / Label.** States tự Backlog; Priority + Module-field để triage/vòng-lặp set bằng script (đừng tự PATCH declarative kẻo wipe nhầm trường khác).
+## 3.1 Module = nhãn `Module: <Tên>` cấp REPO (vì sao, quy ước)
+**Vì sao là nhãn chứ không phải org field:** Module (nhóm chức năng) là chuyện **riêng từng dự án** — elearning có `Course Management`/`Commerce & Payments`…, dự án khác bộ khác hẳn. GitHub org Issue Field dùng CHUNG 1 danh sách cho MỌI repo trong org, nên nhét Module vào org field bắt mọi repo xài chung 1 bộ module — sai. Nhãn (label) thì **per-repo tự nhiên**: mỗi repo tự định nghĩa bộ nhãn riêng. (Phase thì khác: Milestone vốn đã per-repo, nên Phase GIỮ là Milestone.)
+- **Quy ước tên (giữ nguyên chữ, dễ đọc):** `Module: <Tên>` — VD `Module: Course Management`, `Module: Commerce & Payments`, `Module: CRM`. Chữ M hoa, có dấu cách sau dấu hai chấm, tên nhóm chức năng giữ nguyên như tên module dự án đã dùng.
+- **Mỗi repo tự khai bộ nhãn** (danh sách Module sống ở runbook/CLAUDE.md của repo, KHÔNG hardcode vào file chung này). Tạo nhãn 1 lần cho repo trước khi giao CS/PM.
+- **1 issue = 1 nhãn `Module:`** (đúng 1 nhóm chức năng). Bug/task con dùng nhãn Module của feature cha.
+- **Phase = Milestone** (`Phase 1`/`Phase 2`…), không làm label.
+- **Plane sync** (nếu có): map nhãn `Module:` <-> Plane Module. Module KHÔNG còn là org field; `issue-state.mjs` KHÔNG đụng Module.
 
-> **Field gắn theo Issue Type (chỗ hay quên) + script ở đâu:** States/Module/Priority **gắn theo TỪNG Issue Type** — hiện Feature/Bug/Enhancement đều mang đủ 3. Thêm/đổi Issue Type phải gắn đủ 3 field cho type mới, kẻo field không hiện trên issue + `issue-state.mjs` (resolve theo TÊN) không set được. Script này nằm ở `scripts/issue-state.mjs` của repo (seed từ harness `templates/steady-state/scripts/`), thuộc vòng lặp `steady-state-issue-pipeline.md`, **KHÔNG kèm trong file chuẩn này** — gửi riêng file này thì người đọc xem script ở repo, và người tạo issue không cần chạy nó.
+## 4. Cơ chế custom Issue Fields (thành thật — chỗ hay sai)
+States / Priority là **org-level single-select Issue Fields** (trường tuỳ-biến cấp tổ-chức, mỗi trường chọn-1-giá-trị — KHÁC Projects v2, KHÁC label). (**Module KHÔNG còn là org field** — đã chuyển sang nhãn `Module: <Tên>` cấp repo, §3.1.) Đọc value = `GET /repos/{o}/{r}/issues/{n}` header `Accept: application/vnd.github.full+json` -> `.issue_field_values[]`. Set value = `PATCH .../issues/{n}` body `{"issue_field_values":[{"field_id":ID,"value":"<tên option>"}]}` — **DECLARATIVE (khai báo): gửi trường nào thì các trường khác BỊ XOÁ, nên phải gửi lại tất cả cùng lúc** (dùng `scripts/issue-state.mjs`, nó tự gửi lại Priority kèm States). Option chỉ tạo được lúc tạo field (cần quyền admin:org). -> **Agent CS/PM lúc tạo issue chỉ lo: Title / Body / AC / Issue Type / Assignee / Milestone / Parent / Label (`plane` + `Module: <Tên>`).** States tự Backlog; Priority để triage/vòng-lặp set bằng script (đừng tự PATCH declarative kẻo wipe nhầm trường khác).
+
+> **Field gắn theo Issue Type (chỗ hay quên) + script ở đâu:** States/Priority **gắn theo TỪNG Issue Type** — hiện Feature/Bug/Enhancement đều mang đủ 2. Thêm/đổi Issue Type phải gắn đủ 2 field cho type mới, kẻo field không hiện trên issue + `issue-state.mjs` (resolve theo TÊN) không set được. Script này nằm ở `scripts/issue-state.mjs` của repo (seed từ harness `templates/steady-state/scripts/`), thuộc vòng lặp `steady-state-issue-pipeline.md`, **KHÔNG kèm trong file chuẩn này** — gửi riêng file này thì người đọc xem script ở repo, và người tạo issue không cần chạy nó.
 
 ## 5. external_id + PM-tool
 `external_id` (khoá nối sang PM-tool như Plane) = **số issue GitHub**. `[F-NNN]` chỉ là mã phụ trong tiêu đề, không phải khoá nối. Item PM-tool nối 1:1 với issue GitHub (khách nghiệm thu ở đó nếu có).
@@ -103,7 +110,8 @@ States / Module / Priority là **org-level single-select Issue Fields** (trườ
 - **Thiếu khối DoD**, hoặc mỗi issue một kiểu DoD (các mục NFR/process phải giống nhau mọi task).
 - **DoD nhét mô tả tính năng** (DoD chỉ thuần NFR/process; tính năng nằm ở AC), hoặc DoD-item không đính bằng chứng (link/thông số).
 - **Xoá dòng / bỏ trống DoD-item không áp dụng** thay vì ghi `N/A - <lý do>` (mất tính đồng nhất + không rõ đã cân nhắc hay quên).
-- **Loại (Feature/Bug/Enhancement) làm LABEL** thay vì Issue Type; hay **Module/Phase làm label**. Chỉ `plane` là label; loại = Issue Type field, module = body, phase = Milestone.
+- **Loại (Feature/Bug/Enhancement) làm LABEL** thay vì Issue Type; hay **Phase làm label** thay vì Milestone. Label chỉ có `plane` + `Module: <Tên>`; loại = Issue Type field, phase = Milestone.
+- **Module làm org field** thay vì nhãn `Module:` cấp repo (bắt mọi repo dùng chung 1 danh sách — sai, §3.1).
 - Tiêu đề dính code/plan ref (F13, phase-2, audit).
 - Bug mồ côi (không gán feature cha).
 - Thiếu Issue Type / tạo mà chưa BA-validate nhạy cảm nghiệp vụ.
@@ -112,8 +120,8 @@ States / Module / Priority là **org-level single-select Issue Fields** (trườ
 ## Checklist tạo 1 issue (dán cho agent)
 - [ ] BA-validate: kỹ thuật hay nhạy cảm nghiệp vụ? (nhạy cảm -> Tech Lead chốt trước)
 - [ ] Title mệnh lệnh, không code/plan ref (feature: `[F-NNN]`)
-- [ ] Body: Bối cảnh + Phạm vi + **AC checkbox kiểm-được** (kèm Demo/HDSD) + `**Module:**` + **DoD thuần NFR** (các mục NFR/process giống mọi task, mỗi mục đính bằng chứng) + **Liên kết** (Refs #N, PM-task)
+- [ ] Body: Bối cảnh + Phạm vi + **AC checkbox kiểm-được** (kèm Demo/HDSD) + **DoD thuần NFR** (các mục NFR/process giống mọi task, mỗi mục đính bằng chứng) + **Liên kết** (Refs #N, PM-task)
 - [ ] Issue Type (Feature/Bug/Enhancement) + Assignee + Milestone(Phase) + Parent (nếu là con feature)
-- [ ] Label: CHỈ `plane` (loại ở Issue Type field, không phải label)
+- [ ] Label: `plane` + `Module: <Tên>` (1 nhãn Module đúng nhóm chức năng; loại ở Issue Type field, không phải label)
 - [ ] States để Backlog; Priority để triage
-- [ ] Rà: external_id = số issue; không đẻ label loại/module/phase
+- [ ] Rà: external_id = số issue; không đẻ label loại/phase (Module CÓ là label)

@@ -7,6 +7,7 @@ Harness install + verify-gate machinery. Two scripts plus the git hooks under
 |---|---|
 | `install-harness.sh` | One-command bootstrap of the harness skeleton into a new (or existing) project. |
 | `harness-verify-gate.sh` | The non-bypassable Pre-Close Verification Gate. Invoked by the git hooks. |
+| `wait-workers.sh` | ctl helper: block until dispatched bg-worker(s) reach a DONE signal (PR MERGEABLE or worker terminal), then print status. Replaces hand-rolled poll loops. |
 | `../.githooks/pre-commit` | Runs the verify gate at commit time (lint + register + atomicity). |
 | `../.githooks/pre-push` | Runs the verify gate at push time (lint + **test suite** + register). |
 
