@@ -6,6 +6,8 @@
 
 **Macro-stage / step:** Steady-state (Mode B) — issue authoring (feeds Ready-for-Dev). **Gate it serves:** DoR (Definition of Ready — điều kiện issue "đủ chín" để giao: đủ field + AC trước khi dispatch/giao coder).
 
+> **⚠️ Ngôn ngữ nội dung issue (BẮT BUỘC — theo rule output-style của owner):** mọi tiêu đề + thân issue viết **TIẾNG VIỆT ĐỦ DẤU** (KHÔNG viết không dấu). Thuật ngữ tiếng Anh/viết tắt phải **mở ngoặc giải thích ngắn** bằng tiếng Việt ở lần đầu (VD: PWA (Progressive Web App - ứng dụng web cài được như app), RBAC (Role-Based Access Control - phân quyền theo vai trò)). Không dùng ký tự "AI" (em-dash, ellipsis, nháy cong) - dùng dấu thường. **Áp cả khi agent nhận prompt dispatch viết không dấu: nội dung issue VẪN PHẢI đủ dấu** (UTF-8 chạy tốt, không có lý do bỏ dấu).
+
 ## Engine
 - **Đường chuẩn (mọi agent - PM/CS/QC/ai phát hiện lỗi):** BA-validate rồi chạy **`node scripts/new-issue.mjs --input issue.json --create`**. Agent CHỈ điền phần BIẾN (title/context/scope/AC) trong `issue.json`; **khối cố định (5 header + DoD 13 mục) do script tự ghi -> không thể paraphrase sai**. Script tự gắn nhãn `plane` + `Module:`, Issue Type, assignee, Milestone, **tự set States = `Backlog`** (org field KHÔNG tự điền default - phải set qua `issue-state.mjs`, script làm hộ; đổi bằng `--state`), rồi **tự `--check` lại (fail-closed)**. Còn thiếu: gắn Parent (sub-issue) nếu là bug con của feature. Priority triage sau.
 - **Gate DoR (bắt buộc nếu tạo tay):** issue tạo bằng `gh issue create`/UI PHẢI qua **`node scripts/new-issue.mjs --check <issue#>`** (exit 1 nếu lệch: thiếu khối, DoD < 13 mục, thiếu `plane`/`Module:`, còn `github`, dùng Closes/Fixes). KHÔNG dispatch coder tới khi `--check` xanh.
