@@ -2,6 +2,34 @@
 
 CONTROL bồi đắp mỗi lần vấp. Mỗi mục: triệu chứng -> nguyên nhân gốc -> luật rút ra. Mới nhất trên cùng.
 
+## 2026-08-17 — dogfood 1 landing page thật (Lane Lite) + kiểm 3 công cụ mới v7.3 (run-log · issue-state · ops-board)
+
+Chạy thử harness trên 1 trang bán hàng (landing page - trang đích bán hàng) theo Lane Lite (làn nhẹ), bắt 6 chỗ gãy. Ghi 1 pass, đừng vá lẻ (vá thành 1 đợt riêng ngoài cycle).
+
+**L16 - NẶNG: template bán hàng HỨA với khách thứ harness CHƯA cưỡng chế được (gate `landing-acceptance` không tồn tại).**
+Trang landing dựng ra hứa "Tốc độ & SEO (Search Engine Optimization - tối ưu tìm kiếm) đạt ngưỡng", nhưng KHÔNG có gate `landing-acceptance` nào đo/chặn điều đó. Harness đang cho phép cam kết với khách hàng một tiêu chí mà bản thân nó không có cổng nào nghiệm thu - đúng blind-spot L14 (present-tense trong doc ≠ đang chạy), lần này ở tầng bán hàng nên hậu quả là hứa-suông với người trả tiền.
+-> Luật: một dòng cam kết chất-lượng trong template khách-đọc PHẢI có 1 gate chấp-hành thật đứng sau (VD Lighthouse CI cho Tốc độ/SEO), verify-at-source. Chưa có gate thì HOẶC dựng gate, HOẶC XOÁ/hạ-nhãn dòng đó trong template bán hàng (không để lời hứa mồ côi). Nối L14: đọc từ đầu, mỗi cam kết soi có artifact cưỡng chế chưa.
+
+**L17 - Harness không nói dự án landing SỐNG Ở REPO NÀO - sắp có ~5 cái.**
+Dựng landing đầu tiên mà không có chỗ quy định landing ở repo nào: 1 repo dùng chung nhiều trang? mỗi trang 1 repo? Sắp có ~5 landing thì không có quy ước = mỗi lần lại quyết lại, dễ vung vãi.
+-> Luật: harness cần chốt 1 quy ước "landing sống ở đâu" (đề xuất: 1 monorepo `landings/` nhiều trang, hoặc 1 template repo nhân bản) TRƯỚC khi làm trang thứ 2. Đây là quyết định cấu trúc, cần user chốt (business/scale), không tự đoán.
+
+**L18 - Lane Lite vẫn ép REQ-ID grammar + screen-inventory floorplan - THỪA cho 1 trang.**
+Lane Lite (làn nhẹ, đáng ra tối giản) vẫn giữ non-negotiable: cú pháp REQ-ID (mã yêu cầu đánh số) + screen-inventory floorplan (bản liệt kê toàn bộ màn hình như sơ đồ mặt bằng). Cho 1 trang landing đơn thì bộ này nặng vô ích - chi phí nghi thức > giá trị.
+-> Luật: XÁC NHẬN cần Lane thứ 3 riêng cho Landing (bộ artifact tối giản: intake + copy + 1 gate perf/SEO), ĐỪNG nhét landing vào Lite rồi miễn-trừ lắt nhắt. Không tự cắt non-negotiable của Lite (có thể có dự án Lite thật cần chúng - guard user decision); mở Lane mới thay vì đục lỗ Lane cũ.
+
+**L19 - Không có template intake cho landing.**
+Bắt tay làm landing mà thiếu bộ hỏi-đầu-vào (intake): mục tiêu chuyển đổi (conversion goal), đối tượng, offer (chào hàng), kênh traffic (nguồn truy cập), tài sản thương hiệu (brand assets), đối thủ. Thiếu -> phải phỏng đoán hoặc hỏi rời rạc.
+-> Luật: thêm 1 template intake landing gồm đúng 6 mục trên vào Lane Landing (L18). Đây là đầu vào bắt buộc trước khi viết copy/dựng trang.
+
+**L20 - `run-log.mjs` auto-detect SAI repo khi chạy từ cây harness -> phải truyền `--repo`. [đã kiểm 2026-08-17]**
+`run-log.mjs` đoán repo bằng `git rev-parse --show-toplevel` rồi lấy basename. Chạy `node harness/scripts/run-log.mjs start ...` từ trong cây loop-harness -> ghi `repo:"loop-harness"` dù việc thật ở elearning-platform. Kiểm chứng phiên này: truyền `--repo elearning-platform` thì dòng start ghi đúng repo (store `~/.claude/loop-harness/run-log.jsonl`).
+-> Luật: LUÔN truyền `--repo <repo-đích>` khi gọi run-log từ ghế ctl/cây harness; đừng tin auto-detect. Cân nhắc: run-log nên cảnh báo khi CWD basename == "loop-harness" mà không có `--repo` (dễ nhầm chính nó là repo-đích).
+
+**L21 - `run-log.mjs` ghi vào `$HOME/.claude/` - đúng trên workstation, MẤT SẠCH trong session cloud tạm. [đã kiểm 2026-08-17]**
+Store mặc định `~/.claude/loop-harness/run-log.jsonl` (hoặc `$LOOP_HARNESS_RUNLOG`) nằm ngoài git - đúng chủ ý (tránh xung đột merge + bẩn repo khách). Nhưng trong 1 phiên cloud tạm (ephemeral - dùng xong xoá), `$HOME` bay theo phiên -> cái cân đo được nhưng số liệu không sống qua phiên. Cái cân chỉ có nghĩa khi chạy ở nơi nó tồn tại được (workstation lâu dài). Phiên trước sinh 3 công cụ này trên cloud nên chính chúng chưa có dữ liệu thật - phải đợi chạy trên workstation (phiên này) mới có dòng đầu.
+-> Luật: chỉ tin số run-log khi chạy ở môi trường bền (workstation hoặc `$LOOP_HARNESS_RUNLOG` trỏ volume/dir được git-track riêng hoặc backup). Trên cloud tạm: HOẶC set `$LOOP_HARNESS_RUNLOG` vào nơi bền, HOẶC coi run-log tại đó là vô nghĩa và đừng kết luận "harness tốt lên" từ nó.
+
 ## 2026-07-31 → 08-02 — đợt audit-dọn loop-harness (6 lần rà: top-level · playbook · template · stack · docs · phân-khu-zone)
 
 **L15 - Dispatch bg-fleet (1 ctl → N bg): permission-mode là NÚT THẮT + worker phải GHI output ra FILE.**
