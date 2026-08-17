@@ -89,7 +89,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 ## 6. Hai xương sống cũ giờ ở đâu (không xoá, chỉ hạ vai)
 
 - **3-macro (Pre/Build/Post)** — hạ thành **số thứ tự bước bên trong Mode A/B** (1.x/2.x = Mode A; 3.x = go-live + Mode B). KHÔNG còn là mô hình ngang hàng. *Phản biện: đây là tầng cũ nhất, nặng nhất; giữ số bước cho tiện tra WORKFLOW, bỏ vai "xương sống".*
-- **Loop Engineering (kỹ nghệ vòng lặp) (4 bậc: prompt→context→harness→loop)** — hạ thành **hộp tư duy để CHẨN ĐOÁN** "harness trưởng thành tới đâu, thiếu tầng nào" (VD Recover yếu = bậc loop chưa đầy). Là **cái kính nhìn**, không phải bước phải chạy. *Phản biện: mới thêm tuần trước, chủ yếu dán nhãn lại; hữu ích để định vị, đừng để ngang hàng mô hình vận hành.*
+- **Loop / Graph / Harness engineering (3 lớp bọc nhau: `model+prompt ⊂ loop ⊂ graph ⊂ harness`)** — là **hộp tư duy để CHẨN ĐOÁN** "hỏng ở lớp nào", không phải bước phải chạy. Thiếu lớp nào ra triệu chứng nấy: không loop → không dừng · không graph → **không thấy vì sao** · không harness → chạm được mọi thứ. *Lưu ý: v7.3 từng ghi NGƯỢC (loop ngoài cùng, theo LangChain); v7.4 sửa sang harness-ngoài-cùng vì nó xếp theo **quyền chạm** — và sự cố thật của ta (L15, `bypassPermissions`) đều là sự cố quyền, không phải sự cố dừng. Lý do đầy đủ: [`decisions/layer-nesting-harness-outermost.md`](./decisions/layer-nesting-harness-outermost.md).*
 
 ## 7. Scorecard thành thật (đưa dev khác xem cái này)
 

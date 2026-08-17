@@ -1,7 +1,19 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v7.3**.
+templates). Per-project state never lives here. Current version: **v7.4**.
+
+## v7.4 — 2026-08-17 — layer nesting corrected: HARNESS is the outermost ring, and the graph gap now has a price
+
+v7.3 shipped `prompt → context → harness → loop` (loop outermost, LangChain's framing) **without noticing that the source material which started the review used the opposite nesting**. Two coherent framings exist; picking one silently was the defect. Now decided on the record.
+
+- **Nesting inverted to `model+prompt ⊂ loop ⊂ graph ⊂ harness`** — harness outermost, the model the smallest box. Rationale (`decisions/layer-nesting-harness-outermost.md`): this orders layers by **authority / blast radius**, and a loop controller running "outside" the sandbox is a fiction — in a real deployment the sandbox contains everything, including whatever decides to re-run. Decisive evidence is our own: every serious incident we have recorded is an **authority** incident (L15 permission-mode; the open `bypassPermissions` hole), not a stop-rule incident. The model whose outermost ring is *"what may this touch"* puts our largest hole where it cannot be missed; the loop-outermost model foregrounded a layer we are already competent at.
+- **Graph restored from footnote to a ring, with its absence priced.** Under v7.3's framing graph was a paragraph explaining why we skip it. It is now a layer whose omission carries a named cost — **"you cannot see why"**. We still run no executable graph (the first rule holds: do not diagram a workflow you still change weekly), but every post-mortem being prose reconstruction is now on the books instead of waved off.
+- **The failure triad is the new diagnostic spine**: *no loop control → it never stops · no graph → you cannot see why · no harness → it can touch anything.* Mapped against reality: loop = bounded retry ✅ but **no budget cap** ❌; graph = 10-state edges only; harness = strong gates, **weak isolation** (`bypassPermissions`) — restated as the largest open hole in the system.
+- **Context engineering demoted from ring to occupant** — it is not a missing 4th layer, it lives inside the harness (memory + what reaches the model). No content lost; `CONTEXT_RULES.md` and `context-monitor.sh` are unchanged.
+- **Reference implementations recorded per layer** (Temporal · LangGraph · NetworkX · E2B · openai/evals · OpenTelemetry) as pointers only — **D1 still holds**: the harness must run on a bare agent + git + bash.
+- **`docs/decisions/` created** — the directory `HARNESS.md` had referenced since v5 but which never existed.
+- **Repo name re-checked, kept again.** `loop-harness` still reads correctly under the new ordering: the harness is the product, the loop is what it bounds.
 
 ## v7.3 — 2026-08-17 — measurable growth (`run-log.mjs`), enforced state edges, and industry vocabulary
 
