@@ -212,7 +212,33 @@ should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/HARNESS_CHANGELOG.md` (one entry per hardening round (vòng gia cố), naming
 the failures
-it closes) — latest **v7.0**. Full per-round version history + the failure-class taxonomy live in `docs/HARNESS_CHANGELOG.md` (one entry per hardening round); do not inline them here.
+it closes). Full per-round version history + the failure-class taxonomy live in `docs/HARNESS_CHANGELOG.md` (one entry per hardening round); do not inline them here.
+
+### Growth must be measured, not remembered
+
+The rule above describes how the harness **changes**. It says nothing about
+whether a change **helped** — and for v7.0…v7.2 nothing did. Every round had a
+sound rationale; none had evidence. That gap has a cost that compounds: with no
+way to show a rule is dead weight, the only safe move is to add rules, never
+retire them, so the doc tree grows monotonically and the context bill with it.
+
+So a harness patch is not finished at re-propagation. It is finished when the
+next runs can be **compared against the ones before it**:
+
+- **`scripts/run-log.mjs`** — one JSONL line per dispatch (`start` / `end`),
+  written outside git and shared across repos, keyed by the harness version it
+  auto-reads from `HARNESS_CHANGELOG.md`. `report` groups by version so a patch's
+  effect (completion rate, QC failures, retries, wall-clock) is a table, not a
+  recollection. Usage: `scripts/README.md § run-log.mjs`.
+- **Honesty rules bind here too (FC6).** Never fill a field you did not observe —
+  a fabricated metric is worse than a missing one — and treat a thin sample as
+  thin: the report warns below ~5 runs or with a single group, and that warning
+  is not decoration. Do not retire a rule on 3 data points.
+
+Industry names for this layer are **evals** and **observability**; `run-log.mjs`
+is the minimum viable version of both, not the finished article. It is the
+instrument the **hill-climbing loop** (`docs/OPERATING-MODES.md` § four nested
+layers) was missing.
 
 ## Control-Plane Failure Classes
 
