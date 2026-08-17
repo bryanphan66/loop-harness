@@ -4,7 +4,7 @@
 
 How this harness runs a project. **The single operating spine is the two modes (chế độ) below (Mode A → go-live (thời điểm app lên môi trường thật) → Mode B).** Two older framings are kept but SUBORDINATE — not parallel models competing with the spine:
 - the **3 macro-stages** (3 macro-giai đoạn: Pre-Build / Build / Post-Build) are just the *step grouping inside the modes* — Mode A = macro 1→2, Mode B = macro 3's continuous parts (`WORKFLOW.md` details the numbered steps);
-- **Loop Engineering** (kỹ nghệ vòng lặp — the `prompt → context → harness → loop` maturity ladder) is a *diagnostic lens* (lăng kính chẩn đoán), demoted to the box near the end — use it to ask "which layer is thin", not as a thing to run.
+- **Loop / Graph / Harness engineering** (3 lớp bọc nhau — `model+prompt ⊂ loop ⊂ graph ⊂ **harness**`, harness ngoài cùng) is a *diagnostic lens* (lăng kính chẩn đoán), in the box near the end — use it to ask "which layer owns this failure", not as a thing to run.
 
 New readers: start at `UNDERSTANDING-loop-harness.md` (narrative + honest PROVEN/PATCHED/ASPIRATIONAL (đã kiểm chứng / vá-từ-bài-học / chưa-làm) scorecard).
 
@@ -71,16 +71,67 @@ The loop is strong on **discover / dispatch / verify / persist / decide**. Two f
 
 These are development directions, not yet built — do them under Frontier 1 first (a self-healing loop is safer to make autonomous than a fragile one).
 
-## Framing (diagnostic lens): the Loop Engineering maturity ladder
-> This is a **lens for diagnosing the harness, not the operating spine** (the spine is the two modes above). Use it to ask "which layer is thin right now?" — e.g. Recover being weak = the *loop* layer is thin. It mostly re-labels things that already exist; do not treat the 4 rungs as steps to execute.
+## Framing (diagnostic lens): loop ⊂ graph ⊂ harness
+> This is a **lens for diagnosing the harness, not the operating spine** (the spine is the two modes above). Use it to ask "which layer OWNS this failure?" — e.g. a bg worker hanging on a permission prompt is a *harness* fault, not a thin loop. It mostly re-labels things that already exist; do not treat the 4 layers as steps to execute.
 
-`prompt → context → harness → loop` — climbing this ladder = moving from prompting an agent turn-by-turn to designing a *system that discovers work, dispatches it, verifies, recovers, persists state, and decides the next action until a goal is met*. loop-harness embodies rungs 2–4:
+**The model is the SMALLEST box in the system.** Each layer wraps the one before it — an outer layer never replaces an inner one, so **when something misbehaves the fix is usually one layer OUT**, not a better prompt:
 
-| Layer (rung) | What it designs | Where this harness embodies it |
+```text
+┌── HARNESS ────────────────────────────────────┐ controls REALITY  (what it may touch)
+│   tools · permissions · memory · sandbox      │ missing → IT CAN TOUCH ANYTHING
+│   evals · traces · humans                     │
+│  ┌── GRAPH ───────────────────────────────┐   │ controls TOPOLOGY (which step may run next)
+│  │   nodes · edges · state · branches     │   │ missing → YOU CANNOT SEE WHY
+│  │   cycles · checkpoints                 │   │
+│  │  ┌── LOOP ─────────────────────────┐   │   │ controls REPETITION (run it again?)
+│  │  │   turns · retries · budgets ·   │   │   │ missing → IT NEVER STOPS
+│  │  │   exits · no-progress detection │   │   │
+│  │  │   ┌── MODEL + PROMPT ───────┐   │   │   │
+│  │  │   └─────────────────────────┘   │   │   │ ← the smallest box
+│  │  └─────────────────────────────────┘   │   │
+│  └────────────────────────────────────────┘   │
+└───────────────────────────────────────────────┘
+```
+
+**Context engineering is not a missing 4th ring** — it lives *inside* the harness (memory + what reaches the model): `docs/CONTEXT_RULES.md`, `.claude/hooks/context-monitor.sh`, on-demand skills.
+
+> **Ordering note (settled — `decisions/layer-nesting-harness-outermost.md`).** Two industry framings disagree about what wraps what. LangChain draws the loop *outermost* (it decides whether to re-run the machine). We use **harness outermost** because it orders layers by **authority / blast radius** — nothing escapes the sandbox, including the loop controller — and our real incidents have been authority incidents, not stop-rule incidents. Do not flip this back without reading the decision record.
+
+### The three failure modes, and where this harness actually stands
+
+| Missing layer | Symptom | loop-harness today |
 |---|---|---|
-| **Context engineering** (kỹ thuật quản lý ngữ cảnh) | which instructions/data/tools reach the model, minimizing excess | slim `~/.claude/rules` + on-demand skills + progressive disclosure (hé lộ dần theo nhu cầu); the repo's own `CLAUDE.md`, auto-loaded by cwd |
-| **Harness engineering** (kỹ nghệ khung vận hành) | the executable environment around the model (files, git, gates, memory (trí nhớ bền qua các phiên), feedback) | the non-bypassable `harness-verify-gate.sh`, the pnpm stack template (khung code mẫu), `STAGE.md`, gates (PB-G/DoR/DoD), per-repo CI/CD (tự động tích hợp/giao hàng), auto-memory |
-| **Loop engineering** (kỹ nghệ vòng lặp) | how the system repeatedly **discover → dispatch → verify → recover → persist → decide-next**, on a schedule or until a goal | **Mode B** is the loop; verify-at-source; cron routines (Recover R1 still thin = this rung not yet full) |
+| **Loop control** | it never stops | bounded retry (R2/R3) + fail-closed ✅ · **no budget cap** ❌ — nothing stops a run from burning tokens indefinitely |
+| **Graph** | you cannot see why | only the 10-state edge table in `issue-state.mjs`. **This is the priced cost of having no graph:** when a worker goes wrong we cannot replay the path it took — we re-read prose and guess |
+| **Harness (blast radius)** | it can touch anything | gates are strong, **isolation is not**: dispatch runs `bypassPermissions`. This is the largest open hole in the whole system |
+
+**Diagnose by symptom — which layer owns the fix:**
+
+| Symptom | Owning layer | The fix |
+|---|---|---|
+| bg worker hangs asking permission; can't reach a tool safely | **Harness** | tool contract, allow-list, sandbox |
+| Progress lost across sessions | **Harness** | durable state, checkpoint, progress artifact |
+| Can't tell whether a harness patch helped | **Harness (evals + traces)** | `run-log.mjs` today; an eval gate before every rule change is the real answer |
+| First attempt close but unreliable | **Loop** | external grader + deterministic tests + bounded retry |
+| Keeps working after success, or stops without proof | **Loop** | evidence-based terminal state + **budget-aware** stop rule |
+| Cannot reconstruct why a run went wrong | **Graph** | one trace across every node + tool call |
+| Several specialists must run in a fixed order | **Graph** | explicit nodes/edges/joins |
+| The workflow changes too often to diagram | **stay simpler** | keep control model-driven; delay graph formalization |
+
+**Why we still run no executable graph (deliberate, but now priced).** The first rule of graph engineering is *"do not build a graph before you understand the work"*, and our control flow — `WORKFLOW.md` step tables + gates + a supervisor session — stays cheap to change. The one path stable enough to have earned formalization is the 10-state issue board, so its edges are enforced in `issue-state.mjs` and nowhere else. What changed with this framing is that the **cost is now named instead of waved away**: *you cannot see why*. Until there is a graph or at least one continuous trace per run, every post-mortem is reconstruction from prose. Re-open when a path repeats unchanged across 2+ projects, or when a run failure costs more than the tracing would have.
+
+### Reference implementations per layer (for when we do build these)
+
+| Layer | Need | Reference |
+|---|---|---|
+| Loop | a run must survive process failure (durable execution) | `temporalio/temporal` |
+| Graph | the agent chooses its own next step (stateful graph) | `langchain-ai/langgraph` |
+| Graph | the topology itself needs analysis | `networkx/networkx` |
+| Harness | isolate code + tool execution from the host | `e2b-dev/E2B` |
+| Harness | eval gate before every model/prompt change | `openai/evals` |
+| Harness | one trace across every model node and tool call | `open-telemetry/opentelemetry-python` |
+
+These are pointers, not adoptions — Independence Principle (D1) still holds: the harness must run on a bare agent + git + bash.
 
 ## Reference implementation + packaged kit
 Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human operating playbook (công thức vận hành tái dùng — in the loop-harness workshop, not shipped): `plans/team-playbook-human-agent.md`.

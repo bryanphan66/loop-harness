@@ -8,6 +8,7 @@ Harness install + verify-gate machinery. Two scripts plus the git hooks under
 | `install-harness.sh` | One-command bootstrap of the harness skeleton into a new (or existing) project. |
 | `harness-verify-gate.sh` | The non-bypassable Pre-Close Verification Gate. Invoked by the git hooks. |
 | `wait-workers.sh` | ctl helper: block until dispatched bg-worker(s) reach a DONE signal (PR MERGEABLE or worker terminal), then print status. Replaces hand-rolled poll loops. |
+| `run-log.mjs` | **The measurement.** One JSONL line per dispatch (start/end) so "did that harness patch actually help?" is answerable with numbers instead of memory. |
 | `../.githooks/pre-commit` | Runs the verify gate at commit time (lint + register + atomicity). |
 | `../.githooks/pre-push` | Runs the verify gate at push time (lint + **test suite** + register). |
 
@@ -143,6 +144,54 @@ pass `--no-verify`, and do not unset `core.hooksPath`. A red gate means real
 work remains: fix the lint error, run the Verify command and record
 `Result: pass`, or stage `docs/ROADMAP.md` alongside `STAGE.md`
 (AGENTS.md § Verify Gate — No Bypass).
+
+---
+
+## run-log.mjs — the measurement (evals, step 1)
+
+The harness reached v7.x by patching friction: an agent gets stuck → the lesson
+goes into `lessons-log.md` → a rule is added → the change is re-propagated. Every
+step is reasonable, but the loop was **missing its last step: did it actually get
+better?** No number ever said so — only memory and intuition. The visible symptom
+is a doc tree that only ever grows: with no evidence a rule is dead weight,
+nobody dares delete one.
+
+Industry vocabulary for the gap: **evals** + **observability** (*"evals are the
+training data for harness work"*). This script is step 1 — deliberately the
+smallest thing that produces real evidence.
+
+```bash
+# at dispatch — prints the run id on stdout (stderr carries the human line)
+RUN=$(node harness/scripts/run-log.mjs start --issue 123 --worker 1a2b3c4d \
+        --task "fix upload" --model opus)
+
+# when the worker finishes (or dies — a dead run is the interesting data)
+node harness/scripts/run-log.mjs end --run "$RUN" --outcome done \
+        --qc-fails 1 --retries 0 --tokens 180000
+
+# any time
+node harness/scripts/run-log.mjs report                 # grouped by harness version
+node harness/scripts/run-log.mjs report --by repo --since 2026-08-01
+```
+
+- **Where it writes:** `$LOOP_HARNESS_RUNLOG`, default
+  `~/.claude/loop-harness/run-log.jsonl` — **outside git, shared across every
+  repo**. Not in the project repo: an append-only log there means merge
+  conflicts and pollutes a client's tree, and the question worth answering
+  ("is v7.3 better than v7.2?") is cross-project by nature.
+- **Harness version is auto-read** from `docs/HARNESS_CHANGELOG.md`
+  (`Current version: **vX.Y**`) — never hand-declared, so the comparison axis
+  can't quietly go stale.
+- **Outcomes:** `done` (met the AC) · `blocked` (stopped for a human) ·
+  `failed` (ran but wrong) · `abandoned` (dropped mid-flight).
+- **Never invent a field.** Leave it out if unknown — a lying scale is worse
+  than no scale. `report` prints an explicit warning below ~5 runs or with only
+  one group, so a thin sample can't be mistaken for a verdict.
+
+Reading the report: `xong` = % that met the AC, `ket` = % that stalled waiting
+for a human (this is the Recover-R1 frontier, measured). A harness patch that
+works shows up as `xong` rising or `QCfail`/`retry`/`phut` falling **between
+version rows** — that comparison is the whole point of the file.
 
 ---
 

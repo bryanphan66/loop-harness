@@ -14,7 +14,7 @@ How the harness runs a project **after go-live**. This operationalizes `WORKFLOW
 
 ## Install (once, at graduation to Mode B)
 From `harness/templates/steady-state/`, copy into the project:
-- `scripts/issue-state.mjs` — set an issue's State (resolves the org Issue Field by name, re-sends other field values so nothing is wiped, `gh` only).
+- `scripts/issue-state.mjs` — set an issue's State (resolves the org Issue Field by name, re-sends other field values so nothing is wiped, `gh` only). **Enforces the legal transitions below** — the 10 states are a barrier, not paint on the floor.
 - `scripts/qc-checklist.mjs` — generate a QC checklist from an issue's Acceptance Criteria (happy path + 6 slices), post it as a comment (idempotent).
 - `.github/ISSUE_TEMPLATE/bug-report.md` — the bug form (repro / expected / actual / severity / evidence + env).
 - `docs/qc/regression-checklist.md` — fill with THIS project's core flows.
@@ -30,12 +30,43 @@ Every bug/change = **one GitHub Issue** (source of truth). It moves through 10 s
 |---|---|
 | CS + Tech Lead (upstream) | **BA-validate BEFORE creating the issue** — classify business risk (price/order/permission/data-integrity held for a human). The pipeline does not re-validate. |
 | PM | triage Backlog -> Ready for Dev (AC + Module + Priority present). |
-| Control session | dispatch one async coder per issue (own worktree), set In Dev; after code, merge, deploy, verify-at-source, set states. |
+| Control session | dispatch one async coder per issue (own worktree), set In Dev; after code, merge, deploy, verify-at-source, set states. **Bracket every dispatch with `run-log.mjs start` / `end`** — that log is the only evidence a harness change helped. |
 | Coder (bg) | code to AC, run the verify gate, attach QC checklist (`qc-checklist.mjs`), open a **draft PR** to the integration branch. |
 | QC (human) | test on staging via the issue's checklist; pass -> Ready for UAT, fail -> keep + file bug. |
 | Customer | UAT -> Done. |
 
 Set state: `node scripts/issue-state.mjs <N> "<state>"`.
+
+### The transitions are enforced, not documented
+
+The state list used to live only in prose, so nothing stopped an issue jumping
+`Backlog → Done` — shipped without ever passing QC, silently. `issue-state.mjs`
+now carries the edge table and **blocks any move that is not on it** (fail-closed:
+an unrecognised state name is refused too, so an org renaming its options can't
+quietly disarm the guard).
+
+```text
+(unset) → Backlog | Ready for Dev
+Backlog → Ready for Dev                In Dev        → Deploying | Ready for Dev
+Ready for Dev → In Dev | Backlog       Deploying     → Ready for Test | In Dev
+Ready for Test → QC Testing | In Dev   QC Testing    → Ready for UAT | In Dev
+Ready for UAT → UAT Testing | In Dev   UAT Testing   → Done | In Dev
+Done → ∅ (terminal)                    Cancelled     → Backlog
+every non-terminal state → Cancelled
+```
+
+The backward edges are exactly the **golden rule**: a QC/UAT failure inside the
+issue's AC returns it to `In Dev`; a failure outside its AC becomes a new issue.
+`Done` has no outgoing edge on purpose — a defect found after Done is always a
+new issue, never a reopened one (rule 3 below).
+
+Verify the table without touching GitHub: `node scripts/issue-state.mjs --self-test`
+(20 transition cases + table integrity; exits non-zero on any mismatch — safe to
+wire into CI).
+
+**Bypass is for humans only:** `--force "<reason>"` — the reason is mandatory and
+gets logged, same policy as the verify-gate. An agent that hits the guard must
+fix the sequence, not force past it.
 
 ## The rules that bite (bake into every dispatch prompt)
 1. **Golden rule on QC fail:** fail *within* the issue's AC (happy or edge) -> **back to In Dev on the same issue**; fail *outside* its AC -> **a new issue** (the current one proceeds independently). Not "happy vs edge".

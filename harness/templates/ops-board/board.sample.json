@@ -1,0 +1,18 @@
+{
+  "_doc": "Anh chup bang issue tai mot thoi diem. Trang doc file nay de ve 'dang un o dau' + 'worker dang chay'. Thieu file -> roi ve du lieu mau. Chua co script sinh tu dong (xem README § Chua lam).",
+  "updated": "2026-08-17T09:40:00Z",
+  "states": [
+    { "name": "Backlog",        "n": 14, "oldest_days": 23 },
+    { "name": "Ready for Dev",  "n": 6,  "oldest_days": 9 },
+    { "name": "In Dev",         "n": 3,  "oldest_days": 2 },
+    { "name": "Deploying",      "n": 1,  "oldest_days": 0 },
+    { "name": "Ready for Test", "n": 2,  "oldest_days": 1 },
+    { "name": "QC Testing",     "n": 5,  "oldest_days": 11 },
+    { "name": "Ready for UAT",  "n": 2,  "oldest_days": 6 },
+    { "name": "UAT Testing",    "n": 1,  "oldest_days": 4 }
+  ],
+  "workers": [
+    { "id": "1a2b3c4d", "issue": 241, "task": "sua upload video qua 500MB", "state": "running", "minutes": 38 },
+    { "id": "44aa11bb", "issue": 236, "task": "webhook thanh toan tra 409", "state": "blocked", "minutes": 71 }
+  ]
+}

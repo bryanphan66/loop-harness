@@ -16,8 +16,9 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **Mode A — Build** | Chế độ dựng app: hữu hạn, 1 chiều (spec → app chạy được). Driver = `/stage-next`. |
 | **Mode B — Steady-state = the loop** | Chế độ nuôi app sau go-live (thời điểm app lên môi trường thật): vòng lặp vô hạn trên bảng issue (phiếu việc/vấn đề trên bảng theo dõi). Steady-state = trạng thái vận hành ổn định sau go-live. Nơi **chất lượng hội tụ**. |
 | **the loop** (vòng lặp) | **Đồ vật cụ thể** = chu trình vận hành Mode B. Trả lời "mỗi vòng LÀM GÌ": 6 **nhịp** discover (phát hiện việc) → dispatch (giao việc cho agent) → verify (xác minh) → recover (tự-sửa khi lỗi) → persist (lưu trạng thái) → decide-next (quyết việc kế). Dùng khi **vận hành** dự án live. |
-| **Loop Engineering** (kỹ nghệ vòng lặp) | **Bộ môn / bậc thang** (framing). Trả lời "hệ trưởng thành TỚI ĐÂU": 4 **bậc** prompt → context → harness → loop. Dùng khi **thiết kế/định vị** harness. |
-| **the loop ⟂ Loop Engineering** | KHÔNG cạnh tranh: *Loop Engineering* = cái **thang** (dọc, 4 bậc); *the loop* = thứ nằm ở **đỉnh** thang đó (ngang, 6 nhịp). Ẩn dụ: Loop Engineering = ngành cơ khí; the loop = cỗ động cơ ngành đó chế ra. |
+| **3 lớp bọc nhau** (framing) | `model+prompt ⊂ **loop** ⊂ **graph** ⊂ **harness**` — **harness NGOÀI CÙNG**, model là hộp NHỎ NHẤT. Mỗi lớp trả lời 1 câu: loop = *lặp lại* · graph = *địa hình* · harness = *thực tế/chạm được gì*. Thiếu lớp nào ra triệu chứng nấy: **không loop → không bao giờ dừng · không graph → không thấy VÌ SAO · không harness → chạm được mọi thứ**. Owner: [`OPERATING-MODES.md`](./OPERATING-MODES.md). Quyết định thứ tự: [`decisions/layer-nesting-harness-outermost.md`](./decisions/layer-nesting-harness-outermost.md). |
+| **the loop ⟂ Loop Engineering** | KHÔNG cạnh tranh: *Loop Engineering* = **bộ môn** (1 trong 3 lớp); *the loop* = **đồ vật** (6 nhịp Mode B). ⚠️ Loop là lớp **TRONG CÙNG**, không phải trên cùng — sửa loop không sửa được lỗi thuộc harness (VD L15: worker treo vì quyền, không vì vòng lặp). |
+| **context engineering** | KHÔNG phải lớp thứ 4 — nằm **bên trong harness** (memory + cái gì tới được model): `CONTEXT_RULES.md`, `context-monitor.sh`, skill nạp theo nhu cầu. |
 | **go-live (graduation — tốt nghiệp)** | Điểm chuyển A→B: app deploy lên env thường trực đầu tiên. |
 
 ## B. Quy trình Build (Mode A)
@@ -86,7 +87,40 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **CONTROL session** | Phiên orchestrator (điều phối viên): giao task → poll (thăm dò trạng thái) → ship. Không tự cày code feature. |
 | **`claude daemon` / `claude agents` / FleetView** | Bền session / theo dõi các agent đang chạy. |
 | **`flow`** | Ceremony (nghi thức) git+gh cắt release/ship (có xác nhận). Chỉ git+gh, không đụng worktree/Claude. |
+| **`wait-workers.sh`** | ctl chờ bg-worker tới tín hiệu DONE (PR MERGEABLE / worker terminal) — thay vòng poll tự chế. |
+| **`run-log.mjs`** (cái cân) | 1 dòng JSONL / 1 lần dispatch (`start`→`end`), `report --by harness` so các bản harness. Ghi NGOÀI git, dùng chung mọi repo. **Bắt buộc kẹp quanh mọi dispatch** — không có nó thì hill-climbing loop không có số để leo. |
+| **ops-board** | Mặt phẳng trạng thái NỘI BỘ (`templates/ops-board/`): worker đang chạy · số của kỳ · so bản harness · chỗ ùn. Cố ý KHÔNG vẽ lại bảng 10-state. Khách xem mặt riêng (D4). |
 | **verify-at-source** | (xem C) nguyên tắc deploy xuyên suốt: xác nhận artifact chạy = commit đã ship. |
+
+---
+
+## H. Tên nhà ⟷ tên ngành (bảng phiên dịch)
+
+Repo này đặt tên **tự chế** cho gần hết khái niệm — dùng trong nhà thì tốt, nhưng ra ngoài thì không ai hiểu, và ngược lại đọc tài liệu ngành không nhận ra "cái này mình có rồi". Bảng dưới **không đổi tên đang dùng** (đổi là loạn hết doc), chỉ ghi kèm **tên ngành gọi là gì** để:
+- onboard dev mới đã quen từ vựng ngành (khỏi mất 1 tuần dịch ngược),
+- nói chuyện với khách/đối tác kỹ thuật bằng từ họ tìm kiếm,
+- đọc bài/tool ngoài mà biết map vào đâu.
+
+> Trạng thái từ vựng (khảo sát 2026-08): `context engineering` đã chuẩn hoá; `agent harness` / `harness engineering` **hội tụ nhanh nhất** trong nhóm từ mới; `loop engineering` mới thành hình 06/2026; `graph engineering` gắn với framework (LangGraph/AutoGen). Chưa từ nào đóng băng hoàn toàn — bảng này cần soát lại mỗi vài tháng.
+
+| Repo gọi | Ngành gọi | Ghi chú khi dùng ra ngoài |
+|---|---|---|
+| **Mode A — Build** (spec → REQ-ID → build-manifest → phase) | **Spec-Driven Development (SDD)** | Trùng gần hết: 6 thành phần của SDD (outcomes · scope boundaries · constraints · prior decisions · task breakdown · **verification criteria**) đều có mặt. Nói "SDD" thì mượn được cả hệ tooling ngành (Spec Kit, Kiro, OpenSpec…). |
+| **Mode B — the loop** (issue-pipeline) | **event-driven loop** + steady-state | Trigger = 1 issue. |
+| **`/build-phase`** | **agent loop** (cấp phase) | Vòng lặp nền: model → tool → quan sát → lặp. |
+| **verify-gate + verify-at-source + QC-vs-AC** | **verification loop** | Nguyên tắc ngành: *loop on evidence, not on confidence* — mình có sẵn, còn chặt hơn (FC6: không tin cả tín hiệu wrapper). |
+| **Growth Rule** (friction → vá harness → re-propagate) | **hill-climbing loop** | Vòng cải tiến harness. Cần `run-log.mjs` mới leo có đo. |
+| **CONTROL session → N bg worker** | **supervisor pattern** | 2026 doanh nghiệp đang bỏ "swarm" quay về supervisor + phase-gating cứng = đúng cái mình làm. |
+| **Locked Decisions D1–D6** | **constitution** (Constitutional SDD) | Ràng buộc bất-khả-thương-lượng, có version. |
+| **stack template · steady-state kit** | **harness template** | |
+| **CONTEXT_RULES + context-monitor** | **context engineering · compaction · context budget** | |
+| **`run-log.mjs`** | **evals · observability / tracing** | Ngành: *evals là dữ liệu huấn luyện của harness*. |
+| **10-state model** (edge được `issue-state.mjs` ép) | **state machine** — liều nhỏ của **graph engineering** | Đây là đường DUY NHẤT đủ ổn định để formalize; xem `OPERATING-MODES.md` § why there is no graph layer. |
+| **agent build ra sản phẩm** ⟷ **agent nằm TRONG sản phẩm** | **build-side agent** ⟷ **product-side agent** | ⚠️ Hai thứ khác hẳn (gate, evals, mức cẩn thận). Lẫn nhau là lỗi kiến trúc tốn. Harness này chỉ quản **build-side**. |
+
+**Từ nên tránh khi nói với khách/đối tác kỹ thuật:** *"vibecode / vibe coding"* — ngành dùng từ này để chỉ **cách làm ẩu** (agent sinh code trông hợp lý nhưng trôi khỏi ý định); SDD sinh ra chính là để phản ứng lại nó. Repo này thực chất đang làm SDD nghiêm túc → dùng từ đó là tự hạ mình. Trong nhà gọi sao cũng được.
+
+**Từ khoá ngành mình CHƯA có** (trùng đúng backlog): `evals` (đang mở — `run-log.mjs` là bước 1) · `observability/tracing` · `least-privilege / permissions` (dispatch đang `bypassPermissions`) · `durable execution` · `memory engineering`.
 
 ---
 
