@@ -10,6 +10,9 @@ Chạy thử harness trên 1 trang bán hàng (landing page - trang đích bán 
 Trang landing dựng ra hứa "Tốc độ & SEO (Search Engine Optimization - tối ưu tìm kiếm) đạt ngưỡng", nhưng KHÔNG có gate `landing-acceptance` nào đo/chặn điều đó. Harness đang cho phép cam kết với khách hàng một tiêu chí mà bản thân nó không có cổng nào nghiệm thu - đúng blind-spot L14 (present-tense trong doc ≠ đang chạy), lần này ở tầng bán hàng nên hậu quả là hứa-suông với người trả tiền.
 -> Luật: một dòng cam kết chất-lượng trong template khách-đọc PHẢI có 1 gate chấp-hành thật đứng sau (VD Lighthouse CI cho Tốc độ/SEO), verify-at-source. Chưa có gate thì HOẶC dựng gate, HOẶC XOÁ/hạ-nhãn dòng đó trong template bán hàng (không để lời hứa mồ côi). Nối L14: đọc từ đầu, mỗi cam kết soi có artifact cưỡng chế chưa.
 
+> **NGUYÊN TẮC (ứng viên luật cứng - CHƯA nâng, chờ người duyệt):** Harness được phép **thiếu** gate. KHÔNG được phép để bản bán hàng / template khách hàng **hứa** một gate chưa tồn tại. Mọi cam kết chất-lượng trong tài liệu khách phải trỏ được tới gate cưỡng chế nó - không trỏ được thì bỏ câu đó.
+> Đề xuất chỗ đứng nếu duyệt: 1 luật cứng trong **gate review tài liệu khách**. Cố ý để ở đây dạng đề-xuất, không tự nâng: nâng bài học thành luật mà chưa qua người là đúng cơ chế harness phình bằng luật chưa kiểm chứng.
+
 **L17 - Harness không nói dự án landing SỐNG Ở REPO NÀO - sắp có ~5 cái.**
 Dựng landing đầu tiên mà không có chỗ quy định landing ở repo nào: 1 repo dùng chung nhiều trang? mỗi trang 1 repo? Sắp có ~5 landing thì không có quy ước = mỗi lần lại quyết lại, dễ vung vãi.
 -> Luật: harness cần chốt 1 quy ước "landing sống ở đâu" (đề xuất: 1 monorepo `landings/` nhiều trang, hoặc 1 template repo nhân bản) TRƯỚC khi làm trang thứ 2. Đây là quyết định cấu trúc, cần user chốt (business/scale), không tự đoán.
