@@ -7,59 +7,41 @@
 > làm đường truyền. Đích thật là **Mức 1** — mỗi việc harness = 1 GitHub Issue trên
 > chính repo này, dùng đúng Mode B mà harness đã có. Xem § Đích ở cuối.
 
-**Cập nhật:** 2026-08-17 · **Bởi:** phiên cloud · **Trạng thái v7.3:** đã kiểm chứng
-trên dữ liệu thật (guard PASS trên board elearning, run-log 1 run thật, L16–L21 ghi)
+**Cập nhật:** 2026-08-17 (phiên CLI) · **Bởi:** phiên CLI ctl-loop-harness
+**Trạng thái:** 3 việc của handoff trước ĐÃ XONG — giờ chờ user duyệt merge 2 PR.
 
 ---
 
-## Việc 1 — Land bền phần propagate ở elearning (ĐANG MẤT DẦN)
+## ĐANG CHỜ USER DUYỆT (không tự merge)
 
-`elearning-platform/scripts/issue-state.mjs` là **thay đổi chưa commit trên `dev`**.
-Một lần checkout / worktree mới / worker dọn cây là mất sạch — elearning âm thầm quay
-về script KHÔNG có guard trong khi cả team tưởng đã có. Trạng thái này **nguy hiểm hơn
-"chưa propagate"**, vì nó trông như đã xong.
+- **PR #2** (bryanphan66/loop-harness) → `main`: v7.3 + v7.4. Không xung đột với nhánh
+  `harness/issue-standard-diacritics-rule` (đã kiểm: nhánh đó chỉ đụng
+  `github-issue-standard.md`, PR #2 không đụng). **Chờ user duyệt mới merge.**
+- **PR #708** (RenoAI-Labs/elearning-platform) → `dev`: propagate `issue-state.mjs`
+  guard v7.3. Draft. Working-tree bẩn trên `dev` đã dọn (change đã nằm an toàn trên PR).
+- Nhánh `harness/issue-standard-diacritics-rule` còn treo trên origin — chưa rõ chủ,
+  chỉ +2 dòng vào `github-issue-standard.md`. Hỏi user có gộp không.
 
-- Branch từ `dev` → commit riêng file đó → **draft PR**. KHÔNG commit thẳng `dev`.
-- PR body ghi: propagate harness v7.3; guard đã dry-run trên board thật
-  (`Ready for UAT → Done` bị chặn · `→ UAT Testing` qua).
+## ĐÃ XONG phiên này (không làm lại)
 
-## Việc 2 — Push + merge v7.3 vào `main`
+- Việc 1 handoff cũ: propagate elearning land bền → PR #708 (không còn "mất dần").
+- Việc 2: push `claude/twitter-link-access-7q6qqb` + kiểm nhánh lạ + mở PR #2 → main.
+- Việc 3: nguyên tắc cạnh L16 (ứng viên luật review tài liệu khách) → commit `0eb05fe`.
+- v7.3 kiểm chứng thật: guard PASS trên board elearning, run-log 1 run (#632 done 66'),
+  L16–L21 ghi. (PR elearning #705 fix dev-stack #632, draft, đã có sẵn.)
 
-`main` đang ở v7.2 (`9db54a7`). Mọi dự án seed từ `main` lúc này nhận harness cũ:
-không guard, không cân — đúng cái drift `CLAUDE.md` cảnh báo.
+## VIỆC KẾ (sau khi user merge 2 PR)
 
-1. Push `0c4b156` (lessons-log L16–L21) lên `claude/twitter-link-access-7q6qqb` để nó
-   đi cùng chuyến merge.
-2. **Kiểm nhánh lạ TRƯỚC KHI merge**: origin có `harness/issue-standard-diacritics-rule`
-   mà phiên cloud không biết (worker song song?). Nếu nó chạm
-   `playbooks/github-issue-standard.md` hoặc docs v7.3 vừa sửa → xử xung đột trước,
-   đừng merge đè.
-3. Mở PR → `main`. **Đợi user duyệt mới merge.**
-
-## Việc 3 — Chốt nguyên tắc từ L16
-
-Phiên cloud đã sửa phần của nó (bỏ dòng "Tốc độ & SEO đạt ngưỡng" khỏi bản nháp
-landing; 3 cam kết còn lại đều có gate thật đứng sau). Việc còn lại là ghi **nguyên
-tắc**, cạnh L16:
-
-> Harness được phép **thiếu** gate. Không được phép để bản bán hàng / template khách
-> hàng **hứa** một gate chưa tồn tại. Mọi cam kết chất lượng trong tài liệu khách phải
-> trỏ được tới gate cưỡng chế nó — không trỏ được thì bỏ câu đó.
-
-Đây là ứng viên thành **luật cứng trong gate review tài liệu khách**. Thấy đúng thì
-**đề xuất**, đừng tự nâng — nâng bài học thành luật mà chưa qua người là đúng cách
-harness phình bằng luật chưa kiểm chứng.
-
----
+**Chạy thêm ≥4 vòng issue nữa** để `run-log report` bắt đầu có nghĩa — cần **≥2 nhóm
+version × ≥5 run**. Hiện mới 1 run (v7.3). Mỗi vòng: kẹp `run-log start/end`
+(BẮT BUỘC `--repo elearning-platform`, bug #5), dispatch worker 1 issue thật, verify.
 
 ## KHÔNG làm trong phiên này
 
 - ❌ Dựng gate `landing-acceptance` — pre-build cho lane chưa có site nào.
 - ❌ Mở Lane Landing — chờ 1 site thật.
-- ❌ Vá harness thêm — v7.3 mới có **1 run**, chưa đủ căn cứ thêm/bớt luật nào.
-
-Việc thật sự cần sau 3 việc trên: **chạy thêm 4 vòng issue nữa** để `run-log report`
-bắt đầu có nghĩa (cần ≥2 nhóm version × ≥5 run).
+- ❌ Vá harness thêm — v7.3 mới 1 run, chưa đủ căn cứ thêm/bớt luật.
+- ❌ Tự merge PR #2 / #708 — chờ user.
 
 ## Ràng buộc
 
