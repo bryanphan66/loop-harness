@@ -8,8 +8,19 @@
  *
  * Dung:
  *   node scripts/issue-state.mjs <issue-number> "<state name>" [--repo owner/name] [--dry-run]
+ *                                [--force "<ly do>"]
  * Vi du:
  *   node scripts/issue-state.mjs 239 "In Dev"
+ *
+ * TRANSITION GUARD (chan nhay coc): bang 10-state khong con chi la quy uoc ghi
+ * trong tai lieu — script CHAN buoc chuyen khong hop le (vi du Backlog -> Done,
+ * bo qua QC). Bang canh hop le o TRANSITIONS ben duoi, mirror
+ * playbooks/steady-state-issue-pipeline.md. Fail-closed: state khong nam trong
+ * bang (org doi ten / taxonomy khac) cung bi chan, phai --force.
+ *
+ * Escape cho NGUOI: --force "<ly do>" (bat buoc co ly do, in ra log). Agent
+ * KHONG duoc tu --force de di qua guard — do la luat bypass cua verify-gate,
+ * ap dung y het o day.
  *
  * QUAN TRONG - value PATCH la DECLARATIVE (khai bao): gui len issue_field_values
  * nao thi GitHub thay THE toan bo, cac field khong gui bi XOA. Vi vay script
@@ -24,9 +35,83 @@
  */
 import { execFileSync } from 'node:child_process';
 
+// ---- Bang canh hop le cua may trang thai 10-buoc --------------------------
+// Mirror: playbooks/steady-state-issue-pipeline.md § The unit + § rules that bite.
+// Luat vang: QC/UAT fail TRONG AC -> lui "In Dev" tren CHINH issue do;
+// fail NGOAI AC -> issue MOI (khong lui trang thai issue da qua).
+const TRANSITIONS = {
+  '(chua co)':      ['Backlog', 'Ready for Dev', 'Cancelled'], // issue moi tao / chua set States
+  'Backlog':        ['Ready for Dev', 'Cancelled'],
+  'Ready for Dev':  ['In Dev', 'Backlog', 'Cancelled'],
+  'In Dev':         ['Deploying', 'Ready for Dev', 'Cancelled'],
+  'Deploying':      ['Ready for Test', 'In Dev', 'Cancelled'],
+  'Ready for Test': ['QC Testing', 'In Dev', 'Cancelled'],
+  'QC Testing':     ['Ready for UAT', 'In Dev', 'Cancelled'],
+  'Ready for UAT':  ['UAT Testing', 'In Dev', 'Cancelled'],
+  'UAT Testing':    ['Done', 'In Dev', 'Cancelled'],
+  'Done':           [], // terminal — loi phat hien SAU Done = issue MOI, khong mo lai
+  'Cancelled':      ['Backlog'],
+};
+const UNSET = '(chua co)';
+
 const args = process.argv.slice(2);
 const argOf = (f) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : null; };
 const DRY = args.includes('--dry-run');
+const FORCE_REASON = argOf('--force');
+const FORCED = args.includes('--force');
+
+// Quyet dinh hop le: CA HAI dau phai co trong bang, va canh phai ton tai.
+const isLegal = (from, to) => Object.prototype.hasOwnProperty.call(TRANSITIONS, from)
+  && Object.prototype.hasOwnProperty.call(TRANSITIONS, to)
+  && TRANSITIONS[from].includes(to);
+
+// ---- 0. --self-test: kiem chung bang canh, KHONG can gh / mang -----------------
+// Chay duoc o CI hoac tay: `node scripts/issue-state.mjs --self-test`
+if (args.includes('--self-test')) {
+  const cases = [
+    // [from, to, ky vong hop le?]
+    ['(chua co)', 'Backlog', true],
+    ['(chua co)', 'Done', false],          // issue moi khong nhay thang Done
+    ['Backlog', 'Ready for Dev', true],
+    ['Backlog', 'Done', false],            // nhay coc bo qua ca QC lan UAT
+    ['Backlog', 'In Dev', false],          // phai qua triage (Ready for Dev)
+    ['Ready for Dev', 'In Dev', true],
+    ['In Dev', 'Deploying', true],
+    ['In Dev', 'Ready for Test', false],   // chua deploy thi chua test duoc
+    ['Deploying', 'Ready for Test', true],
+    ['Ready for Test', 'QC Testing', true],
+    ['QC Testing', 'Ready for UAT', true],
+    ['QC Testing', 'In Dev', true],        // luat vang: fail TRONG AC -> lui
+    ['QC Testing', 'Done', false],         // bo qua UAT
+    ['Ready for UAT', 'UAT Testing', true],
+    ['UAT Testing', 'Done', true],
+    ['Done', 'In Dev', false],             // Done la terminal -> loi moi = issue MOI
+    ['Done', 'Backlog', false],
+    ['Cancelled', 'Backlog', true],        // hoi sinh issue da huy
+    ['In Dev', 'Khong Ton Tai', false],    // state la (taxonomy khac) -> fail-closed
+    ['State La', 'In Dev', false],
+  ];
+  let bad = 0;
+  for (const [from, to, want] of cases) {
+    const got = isLegal(from, to);
+    if (got !== want) { console.error(`[FAIL] "${from}" -> "${to}": mong ${want}, nhan ${got}`); bad++; }
+  }
+  // Moi state (tru terminal/unset) phai co duong ve "Cancelled".
+  for (const [s, outs] of Object.entries(TRANSITIONS)) {
+    if (s === 'Done' || s === 'Cancelled') continue;
+    if (!outs.includes('Cancelled')) { console.error(`[FAIL] "${s}" khong co duong -> "Cancelled"`); bad++; }
+  }
+  // Moi dich den phai la state co that trong bang (khong go sai ten).
+  for (const [s, outs] of Object.entries(TRANSITIONS)) {
+    for (const t of outs) {
+      if (!Object.prototype.hasOwnProperty.call(TRANSITIONS, t)) { console.error(`[FAIL] "${s}" -> "${t}": dich khong ton tai trong bang`); bad++; }
+    }
+  }
+  if (bad) { console.error(`[self-test] ${bad} case sai.`); process.exit(1); }
+  console.log(`[self-test] OK — ${cases.length} case + bat buoc Cancelled + tinh toan ven cua bang.`);
+  process.exit(0);
+}
+
 const REPO = argOf('--repo') || execFileSync('gh', ['repo', 'view', '--json', 'nameWithOwner', '-q', '.nameWithOwner'], { encoding: 'utf8' }).trim();
 const ORG = REPO.split('/')[0];
 
@@ -36,6 +121,7 @@ for (let i = 0; i < args.length; i++) {
   const a = args[i];
   if (a === '--dry-run') continue;
   if (a === '--repo') { i++; continue; }
+  if (a === '--force') { i++; continue; }
   positionals.push(a);
 }
 const issueNumber = positionals[0];
@@ -94,6 +180,41 @@ const valueOf = (fv) => (fv.data_type === 'single_select'
   ? (fv.single_select_option && fv.single_select_option.name)
   : fv.value);
 
+// ---- 3b. TRANSITION GUARD (fail-closed) ----------------------------------------
+// Bang 10-state phai la BARIE that, khong phai vach son. Chan moi buoc chuyen
+// khong co trong TRANSITIONS; nguoi muon di tat thi --force "<ly do>".
+const currentStateFv = existing.find((fv) => fv.issue_field_id === statesFieldId);
+const fromState = (currentStateFv && valueOf(currentStateFv)) || UNSET;
+
+if (FORCED && !FORCE_REASON) {
+  die('--force phai kem ly do: --force "<ly do>" (luat bypass giong verify-gate: nguoi bypass phai noi ro vi sao).');
+}
+
+if (fromState === stateName) {
+  console.log(`[issue #${issueNumber}] da o "${stateName}" san — khong doi gi.`);
+  process.exit(0);
+}
+
+const allowed = TRANSITIONS[fromState];
+const known = allowed !== undefined && Object.prototype.hasOwnProperty.call(TRANSITIONS, stateName);
+
+if (!isLegal(fromState, stateName)) {
+  const why = !known
+    ? `state "${!allowed ? fromState : stateName}" khong co trong bang chuyen (org doi ten state? taxonomy khac?)`
+    : `"${fromState}" -> "${stateName}" KHONG hop le. Tu "${fromState}" chi di duoc: ${allowed.length ? allowed.map((s) => `"${s}"`).join(', ') : '(khong di dau — trang thai cuoi)'}`;
+
+  if (!FORCED) {
+    console.error(`[chan] ${why}`);
+    console.error('       Luat vang: QC/UAT fail TRONG AC -> lui "In Dev" tren chinh issue nay;');
+    console.error('                  fail NGOAI AC -> tao issue MOI (issue nay di tiep doc lap).');
+    console.error('                  Loi phat hien SAU "Done" -> LUON la issue moi, khong mo lai.');
+    console.error(`       Nguoi (khong phai agent) muon di tat: them --force "<ly do>".`);
+    process.exit(1);
+  }
+  console.error(`[force] bo qua guard: ${why}`);
+  console.error(`[force] ly do: ${FORCE_REASON}`);
+}
+
 const payloadValues = [];
 let statesReplaced = false;
 for (const fv of existing) {
@@ -115,7 +236,7 @@ const kept = payloadValues
   .filter((p) => p.field_id !== statesFieldId)
   .map((p) => p.value)
   .join(', ') || '(khong co)';
-console.log(`[issue #${issueNumber}] States -> "${stateName}" (giu lai: ${kept})${DRY ? ' [DRY-RUN]' : ''}`);
+console.log(`[issue #${issueNumber}] States "${fromState}" -> "${stateName}" (giu lai: ${kept})${DRY ? ' [DRY-RUN]' : ''}`);
 
 if (DRY) { console.log(`[dry-run] payload: ${body}`); process.exit(0); }
 
