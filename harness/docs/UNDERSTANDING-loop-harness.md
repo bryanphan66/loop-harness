@@ -52,7 +52,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 **6 nhịp vòng lặp** `PROVEN` (trừ recover): discover (phát hiện việc: bug/change → 1 issue) → dispatch (giao việc cho agent: 1 coder/issue, worktree riêng) → verify (xác minh: verify-at-source + gate + QC (Quality Control — kiểm thử chất lượng) checklist) → **recover** (tự-sửa khi lỗi) → persist (lưu trạng thái: bảng 10-state) → decide-next (quyết việc kế: QC pass thì tiến, fail theo luật vàng (golden rule)). Bản đầy đủ: [`playbooks/steady-state-issue-pipeline.md`](./playbooks/steady-state-issue-pipeline.md).
 
 **Luật đã đổ máu** (nhớ kỹ, mỗi cái từng gây bug thật):
-- **10-state** `PROVEN/⚠️` — Backlog→Ready for Dev→In Dev→Deploying→Ready for Test→QC Testing→Ready for UAT→UAT Testing→Done (+Cancelled). Issue **chỉ đóng ở Done**. *Phản biện: 10 state hơi nhiều cho 1 QC solo; nhiều nhóm dùng 4-5.*
+- **10-state** `PROVEN/⚠️` — Backlog→Ready for Dev→In Dev→Deploying→Ready for Test→QC Testing→Ready for UAT→UAT Testing→Done (+Cancelled). Issue **chỉ đóng ở Done**. Từ v7.3 các **cạnh chuyển được `issue-state.mjs` ÉP** (nhảy cóc kiểu Backlog→Done bị chặn; `--force "<lý do>"` chỉ dành cho người). *Phản biện: 10 state hơi nhiều cho 1 QC solo; nhiều nhóm dùng 4-5.*
 - **Luật vàng QC fail** `PROVEN` — lỗi TRONG AC → lùi In Dev sửa issue cũ; lỗi NGOÀI AC → issue mới.
 - **Refs-not-Closes** `PROVEN` — tham chiếu `Refs #N` ở CẢ PR body VÀ commit message (squash (gộp các commit thành một khi merge) gộp keyword → `Closes` đóng nhầm).
 - **verify-at-source (xác minh tại nguồn — kiểm cái đang CHẠY, không tin CI xanh)** `PROVEN` — sau deploy, container đang chạy phải mang đúng commit. Không tin CI-xanh/HTTP-200.
@@ -96,9 +96,12 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 | Vững (PROVEN, tin được) | Còn nặng/đặc thù (PATCHED) | Chưa build (ASPIRATIONAL) |
 |---|---|---|
 | Mode B loop + 6 luật đổ máu | 3-macro legacy (đã hạ vai) | R1 auto re-dispatch khi BLOCKED |
-| build-manifest, walking skeleton, runbook tier (mẫu elearning §5b) | REQ-ID nặng cho nội bộ (→Lane Lite) | — |
-| R2/R3, verify-at-source | 10-state hơi nhiều cho QC solo | proof deploy qua pipeline từ xa (mới chỉ prod-stack local) |
+| build-manifest, walking skeleton, runbook tier (mẫu elearning §5b) | REQ-ID nặng cho nội bộ (→Lane Lite) | least-privilege cho bg worker (đang `bypassPermissions`) |
+| R2/R3, verify-at-source | 10-state hơi nhiều cho QC solo (v7.3 đã ép cạnh) | proof deploy qua pipeline từ xa (mới chỉ prod-stack local) |
 | stack template (sau khi dogfood) | Loop Engineering (dán nhãn lại) | |
+| — | `run-log.mjs` (v7.3, **mới — chưa có dữ liệu thật**) | evals/observability đầy đủ (run-log mới là bước 1) |
+
+> **Nhãn cho `run-log.mjs` phải đọc kỹ:** script chạy được + self-test xanh, nhưng **chưa có run thật nào** trong log. Nó là *dụng cụ đo*, chưa phải *kết quả đo*. Đừng trích nó như bằng chứng harness tốt lên — nó mới chỉ khiến câu hỏi đó **trả lời được**. Mốc chuyển sang `PROVEN`: ≥2 nhóm version, ≥5 run/nhóm.
 
 ## 8. Dev mới bắt đầu thế nào
 1. Mở session (phiên làm việc): `cd ~/Desktop/Workspace/loop-harness && claude` (context tự nạp từ `CLAUDE.md`).

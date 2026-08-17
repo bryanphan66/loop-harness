@@ -4,7 +4,7 @@
 
 How this harness runs a project. **The single operating spine is the two modes (chế độ) below (Mode A → go-live (thời điểm app lên môi trường thật) → Mode B).** Two older framings are kept but SUBORDINATE — not parallel models competing with the spine:
 - the **3 macro-stages** (3 macro-giai đoạn: Pre-Build / Build / Post-Build) are just the *step grouping inside the modes* — Mode A = macro 1→2, Mode B = macro 3's continuous parts (`WORKFLOW.md` details the numbered steps);
-- **Loop Engineering** (kỹ nghệ vòng lặp — the `prompt → context → harness → loop` maturity ladder) is a *diagnostic lens* (lăng kính chẩn đoán), demoted to the box near the end — use it to ask "which layer is thin", not as a thing to run.
+- **Loop Engineering** (kỹ nghệ vòng lặp — the `prompt → context → harness → loop` **nested layers**, lớp bọc nhau) is a *diagnostic lens* (lăng kính chẩn đoán), demoted to the box near the end — use it to ask "which layer owns this failure", not as a thing to run.
 
 New readers: start at `UNDERSTANDING-loop-harness.md` (narrative + honest PROVEN/PATCHED/ASPIRATIONAL (đã kiểm chứng / vá-từ-bài-học / chưa-làm) scorecard).
 
@@ -71,16 +71,41 @@ The loop is strong on **discover / dispatch / verify / persist / decide**. Two f
 
 These are development directions, not yet built — do them under Frontier 1 first (a self-healing loop is safer to make autonomous than a fragile one).
 
-## Framing (diagnostic lens): the Loop Engineering maturity ladder
-> This is a **lens for diagnosing the harness, not the operating spine** (the spine is the two modes above). Use it to ask "which layer is thin right now?" — e.g. Recover being weak = the *loop* layer is thin. It mostly re-labels things that already exist; do not treat the 4 rungs as steps to execute.
+## Framing (diagnostic lens): the four nested layers
+> This is a **lens for diagnosing the harness, not the operating spine** (the spine is the two modes above). Use it to ask "which layer OWNS this failure?" — e.g. a bg worker hanging on a permission prompt is a *harness* fault, not a thin loop. It mostly re-labels things that already exist; do not treat the 4 layers as steps to execute.
 
-`prompt → context → harness → loop` — climbing this ladder = moving from prompting an agent turn-by-turn to designing a *system that discovers work, dispatches it, verifies, recovers, persists state, and decides the next action until a goal is met*. loop-harness embodies rungs 2–4:
+`prompt → context → harness → loop` — **each layer WRAPS the one before it** (lớp bọc, không phải bậc thang). This is the industry framing (LangChain, 2026) and it matters mechanically: an outer layer never replaces an inner one, so **when the loop misbehaves the fix is often one layer IN** (stale state, an ambiguous tool contract, a missing permission), not one more loop.
 
-| Layer (rung) | What it designs | Where this harness embodies it |
+```text
+┌── loop ──────────────────────────────────┐  "run the machine again?"  (goal + stop rule + budget)
+│  ┌── harness ─────────────────────────┐  │  "the machine"            (tools · state · gates · verifier)
+│  │  ┌── context ─────────────────┐    │  │  "the memory"             (what reaches the model)
+│  │  │  ┌── prompt ─────────┐     │    │  │  "the message"            (one input)
+│  │  │  └───────────────────┘     │    │  │
+│  │  └────────────────────────────┘    │  │
+│  └────────────────────────────────────┘  │
+└──────────────────────────────────────────┘
+```
+
+| Layer | What it designs | Where this harness embodies it |
 |---|---|---|
-| **Context engineering** (kỹ thuật quản lý ngữ cảnh) | which instructions/data/tools reach the model, minimizing excess | slim `~/.claude/rules` + on-demand skills + progressive disclosure (hé lộ dần theo nhu cầu); the repo's own `CLAUDE.md`, auto-loaded by cwd |
+| **Context engineering** (kỹ thuật quản lý ngữ cảnh) | which instructions/data/tools reach the model, minimizing excess | `docs/CONTEXT_RULES.md` (per-step Must/Should/Skip), `.claude/hooks/context-monitor.sh` (40/60/80/95% + next-session seed), on-demand skills + progressive disclosure (hé lộ dần theo nhu cầu); the repo's own `CLAUDE.md`, auto-loaded by cwd |
 | **Harness engineering** (kỹ nghệ khung vận hành) | the executable environment around the model (files, git, gates, memory (trí nhớ bền qua các phiên), feedback) | the non-bypassable `harness-verify-gate.sh`, the pnpm stack template (khung code mẫu), `STAGE.md`, gates (PB-G/DoR/DoD), per-repo CI/CD (tự động tích hợp/giao hàng), auto-memory |
-| **Loop engineering** (kỹ nghệ vòng lặp) | how the system repeatedly **discover → dispatch → verify → recover → persist → decide-next**, on a schedule or until a goal | **Mode B** is the loop; verify-at-source; cron routines (Recover R1 still thin = this rung not yet full) |
+| **Loop engineering** (kỹ nghệ vòng lặp) | whether to run the machine again: goal, evidence, stop rule, budget | **Mode B** is the loop; verify-at-source; `scripts/run-log.mjs` (the measurement); Recover R1 still thin = this layer not yet full |
+
+**Diagnose by symptom — which layer owns the fix:**
+
+| Symptom | Owning layer | The fix |
+|---|---|---|
+| Agent can't reach the right data/tool safely; bg worker hangs asking permission | **Harness** | tool contract, allow-list, sandbox, context injection |
+| Progress lost across sessions | **Harness** | durable state, checkpoint, progress artifact, compaction |
+| First attempt close but unreliable | **Loop** | external grader + deterministic tests + bounded retry |
+| Agent keeps working after success, or stops without proof | **Loop** | evidence-based terminal state + budget-aware stop rule |
+| Can't tell whether a harness patch actually helped | **Loop (measurement)** | `run-log.mjs` — replay real runs, compare versions |
+| Several specialists must run in a fixed order | *Graph* (not built — see below) | explicit nodes/edges/joins |
+| The workflow changes too often to diagram | **Simpler harness** | keep control model-driven; delay graph formalization |
+
+**Why there is no graph layer here (deliberate).** Graph engineering (nodes/edges/joins as an executable topology — LangGraph, AutoGen GraphFlow) is the fourth term in the 2026 vocabulary. This harness does **not** run one, and that is a decision, not a debt: the industry's own first rule is *"do not build a graph before you understand the work"*. Our control flow is carried by `WORKFLOW.md` step tables + gates + a supervisor session, which stays cheap to change. The **one** path stable enough to have earned formalization is the 10-state issue board — so its edges are enforced in `issue-state.mjs` (legal transitions only), and nowhere else. Re-open this when a path has been repeated across 2+ projects unchanged.
 
 ## Reference implementation + packaged kit
 Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human operating playbook (công thức vận hành tái dùng — in the loop-harness workshop, not shipped): `plans/team-playbook-human-agent.md`.
