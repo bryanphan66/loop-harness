@@ -18,7 +18,7 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
     ├── .claude/ ········· tự động hoá SHIP: commands + agent + hooks
     ├── scripts/ ········· install-harness.sh + harness-verify-gate.sh
     ├── .githooks/ ······· pre-commit + pre-push (gate fail-closed, không bypass)
-    └── templates/ ······· scaffold: stack (Mode A) + steady-state (Mode B) + doc-stubs (gồm lessons-log)
+    └── templates/ ······· scaffold: stack (Mode A) + steady-state (Mode B) + ops-board + doc-stubs (gồm lessons-log)
 ```
 
 > **Ranh giới cứng (chuẩn dài hạn):** `harness/` là SẢN PHẨM, **tự-đủ tuyệt đối** (self-contained — không trỏ/phụ thuộc ra ngoài chính nó) — docs trong đó KHÔNG `../../` ra ngoài cây; khi cài đi đâu cũng chạy. Mọi thứ ở root là XƯỞNG (workshop — làm ra harness): `plans/` chứa lessons-log (sổ bài học) + team-playbook (công thức tái dùng của team) + reports CỦA harness; `.claude/` là config phiên dev (gitignore phần cá nhân). Tri thức "cho dự án" (VD lessons-log của dự án) là 1 **template** (khung mẫu) trong `harness/docs/templates/`, không phải lessons-log dev của harness.
@@ -59,7 +59,7 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 |---|---|---|
 | `README.md` | Crosswalk (bảng ánh xạ): process-folder của harness → doc trong `CLAUDE.md` toàn cục + thứ tự đọc doc. | người + máy |
 | `DOC-STANDARD.md` | Rubric (thước đo) C1-C10 để viết/refactor bất kỳ doc; có When-To-Run. | người (tác giả doc) |
-| `HARNESS_CHANGELOG.md` | Version log (nhật ký phiên bản) của CHÍNH mô hình harness (docs/playbook/gate/template); hiện v7.0. State dự án KHÔNG ở đây. | tham chiếu |
+| `HARNESS_CHANGELOG.md` | Version log (nhật ký phiên bản) của CHÍNH mô hình harness (docs/playbook/gate/template); **dòng `Current version:` ở đầu file là NGUỒN DUY NHẤT** — `run-log.mjs` đọc chính dòng đó, nên đừng chép số version sang file khác. State dự án KHÔNG ở đây. | tham chiếu |
 
 ## `harness/.claude/` — tự động hoá (index: `.claude/README.md`)
 - `commands/`: **`/stage-next`** (chạy bước kế), **`/build-phase`** (vòng code phase), **`/gate-check`**.
@@ -70,10 +70,13 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 ## `harness/scripts/` + `.githooks/` — gate + cài đặt (index: `scripts/README.md`)
 - `install-harness.sh`: bê toàn bộ `harness/` vào dự án mới + init git + bật verify-gate (cổng kiểm chứng không bỏ qua được).
 - `harness-verify-gate.sh` + `pre-commit`/`pre-push`: **gate fail-closed (mặc định CHẶN khi nghi ngờ/lỗi) không bypass (không bỏ qua được)** (chặn commit lỗi lint/typecheck/register).
+- `wait-workers.sh`: ctl chờ bg-worker tới tín hiệu DONE (PR MERGEABLE hoặc worker terminal) — thay vòng poll tự chế.
+- `run-log.mjs`: **cái cân** — 1 dòng JSONL / 1 lần dispatch, `report` so các bản harness. Ghi NGOÀI git (`~/.claude/loop-harness/run-log.jsonl`), dùng chung mọi repo.
 
-## `harness/templates/` — 2 scaffold
+## `harness/templates/` — 3 scaffold
 - `stack-pnpm-nest-next/`: khung app **Mode A (chế độ A — Build)** (walking skeleton (bộ xương biết đi) — NestJS+Prisma+Postgres+Next.js+CI+e2e+docker). Dùng ở bước 2.4.
-- `steady-state/` (trạng thái vận hành ổn định sau go-live): kit (bộ đồ nghề) **Mode B** — `issue-state.mjs`, `qc-checklist.mjs`, `push-retry.sh` (Recover (tự-sửa khi lỗi) R2), `ship-and-verify.sh` (Recover R3), `bug-report.md`, `regression-checklist.md`. Copy vào dự án khi go-live (thời điểm app lên môi trường thật).
+- `steady-state/` (trạng thái vận hành ổn định sau go-live): kit (bộ đồ nghề) **Mode B** — `issue-state.mjs` (đặt state + **ép cạnh chuyển hợp lệ**), `qc-checklist.mjs`, `push-retry.sh` (Recover (tự-sửa khi lỗi) R2), `ship-and-verify.sh` (Recover R3), `bug-report.md`, `regression-checklist.md`. Copy vào dự án khi go-live (thời điểm app lên môi trường thật).
+- `ops-board/`: **mặt phẳng trạng thái nội bộ** (internal status surface) đã đặc tả ở `HARNESS.md` § Status Artifact — 1 file HTML tự-đủ + `Dockerfile` nginx. Đọc `run-log.jsonl` + `board.json` đặt cạnh nó; thiếu file thì rơi về dữ liệu mẫu và **nói thẳng trên banner**. Nhãn `experimental` — chưa chạy trên dữ liệu thật. KHÔNG đưa cho khách (mặt khách là file/URL riêng — D4).
 
 ## 4 kho tri thức — VỊ TRÍ ("cất gì vào đâu" xem [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) §5)
 | Kho | Ở đâu |
