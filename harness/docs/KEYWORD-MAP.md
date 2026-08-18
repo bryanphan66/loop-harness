@@ -109,14 +109,14 @@ Repo này đặt tên **tự chế** cho gần hết khái niệm — dùng tron
 | **Mode B — the loop** (issue-pipeline) | **event-driven loop** + steady-state | Trigger = 1 issue. |
 | **`/build-phase`** | **agent loop** (cấp phase) | Vòng lặp nền: model → tool → quan sát → lặp. |
 | **verify-gate + verify-at-source + QC-vs-AC** | **verification loop** | Nguyên tắc ngành: *loop on evidence, not on confidence* — mình có sẵn, còn chặt hơn (FC6: không tin cả tín hiệu wrapper). |
-| **Growth Rule** (friction → vá harness → re-propagate) | **hill-climbing loop** | Vòng cải tiến harness. Cần `run-log.mjs` mới leo có đo. |
+| **Growth Rule** (friction → vá harness → re-propagate) | **hướng tới hill-climbing loop** (chưa tự-động) | ⚠️ MỚI LÀ QUY-ƯỚC, chưa thành vòng tự-động: vá harness vẫn do người kích, `run-log.mjs` (cái cân) có rồi nhưng **chưa đủ dữ liệu để leo** (mới ~3 run, cần ≥5/nhóm × ≥2 nhóm). Cân có, chưa cân đủ để "leo có đo". |
 | **CONTROL session → N bg worker** | **supervisor pattern** | 2026 doanh nghiệp đang bỏ "swarm" quay về supervisor + phase-gating cứng = đúng cái mình làm. |
 | **Locked Decisions D1–D6** | **constitution** (Constitutional SDD) | Ràng buộc bất-khả-thương-lượng, có version. |
 | **stack template · steady-state kit** | **harness template** | |
 | **CONTEXT_RULES + context-monitor** | **context engineering · compaction · context budget** | |
 | **`run-log.mjs`** | **tiền-evals (logger)** — hướng tới evals · observability / tracing | ⚠️ CHƯA phải evals: mới GHI log (`start`/`end`/`report`), chưa **chấm điểm vs kỳ vọng** (evals) cũng chưa **lần vết từng run** (tracing). Chính comment trong script tự khai "bước 1". Ngành: *evals là dữ liệu huấn luyện của harness* — đây là chỗ ĐỔ dữ liệu đó, chưa phải bản thân evals. Xem dòng "CHƯA có" cuối § H. |
 | **10-state model** (edge được `issue-state.mjs` ép) | **state machine** — liều nhỏ của **graph engineering** | Đây là đường DUY NHẤT đủ ổn định để formalize; xem `OPERATING-MODES.md` § why there is no graph layer. |
-| **agent build ra sản phẩm** ⟷ **agent nằm TRONG sản phẩm** | **build-side agent** ⟷ **product-side agent** | ⚠️ Hai thứ khác hẳn (gate, evals, mức cẩn thận). Lẫn nhau là lỗi kiến trúc tốn. Harness này chỉ quản **build-side**. |
+| **agent build ra sản phẩm** ⟷ **agent nằm TRONG sản phẩm** | **build-side agent** ⟷ **product-side agent** (mới là GHI CHÚ, chưa thành ranh giới thực thi) | ⚠️ Hai thứ khác hẳn (gate, evals, mức cẩn thận); lẫn nhau là lỗi kiến trúc tốn. Harness này chỉ quản **build-side**. NHƯNG hiện phân biệt này CHỈ nằm ở doc — chưa có gate/cơ chế nào cưỡng chế "không lẫn build-side vào product-side". Là nguyên-tắc-để-nhớ, chưa phải ranh giới máy chặn. |
 
 **Từ nên tránh khi nói với khách/đối tác kỹ thuật:** *"vibecode / vibe coding"* — ngành dùng từ này để chỉ **cách làm ẩu** (agent sinh code trông hợp lý nhưng trôi khỏi ý định); SDD sinh ra chính là để phản ứng lại nó. Repo này thực chất đang làm SDD nghiêm túc → dùng từ đó là tự hạ mình. Trong nhà gọi sao cũng được.
 
