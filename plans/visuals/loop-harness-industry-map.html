@@ -229,7 +229,7 @@
       <div class="card real">
         <div class="top"><span class="repo">Mode B issue-pipeline</span><span class="badge real">có thật</span></div>
         <div class="ind">event-driven loop</div>
-        <p class="desc">Kích bằng 1 issue. DoD (định nghĩa hoàn thành) 13 mục là hằng số trong code, có gate --check fail-closed.</p>
+        <p class="desc">Kích bằng 1 issue gồm 5 khối. <b>AC (tiêu chí nghiệm thu)</b> = phần BIẾN agent điền, dạng Given-When-Then, QC/UAT tick - "xong CÁI GÌ". <b>DoD 13 mục</b> = phần CỐ ĐỊNH script ghi, thuần NFR - "xong THẾ NÀO". Gate --check ép sự có mặt của cả hai (fail-closed).</p>
         <span class="art">templates/steady-state/scripts/new-issue.mjs</span>
       </div>
 
@@ -260,7 +260,7 @@
   <hr class="rule">
 
   <h2>Chưa có - repo tự nhận thiếu</h2>
-  <p class="h2-note">Đúng backlog (việc còn nợ). Không giấu - ghi thẳng trong KEYWORD-MAP.</p>
+  <p class="h2-note">Không lơ, cũng không tự xây. Cách xử lý = gọi tên thật -> định giá cái mất -> xếp thứ tự (frontier) -> đặt điều kiện mở lại.</p>
   <div class="group">
     <div class="cards">
       <div class="card todo">
@@ -294,6 +294,10 @@
         <span class="art none">chưa có artifact</span>
       </div>
     </div>
+  </div>
+
+  <div class="note-box" style="margin-top:14px">
+    <b>Xử lý thế nào (không auto-build):</b> mỗi lỗ được <b>định giá</b> - vd không có graph = "không thấy được vì sao worker sai"; <span class="mono">bypassPermissions</span> = "lỗ to nhất hệ thống". Xếp theo <b>frontier</b>: tự-chữa (self-heal) trước tự-chủ (autonomy) - "vòng mong manh không nên tự lái". <b>Mở lại theo điều kiện, không theo lịch</b>: graph mở khi 1 đường lặp y hệt qua 2+ dự án; evals cần dữ liệu trước (run-log là bước 1, mới ~3 run). Triết lý: không thêm cơ chế trước khi có bằng chứng cần - chống harness phình bằng luật chưa kiểm.
   </div>
 
   <hr class="rule strong">
