@@ -1,0 +1,318 @@
+<title>loop-harness - bản đồ khái niệm ngành</title>
+<style>
+  :root{
+    --bg:#efece4; --surface:#f7f5ef; --surface-2:#efeae0;
+    --ink:#23292e; --muted:#5c6670; --faint:#8a8f8a;
+    --hair:#d9d3c7; --hair-strong:#c4bdad;
+    --accent:#0d6e69; --accent-soft:#0d6e6914;
+    --real:#2f7d43; --wip:#b5761a; --todo:#6f7883;
+    --real-bg:#2f7d4314; --wip-bg:#b5761a16; --todo-bg:#6f78380f;
+    --font-display:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#14181b; --surface:#1b2127; --surface-2:#20272d;
+      --ink:#e7e3da; --muted:#9aa2aa; --faint:#78808a;
+      --hair:#2b333a; --hair-strong:#3a444c;
+      --accent:#54b7b0; --accent-soft:#54b7b016;
+      --real:#5cbd6f; --wip:#d99a3c; --todo:#8b95a0;
+      --real-bg:#5cbd6f14; --wip-bg:#d99a3c16; --todo-bg:#8b95a00f;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#efece4; --surface:#f7f5ef; --surface-2:#efeae0;
+    --ink:#23292e; --muted:#5c6670; --faint:#8a8f8a;
+    --hair:#d9d3c7; --hair-strong:#c4bdad;
+    --accent:#0d6e69; --accent-soft:#0d6e6914;
+    --real:#2f7d43; --wip:#b5761a; --todo:#6f7883;
+    --real-bg:#2f7d4314; --wip-bg:#b5761a16; --todo-bg:#6f78380f;
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181b; --surface:#1b2127; --surface-2:#20272d;
+    --ink:#e7e3da; --muted:#9aa2aa; --faint:#78808a;
+    --hair:#2b333a; --hair-strong:#3a444c;
+    --accent:#54b7b0; --accent-soft:#54b7b016;
+    --real:#5cbd6f; --wip:#d99a3c; --todo:#8b95a0;
+    --real-bg:#5cbd6f14; --wip-bg:#d99a3c16; --todo-bg:#8b95a00f;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font-body);
+    line-height:1.6;-webkit-font-smoothing:antialiased;margin:0}
+  .wrap{max-width:1060px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(18px,4vw,40px) 72px}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+  h1{font-family:var(--font-mono);font-weight:600;font-size:clamp(30px,6vw,52px);
+    letter-spacing:-.01em;margin:0 0 8px;color:var(--ink)}
+  .thesis{font-family:var(--font-display);font-size:clamp(18px,2.6vw,23px);
+    line-height:1.5;color:var(--ink);max-width:40ch;margin:0 0 6px;text-wrap:balance}
+  .sub{color:var(--muted);max-width:60ch;margin:10px 0 0}
+
+  .rule{height:1px;background:var(--hair);border:0;margin:34px 0}
+  .rule.strong{background:var(--hair-strong)}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);
+    font-size:12.5px;padding:6px 11px;border:1px solid var(--hair-strong);border-radius:3px;
+    background:var(--surface)}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .dot.real{background:var(--real)} .dot.wip{background:var(--wip)} .dot.todo{background:var(--todo)}
+
+  h2{font-family:var(--font-mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 4px;font-weight:600}
+  .h2-note{color:var(--faint);font-size:13.5px;margin:0 0 20px}
+
+  /* spine */
+  .spine{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:12px}
+  .stage{background:var(--surface);border:1px solid var(--hair);border-radius:4px;padding:18px 18px 16px}
+  .stage .k{font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  .stage h3{font-family:var(--font-display);font-size:19px;margin:0 0 6px;font-weight:700}
+  .stage p{margin:0;font-size:14px;color:var(--muted)}
+  .stage .ind{font-family:var(--font-mono);font-size:12px;color:var(--ink);margin-top:10px;
+    padding-top:9px;border-top:1px dashed var(--hair-strong)}
+  .arrow{align-self:center;font-family:var(--font-mono);color:var(--faint);font-size:20px;text-align:center}
+  .golive{align-self:center;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--wip);writing-mode:vertical-rl;transform:rotate(180deg);
+    padding:6px 0}
+
+  /* concept groups */
+  .group{margin-top:12px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .card{background:var(--surface);border:1px solid var(--hair);border-left:3px solid var(--todo);
+    border-radius:4px;padding:15px 16px 14px;position:relative}
+  .card.real{border-left-color:var(--real)}
+  .card.wip{border-left-color:var(--wip)}
+  .card.todo{border-left-color:var(--todo)}
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px}
+  .card .repo{font-weight:700;font-size:15px;line-height:1.35}
+  .card .badge{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+    padding:3px 7px;border-radius:3px;white-space:nowrap;flex:none}
+  .badge.real{color:var(--real);background:var(--real-bg)}
+  .badge.wip{color:var(--wip);background:var(--wip-bg)}
+  .badge.todo{color:var(--todo);background:var(--todo-bg)}
+  .card .ind{font-family:var(--font-mono);font-size:12.5px;color:var(--accent);margin-bottom:8px}
+  .card .ind::before{content:"= ";color:var(--faint)}
+  .card .desc{font-size:13.5px;color:var(--muted);margin:0 0 10px}
+  .card .art{font-family:var(--font-mono);font-size:11.5px;color:var(--ink);background:var(--surface-2);
+    border:1px solid var(--hair);border-radius:3px;padding:3px 7px;display:inline-block;word-break:break-word}
+  .card .art.none{color:var(--faint);border-style:dashed;background:transparent}
+
+  /* honesty summary */
+  .tally{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .tcell{background:var(--surface);border:1px solid var(--hair);border-radius:4px;padding:16px 18px;
+    border-top:3px solid var(--todo)}
+  .tcell.real{border-top-color:var(--real)}
+  .tcell.wip{border-top-color:var(--wip)}
+  .tcell.todo{border-top-color:var(--todo)}
+  .tcell .n{font-family:var(--font-mono);font-size:34px;font-weight:600;line-height:1;
+    font-variant-numeric:tabular-nums}
+  .tcell.real .n{color:var(--real)} .tcell.wip .n{color:var(--wip)} .tcell.todo .n{color:var(--todo)}
+  .tcell .lbl{font-size:13px;color:var(--muted);margin-top:8px}
+  .note-box{background:var(--accent-soft);border:1px solid var(--hair-strong);border-left:3px solid var(--accent);
+    border-radius:4px;padding:15px 17px;font-size:14px;color:var(--ink)}
+  .note-box b{color:var(--accent)}
+  .note-box .mono{font-family:var(--font-mono);font-size:12.5px}
+
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--hair);
+    font-family:var(--font-mono);font-size:12px;color:var(--faint);
+    display:flex;flex-wrap:wrap;gap:6px 20px;justify-content:space-between}
+
+  @media (max-width:720px){
+    .spine{grid-template-columns:1fr}
+    .arrow{transform:rotate(90deg)}
+    .golive{writing-mode:horizontal-tb;transform:none;text-align:center}
+    .tally{grid-template-columns:1fr}
+  }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Harness · bản đồ khái niệm</p>
+  <h1>loop-harness</h1>
+  <p class="thesis">Một bộ khung điều khiển agent (agent harness) tái sử dụng: chạy-là-ra-dự-án đạt chuẩn, không phải làm ẩu.</p>
+  <p class="sub">Trang này dịch từng tên "tự chế" trong repo sang tên mà ngành gọi (khảo sát 2026), và nói thật mỗi cái đã là code cưỡng chế hay mới là chữ. Không tô hồng - đúng bản kiểm 18/08.</p>
+
+  <div class="legend">
+    <span class="chip"><span class="dot real"></span>CÓ THẬT - có code/gate cưỡng chế</span>
+    <span class="chip"><span class="dot wip"></span>ĐANG LÀM - mới một phần / là quy ước</span>
+    <span class="chip"><span class="dot todo"></span>CHƯA CÓ - repo tự nhận thiếu</span>
+  </div>
+
+  <hr class="rule strong">
+
+  <h2>Xương sống</h2>
+  <p class="h2-note">Hai chế độ (mode) tách nhau ở mốc go-live (lên thật). Đây là trục chính, cả hai đều CÓ THẬT.</p>
+  <div class="spine">
+    <div class="stage">
+      <p class="k">Mode A - Build</p>
+      <h3>Dựng từ spec</h3>
+      <p>spec -> REQ-ID (mã yêu cầu đánh số) -> build-manifest (bảng kê dựng) -> phase (chặng).</p>
+      <p class="ind">ngành: Spec-Driven Development</p>
+    </div>
+    <div class="golive">go-live</div>
+    <div class="stage" style="grid-column:3">
+      <p class="k">Mode B - the loop</p>
+      <h3>Vòng lặp vận hành</h3>
+      <p>Mỗi việc = 1 GitHub Issue chạy qua 10 trạng thái (state), có gate chặn nhảy cóc.</p>
+      <p class="ind">ngành: event-driven loop + steady-state</p>
+    </div>
+    <div class="arrow" style="grid-column:4">-&gt;</div>
+    <div class="stage" style="grid-column:5">
+      <p class="k">Đo &amp; cải tiến</p>
+      <h3>Vòng leo dốc</h3>
+      <p>Vấp -&gt; vá harness -&gt; đẩy lại xuống dự án. Có cái cân (run-log) nhưng chưa đủ dữ liệu.</p>
+      <p class="ind">ngành: hill-climbing (chưa tự-động)</p>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <h2>Bản đồ khái niệm</h2>
+  <p class="h2-note">Tên nhà (repo gọi) = tên ngành, kèm trạng thái thật và tên file/artifact cưỡng chế nó.</p>
+
+  <div class="group">
+    <div class="cards">
+
+      <div class="card real">
+        <div class="top"><span class="repo">Mode A: spec -> phase</span><span class="badge real">có thật</span></div>
+        <div class="ind">Spec-Driven Development (SDD)</div>
+        <p class="desc">6 phần của SDD đều có: kết quả, ranh giới, ràng buộc, quyết định trước, chia việc, tiêu chí nghiệm thu.</p>
+        <span class="art">.claude/commands/stage-next.md · build-phase.md</span>
+      </div>
+
+      <div class="card real">
+        <div class="top"><span class="repo">verify-gate + verify-at-source</span><span class="badge real">có thật</span></div>
+        <div class="ind">verification loop</div>
+        <p class="desc">Nguyên tắc: tin bằng chứng, không tin sự tự tin. Gate là git-hook không né được, fail-closed (đỏ thì chặn).</p>
+        <span class="art">scripts/harness-verify-gate.sh</span>
+      </div>
+
+      <div class="card real">
+        <div class="top"><span class="repo">10-state model</span><span class="badge real">có thật</span></div>
+        <div class="ind">state machine (liều nhỏ graph engineering)</div>
+        <p class="desc">Bảng chuyển trạng thái ép cứng: chặn Backlog -> Done bỏ qua QC. Có tự-kiểm 20 case.</p>
+        <span class="art">templates/steady-state/scripts/issue-state.mjs</span>
+      </div>
+
+      <div class="card real">
+        <div class="top"><span class="repo">CONTROL -> N bg worker</span><span class="badge real">có thật</span></div>
+        <div class="ind">supervisor pattern</div>
+        <p class="desc">2026 ngành bỏ "swarm" (bầy đàn) quay về supervisor (giám sát) + phase-gating cứng - đúng cái này làm.</p>
+        <span class="art">Task() + scripts/wait-workers.sh</span>
+      </div>
+
+      <div class="card real">
+        <div class="top"><span class="repo">CONTEXT_RULES + context-monitor</span><span class="badge real">có thật</span></div>
+        <div class="ind">context engineering</div>
+        <p class="desc">Hook chạy thật: đếm % ngữ cảnh (context) đã dùng, cảnh báo theo mức 40/60/80/95, ghi bàn giao khi sắp đầy.</p>
+        <span class="art">.claude/hooks/context-monitor.sh</span>
+      </div>
+
+      <div class="card real">
+        <div class="top"><span class="repo">Locked Decisions D1-D6</span><span class="badge real">có thật</span></div>
+        <div class="ind">constitution (Constitutional SDD)</div>
+        <p class="desc">Ràng buộc bất-khả-thương-lượng, có đánh version, được viện dẫn xuyên tài liệu + có code chống lưng.</p>
+        <span class="art">docs/HARNESS.md</span>
+      </div>
+
+      <div class="card real">
+        <div class="top"><span class="repo">stack + steady-state kit</span><span class="badge real">có thật</span></div>
+        <div class="ind">harness template</div>
+        <p class="desc">Bộ khung nhân bản được: monorepo thật (pnpm + NestJS + Next), docker-compose, 3 gate lint.</p>
+        <span class="art">templates/stack-pnpm-nest-next/</span>
+      </div>
+
+      <div class="card real">
+        <div class="top"><span class="repo">Mode B issue-pipeline</span><span class="badge real">có thật</span></div>
+        <div class="ind">event-driven loop</div>
+        <p class="desc">Kích bằng 1 issue. DoD (định nghĩa hoàn thành) 13 mục là hằng số trong code, có gate --check fail-closed.</p>
+        <span class="art">templates/steady-state/scripts/new-issue.mjs</span>
+      </div>
+
+      <div class="card wip">
+        <div class="top"><span class="repo">run-log.mjs</span><span class="badge wip">đang làm</span></div>
+        <div class="ind">tiền-evals (logger)</div>
+        <p class="desc">Mới GHI log mỗi lần giao việc (start/end/report). CHƯA chấm điểm vs kỳ vọng (evals), chưa lần vết từng lần chạy (tracing). Chính script tự nhận "bước 1".</p>
+        <span class="art">scripts/run-log.mjs</span>
+      </div>
+
+      <div class="card wip">
+        <div class="top"><span class="repo">Growth Rule</span><span class="badge wip">đang làm</span></div>
+        <div class="ind">hill-climbing loop (chưa tự-động)</div>
+        <p class="desc">Vòng "vấp -> vá -> lan xuống dự án" mới là quy ước, người còn phải tự kích. Cân có nhưng mới ~3 lần chạy - chưa đủ để "leo có đo".</p>
+        <span class="art">docs (chưa cơ chế tự-động)</span>
+      </div>
+
+      <div class="card wip">
+        <div class="top"><span class="repo">build-side vs product-side</span><span class="badge wip">đang làm</span></div>
+        <div class="ind">build-side / product-side agent</div>
+        <p class="desc">Agent DỰNG sản phẩm khác hẳn agent NẰM TRONG sản phẩm (gate, mức cẩn thận). Mới là ghi chú để nhớ, chưa có gate cưỡng chế ranh giới.</p>
+        <span class="art none">chỉ có trong doc</span>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <h2>Chưa có - repo tự nhận thiếu</h2>
+  <p class="h2-note">Đúng backlog (việc còn nợ). Không giấu - ghi thẳng trong KEYWORD-MAP.</p>
+  <div class="group">
+    <div class="cards">
+      <div class="card todo">
+        <div class="top"><span class="repo">evals đầy đủ</span><span class="badge todo">chưa có</span></div>
+        <div class="ind">evals</div>
+        <p class="desc">Chấm điểm kết quả agent vs kỳ vọng. run-log mới là chỗ đổ dữ liệu, chưa phải bản thân evals.</p>
+        <span class="art none">chưa có artifact</span>
+      </div>
+      <div class="card todo">
+        <div class="top"><span class="repo">observability / tracing</span><span class="badge todo">chưa có</span></div>
+        <div class="ind">observability</div>
+        <p class="desc">Lần vết liên tục từng lần chạy (mỗi tool-call, mỗi quan sát). Repo tự khai "no continuous trace per run".</p>
+        <span class="art none">chưa có artifact</span>
+      </div>
+      <div class="card todo">
+        <div class="top"><span class="repo">phân quyền tối thiểu</span><span class="badge todo">chưa có</span></div>
+        <div class="ind">least-privilege / permissions</div>
+        <p class="desc">Lỗ hổng to nhất tự khai: worker chạy bằng bypassPermissions (tắt hết cổng xin phép) thay vì cấp quyền tối thiểu.</p>
+        <span class="art none">bypassPermissions = lỗ hở</span>
+      </div>
+      <div class="card todo">
+        <div class="top"><span class="repo">durable execution</span><span class="badge todo">chưa có</span></div>
+        <div class="ind">durable execution</div>
+        <p class="desc">Chạy bền qua sự cố (khôi phục đúng chỗ dừng). claude daemon chỉ giữ phiên sống, không phải cái này.</p>
+        <span class="art none">chưa có artifact</span>
+      </div>
+      <div class="card todo">
+        <div class="top"><span class="repo">memory engineering</span><span class="badge todo">chưa có</span></div>
+        <div class="ind">memory engineering</div>
+        <p class="desc">memory hiện là 1 thư mục file ngoài git (quy ước), chưa có cơ chế/kỹ thuật quản trí nhớ đúng nghĩa.</p>
+        <span class="art none">chưa có artifact</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule strong">
+
+  <h2>Thật đến đâu</h2>
+  <p class="h2-note">Tổng kết trung thực (12 khái niệm khai + 5 backlog tự nhận).</p>
+  <div class="tally">
+    <div class="tcell real"><div class="n">9</div><div class="lbl">CÓ THẬT - code/gate cưỡng chế khái niệm, không phải chữ</div></div>
+    <div class="tcell wip"><div class="n">3</div><div class="lbl">ĐANG LÀM - mới một phần hoặc còn là quy ước</div></div>
+    <div class="tcell todo"><div class="n">5</div><div class="lbl">CHƯA CÓ - repo tự nhận thiếu, ghi thẳng backlog</div></div>
+  </div>
+  <div class="note-box">
+    <b>Chỗ vững nhất:</b> <span class="mono">issue-state.mjs</span> (máy trạng thái tự-kiểm), <span class="mono">harness-verify-gate.sh</span> (cổng không né được), <span class="mono">context-monitor.sh</span> (hook chạy thật) - đây là code CƯỠNG CHẾ khái niệm. &nbsp; <b>Chỗ cần vá:</b> tầng đo (evals) mới là logger; tầng vận hành song song còn lỗ <span class="mono">bypassPermissions</span> (chưa least-privilege). Repo khai đúng cả điểm mạnh lẫn lỗ - đó mới là thứ đáng tin.
+  </div>
+
+  <footer>
+    <span>loop-harness · v7.4</span>
+    <span>github.com/bryanphan66/loop-harness · RenoAI-Labs/loop-harness</span>
+    <span>nguồn: audit KEYWORD-MAP §H · 2026-08-18</span>
+  </footer>
+
+</div>
