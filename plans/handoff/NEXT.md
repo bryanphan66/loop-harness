@@ -13,10 +13,7 @@ xong phần làm được; còn vài mục chờ user + 1 mục bất khả thi 
 
 ## ĐANG CHỜ USER DUYỆT (không tự merge — classifier chặn self-approval)
 
-- **PR #3** (bryanphan66/loop-harness → main): luật "issue content bắt buộc đủ dấu +
-  gloss English" (nhánh diacritics cũ, đã chuyển từ nhánh-treo thành PR). Rule ĐÚNG,
-  khớp output-style owner → khuyến nghị merge. Chờ user (user chỉ duyệt #2+#708, không
-  nêu diacritics nên tôi không tự merge).
+- ~~PR #3 (diacritics rule)~~ ✅ **MERGED → main** (a525158, user duyệt 2026-08-18).
 - **PR #709** (RenoAI-Labs/elearning-platform → dev): fix #707 menu trùng đôi 'Về chúng
   tôi'. DONE, Refs #707, sạch close-keyword. → cần QC/UAT rồi mới merge (theo Mode B).
 - **PR #710** (elearning → dev): fix #706 avgRating chỉ tính APPROVED (+ bonus #686
