@@ -114,7 +114,7 @@ Repo này đặt tên **tự chế** cho gần hết khái niệm — dùng tron
 | **Locked Decisions D1–D6** | **constitution** (Constitutional SDD) | Ràng buộc bất-khả-thương-lượng, có version. |
 | **stack template · steady-state kit** | **harness template** | |
 | **CONTEXT_RULES + context-monitor** | **context engineering · compaction · context budget** | |
-| **`run-log.mjs`** | **evals · observability / tracing** | Ngành: *evals là dữ liệu huấn luyện của harness*. |
+| **`run-log.mjs`** | **tiền-evals (logger)** — hướng tới evals · observability / tracing | ⚠️ CHƯA phải evals: mới GHI log (`start`/`end`/`report`), chưa **chấm điểm vs kỳ vọng** (evals) cũng chưa **lần vết từng run** (tracing). Chính comment trong script tự khai "bước 1". Ngành: *evals là dữ liệu huấn luyện của harness* — đây là chỗ ĐỔ dữ liệu đó, chưa phải bản thân evals. Xem dòng "CHƯA có" cuối § H. |
 | **10-state model** (edge được `issue-state.mjs` ép) | **state machine** — liều nhỏ của **graph engineering** | Đây là đường DUY NHẤT đủ ổn định để formalize; xem `OPERATING-MODES.md` § why there is no graph layer. |
 | **agent build ra sản phẩm** ⟷ **agent nằm TRONG sản phẩm** | **build-side agent** ⟷ **product-side agent** | ⚠️ Hai thứ khác hẳn (gate, evals, mức cẩn thận). Lẫn nhau là lỗi kiến trúc tốn. Harness này chỉ quản **build-side**. |
 
