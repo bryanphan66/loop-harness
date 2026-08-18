@@ -96,6 +96,8 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 
 ## H. Tên nhà ⟷ tên ngành (bảng phiên dịch)
 
+> 📊 **Bản đồ trực quan** của mục này (badge thật/đang-làm/chưa-có), hosted (private): https://claude.ai/code/artifact/44acda68-210d-4e7b-8ed1-1a5ea1f6a526
+
 Repo này đặt tên **tự chế** cho gần hết khái niệm — dùng trong nhà thì tốt, nhưng ra ngoài thì không ai hiểu, và ngược lại đọc tài liệu ngành không nhận ra "cái này mình có rồi". Bảng dưới **không đổi tên đang dùng** (đổi là loạn hết doc), chỉ ghi kèm **tên ngành gọi là gì** để:
 - onboard dev mới đã quen từ vựng ngành (khỏi mất 1 tuần dịch ngược),
 - nói chuyện với khách/đối tác kỹ thuật bằng từ họ tìm kiếm,

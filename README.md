@@ -26,6 +26,11 @@ are just the step-grouping inside the modes (`harness/docs/WORKFLOW.md`), and
 *Loop Engineering* (`prompt -> context -> harness -> loop`) is a diagnostic lens, not a
 third model. Full detail + honest scorecard: **`harness/docs/UNDERSTANDING-loop-harness.md`**.
 
+**Visual concept map (Vietnamese)** — every repo term mapped to its 2026 industry name,
+badged *real / in-progress / not-yet* (from the `KEYWORD-MAP.md § H` audit):
+[`plans/visuals/loop-harness-industry-map.html`](plans/visuals/loop-harness-industry-map.html)
+· hosted: <https://claude.ai/code/artifact/44acda68-210d-4e7b-8ed1-1a5ea1f6a526> (private link).
+
 ## Repo layout
 
 **Hard boundary: the product is `harness/` (self-contained); everything at root is the workshop that builds it.**
