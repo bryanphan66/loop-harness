@@ -54,7 +54,7 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
    | **PB-G2** | every BLOCKER in `docs/requirements/CLARIFICATIONS.md` answered + `docs/scope-baseline/feature-register.{md,xlsx}` marked frozen + RTM **backward** complete (every feature-register line → ≥1 REQ-ID + ≥1 use case, per `docs/TRACE_SPEC.md`). Client sign recorded. |
    | **PB-G3** | `docs/visuals/prototype/feedback-final.md` records a written freeze; no open scope-drift items. |
    | **PB-G4** | signed contract + deposit recorded; `docs/ROADMAP.md` skeleton exists. **No build code may exist before this.** |
-   | **DoR** | requirements baselined + scope signed (PB-G4 / Lite equivalent) + ERD frozen + design approved + acceptance criteria + NFR present + **`docs/build-manifest.md` complete: every in-scope REQ-ID in exactly one phase, P0 defined**. |
+   | **DoR** | requirements baselined + scope signed (PB-G4 / Lite equivalent) + ERD frozen + design approved + acceptance criteria + NFR present + **build-manifest complete** — assert the full DoR checklist incl. the manifest-completeness rule from `docs/gates/dor-build.md` (SoT). |
    | **ERD-FROZEN** | ERD ADR (`docs/decisions/<domain>-data-model-freeze.md`) + entities/normalization/audit+tenant fields reviewed. |
    | **WALKING-SKELETON** | scaffolded app: install + build green, `docker compose up` boots, health endpoint 200, seeded admin login works (after 2.5), CI(-equivalent local run) green, secret scan clean. Prefer running the commands over reading claims. |
    | **SECURITY-SIGNOFF** | security report shows 0 Critical/High open + red-team performed. |
@@ -93,7 +93,8 @@ Rules:
   `MANUAL_CHECKPOINT`.
 - **Conditional enterprise gates** absent because marked **N/A by decision** →
   report `N/A by decision` with the file that records the decision; never report
-  them as a silent pass.
+  them as a silent pass. The tracked toggle table (SoT) is
+  `docs/gates/dod-build.md` § Conditional Enterprise Gate Toggles.
 - If asked `--before <id>` and the gate is NOT GREEN, state plainly: "step `<id>`
   must NOT run yet" and name the blocking gate.
 

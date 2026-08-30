@@ -11,7 +11,8 @@
 > (`docs/gates/phase-acceptance.md`). The heavy gates below — 2.7 review, 2.9
 > security, 2.10 QA — run **once when the build-manifest is complete** (plus a
 > mid-point 2.7 review when the manifest has >6 phases), as aggregation and
-> cross-phase confirmation — not the first place a per-phase defect is caught.
+> cross-phase confirmation — not the first place a per-phase defect is caught
+> (token-curve rationale → `docs/gates/phase-acceptance.md` § Why this gate exists, SoT).
 > This checklist is filled at that completion pass.
 
 DoD confirms the build is provably finished before it is shown to the client for

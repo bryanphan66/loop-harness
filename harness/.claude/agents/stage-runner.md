@@ -149,6 +149,16 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
   readiness checklist). Run the commands; never assert without evidence.
 - **2.12 UAT** is client-paging (ACCEPTANCE): emit `MANUAL_CHECKPOINT`, return
   `MANUAL_CHECKPOINT_PENDING`.
+- **2.13 release:** verify-at-source per `docs/playbooks/go-live-deploy-verify.md`
+  (health `.status==ok` + a build-specific content marker — NOT CI-green / HTTP-200
+  / a version string; rebuilt build-ARG env; real money/identity secrets fail-closed).
+  Emit `MANUAL_CHECKPOINT` naming the target host — the prod deploy is a
+  named-endpoint human decision (Rule 5), never auto-fire. **On go-live, flip
+  Mode A → Mode B** (`docs/OPERATING-MODES.md` § The graduation): in the SAME
+  close, edit `STAGE.md` so its Macro-stage becomes **Steady-state (Macro 3)**,
+  drop the "current step" field, replace it with `Steady-state since <date>; board
+  = <issues link>`, and record that the issue-pipeline loop (not `/stage-next`)
+  now drives new work.
 - **QA evidence** (2.8 / 2.10): add TC-NNN rows to the verification register;
   produce evidence under `plans/reports/` per the canonical-e2e playbook when
   applicable (the `qa-deliver.sh` hook pushes it).
@@ -169,7 +179,8 @@ Read the WORKFLOW row's **Gate** and the Canonical Gate List in
 - **Conditional enterprise gates** (data-migration/cutover 2.1b, NFR/load 2.11,
   DR + RTO/RPO 2.11, compliance/privacy/WCAG, observability/SLO 2.4; Lite lane:
   1.14/1.15): when not applicable, mark **N/A by decision** explicitly in the
-  artifact + the trace — **never silently drop**.
+  artifact + the trace — **never silently drop**. The tracked toggle table (SoT)
+  is `docs/gates/dod-build.md` § Conditional Enterprise Gate Toggles.
 - **Internal gates** (DoR, ERD FROZEN, WALKING SKELETON, SECURITY SIGN-OFF,
   DoD): assert the checklist with evidence; if a required input is missing,
   return `BLOCKED` naming it.

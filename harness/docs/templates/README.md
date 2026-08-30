@@ -43,7 +43,7 @@ and code fences stay English even inside a VN fork.
 | File | Step | Gate | locale-vi fork? | Notes |
 | --- | --- | --- | --- | --- |
 | [spec-intake.md](spec-intake.md) | Build entry | DoR inputs | no (internal) | Turns the signed BA spine into ERD/stack questions. Carries conditional enterprise triggers. |
-| [build-manifest.md](build-manifest.md) | 2.3 | **DoR** (coverage: every in-scope `REQ-ID` in exactly one phase, P0 defined) | no (internal) | Ordered executable phases P0..PN — the spec→code conversion layer `/build-phase` executes. Playbook: `build-manifest-compilation.md`. |
+| [build-manifest.md](build-manifest.md) | 2.3 | **DoR** (coverage: manifest-completeness rule, SoT `docs/gates/dor-build.md`) | no (internal) | Ordered executable phases P0..PN — the spec→code conversion layer `/build-phase` executes. Playbook: `build-manifest-compilation.md`. |
 | [story.md](story.md) | 2.6 | verify-gate / DoD | no (internal) | FLAT `<module>-NN-<slug>.md`. Realises `REQ-ID`s; commits cite ≥1 token; tests mint `TC-NNN`. Implementation guardrails. |
 | [validation-report.md](validation-report.md) | 2.8 → 2.10 | DoD | no (internal) | `REQ-ID` × `TC-NNN` coverage + layer results. Feeds the verification register the verify-gate parses. |
 | [release-note.md](release-note.md) | 2.13 | release smoke | **yes** | Every released `REQ-ID` appears; each cites the `TC-NNN` that proved it. Pre/post-deploy smoke + rollback + client update. |

@@ -1,5 +1,28 @@
 # Gate — Phase Acceptance (per-phase verification before the next phase)
 
+> ⚠️ **ENFORCEMENT STATUS (read first — honest scope of the "auto-block").**
+> Every numbered check (1-27) in **Leg 1** below is run by the **independent
+> verifier AGENT against the running app** — a *prose contract the agent
+> executes*, **not** an auto-lint that blocks a commit, UNLESS it is backed by one
+> of the shipped scripts. Auto-enforced TODAY in `lint:gates` (via the `validate`
+> script the verify-gate hook runs) = exactly **three** scripts:
+> `scripts/check-universal-fidelity-imports.mjs` (backs check 5's
+> universal-fixture-import rule), `scripts/check-prisma-fk-indexes.mjs` (backs
+> check 7's FK-index rule), `scripts/check-admin-screen-width-caps.mjs` (backs
+> visual-fidelity U7). Plus `scripts/harness-verify-gate.sh` greps the
+> verification register (`docs/TEST_MATRIX.md`) for `fail` / `never-run`. **Every
+> other "Lint:/grep …" clause in the checks below is SPECIFIED, NOT YET SHIPPED**
+> — the verifier agent performs it by hand; do not treat it as an auto-block.
+>
+> | Marker | Meaning | Checks |
+> |---|---|---|
+> | **[AUTO]** (partial) | a shipped `lint:gates` script backs PART of the check; the rest is agent-driven | 5 (fixture-import), 7 (FK-index) |
+> | **[VERIFIER]** | agent-driven only — drives the running app + does any grep by hand; no auto-block today | 1-4, 6, 8-27 |
+>
+> **Backlog — script-ify the 3 costliest (turn [VERIFIER] → [AUTO]):** check 16
+> (object-level authz / IDOR), check 20 (concurrency / TOCTOU), and a
+> **manifest-coverage** lint (feature-register REQ-ID ⟷ build-manifest phase).
+
 > **Type:** internal HARD gate (auto-block), **per build-manifest phase**.
 > **Read by:** the `/build-phase` loop at step **2.6** (the orchestrator enforces
 > it between phases), `docs/STAGE_GOALS.md` § 2.6, and **DoD** at 2.10 (which

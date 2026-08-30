@@ -410,6 +410,13 @@ validation queries, cutover order), a dry-run report proves the ETL on a copy,
 and a rollback-of-data plan + RTO/RPO are stated. STAGE.md Current = 2.2.
 Stop after 15 turns.
 
+> **Applicability (stays a real numbered step, NOT an appendix).** This step is
+> **N/A-by-decision for a greenfield Lite/internal** build (record the one line
+> and move on), and **APPLICABLE only for brownfield** — replacing a legacy
+> system that carries real data (real use: nhatnghe.net Phase-1.5 + the Phase-2
+> migration). Keeping it inline means a brownfield project cannot skip it by
+> forgetting it exists.
+
 ### Step 2.2 — Technical design + stack decision (TDR) + threat-model (Tech Lead)
 
 - **Inputs:** NFR + frozen ERD + screen inventory.
@@ -441,7 +448,7 @@ STAGE.md Current = 2.3. Stop after 15 turns.
 
 - **Inputs:** TDR + scope baseline (or srs-lite) + frozen ERD + screen inventory + API contract.
 - **Output path:** `plans/<YYMMDD-HHMM>-<slug>/` (plan.md) + **`docs/build-manifest.md`**.
-- **Gate:** **DoR** (`docs/gates/dor-build.md`) — incl. build-manifest complete: every in-scope REQ-ID in exactly one phase, P0 defined.
+- **Gate:** **DoR** (`docs/gates/dor-build.md`, SoT) — incl. build-manifest complete (manifest-completeness rule).
 - **Manual?** no.
 
 Goal:
@@ -459,7 +466,8 @@ size (S/M/L), plus a **`Phase-type`** (`crud` default | `async-job` |
 async/media/storage/integration signal routes to its non-CRUD phase-type carrying
 that type's acceptance categories (`build-manifest-compilation.md` step 4b; folding
 it into a CRUD phase is a 2.3 defect). **Every in-scope REQ-ID appears in exactly
-one phase** (the manifest ends with the coverage checklist proving it); any phase
+one phase** (manifest-completeness rule — SoT `docs/gates/dor-build.md`; the
+manifest ends with the coverage checklist proving it); any phase
 estimated
 beyond one agent session (~10 files touched) is split; any PUB product-shot
 capture phase depends on the APP screen phases it depicts. A thin
@@ -494,10 +502,9 @@ locally (the CI-equivalent run); (3) `docker compose up` boots db + api + web;
 (4) the health endpoint returns 200; (5) the CI workflow file runs those same
 jobs; (6) `.env.example` lists every required var and no secret is committed
 (secret scan clean — gitleaks or `scripts/secret-scan.sh`). **Offline caveat:**
-when a base-image pull is network-blocked, the boot evidence may substitute a
-locally-cached postgres-16-compatible image for the db, and app-container boot
-may be proven by running the exact prod commands on the built artifacts —
-record the caveat in the register row; do not block the gate on the network.
+if the base-image pull is network-blocked, follow the shared **Offline boot
+caveat** (§ below) — substitute cached-db / prod-command boot evidence + record
+the caveat; do not block the gate on the network.
 Observability is decided: structured logging on by
 default; alerting/SLO configured or recorded `N/A by decision` in the
 dod-build toggles. STAGE.md Current = 2.5. Stop after 25 turns.
@@ -538,10 +545,9 @@ on every screen and input validation at the boundary. Before coding any
 grid/form screen its screen-inventory floorplan row is confirmed (missing row =
 blocker — escalate, never invent a floorplan), and its **prototype export source
 file** (cited in the phase block) is opened — screens **adopt the export as
-code** (bring its `tokens.css`/`components.css` in, port the kit KEEPING
-classNames, rebuild the screen from its `screens-*.jsx`, wire only real data) per
-`playbooks/build-execution.md` § Prototype → Code Fidelity +
-`prototype-export-adoption.md` — NOT re-drawn in fresh Tailwind, unless the phase
+code** (NOT re-drawn in fresh Tailwind) following the method in
+`docs/gates/visual-fidelity.md` + `playbooks/build-execution.md` § Prototype →
+Code Fidelity + `prototype-export-adoption.md` (SoT) — unless the phase
 block records `rebuild (decision: <slug>)` (no export for that screen).
 Failed operations surface their real cause to the UI (no generic error-swallow);
 a fix touching a systemic pattern sweeps ALL its call-sites. Then, in order:
@@ -669,12 +675,11 @@ build and browser-QA in separate steps. STAGE.md Current = 2.11. Stop after
 
 Goal:
 The readiness checklist is green: production build variant (Dockerfiles +
-prod compose or deploy target) boots from a clean pull. **Offline caveat:** when
-the base-image pull is network-blocked locally, accept "prod compose config
-valid + Dockerfiles present + prod artifacts boot via their exact prod commands
-(`node dist/main.js`, `next start`) + image build delegated to CI" — record the
-caveat; the containerized boot must then be proven in CI/deploy before 2.13
-release. Environments isolated
+prod compose or deploy target) boots from a clean pull. **Offline caveat:** if
+the base-image pull is network-blocked locally, follow the shared **Offline boot
+caveat** (§ below) — accept prod-command boot on built artifacts + config-valid +
+CI-delegated build, record the caveat, and prove the containerized boot in
+CI/deploy before the 2.13 release. Environments isolated
 with `.env.<env>.example` complete; backups configured and a restore verified;
 **rollback rehearsed** (deploy previous `IMAGE_TAG`, one-line procedure
 recorded); monitoring/alerting live. DR restore-drill + RTO/RPO and NFR/load
@@ -701,15 +706,39 @@ sign-off. STAGE.md Current = 2.13 only after sign-off. Stop after 10 turns.
 
 - **Inputs:** accepted build + sign-off.
 - **Output path:** release note (template `docs/templates/release-note.md`, `locale-vi/` fork) + git tag + deployed production.
-- **Gate:** release-note lists every released REQ-ID; post-deploy smoke pass; rollback = one `IMAGE_TAG` line.
-- **Manual?** no.
+- **Gate:** release-note lists every released REQ-ID; **verify-at-source PASS** (not a smoke-200) + rollback = one `IMAGE_TAG` line — the 5 release rules + Post-Deploy Checklist are the SoT in `docs/playbooks/go-live-deploy-verify.md`.
+- **Manual?** **MANUAL_CHECKPOINT** — the prod deploy is a named-endpoint human decision (`go-live-deploy-verify.md` Rule 5).
 
 Goal:
 The release is tagged and deployed to production. The release note (EN + VN fork
 for a VN client) lists **every released REQ-ID**, the version, and the one-line
-rollback (`IMAGE_TAG` of the previous release). Post-deploy smoke passes against
-production (health + login + one critical journey). STAGE.md Current =
-Post-Build / 3.1. Stop after 12 turns.
+rollback (`IMAGE_TAG` of the previous release).
+
+**Verify-at-source, fail-closed (closes L1 / FC6 — a green CI run and an HTTP-200
+are liars for "the new build is live").** Apply the 5 rules in
+`docs/playbooks/go-live-deploy-verify.md` (SoT) and fill its **Post-Deploy
+Checklist** before declaring the release done:
+1. health `.status==ok` (+ db/redis where applicable) AND a **build-specific
+   content marker** observed in the served artifact — never CI-green / HTTP-200 /
+   a version string (Rule 2);
+2. build-time-inlined env (`NEXT_PUBLIC_*`, sitemap/OG/json-ld) baked via build
+   ARG on a **real rebuild**, not a cached redeploy (Rule 1);
+3. money / identity / legal secrets carry **real deploy-env values**, placeholder
+   defaults rejected in prod, fail-closed proven at source (Rules 3-4);
+4. the deploy is fired against a **named endpoint with human go-ahead** — emit
+   `MANUAL_CHECKPOINT` naming the target host; never auto-fire a prod deploy
+   (Rule 5).
+
+**Then flip Mode A → Mode B (graduation — `docs/OPERATING-MODES.md` § The
+graduation).** Go-live is the graduation point; in the SAME close edit `STAGE.md`:
+its Macro-stage flips to **Steady-state (Macro 3)**, the **"current step" field is
+dropped** (meaningless now) and replaced with **"Steady-state since {date}; board
+= <issues link>"**, and it records that `/stage-next` is no longer the driver — the
+**loop (issue-pipeline)** takes over and new work enters as **issues**, not stage
+steps. A live product still naming a finite "current step" is the smell that it
+graduated but nobody flipped the mode. STAGE.md Current = Post-Build / 3.1 (the
+one-time 3.1 handover / 3.2 hypercare-kickoff / 3.6 retro ceremonies still run via
+`/stage-next`; 3.3 + 3.5 are the continuous loop). Stop after 12 turns.
 
 ---
 
@@ -808,6 +837,22 @@ changelog gains a closing entry. STAGE.md marks the project closed (or
 maintenance-mode). Stop after 10 turns.
 
 ---
+
+## Offline boot caveat (shared — steps 2.4 & 2.11)
+
+When a base-image pull is network-blocked locally, do **not** block the boot gate
+on the network — accept substitute evidence and record the caveat in the register
+row:
+
+- a locally-cached postgres-16-compatible image may stand in for the db;
+- app / prod-container boot is proven by running the **exact prod commands** on
+  the built artifacts (`node dist/main.js`, `next start`);
+- at 2.11 additionally accept "prod compose config valid + Dockerfiles present +
+  image build delegated to CI".
+
+The **containerized boot must then be proven in CI/deploy before the 2.13
+release** — the offline substitution defers the container proof, it does not
+waive it.
 
 ## Lookup convention for tooling
 

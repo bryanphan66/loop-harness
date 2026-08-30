@@ -69,7 +69,8 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 Per D2, enterprise gates are **conditional**, not dropped. Each one must be
 explicitly marked **N/A by decision** (with a one-line reason + date) when it does
 not apply — never silently skipped. They live mostly in Build & Go-live and
-Post-Build, and their toggles are tracked in `dod-build.md`:
+Post-Build; their **single tracked toggle table (SoT)** is `dod-build.md`
+§ Conditional Enterprise Gate Toggles:
 
 - data-migration / cutover (2.1b)
 - NFR / load test (2.11)
