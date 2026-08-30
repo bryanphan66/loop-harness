@@ -5,23 +5,45 @@
 > verifier AGENT against the running app** — a *prose contract the agent
 > executes*, **not** an auto-lint that blocks a commit, UNLESS it is backed by one
 > of the shipped scripts. Auto-enforced TODAY in `lint:gates` (via the `validate`
-> script the verify-gate hook runs) = exactly **three** scripts:
-> `scripts/check-universal-fidelity-imports.mjs` (backs check 5's
-> universal-fixture-import rule), `scripts/check-prisma-fk-indexes.mjs` (backs
-> check 7's FK-index rule), `scripts/check-admin-screen-width-caps.mjs` (backs
-> visual-fidelity U7). Plus `scripts/harness-verify-gate.sh` greps the
-> verification register (`docs/TEST_MATRIX.md`) for `fail` / `never-run`. **Every
-> other "Lint:/grep …" clause in the checks below is SPECIFIED, NOT YET SHIPPED**
-> — the verifier agent performs it by hand; do not treat it as an auto-block.
+> script the verify-gate hook runs) = **seven** scripts (all under `scripts/`,
+> each fail-soft on a bare skeleton so the harness stays runnable):
+> - `check-universal-fidelity-imports.mjs` — an existing `*-fidelity.spec.ts` imports the universal fixture (backs check 5).
+> - `check-new-screen-fidelity-required.mjs` — every admin screen HAS a fidelity spec (backs check 5; closes the "a new screen skips the U1-U4/i18n/a11y floor" hole a field run found).
+> - `check-prisma-fk-indexes.mjs` — every FK scalar is indexed (backs check 7).
+> - `check-admin-screen-width-caps.mjs` — no hard content-width cap (backs visual-fidelity U7).
+> - `check-manifest-coverage.mjs` — every in-MVP REQ-ID is built in exactly one phase + P0 defined (backs the DoR manifest-completeness rule; closes the G4 duplicate-build risk).
+> - `check-authz-test-present.mjs` — every id-addressed controller HAS a negative-authz spec (backs check 16).
+> - `check-money-concurrency-test-present.mjs` — every money model HAS a concurrency spec (backs check 20).
+>
+> Plus `scripts/harness-verify-gate.sh` greps the verification register
+> (`docs/TEST_MATRIX.md`) for `fail` / `never-run`.
+>
+> **What the coverage gates DO vs DON'T (the honest limit).** The four
+> coverage/presence gates (`new-screen-fidelity-required`, `manifest-coverage`,
+> `authz-test-present`, `money-concurrency-test-present`) enforce that the required
+> SPEC/TEST EXISTS and the structural mapping is complete — they do NOT prove the
+> behaviour is correct. The behavioural assertion (the IDOR denial actually fires,
+> the concurrent race actually yields ONE effect, the fidelity floor actually
+> passes) stays with the verifier agent RUNNING that spec against the app. So a
+> leg marked **[AUTO] (presence)** can no longer be silently self-attested (the
+> machine blocks a MISSING spec), but a green `lint:gates` is NOT proof the spec
+> passes — that remains the verifier's job. **Every other "Lint:/grep …" clause
+> below is SPECIFIED, NOT SHIPPED** — the verifier performs it by hand; do not
+> treat it as an auto-block.
 >
 > | Marker | Meaning | Checks |
 > |---|---|---|
-> | **[AUTO]** (partial) | a shipped `lint:gates` script backs PART of the check; the rest is agent-driven | 5 (fixture-import), 7 (FK-index) |
-> | **[VERIFIER]** | agent-driven only — drives the running app + does any grep by hand; no auto-block today | 1-4, 6, 8-27 |
+> | **[AUTO]** (partial) | a shipped `lint:gates` script backs PART of the check; the rest is agent-driven | 5 (fixture-import + spec-exists), 7 (FK-index) |
+> | **[AUTO] (presence)** | a shipped script enforces the required spec/test EXISTS + structural coverage; the BEHAVIOUR stays verifier-run | 16 (negative-authz spec exists), 20 (concurrency spec exists) |
+> | **[VERIFIER]** | agent-driven only — drives the running app + does any grep by hand; no auto-block today | 1-4, 6, 8-15, 17-19, 21-27 |
 >
-> **Backlog — script-ify the 3 costliest (turn [VERIFIER] → [AUTO]):** check 16
-> (object-level authz / IDOR), check 20 (concurrency / TOCTOU), and a
-> **manifest-coverage** lint (feature-register REQ-ID ⟷ build-manifest phase).
+> Plus a manifest-level auto gate not tied to a numbered leg:
+> **manifest-coverage** (REQ-ID ⟷ phase). **Backlog now clear of the 3 costliest
+> the field run flagged** (IDOR-test, concurrency-test, manifest-coverage — all
+> shipped as presence gates); the remaining `[VERIFIER]` legs are behavioural by
+> nature and stay agent-run by design. **Not a script (ops-task):** server-side
+> branch-protection so `validate` cannot be bypassed at push — a repo-config
+> change, tracked separately.
 
 > **Type:** internal HARD gate (auto-block), **per build-manifest phase**.
 > **Read by:** the `/build-phase` loop at step **2.6** (the orchestrator enforces
