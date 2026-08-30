@@ -277,14 +277,42 @@ rebuild đạt ~90% khớp) đi đúng 5 nhịp, THEO THỨ TỰ:
    thật; **fidelity spec ASSERT cấu trúc prototype hiện diện** (component +
    section), không chỉ smoke-test (chỉ kiểm màn mở được).
 
+**Bảng ánh xạ ĐỒ-GIẢ prototype -> COMPONENT dự án (đọc TRƯỚC khi gõ UI).**
+Prototype export được vẽ bằng "đồ giả" (mock primitive) của riêng công cụ design,
+KHÔNG phải component thật của dự án. "Adopt" = **MAP từng đồ-giả sang component dự
+án**, TUYỆT ĐỐI không chép nguyên markup export. Đây là gốc của gần như MỌI "lỗi
+vặt UI lặp lại" (bảng không filter, thiếu tooltip, chart tự vẽ, modal tràn):
+
+| Đồ-giả trong `screens-*.jsx` | Map sang component dự án | Chép thô = lỗi gì |
+|---|---|---|
+| `<table className="tbl">` | `DataGrid` (filter/search từng cột + scroll nội bộ). Preview ngắn -> biến thể DataGrid gọn, KHÔNG `<table>` | grid không filter/search, scroll cả trang |
+| `<div className="muted fzNN">` helper cạnh title card | `InfoTooltip` (icon "i") | card thiếu tooltip, chữ dày |
+| `<div>` cột/thanh tự vẽ làm biểu đồ | chart component dự án (recharts wrapper trong `components/ui`) | biểu đồ tự vẽ, dính đáy card |
+| modal/dialog sơ khai của export | shared `Dialog` (căn giữa, max-width, no-overflow) | modal tràn/cắt mép, list dài không cuộn |
+| `<Select>` / `<Badge>` / `<Btn>` mock | `SelectInput` / `Badge` / `Button` dự án (grep `components/ui`) | double component, lệch style |
+
+Quy tắc: nếu prototype có KPI card thì màn PHẢI có `InfoTooltip`; có biểu đồ thì
+PHẢI dùng chart component; có grid thì PHẢI `DataGrid`; có modal thì PHẢI `Dialog`.
+Liệt kê ĐỦ các component này vào `requiredComponents` của route trong
+`fidelity-map.json` để gate ép bằng máy (xem dưới) - map thiếu = gate mù = lọt.
+
 **Gate máy kiểm bước này:** `scripts/check-prototype-fidelity.mjs` (chạy trong
 `lint:gates`). Nó đọc `scripts/fidelity-map.json` - mỗi route admin map tới
 `{prototypeFile, requiredComponents, requiredSections}` - rồi ASSERT trên
-`page.tsx` đã build: các `requiredComponents` được import TỪ thư mục shared +
-dùng trong JSX, các `requiredSections` hiện diện, và không có `<table>` thô trên
-màn grid. Thiếu -> FAIL, chỉ rõ route + component/section còn thiếu. Gate STRICT
-cho route CÓ trong map, fail-soft cho route CHƯA map (baseline). Map được soạn
-khi prototype đóng băng (PB-G3), trước khi build màn.
+`page.tsx` + mọi `.tsx` co-located cùng route (kể cả file tab/aside) đã build:
+các `requiredComponents` được import TỪ thư mục shared + dùng trong JSX, các
+`requiredSections` hiện diện, và không có `<table>` thô trên màn grid. Thiếu ->
+FAIL, chỉ rõ route + component/section còn thiếu. Gate STRICT cho route CÓ trong
+map, fail-soft cho route CHƯA map (baseline). Map được soạn khi prototype đóng
+băng (PB-G3), trước khi build màn.
+
+**Backstop chống chép-thô (`forbidPatterns`):** `fidelity-map.json` nhận thêm
+`forbidPatterns` (mảng regex, top-level áp mọi route + `forbidPatterns` per-route).
+Bất kỳ signature đồ-giả nào khớp (mặc định nên set `className="tbl"` = class bảng
+mock của export) -> FAIL, **kể cả khi `forbidRawTable:false`**. Lý do: object-page
+đôi khi cần tắt `forbidRawTable` cho 1 bảng preview hợp lệ, nhưng class mock `tbl`
+thì KHÔNG BAO GIỜ được sống sót vào code - preview phải dùng biến thể DataGrid gọn.
+Đừng blanket-tắt `forbidRawTable` để né gate; đó chính là cách lỗ lọt ở #985.
 
 > Giới hạn thành thật: gate chỉ kiểm **component-presence** (các khối cấu trúc
 > mà export ngụ ý CÓ hiện diện). Phần **pixel-match** (khớp khoảng cách, theme,

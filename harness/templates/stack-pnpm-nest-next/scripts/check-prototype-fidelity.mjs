@@ -202,6 +202,38 @@ export function runGate(root) {
       reasons.push(`raw <table> found — a grid MUST render through DataGrid, not a re-drawn HTML table`);
     }
 
+    // forbidPatterns — the ANTI-TRANSCRIPTION backstop. The prototype export is
+    // authored in its OWN mock primitives (a raw `<table className="tbl">`, a
+    // div-bar chart, an inline `muted fz11` helper, a bare modal). "Adopt the
+    // prototype" means MAP each mock primitive to the project's real component
+    // (DataGrid, the chart component, InfoTooltip, the shared Dialog) — NOT copy
+    // the export's markup verbatim. Any pattern here is a tell-tale that the mock
+    // markup was transcribed instead of mapped; it fires even when forbidRawTable
+    // was switched off for a legit reason (e.g. an object-page with a preview),
+    // because the mock CLASS still must never survive into shipped code. Sources:
+    // top-level map.forbidPatterns (applies to every mapped route) + per-route
+    // entry.forbidPatterns. Each item is a regex string or {pattern, message}.
+    const forbidPatterns = [
+      ...(Array.isArray(map.forbidPatterns) ? map.forbidPatterns : []),
+      ...(Array.isArray(entry.forbidPatterns) ? entry.forbidPatterns : []),
+    ];
+    for (const fp of forbidPatterns) {
+      const spec = typeof fp === 'string' ? { pattern: fp } : fp;
+      if (!spec || !spec.pattern) continue;
+      let re;
+      try {
+        re = spec.pattern instanceof RegExp ? spec.pattern : new RegExp(spec.pattern);
+      } catch {
+        continue; // a malformed pattern must not crash the gate
+      }
+      if (re.test(source)) {
+        reasons.push(
+          spec.message ||
+            `forbidden prototype-mock markup /${spec.pattern}/ present — map the export's mock primitive to the project component, do not transcribe it`,
+        );
+      }
+    }
+
     if (reasons.length) failures.push({ route: entry.route, file: relative(root, pageFile), proto: entry.prototypeFile, reasons });
   }
 
@@ -310,6 +342,22 @@ function selftest() {
   const r3 = runGate(skipRoot);
   assert('SKIP fixture exits 0', r3.code === 0);
   assert('SKIP fixture reports skipped', r3.out.join('\n').includes('skipped'));
+
+  // Case FORBID-PATTERN — a mapped route with forbidRawTable:false (a legit
+  // object-page preview) must STILL not transcribe the prototype's mock table
+  // class; the global forbidPatterns backstop fires even with the table guard off.
+  const forbidRoot = join(tmp, 'forbid');
+  writeFixture(forbidRoot, {
+    'scripts/fidelity-map.json': JSON.stringify({
+      forbidPatterns: [{ pattern: 'className="tbl"', message: 'mock table class tbl transcribed' }],
+      routes: [{ route: '/admin/crm/customers/[id]', requiredComponents: [], forbidRawTable: false }],
+    }),
+    'apps/web/src/app/admin/crm/customers/[id]/page.tsx':
+      'export default function P(){ return <table className="tbl"><tbody/></table>; }',
+  });
+  const r5 = runGate(forbidRoot);
+  assert('FORBID-PATTERN fires with forbidRawTable:false', r5.code === 1);
+  assert('FORBID-PATTERN uses custom message', r5.err.join('\n').includes('mock table class tbl transcribed'));
 
   // Guard against false-positive floods: the PASS fixture must produce ZERO
   // failure lines (a gate that fails a correct screen is worse than useless).

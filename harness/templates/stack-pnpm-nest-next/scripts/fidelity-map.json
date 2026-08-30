@@ -6,12 +6,17 @@
     "prototypeFile      — the frozen export screen file this route adopts (for the failure message + the verifier glance). Optional but recommended.",
     "requiredComponents — shared components the prototype implies. Each MUST be imported from a shared root (@/components, components/ui, …) AND used as <Comp/>. A locally re-drawn copy FAILS. Grid screens MUST list DataGrid.",
     "requiredSections   — prototype sections. Built-in heuristics: kpi-row/stat-row -> <StatCard>, object-page-tabs/tabs -> <PageHead tabs=…> or <Tabs>, timeline -> <Timeline>, grid/table -> <DataGrid>, filter-bar/toolbar -> <FilterBar>/<Toolbar>, detail-panel -> <DetailPanel>/<SidePanel>, empty-state -> <EmptyState>. An unknown key falls back to a literal token-in-source check.",
-    "forbidRawTable     — default true: a raw <table> on the screen FAILS (grids render through DataGrid). Set false only for a genuine non-grid table.",
+    "forbidRawTable     — default true: a raw <table> on the screen FAILS (grids render through DataGrid). Set false ONLY for a genuine preview/non-grid table — and keep the tbl mock class in forbidPatterns so a transcribed export table still fails.",
+    "forbidPatterns     — ANTI-TRANSCRIPTION backstop: array of regex strings or {pattern,message}. Top-level applies to EVERY mapped route; per-route entry.forbidPatterns adds more. A match FAILS even when forbidRawTable is off. Set the export's mock primitives here (at least the raw-table class) so 'adopt' can never degrade into 'copy the export markup'. requiredComponents force the RIGHT component IN; forbidPatterns keep the mock primitive OUT.",
     "sectionHeuristics  — optional per-route (or top-level) override: { \"my-section\": [\"<MyThing\"] } compiles the strings to regexes.",
     "sharedImportRoots  — optional top-level override of the import roots that count as 'shared' (default @/components, components/ui, components/, ~/components, @components)."
   ],
 
   "routes": [],
+
+  "_example_forbidPatterns": [
+    { "pattern": "className=\"tbl\"", "message": "prototype mock table class \"tbl\" transcribed verbatim — render the grid through DataGrid (a compact variant for previews), never the export's raw <table className=tbl>" }
+  ],
 
   "_example_routes": [
     {
