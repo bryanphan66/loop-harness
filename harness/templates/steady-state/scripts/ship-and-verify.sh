@@ -30,6 +30,15 @@ SHORT="${COMMIT:0:7}"
 HEALTH="$(cfg healthUrl)"; HGREP="$(cfg healthGrep)"
 SSH_T="$(cfg sshTarget)"; SSH_P="$(cfg sshPort)"; SSH_P="${SSH_P:-22}"; CGREP="$(cfg containerGrep)"
 
+# Auto-set State (bind transition vao deploy — het phu thuoc operator nho tay).
+# Best-effort: state la side-effect, KHONG duoc chan/ket thuc deploy. Guard cua
+# issue-state.mjs tu chan buoc khong hop le (vd re-run khi da qua Deploying).
+STATE_JS="$(dirname "$0")/issue-state.mjs"
+set_state() { # $1 = state name
+  [ -f "$STATE_JS" ] || return 0
+  node "$STATE_JS" "$ISSUE" "$1" >&2 2>&1 || echo "  (state -> '$1' bo qua: buoc khong hop le hoac gh loi)" >&2
+}
+
 poll_deploy() {
   local i st cc rid
   for i in $(seq 1 40); do
@@ -56,15 +65,16 @@ verify() { # verify-at-source: true iff the running artifact carries $SHORT
 }
 
 echo "R3: wait deploy $BRANCH -> verify target == $SHORT"
+set_state "Deploying"   # In Dev -> Deploying (merge da xong, dang trien khai)
 poll_deploy || true
-if verify; then echo "OK: target is running $SHORT"; exit 0; fi
+if verify; then echo "OK: target is running $SHORT"; set_state "Ready for Test"; exit 0; fi
 
 echo "R3 recover: target != $SHORT -> re-trigger deploy once"
 gh workflow run "$WORKFLOW" --repo "$REPO" --ref "$BRANCH" 2>/dev/null \
   || gh run rerun "$(gh run list --repo "$REPO" --branch "$BRANCH" --workflow "$WORKFLOW" --limit 1 --json databaseId --jq '.[0].databaseId')" 2>/dev/null \
   || echo "  (could not re-trigger — workflow lacks dispatch/rerun)" >&2
 poll_deploy || true
-if verify; then echo "OK after re-trigger: target is running $SHORT"; exit 0; fi
+if verify; then echo "OK after re-trigger: target is running $SHORT"; set_state "Ready for Test"; exit 0; fi
 
 echo "R3 fail-closed: still drifted after re-trigger -> open deploy-drift issue"
 url="$(gh issue create --repo "$REPO" \

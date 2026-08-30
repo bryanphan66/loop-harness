@@ -8,9 +8,16 @@
  *
  * Dung:
  *   node scripts/issue-state.mjs <issue-number> "<state name>" [--repo owner/name] [--dry-run]
- *                                [--force "<ly do>"]
+ *                                [--force "<ly do>"] [--advance]
  * Vi du:
  *   node scripts/issue-state.mjs 239 "In Dev"
+ *
+ * --advance: tu di CAC BUOC HOP LE TIEN toi dich (idempotent) thay vi 1 buoc.
+ *   Dung khi dispatch coder: issue co the dang o (chua co)/Backlog/Ready for Dev
+ *   -> "In Dev --advance" tu di het duong (chua co)->Ready for Dev->In Dev, khong
+ *   can operator nho tung buoc. GIOI HAN: chi tien toi "In Dev" (vung TRUOC deploy);
+ *   tu Deploying tro di PHAI do ship-and-verify.sh / QC that set (giu cong QC/UAT
+ *   la nguoi). --advance chi di TIEN, khong di lui (QC-fail lui In Dev = set 1 buoc).
  *
  * TRANSITION GUARD (chan nhay coc): bang 10-state khong con chi la quy uoc ghi
  * trong tai lieu — script CHAN buoc chuyen khong hop le (vi du Backlog -> Done,
@@ -59,6 +66,16 @@ const argOf = (f) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : 
 const DRY = args.includes('--dry-run');
 const FORCE_REASON = argOf('--force');
 const FORCED = args.includes('--force');
+const ADVANCE = args.includes('--advance');
+
+// Duong TIEN happy-path (chi 1 buoc/state) — dung cho --advance. Chi toi truoc
+// deploy; Deploying tro di do actor that (ship-and-verify/QC) set, khong auto-jump.
+const FORWARD = {
+  '(chua co)':     'Ready for Dev',
+  'Backlog':       'Ready for Dev',
+  'Ready for Dev': 'In Dev',
+};
+const ADVANCE_MAX = ['Backlog', 'Ready for Dev', 'In Dev'];
 
 // Quyet dinh hop le: CA HAI dau phai co trong bang, va canh phai ton tai.
 const isLegal = (from, to) => Object.prototype.hasOwnProperty.call(TRANSITIONS, from)
@@ -106,6 +123,14 @@ if (args.includes('--self-test')) {
     for (const t of outs) {
       if (!Object.prototype.hasOwnProperty.call(TRANSITIONS, t)) { console.error(`[FAIL] "${s}" -> "${t}": dich khong ton tai trong bang`); bad++; }
     }
+  }
+  // Moi canh TIEN (--advance) phai la 1 transition HOP LE (advance khong duoc lach guard).
+  for (const [from, to] of Object.entries(FORWARD)) {
+    if (!isLegal(from, to)) { console.error(`[FAIL] FORWARD "${from}" -> "${to}" khong hop le trong TRANSITIONS`); bad++; }
+  }
+  // --advance chi duoc tien toi vung truoc-deploy.
+  for (const s of ADVANCE_MAX) {
+    if (!Object.prototype.hasOwnProperty.call(TRANSITIONS, s)) { console.error(`[FAIL] ADVANCE_MAX "${s}" khong co trong bang`); bad++; }
   }
   if (bad) { console.error(`[self-test] ${bad} case sai.`); process.exit(1); }
   console.log(`[self-test] OK — ${cases.length} case + bat buoc Cancelled + tinh toan ven cua bang.`);
@@ -188,6 +213,36 @@ const fromState = (currentStateFv && valueOf(currentStateFv)) || UNSET;
 
 if (FORCED && !FORCE_REASON) {
   die('--force phai kem ly do: --force "<ly do>" (luat bypass giong verify-gate: nguoi bypass phai noi ro vi sao).');
+}
+
+// ---- 3c. --advance: tu di cac buoc hop le TIEN toi dich ------------------------
+// Bind vao dispatch: 1 lenh idempotent dua issue toi "In Dev" du dang o dau (truoc
+// deploy). Moi hop la 1 lan goi lai chinh script (khong --advance) -> tai su dung
+// nguyen guard/patch o duoi, khong nhan doi logic.
+if (ADVANCE) {
+  if (!ADVANCE_MAX.includes(stateName)) {
+    die(`--advance chi tien toi "In Dev" (vung truoc deploy). "${stateName}" tro di phai do ship-and-verify.sh / QC that set.`);
+  }
+  if (fromState === stateName) {
+    console.log(`[issue #${issueNumber}] da o "${stateName}" san — khong doi gi.`);
+    process.exit(0);
+  }
+  const path = [];
+  let cur = fromState, guard = 0;
+  while (cur !== stateName) {
+    const nxt = FORWARD[cur];
+    if (!nxt || guard++ > 10) {
+      die(`--advance: khong co duong TIEN tu "${fromState}" toi "${stateName}" (chi di tien, khong di lui). QC-fail lui "In Dev" thi set 1 buoc khong --advance.`);
+    }
+    path.push(nxt);
+    cur = nxt;
+  }
+  for (const hop of path) {
+    const hopArgs = [process.argv[1], issueNumber, hop, '--repo', REPO];
+    if (DRY) hopArgs.push('--dry-run');
+    execFileSync(process.argv[0], hopArgs, { stdio: 'inherit' });
+  }
+  process.exit(0);
 }
 
 if (fromState === stateName) {

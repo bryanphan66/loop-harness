@@ -30,12 +30,27 @@ Every bug/change = **one GitHub Issue** (source of truth). It moves through 10 s
 |---|---|
 | CS + Tech Lead (upstream) | **BA-validate BEFORE creating the issue** — classify business risk (price/order/permission/data-integrity held for a human). The pipeline does not re-validate. |
 | PM | triage Backlog -> Ready for Dev (AC + Module + Priority present). |
-| Control session | dispatch one async coder per issue (own worktree), set In Dev; after code, merge, deploy, verify-at-source, set states. **Bracket every dispatch with `run-log.mjs start` / `end`** — that log is the only evidence a harness change helped. |
-| Coder (bg) | code to AC, run the verify gate, attach QC checklist (`qc-checklist.mjs`), open a **draft PR** to the integration branch. |
+| Control session | dispatch one async coder per issue (own worktree); after code, merge, run `ship-and-verify.sh` (auto-sets Deploying + Ready for Test). **Bracket every dispatch with `run-log.mjs start` / `end`** — that log is the only evidence a harness change helped. |
+| Coder (bg) | **first action: `node scripts/issue-state.mjs <N> "In Dev" --advance`** (binds In Dev to the coder actually starting — no operator memory needed); then code to AC, run the verify gate, attach QC checklist (`qc-checklist.mjs`), open a **draft PR** to the integration branch. |
 | QC (human) | test on staging via the issue's checklist; pass -> Ready for UAT, fail -> keep + file bug. |
 | Customer | UAT -> Done. |
 
 Set state: `node scripts/issue-state.mjs <N> "<state>"`.
+
+### States are auto-set by the action, not by memory
+The loop used to rely on the operator *remembering* to run `issue-state.mjs` at each
+step — so issues silently sat at their old state (e.g. a coder working while the issue
+was still unset / Backlog). State is now **bound to the action that defines it**:
+
+| Transition | Bound to | Mechanism |
+|---|---|---|
+| ... -> **In Dev** | coder starts | first line of the coder dispatch prompt runs `issue-state.mjs <N> "In Dev" --advance` (walks unset/Backlog/Ready-for-Dev -> In Dev in one idempotent call) |
+| In Dev -> **Deploying** | merge + deploy | `ship-and-verify.sh` sets it before polling the deploy |
+| Deploying -> **Ready for Test** | verify-at-source PASS | `ship-and-verify.sh` sets it only after the running artifact carries the shipped commit (fail-closed: no verify, no advance) |
+| Ready for Test -> QC -> UAT -> Done | **human** | left manual on purpose — QC/UAT are human gates; `--advance` refuses to auto-jump past In Dev |
+
+Issues entering via Plane-sync / manual `gh` land at `(chua co)` (unset); `--advance`
+handles that start. Issues created via `new-issue.mjs` start at `Backlog` automatically.
 
 ### The transitions are enforced, not documented
 
