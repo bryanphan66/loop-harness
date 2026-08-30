@@ -1,0 +1,21 @@
+{
+  "_doc": "Per-project knobs for the lint:gates scripts. All keys optional; each gate falls back to the defaults shown here. Allowlists are for genuine exceptions only — prefer fixing the code.",
+  "fidelityRequired": {
+    "_doc": "check-new-screen-fidelity-required.mjs — admin routes exempt from needing a *-fidelity.spec.ts (canvas/redirect/programmatic). Exact route path, or a '/prefix/*' glob.",
+    "allowlist": []
+  },
+  "manifestCoverage": {
+    "_doc": "check-manifest-coverage.mjs — where the frozen scope baseline + build plan live.",
+    "featureRegister": "docs/scope-baseline/feature-register.md",
+    "buildManifest": "docs/build-manifest.md"
+  },
+  "authzTest": {
+    "_doc": "check-authz-test-present.mjs — controllers exempt from needing a negative-authz spec (resource slug, controller filename, or repo-relative path).",
+    "allowlist": []
+  },
+  "moneyConcurrency": {
+    "_doc": "check-money-concurrency-test-present.mjs — extra BigInt column-name substrings to treat as money; model names exempt from needing a concurrency spec.",
+    "moneyColumns": [],
+    "allowlist": []
+  }
+}
