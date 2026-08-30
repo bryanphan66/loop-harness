@@ -84,6 +84,13 @@ Do NOT implement the phase in the main session — orchestrate only.
    Prototype → Code Fidelity + prototype-export-adoption.md). Encode the phase
    block's per-screen fidelity contract (required elements + interactions) as
    Playwright assertions in a `<screen>-fidelity.spec.ts` and run them green.
+   IMPLEMENT every screen through EXISTING shared components (grep components/ui/
+   first; a grid MUST use DataGrid, never a re-drawn `<table>`; do NOT create a
+   duplicate of an existing primitive — add a MISSING primitive to components/ui/
+   as shared). Every mapped route in scripts/fidelity-map.json must pass
+   `check-prototype-fidelity.mjs` (required components imported-from-shared + used,
+   required sections present) — this is the adopt-via-existing-components HARD step
+   (build-execution.md § Bước bắt buộc 2.6.b).
    Failed operations must surface their REAL cause to the UI — no generic
    error-swallow. A fix touching a systemic pattern (error handling, model/tier
    resolution, auth, quota) sweeps ALL grep'd call-sites, not just the reported

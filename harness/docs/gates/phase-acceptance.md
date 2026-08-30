@@ -5,10 +5,11 @@
 > verifier AGENT against the running app** — a *prose contract the agent
 > executes*, **not** an auto-lint that blocks a commit, UNLESS it is backed by one
 > of the shipped scripts. Auto-enforced TODAY in `lint:gates` (via the `validate`
-> script the verify-gate hook runs) = **seven** scripts (all under `scripts/`,
+> script the verify-gate hook runs) = **eight** scripts (all under `scripts/`,
 > each fail-soft on a bare skeleton so the harness stays runnable):
 > - `check-universal-fidelity-imports.mjs` — an existing `*-fidelity.spec.ts` imports the universal fixture (backs check 5).
 > - `check-new-screen-fidelity-required.mjs` — every admin screen HAS a fidelity spec (backs check 5; closes the "a new screen skips the U1-U4/i18n/a11y floor" hole a field run found).
+> - `check-prototype-fidelity.mjs` — every route mapped in `scripts/fidelity-map.json` IMPORTS-from-shared + USES its required components + has its required sections + no re-drawn `<table>` on a grid (backs check 2, the component-presence half of visual-fidelity Tooth A; closes the RE-DRAW hole — a screen hand-built instead of adopted through existing components).
 > - `check-prisma-fk-indexes.mjs` — every FK scalar is indexed (backs check 7).
 > - `check-admin-screen-width-caps.mjs` — no hard content-width cap (backs visual-fidelity U7).
 > - `check-manifest-coverage.mjs` — every in-MVP REQ-ID is built in exactly one phase + P0 defined (backs the DoR manifest-completeness rule; closes the G4 duplicate-build risk).
@@ -34,8 +35,8 @@
 > | Marker | Meaning | Checks |
 > |---|---|---|
 > | **[AUTO]** (partial) | a shipped `lint:gates` script backs PART of the check; the rest is agent-driven | 5 (fixture-import + spec-exists), 7 (FK-index) |
-> | **[AUTO] (presence)** | a shipped script enforces the required spec/test EXISTS + structural coverage; the BEHAVIOUR stays verifier-run | 16 (negative-authz spec exists), 20 (concurrency spec exists) |
-> | **[VERIFIER]** | agent-driven only — drives the running app + does any grep by hand; no auto-block today | 1-4, 6, 8-15, 17-19, 21-27 |
+> | **[AUTO] (presence)** | a shipped script enforces the required spec/test EXISTS + structural coverage; the BEHAVIOUR stays verifier-run | 2 (mapped screen imports+uses its prototype components/sections — component-presence; the PIXEL/aesthetic glance stays verifier+human), 16 (negative-authz spec exists), 20 (concurrency spec exists) |
+> | **[VERIFIER]** | agent-driven only — drives the running app + does any grep by hand; no auto-block today | 1, 3-4, 6, 8-15, 17-19, 21-27 |
 >
 > Plus a manifest-level auto gate not tied to a numbered leg:
 > **manifest-coverage** (REQ-ID ⟷ phase). **Backlog now clear of the 3 costliest
@@ -85,12 +86,28 @@ app**, never by reading the diff and assuming:
 
 1. **Functional AC** — every numbered acceptance check in the phase block is
    exercised as written (actor → action → observable outcome) and holds.
-2. **Visual fidelity** — each screen the phase ships has its **Playwright
-   fidelity assertions** (element completeness + interaction behaviour) run
-   GREEN and its screenshot captured for the human side-by-side glance, per
-   `docs/gates/visual-fidelity.md`. The verifier RUNS the assertions — it does
-   NOT LLM-compare two images, and an implementer's "matches export" self-claim
-   is not a substitute.
+2. **Visual fidelity** [AUTO] (presence) + [VERIFIER] — each screen the phase
+   ships has its **Playwright fidelity assertions** (element completeness +
+   interaction behaviour) run GREEN and its screenshot captured for the human
+   side-by-side glance, per `docs/gates/visual-fidelity.md`. The verifier RUNS the
+   assertions — it does NOT LLM-compare two images, and an implementer's "matches
+   export" self-claim is not a substitute.
+   - **Component-presence is now AUTO** for every route in
+     `scripts/fidelity-map.json`: `check-prototype-fidelity.mjs` fails the phase
+     if a mapped screen does not IMPORT-from-shared + USE its required components
+     (DataGrid/StatCard/PageHead-tabs/…), is missing a required section, or
+     re-draws a grid as a raw `<table>`. This machine-blocks the RE-DRAW hole
+     (build a look-alike by hand instead of adopting the export through existing
+     components) — the worst Macro-2 defect class.
+   - **Pixel/aesthetic match stays VERIFIER + human.** The machine proves the
+     structural blocks are present; it cannot judge "looks like the export". So
+     the verify-fidelity checkpoint still runs: OPEN the cited prototype
+     `screens-*.jsx`, compare structure (KPI row / tabs / grid columns / sections)
+     against the built screen, and glance the running screenshot (desktop + 375px)
+     side-by-side with the prototype image BEFORE the phase closes
+     (`docs/playbooks/build-execution.md` § Checkpoint verify-fidelity). This is
+     verify-at-source for fidelity — a green `check-prototype-fidelity` is NOT a
+     substitute for the glance.
 3. **Negative path** — the phase's error/empty acceptance check(s) trigger the
    failure for real and the REAL cause surfaces in the UI (a generic message =
    FAIL, per the no-error-swallow floor rule).
