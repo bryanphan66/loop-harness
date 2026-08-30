@@ -1,0 +1,32 @@
+{
+  "_doc": "Route -> frozen-prototype STRUCTURAL contract, read by check-prototype-fidelity.mjs. Author ONE entry per admin screen the prototype froze, when the prototype is frozen (PB-G3) — before the screen is built. The gate is STRICT for every route listed here and fail-soft for routes not listed. This is a SAMPLE/skeleton: it ships with routes:[] so a fresh project skips the gate until real screens are mapped. Replace the commented example with your real screens.",
+
+  "_howto": [
+    "route              — the admin route path (e.g. /admin/courses). page.tsx is derived at apps/web/src/app<route>/page.tsx; override with `page` if it lives elsewhere.",
+    "prototypeFile      — the frozen export screen file this route adopts (for the failure message + the verifier glance). Optional but recommended.",
+    "requiredComponents — shared components the prototype implies. Each MUST be imported from a shared root (@/components, components/ui, …) AND used as <Comp/>. A locally re-drawn copy FAILS. Grid screens MUST list DataGrid.",
+    "requiredSections   — prototype sections. Built-in heuristics: kpi-row/stat-row -> <StatCard>, object-page-tabs/tabs -> <PageHead tabs=…> or <Tabs>, timeline -> <Timeline>, grid/table -> <DataGrid>, filter-bar/toolbar -> <FilterBar>/<Toolbar>, detail-panel -> <DetailPanel>/<SidePanel>, empty-state -> <EmptyState>. An unknown key falls back to a literal token-in-source check.",
+    "forbidRawTable     — default true: a raw <table> on the screen FAILS (grids render through DataGrid). Set false only for a genuine non-grid table.",
+    "sectionHeuristics  — optional per-route (or top-level) override: { \"my-section\": [\"<MyThing\"] } compiles the strings to regexes.",
+    "sharedImportRoots  — optional top-level override of the import roots that count as 'shared' (default @/components, components/ui, components/, ~/components, @components)."
+  ],
+
+  "routes": [],
+
+  "_example_routes": [
+    {
+      "route": "/admin/courses",
+      "prototypeFile": "docs/visuals/prototype/exports/app-v1/screens-courses.jsx",
+      "requiredComponents": ["PageHead", "StatCard", "DataGrid"],
+      "requiredSections": ["kpi-row", "object-page-tabs"]
+    },
+    {
+      "route": "/admin/orders/[id]",
+      "page": "apps/web/src/app/admin/orders/[id]/page.tsx",
+      "prototypeFile": "docs/visuals/prototype/exports/app-v1/screens-order-detail.jsx",
+      "requiredComponents": ["PageHead", "StatCard", "Timeline"],
+      "requiredSections": ["kpi-row", "object-page-tabs", "timeline"],
+      "forbidRawTable": false
+    }
+  ]
+}

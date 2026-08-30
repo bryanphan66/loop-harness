@@ -3,6 +3,7 @@
  * recursive file walk). Kept tiny + dependency-free so every gate stays a plain
  * runnable .mjs. The gates that consume this:
  *   - check-new-screen-fidelity-required.mjs
+ *   - check-prototype-fidelity.mjs
  *   - check-manifest-coverage.mjs
  *   - check-authz-test-present.mjs
  *   - check-money-concurrency-test-present.mjs

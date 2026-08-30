@@ -4,6 +4,10 @@
     "_doc": "check-new-screen-fidelity-required.mjs — admin routes exempt from needing a *-fidelity.spec.ts (canvas/redirect/programmatic). Exact route path, or a '/prefix/*' glob.",
     "allowlist": []
   },
+  "prototypeFidelity": {
+    "_doc": "check-prototype-fidelity.mjs — where the route→prototype structural map lives (routes, requiredComponents, requiredSections). Default scripts/fidelity-map.json. STRICT for mapped routes, fail-soft for the rest.",
+    "mapFile": "scripts/fidelity-map.json"
+  },
   "manifestCoverage": {
     "_doc": "check-manifest-coverage.mjs — where the frozen scope baseline + build plan live.",
     "featureRegister": "docs/scope-baseline/feature-register.md",

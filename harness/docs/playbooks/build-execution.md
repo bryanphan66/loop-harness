@@ -251,6 +251,61 @@ Guardrails (all zones):
 - The plan (2.3) states adopt-vs-rebuild per zone; the manifest carries it per
   screen.
 
+### Bước bắt buộc 2.6.b — adopt prototype QUA component có sẵn (HARD)
+
+Đây là bước KHÔNG được bỏ khi build một màn có prototype. Lỗ nặng nhất của
+Macro-2 (giai đoạn Build) là **re-draw** (vẽ lại UI từ đầu) thay vì **adopt**
+(bê nguyên) prototype - màn trông "same same" nhưng lệch ~20% và gate cũ chỉ
+kiểm "có file spec" nên vẫn xanh. Pattern đúng (đã chứng minh: elearning #985
+rebuild đạt ~90% khớp) đi đúng 5 nhịp, THEO THỨ TỰ:
+
+1. **ĐỌC prototype của màn TRƯỚC khi gõ dòng UI đầu tiên.** Mở đúng file export
+   Claude Design mà phase block trích dẫn (`screens-*.jsx`) - đọc layout, hàng
+   KPI (Key Performance Indicator - chỉ số chính), tab, section, cột của grid.
+   Đây là "nguồn sự thật" (source of truth), không phải trí nhớ.
+2. **Adopt đúng layout/KPI/tab/section/cột** - dựng lại cây phần tử của màn theo
+   `screens-*.jsx`, không tự nghĩ bố cục mới.
+3. **IMPLEMENT bằng component CÓ SẴN.** `grep components/ui/` (thư mục primitive
+   dùng chung) TRƯỚC khi viết bất kỳ component nào. Grid BẮT BUỘC dùng
+   `DataGrid` - cấm re-draw `<table>` tay. Tái dùng `StatCard`, `PageHead`
+   (dạng tab), `Timeline`... **Cấm tạo component trùng** (một `StatsCard` mới
+   cạnh `StatCard` sẵn có = build-phase BLOCK, đúng luật Tier-3 inventory).
+4. **Thiếu primitive thì THÊM ở `components/ui/` dạng SHARED** (dùng chung), rồi
+   ghi vào `src/components/README.md` để màn sau tái dùng - KHÔNG viết bản copy
+   nội bộ trong thư mục 1 màn.
+5. **Adopt CSS** (`tokens.css` + `components.css` từ export) rồi mới wire dữ liệu
+   thật; **fidelity spec ASSERT cấu trúc prototype hiện diện** (component +
+   section), không chỉ smoke-test (chỉ kiểm màn mở được).
+
+**Gate máy kiểm bước này:** `scripts/check-prototype-fidelity.mjs` (chạy trong
+`lint:gates`). Nó đọc `scripts/fidelity-map.json` - mỗi route admin map tới
+`{prototypeFile, requiredComponents, requiredSections}` - rồi ASSERT trên
+`page.tsx` đã build: các `requiredComponents` được import TỪ thư mục shared +
+dùng trong JSX, các `requiredSections` hiện diện, và không có `<table>` thô trên
+màn grid. Thiếu -> FAIL, chỉ rõ route + component/section còn thiếu. Gate STRICT
+cho route CÓ trong map, fail-soft cho route CHƯA map (baseline). Map được soạn
+khi prototype đóng băng (PB-G3), trước khi build màn.
+
+> Giới hạn thành thật: gate chỉ kiểm **component-presence** (các khối cấu trúc
+> mà export ngụ ý CÓ hiện diện). Phần **pixel-match** (khớp khoảng cách, theme,
+> "trông có giống export không") máy KHÔNG phán được - vẫn cần verifier + người
+> ở checkpoint verify-fidelity dưới đây.
+
+### Checkpoint verify-fidelity (verify-at-source cho FIDELITY)
+
+Sau khi build xong 1 màn CÓ prototype, verifier/ctl PHẢI đối chiếu bản build với
+prototype TRƯỚC khi coi màn "đạt" - đây là verify-at-source (xác minh tại nguồn)
+áp cho fidelity, y hệt nguyên tắc không-tin-CI-xanh của deploy:
+
+1. Chạy `node scripts/check-prototype-fidelity.mjs` xanh (component-presence).
+2. MỞ file prototype (`screens-*.jsx`) mà phase block trích dẫn và so cấu trúc:
+   đủ hàng KPI? đủ tab? đủ cột grid? đúng section? Không được tin lời builder
+   "đã khớp export" suông (FC7 - self-attest bị cấm).
+3. Chụp screenshot màn đã build (desktop + 375px) để glance side-by-side với ảnh
+   prototype - người chốt phần thẩm mỹ/pixel mà máy không phán được.
+
+Thiếu 1 trong 3 = màn CHƯA đạt fidelity, không được đóng phase (fail-closed).
+
 ### PUB product-shot capture is a LATE phase
 
 Marketing screens (landing hero, feature sections) often embed **screenshots of

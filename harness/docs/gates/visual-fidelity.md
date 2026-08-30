@@ -1,12 +1,28 @@
 # Gate — Visual Fidelity (built screen vs frozen prototype)
 
 > ⚠️ **ENFORCEMENT STATUS (read first — honest scope of the "auto-block").**
-> Auto-enforced TODAY in the shipped template's `lint:gates` = exactly **three**
-> scripts: `scripts/check-universal-fidelity-imports.mjs`,
-> `check-prisma-fk-indexes.mjs`, `check-admin-screen-width-caps.mjs` (run by the
-> verify-gate hook via the `validate` script). The per-screen **Playwright
-> fidelity assertions** are real but only gate if the project wires its
-> `apps/web/e2e-ui/*.fidelity.ts` specs into a run the hook/CI executes.
+> Auto-enforced TODAY in the shipped template's `lint:gates` for fidelity =
+> **four** scripts: `scripts/check-universal-fidelity-imports.mjs`,
+> `check-new-screen-fidelity-required.mjs`, **`check-prototype-fidelity.mjs`
+> (NEW — structural adopt-via-existing-components check)**, and
+> `check-admin-screen-width-caps.mjs` (plus `check-prisma-fk-indexes.mjs` for the
+> FK floor) — all run by the verify-gate hook via the `validate` script. The
+> per-screen **Playwright fidelity assertions** are real but only gate if the
+> project wires its `apps/web/e2e-ui/*.fidelity.ts` specs into a run the hook/CI
+> executes.
+>
+> **The fidelity spec must ASSERT the prototype's components/sections, not merely
+> EXIST.** A spec that only smoke-tests "the screen renders" is NOT fidelity. The
+> rule now has machine teeth: `check-prototype-fidelity.mjs` reads
+> `scripts/fidelity-map.json` (route → `{prototypeFile, requiredComponents,
+> requiredSections}`) and fails a mapped screen whose `page.tsx` does not IMPORT
+> the required shared components (from `@/components`/`components/ui`) and USE
+> them, or is missing a required section, or re-draws a grid as a raw `<table>`
+> instead of `DataGrid`. This auto-blocks the RE-DRAW hole (build a look-alike by
+> hand instead of adopting the export through existing components). Its limit is
+> honest: it checks **component-presence only** — the **pixel/aesthetic match**
+> (Tooth B, the side-by-side glance) stays a verifier + human step, never an
+> auto-block.
 > The U13–U19 `scripts/check-dead-affordance.mjs`, `check-inline-grid-reflow.mjs`,
 > `check-icon-registry-coverage.mjs`, `check-prototype-copy-verbatim.mjs`,
 > `check-primitive-inline-style.mjs`, `check-toast-convention.mjs` cited below are
@@ -59,6 +75,9 @@ the export's code — this gate now proves it mechanically.
   `rebuild (decision: <slug>)` marker + its **required-element + interaction
   assertions**.
 - The screen's Playwright fidelity spec (e.g. `apps/web/e2e-ui/<screen>-fidelity.spec.ts`).
+- `scripts/fidelity-map.json` — route → `{prototypeFile, requiredComponents,
+  requiredSections}`, the structural contract `check-prototype-fidelity.mjs`
+  auto-enforces (authored when the prototype is frozen, PB-G3).
 
 ## Scope (which screens MUST have assertions + a glance)
 
