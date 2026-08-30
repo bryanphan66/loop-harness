@@ -140,7 +140,7 @@ app, never from an early scaffold UI. Commit the capture script so shots are
 re-generatable. (build-execution.md § PUB product-shot capture is a LATE phase)
 -->
 
-## Coverage checklist *(DoR proof — every in-scope REQ-ID exactly once)*
+## Coverage checklist *(DoR proof — manifest-completeness rule, SoT `docs/gates/dor-build.md`)*
 
 | REQ-ID | Phase |
 |---|---|

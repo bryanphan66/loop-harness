@@ -91,9 +91,9 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
    `end-only`) and the one-line **Preview command** — then derive each phase's
    `Verify-by` from the cadence. The operator may retune the cadence mid-build;
    re-derive the remaining phases' `Verify-by` when they do.
-7. **Prove coverage.** Fill the coverage checklist: every in-scope REQ-ID in
-   exactly one phase. A REQ-ID in zero phases = scope silently dropped; in two
-   = double-build drift. Both block DoR.
+7. **Prove coverage.** Fill the coverage checklist so the manifest-completeness
+   rule holds (SoT: `docs/gates/dor-build.md`): a REQ-ID in zero phases = scope
+   silently dropped; in two = double-build drift. Both block DoR.
 8. **Gate.** DoR (`docs/gates/dor-build.md`) now includes: manifest complete,
    coverage proven, P0 defined, every phase ≤ one session, every phase's
    acceptance checks covering the three categories + `Verify-by` set + the

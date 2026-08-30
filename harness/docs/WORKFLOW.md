@@ -166,9 +166,9 @@ release note → production release. *(payment milestones attach here in Full)*
 | # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
 |---|---|---|---|---|---|---|---|
 | 2.1 | Solution/data arch — **freeze ERD** | **SA** | `ck-tech-design` (databases) + `tech-graph` | SRS(-lite) data-model + use-cases + screen inventory | `docs/decisions/<slug>.md` + `docs/system-architecture.md` (ERD) | ERD review: entities, normalization, audit + tenant fields; **ERD FROZEN** | no |
-| 2.1b | Data migration & cutover (brownfield) | SA + DevSecOps | `databases` + `devops` | legacy schema + ERD | migration plan + dry-run report | **CONDITIONAL — N/A by decision** (greenfield); else ETL + dry-run cutover + rollback-of-data + RTO/RPO | no |
+| 2.1b | Data migration & cutover (brownfield) | SA + DevSecOps | `databases` + `devops` | legacy schema + ERD | migration plan + dry-run report | **CONDITIONAL — N/A by decision** for greenfield / Lite internal; APPLICABLE only when brownfield (replacing a legacy system — real use: nhatnghe.net Phase-1.5 + migration Phase-2): ETL + dry-run cutover + rollback-of-data + RTO/RPO | no |
 | 2.2 | Technical design + choose stack (TDR) | **Tech Lead** | `ck-tech-design` + `ck-predict` | NFR + ERD | `docs/decisions/<slug>.md` (stack) + API contract | stack justified vs NFR (**default = the shipped walking-skeleton stack template**; deviations need the ADR to say why), API contract complete, authz; **STRIDE threat-model here** | no |
-| 2.3 | Implementation plan + **BUILD MANIFEST** + DoR | Tech Lead + PM | `ck-plan` + build-manifest-compilation playbook | TDR + scope baseline + ERD + screen inventory | `plans/<YYMMDD-HHMM>-<slug>/` + **`docs/build-manifest.md`** | **DoR GATE** (`docs/gates/dor-build.md`): baselined + ERD frozen + design approved + acceptance criteria + NFR **+ build-manifest complete: every in-scope REQ-ID in exactly one phase, P0 defined** | no |
+| 2.3 | Implementation plan + **BUILD MANIFEST** + DoR | Tech Lead + PM | `ck-plan` + build-manifest-compilation playbook | TDR + scope baseline + ERD + screen inventory | `plans/<YYMMDD-HHMM>-<slug>/` + **`docs/build-manifest.md`** | **DoR GATE** — manifest-completeness + all clearing conditions in `docs/gates/dor-build.md` (SoT) | no |
 | 2.4 | **Walking skeleton** (manifest **P0**) + env + CI/CD + observability | DevSecOps | stack template `scaffold.sh` + `devops` + `deploy` | stack decision + manifest P0 | scaffolded monorepo + pipeline + compose | **WALKING SKELETON**: `install && build` green, `docker compose up` boots, health OK, CI(-equivalent local) green, secret scan clean; alerting/SLO live or N/A-by-decision | no |
 | 2.5 | Seed + foundation data | DevSecOps + Dev | `ck-seed` + seed-data-pattern | ERD + RBAC | seed scripts (extends the template's admin seed to the domain) | app boots with RBAC + **seeded admin login works**; FK-valid; P0 marked done in manifest | no |
 | 2.6 | **Code feature by phase — `/build-phase` loop P1..PN** | Fullstack Dev | `/build-phase` → `fullstack-developer` (·`cook`) + independent verifier subagent | build-manifest + ERD + SRS module file(s) + screen-inventory rows + **prototype export files** + tokens | code commits + verification-register rows + manifest progress (incl. `Accepted` cell) | per phase: compiles/runs, `validate:quick` green, e2e smoke for the phase's journeys, **floor self-check** (design-system floor rules + **visual-fidelity** — each screen's Playwright fidelity assertions green + screenshot captured for the human glance; screens **adopt the export as code** per `build-execution.md` § Prototype → Code Fidelity + `prototype-export-adoption.md`), commit cites ≥1 token, phase marked done in manifest, **+ PHASE ACCEPTANCE** (`docs/gates/phase-acceptance.md`): independent agent-verifier PASS on the phase's AC vs the running preview; human checkpoint per the manifest cadence | **cadence** — `Verify-by: both` phases page the operator (internal, not the client) |
@@ -178,7 +178,7 @@ release note → production release. *(payment milestones attach here in Full)*
 | 2.10 | QA real-browser + video | QC/QA | `ck-qa` | running build + prototype exports | QA evidence + filled `docs/gates/visual-fidelity.md` | **DoD GATE** (`docs/gates/dod-build.md`): review + E2E + security + QA evidence + user-manual + design-system-compliance green per screen + **visual-fidelity pass per key screen** (fidelity assertions green + human side-by-side glance recorded); PUB product-shots captured after the APP screens they depict | no |
 | 2.11 | Go-live readiness | DevSecOps + PM | `ck-prod-readiness` | build + infra | readiness checklist | readiness green; **rollback rehearsed**; **DR restore-drill + RTO/RPO (CONDITIONAL — N/A by decision)**; **NFR/load test (CONDITIONAL — N/A by decision)** | no |
 | 2.12 | **UAT + sign-off (one client session)** | BA + Release Mgr + Client | `ck-uat` → `ck-signoff` | running build + prototype | `docs/uat/*` + signed sign-off (`locale-vi/`) | **ACCEPTANCE (CLIENT)**: critical journeys pass + matches prototype + sign-off signed (Lite: owner runs UAT + ack) | **yes** |
-| 2.13 | Release | Release Manager | `ship` + `deploy` | accepted build | release note + tag | release-note (every released REQ) + smoke pass; rollback = one `IMAGE_TAG` line | no |
+| 2.13 | Release | Release Manager | `ship` + `deploy` | accepted build | release note + tag | release-note (every released REQ) + **verify-at-source** (health `.status==ok` + a build-specific content marker, NOT CI-green / HTTP-200 / a version string) + rollback = one `IMAGE_TAG` line — the 5 release rules + Post-Deploy Checklist are in `docs/playbooks/go-live-deploy-verify.md` | **MANUAL_CHECKPOINT** — the prod deploy is a named-endpoint human decision (`go-live-deploy-verify.md` Rule 5) |
 
 > **Build Manifest (step 2.3 output — the spec→code conversion layer).** ONE
 > file, `docs/build-manifest.md` (template:
@@ -203,12 +203,11 @@ release note → production release. *(payment milestones attach here in Full)*
 > six-dimension review, 2.9 security review, 2.10 full QA — still run **once
 > when the manifest is complete** (plus one mid-point 2.7 review if the
 > manifest has more than 6 phases), but as **aggregation and cross-phase
-> confirmation** — per-phase acceptance means they are no longer the first
-> place a phase's defect can be caught. Catching a defect in its own phase
-> costs one fix cycle; catching it at the end costs cross-phase rework — the
-> single biggest token sink observed in the field. Do not page a full review
-> per phase; do not skip the floor self-check or the acceptance verification on
-> any phase.
+> confirmation** — no longer the first place a phase's defect can be caught. Do
+> not page a full review per phase; do not skip the floor self-check or the
+> acceptance verification on any phase. **Why per-phase — the token-curve
+> rationale (defect-in-phase = one fix cycle; defect-at-end = cross-phase rework,
+> the biggest token sink) → `docs/gates/phase-acceptance.md` § Why this gate exists (SoT).**
 
 > **Conditional enterprise gates (each marked N/A by decision if not needed —
 > never silently dropped):** 2.1b data-migration/cutover · 2.11 NFR/load (k6 p95
@@ -282,7 +281,7 @@ Change-control runs continuously, re-entering the pipeline at 2.3 / 2.6.
 | **PB-G2** | Pre-Build | **CLIENT** (Lite: owner ack) | scope frozen — BLOCKERs answered + feature-register (or Lite feature list) frozen |
 | **PB-G3** | Pre-Build | **CLIENT** (Lite: owner ack) | prototype frozen in writing |
 | **PB-G4** | Pre-Build | **CLIENT** (hardest; Lite: N/A-by-decision auto) | contract signed + deposit received — *no build code before this (Full lane)* |
-| **DoR** | Build | internal | baselined + ERD frozen + design approved + acceptance criteria + NFR + **build-manifest complete (every in-scope REQ-ID in exactly one phase, P0 defined)** |
+| **DoR** | Build | internal | baselined + ERD frozen + design approved + acceptance criteria + NFR + **build-manifest complete** (manifest-completeness + full clearing conditions → `docs/gates/dor-build.md`, SoT) |
 | **ERD FROZEN** | Build | internal | entities / normalization / audit+tenant fields reviewed |
 | **WALKING SKELETON** | Build | internal | scaffolded app installs, builds, boots via compose, health OK, seeded admin login works, CI(-equivalent local) green |
 | **SECURITY SIGN-OFF** | Build | internal | 0 Critical/High open (red-team required) |
@@ -297,7 +296,9 @@ Change-control runs continuously, re-entering the pipeline at 2.3 / 2.6.
 decision** when not applicable, never silently dropped: data-migration/cutover
 (2.1b), NFR/load test (2.11), DR + RTO/RPO (2.11), compliance/privacy/WCAG,
 observability/SLO (2.4 — usually always-on). **Lite lane auto-N/A:** 1.14, 1.15,
-optionally 3.4 — still recorded.
+optionally 3.4 — still recorded. The single tracked **toggle table (SoT)** where
+each is cleared-or-N/A lives in `docs/gates/dod-build.md` § Conditional Enterprise
+Gate Toggles.
 
 > **Client-paging gates** (page the human via `MANUAL_CHECKPOINT`): PB-G2,
 > PB-G3, PB-G4, ACCEPTANCE, HANDOVER. PB-G1 is internal — it does **not** page.
@@ -362,7 +363,8 @@ re-enter the chain at 1.5 (mid-build: at 2.3 as a new manifest phase).
 **RTM completeness rule:** every feature-register line traces back to ≥1 REQ-ID
 and ≥1 use case, and forward to ≥1 TC-NNN before ACCEPTANCE. **Manifest
 completeness rule (2.3):** every in-scope REQ-ID appears in exactly one manifest
-phase. The verify-gate reads the RTM rule; the DoR gate reads the manifest rule.
+phase (SoT: `docs/gates/dor-build.md`). The verify-gate reads the RTM rule; the
+DoR gate reads the manifest rule.
 
 ---
 
