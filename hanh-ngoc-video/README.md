@@ -56,8 +56,18 @@ node scripts/build-vo.mjs --rate=-12%                       # đọc chậm hơn
 node scripts/build-vo.mjs --tail 2.2                        # đệm hình dài hơn
 ```
 
-Engine mặc định là **edge-tts** (`pip install edge-tts`) — miễn phí, không cần key.
-Giọng: `vi-VN-HoaiMyNeural` (nữ) và `vi-VN-NamMinhNeural` (nam).
+Engine mặc định là **edge-tts** (`pip install edge-tts`) — miễn phí, không cần key,
+giọng neural thật. Giọng: `vi-VN-HoaiMyNeural` (nữ) và `vi-VN-NamMinhNeural` (nam).
+
+Nghe thử hai giọng trước khi dựng cả video (chỉ cần Python):
+
+```bash
+pip install edge-tts
+bash scripts/nghe-thu.sh
+```
+
+> `--engine espeak` chỉ là **thước đo thời lượng** khi máy không ra được mạng.
+> Giọng máy, không bao giờ đem giao — `verify.mjs` sẽ chặn lại.
 
 Ba điều đã sửa so với bản cũ, đừng làm lại:
 
