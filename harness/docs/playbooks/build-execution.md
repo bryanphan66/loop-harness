@@ -291,6 +291,11 @@ vặt UI lặp lại" (bảng không filter, thiếu tooltip, chart tự vẽ, m
 | modal/dialog sơ khai của export | shared `Dialog` (căn giữa, max-width, no-overflow) | modal tràn/cắt mép, list dài không cuộn |
 | `<Select>` / `<Badge>` / `<Btn>` mock | `SelectInput` / `Badge` / `Button` dự án (grep `components/ui`) | double component, lệch style |
 
+> Lưu ý: cột trái là **markup tự tay**, không phải bản thân tên class. Class
+> `.tbl`/`.bars-chart`/`.card` là style dùng chung hợp lệ (chính `DataGrid` +
+> chart thật dùng chúng) - vấn đề là **TỰ VẼ** bằng `<table>`/`<div>` thay vì gọi
+> COMPONENT. Đừng đi cấm tên class; hãy ép component qua `requiredComponents`.
+
 Quy tắc: nếu prototype có KPI card thì màn PHẢI có `InfoTooltip`; có biểu đồ thì
 PHẢI dùng chart component; có grid thì PHẢI `DataGrid`; có modal thì PHẢI `Dialog`.
 Liệt kê ĐỦ các component này vào `requiredComponents` của route trong
@@ -306,13 +311,18 @@ FAIL, chỉ rõ route + component/section còn thiếu. Gate STRICT cho route C�
 map, fail-soft cho route CHƯA map (baseline). Map được soạn khi prototype đóng
 băng (PB-G3), trước khi build màn.
 
-**Backstop chống chép-thô (`forbidPatterns`):** `fidelity-map.json` nhận thêm
-`forbidPatterns` (mảng regex, top-level áp mọi route + `forbidPatterns` per-route).
-Bất kỳ signature đồ-giả nào khớp (mặc định nên set `className="tbl"` = class bảng
-mock của export) -> FAIL, **kể cả khi `forbidRawTable:false`**. Lý do: object-page
-đôi khi cần tắt `forbidRawTable` cho 1 bảng preview hợp lệ, nhưng class mock `tbl`
-thì KHÔNG BAO GIỜ được sống sót vào code - preview phải dùng biến thể DataGrid gọn.
-Đừng blanket-tắt `forbidRawTable` để né gate; đó chính là cách lỗ lọt ở #985.
+**Kiểm soát ĐÚNG = `requiredComponents`, KHÔNG phải cấm tên class.** Cạm bẫy đã
+mắc (elearning 2026-08-31): dự án adopt NGUYÊN bộ stylesheet của export
+(`styles/prototype/components.css`) nên tên class (`tbl`, `card`, `bars-chart`,
+`dialog-*`, `filterbar`...) là **class DÙNG CHUNG hợp lệ** - chính `DataGrid`
+render bằng `className="tbl"`, chart thật xài `bars-chart`. Vì vậy KHÔNG phân biệt
+được chép-thô vs adopt-đúng qua tên class; cấm 1 class = bắn nhầm hàng loạt màn
+đúng. Cách ép thật sự: liệt kê ĐỦ component vào `requiredComponents` (gate bắt
+`<DataGrid`/`<InfoTooltip`/chart-component phải được import-từ-shared + dùng trong
+JSX) - đây mới là "adopt qua component". `forbidPatterns` (top-level + per-route,
+FAIL kể cả khi `forbidRawTable:false`) chỉ để chặn 1 signature **mock-ONLY** mà dự
+án KHÔNG adopt, đừng seed bằng class dùng-chung. Và đừng blanket-tắt `forbidRawTable`
+để né gate ở màn list (lỗ #985); object-page tắt được vì có bảng preview nhỏ hợp lệ.
 
 > Giới hạn thành thật: gate chỉ kiểm **component-presence** (các khối cấu trúc
 > mà export ngụ ý CÓ hiện diện). Phần **pixel-match** (khớp khoảng cách, theme,
