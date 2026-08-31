@@ -1,0 +1,4 @@
+node_modules/
+out/
+# Lời đọc là file sinh ra — chạy `node scripts/build-vo.mjs` để có.
+public/vo/*/*.wav

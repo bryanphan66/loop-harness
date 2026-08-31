@@ -1,0 +1,19 @@
+{
+  "name": "hanh-ngoc-video",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Remotion template cho video truyen thong Phong kham Da khoa Hanh Ngoc (1080x1920, 30fps)",
+  "scripts": {
+    "vo": "node scripts/build-vo.mjs",
+    "studio": "remotion studio src/index.jsx",
+    "render": "node scripts/render-all.mjs",
+    "check": "node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.443",
+    "remotion": "4.0.443",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  }
+}
