@@ -6,7 +6,8 @@
 > executes*, **not** an auto-lint that blocks a commit, UNLESS it is backed by one
 > of the shipped scripts. Auto-enforced TODAY in `lint:gates` (via the `validate`
 > script the verify-gate hook runs) = **eight** scripts (all under `scripts/`,
-> each fail-soft on a bare skeleton so the harness stays runnable):
+> each fail-soft on a bare skeleton so the harness stays runnable) — plus one
+> **coverage-floor** script (`check-ac-coverage.mjs`) that backs Leg 1:
 > - `check-universal-fidelity-imports.mjs` — an existing `*-fidelity.spec.ts` imports the universal fixture (backs check 5).
 > - `check-new-screen-fidelity-required.mjs` — every admin screen HAS a fidelity spec (backs check 5; closes the "a new screen skips the U1-U4/i18n/a11y floor" hole a field run found).
 > - `check-prototype-fidelity.mjs` — every route mapped in `scripts/fidelity-map.json` IMPORTS-from-shared + USES its required components + has its required sections + no re-drawn `<table>` on a grid (backs check 2, the component-presence half of visual-fidelity Tooth A; closes the RE-DRAW hole — a screen hand-built instead of adopted through existing components).
@@ -15,6 +16,13 @@
 > - `check-manifest-coverage.mjs` — every in-MVP REQ-ID is built in exactly one phase + P0 defined (backs the DoR manifest-completeness rule; closes the G4 duplicate-build risk).
 > - `check-authz-test-present.mjs` — every id-addressed controller HAS a negative-authz spec (backs check 16).
 > - `check-money-concurrency-test-present.mjs` — every money model HAS a concurrency spec (backs check 20).
+> - `check-ac-coverage.mjs` — every in-scope REQ-ID (from the build-manifest phase
+>   blocks) is REFERENCED by >=1 test file (backs check 1, the coverage half). A
+>   **coverage floor**, not an RTM: it proves no REQ-ID is entirely test-less; it
+>   does NOT prove every AC under a REQ has its own test, nor that the referencing
+>   test asserts the AC correctly (that stays with the verifier + the test-run
+>   gate). Wire it HARD on a new project; a repo with a pre-gate backlog runs it
+>   `--advisory` (reports, does not block) until the backlog burns down.
 >
 > Plus `scripts/harness-verify-gate.sh` greps the verification register
 > (`docs/TEST_MATRIX.md`) for `fail` / `never-run`.
@@ -36,7 +44,8 @@
 > |---|---|---|
 > | **[AUTO]** (partial) | a shipped `lint:gates` script backs PART of the check; the rest is agent-driven | 5 (fixture-import + spec-exists), 7 (FK-index) |
 > | **[AUTO] (presence)** | a shipped script enforces the required spec/test EXISTS + structural coverage; the BEHAVIOUR stays verifier-run | 2 (mapped screen imports+uses its prototype components/sections — component-presence; the PIXEL/aesthetic glance stays verifier+human), 16 (negative-authz spec exists), 20 (concurrency spec exists) |
-> | **[VERIFIER]** | agent-driven only — drives the running app + does any grep by hand; no auto-block today | 1, 3-4, 6, 8-15, 17-19, 21-27 |
+> | **[AUTO] (coverage-floor)** | `check-ac-coverage.mjs` proves every in-scope REQ-ID is REFERENCED by >=1 test; per-AC completeness + the AC actually holding stays verifier-run | 1 (each REQ-ID has a test home — the coverage half; the actor→action→outcome behaviour stays [VERIFIER]) |
+> | **[VERIFIER]** | agent-driven only — drives the running app + does any grep by hand; no auto-block today | 1 (behaviour), 3-4, 6, 8-15, 17-19, 21-27 |
 >
 > Plus a manifest-level auto gate not tied to a numbered leg:
 > **manifest-coverage** (REQ-ID ⟷ phase). **Backlog now clear of the 3 costliest

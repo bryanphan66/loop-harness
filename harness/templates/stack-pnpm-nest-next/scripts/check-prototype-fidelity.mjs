@@ -34,6 +34,13 @@
  *     that it eventually gets built.
  *   - No fidelity-map.json at all → skipped (not a prototype-mapped project yet).
  *
+ * A route's screen source is scoped to its OWN app-router segment: the .tsx
+ * files directly in the route dir plus private/group co-location folders, but
+ * NOT a child route segment (a subdir that owns its own page.tsx — e.g. a
+ * `customers/` list route does NOT swallow the `customers/[id]/` object page).
+ * Without that boundary the list route would inherit the object page's small
+ * per-tab tables and falsely trip forbidRawTable.
+ *
  * This gate does the COMPONENT-PRESENCE half of visual-fidelity Tooth A. The
  * PIXEL/AESTHETIC half (side-by-side glance, exact spacing/theme) stays with the
  * verifier + human — a machine cannot judge "looks like the export", only that
@@ -42,17 +49,34 @@
  *   node scripts/check-prototype-fidelity.mjs
  *   node scripts/check-prototype-fidelity.mjs --selftest   # fixture pass/fail/skip
  */
-import { readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import {
+  readFileSync,
+  existsSync,
+  readdirSync,
+  statSync,
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  rmSync,
+} from 'node:fs';
 import { resolve, dirname, join, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { gateRoot, loadGateConfig, walk, readSafe } from './gate-lib.mjs';
+import { gateRoot, loadGateConfig, readSafe } from './gate-lib.mjs';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 
 // Default shared-component import roots. A required component must be imported
 // from one of these to count as "reused" (not re-drawn inline). Substring match.
 const DEFAULT_SHARED_ROOTS = ['@/components', 'components/ui', 'components/', '~/components', '@components'];
+
+// Vendor/build dirs never walked when collecting a route's screen source.
+const SKIP_DIRS = new Set(['node_modules', '.next', 'dist', '.git', 'coverage', 'build', '.turbo']);
+
+// A JSX-usage / heuristic boundary that also accepts a generic type argument, so
+// `<DataGrid<Customer>` (component used with a generic) counts as used, not just
+// `<DataGrid ` / `<DataGrid/>` / `<DataGrid>`.
+const JSX_BOUNDARY = '[\\s/><]';
 
 // Built-in section presence heuristics. Each section key → list of regexes; the
 // section is present when ANY matches the concatenated screen source. A key not
@@ -65,20 +89,56 @@ const DEFAULT_SECTION_HEURISTICS = {
   'object-page-tabs': [/<PageHead[^>]*\btabs\s*=/, /<Tabs[\s/>]/],
   'tabs': [/<PageHead[^>]*\btabs\s*=/, /<Tabs[\s/>]/],
   'timeline': [/<Timeline[\s/>]/],
-  'data-grid': [/<DataGrid[\s/>]/],
-  'grid': [/<DataGrid[\s/>]/],
-  'table': [/<DataGrid[\s/>]/],
+  'data-grid': [/<DataGrid[\s/><]/],
+  'grid': [/<DataGrid[\s/><]/],
+  'table': [/<DataGrid[\s/><]/],
   'filter-bar': [/<FilterBar[\s/>]/, /<Toolbar[\s/>]/],
   'toolbar': [/<Toolbar[\s/>]/, /<FilterBar[\s/>]/],
   'detail-panel': [/<DetailPanel[\s/>]/, /<SidePanel[\s/>]/],
   'empty-state': [/<EmptyState[\s/>]/],
 };
 
-/** collect the screen source for a route: its page.tsx + every sibling .tsx in the route dir */
+/**
+ * Collect the .tsx files that make up a route's OWN screen: files directly in
+ * the route dir + recursion into private (`_x`) / route-group (`(x)`) folders,
+ * but NOT into a child route segment (a subdir that owns its own page.tsx). This
+ * keeps a list route from inheriting its `[id]/` object-page source.
+ */
+function collectScreenTsx(dir) {
+  const out = [];
+  let entries;
+  try {
+    entries = readdirSync(dir);
+  } catch {
+    return out;
+  }
+  for (const name of entries) {
+    const p = join(dir, name);
+    let st;
+    try {
+      st = statSync(p);
+    } catch {
+      continue;
+    }
+    if (st.isDirectory()) {
+      if (SKIP_DIRS.has(name)) continue;
+      // A subdir that owns a page.tsx/page.ts is a DIFFERENT route segment — its
+      // source belongs to that route, not this one.
+      if (existsSync(join(p, 'page.tsx')) || existsSync(join(p, 'page.ts'))) continue;
+      out.push(...collectScreenTsx(p));
+    } else if (name.endsWith('.tsx')) {
+      out.push(p);
+    }
+  }
+  return out;
+}
+
+/** collect the screen source for a route: its page.tsx + every co-located .tsx in the route segment */
 function screenSource(root, pageFile) {
   const dir = dirname(pageFile);
-  const tsx = walk(dir, (n) => n.endsWith('.tsx'));
-  return tsx.map((p) => readSafe(p)).join('\n/* --- */\n');
+  return collectScreenTsx(dir)
+    .map((p) => readSafe(p))
+    .join('\n/* --- */\n');
 }
 
 /** the route's page.tsx path — explicit `page` override, else derived under apps/web/src/app */
@@ -114,7 +174,7 @@ function importedFromShared(imports, name, sharedRoots) {
 }
 
 function usedInJsx(source, name) {
-  return new RegExp('<' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[\\s/>]').test(source);
+  return new RegExp('<' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + JSX_BOUNDARY).test(source);
 }
 
 function sectionPresent(source, key, overrides) {
@@ -202,17 +262,13 @@ export function runGate(root) {
       reasons.push(`raw <table> found — a grid MUST render through DataGrid, not a re-drawn HTML table`);
     }
 
-    // forbidPatterns — the ANTI-TRANSCRIPTION backstop. The prototype export is
-    // authored in its OWN mock primitives (a raw `<table className="tbl">`, a
-    // div-bar chart, an inline `muted fz11` helper, a bare modal). "Adopt the
-    // prototype" means MAP each mock primitive to the project's real component
-    // (DataGrid, the chart component, InfoTooltip, the shared Dialog) — NOT copy
-    // the export's markup verbatim. Any pattern here is a tell-tale that the mock
-    // markup was transcribed instead of mapped; it fires even when forbidRawTable
-    // was switched off for a legit reason (e.g. an object-page with a preview),
-    // because the mock CLASS still must never survive into shipped code. Sources:
-    // top-level map.forbidPatterns (applies to every mapped route) + per-route
-    // entry.forbidPatterns. Each item is a regex string or {pattern, message}.
+    // forbidPatterns — ANTI-TRANSCRIPTION backstop. The prototype export is drawn
+    // in its OWN mock primitives (raw `<table className="tbl">`, div-bar chart,
+    // inline `muted fzNN` helper, bare modal). "Adopt" means MAP each mock to the
+    // project component (DataGrid / chart / InfoTooltip / Dialog) — never copy the
+    // export markup. Any pattern here fires even when forbidRawTable is off for a
+    // legit preview, so the mock CLASS can never survive into shipped code.
+    // Sources: top-level map.forbidPatterns (every route) + entry.forbidPatterns.
     const forbidPatterns = [
       ...(Array.isArray(map.forbidPatterns) ? map.forbidPatterns : []),
       ...(Array.isArray(entry.forbidPatterns) ? entry.forbidPatterns : []),
@@ -224,7 +280,7 @@ export function runGate(root) {
       try {
         re = spec.pattern instanceof RegExp ? spec.pattern : new RegExp(spec.pattern);
       } catch {
-        continue; // a malformed pattern must not crash the gate
+        continue;
       }
       if (re.test(source)) {
         reasons.push(
@@ -255,8 +311,8 @@ export function runGate(root) {
 }
 
 // --------------------------------------------------------------------------
-// Self-test: build 3 throwaway fixtures (pass / fail / skip) and assert exit
-// codes. Runs the SAME runGate() the real check uses.
+// Self-test: build throwaway fixtures (pass / fail / skip / route-scope) and
+// assert exit codes. Runs the SAME runGate() the real check uses.
 // --------------------------------------------------------------------------
 function writeFixture(base, files) {
   for (const [rel, content] of Object.entries(files)) {
@@ -275,7 +331,8 @@ function selftest() {
     else { fail++; console.error(`  ✗ ${name}`); }
   };
 
-  // Case PASS — courses screen adopts DataGrid + StatCard + PageHead-tabs.
+  // Case PASS — courses screen adopts DataGrid (with a generic type arg) +
+  // StatCard + PageHead-tabs.
   const passRoot = join(tmp, 'pass');
   writeFixture(passRoot, {
     'scripts/fidelity-map.json': JSON.stringify({
@@ -283,7 +340,7 @@ function selftest() {
         route: '/admin/courses',
         prototypeFile: 'docs/visuals/prototype/exports/app-v1/screens-courses.jsx',
         requiredComponents: ['DataGrid', 'StatCard', 'PageHead'],
-        requiredSections: ['kpi-row', 'object-page-tabs'],
+        requiredSections: ['kpi-row', 'object-page-tabs', 'grid'],
       }],
     }),
     'apps/web/src/app/admin/courses/page.tsx': `
@@ -295,7 +352,7 @@ function selftest() {
           <>
             <PageHead title="Courses" tabs={[{ label: 'All' }]} />
             <StatCard label="Total" value={12} />
-            <DataGrid rows={[]} columns={[]} />
+            <DataGrid<Row> rows={[]} columns={[]} />
           </>
         );
       }`,
@@ -303,6 +360,7 @@ function selftest() {
   const r1 = runGate(passRoot);
   assert('PASS fixture exits 0', r1.code === 0);
   assert('PASS fixture reports 1 screen checked', r1.out.join('\n').includes('1 mapped screen'));
+  assert('PASS matches generic <DataGrid<Row>', !r1.err.join('\n').includes('DataGrid'));
 
   // Case FAIL — orders screen re-draws a raw <table>, misses DataGrid + StatCard,
   // and imports a locally re-drawn PageHead (not from a shared root).
@@ -343,21 +401,28 @@ function selftest() {
   assert('SKIP fixture exits 0', r3.code === 0);
   assert('SKIP fixture reports skipped', r3.out.join('\n').includes('skipped'));
 
-  // Case FORBID-PATTERN — a mapped route with forbidRawTable:false (a legit
-  // object-page preview) must STILL not transcribe the prototype's mock table
-  // class; the global forbidPatterns backstop fires even with the table guard off.
-  const forbidRoot = join(tmp, 'forbid');
-  writeFixture(forbidRoot, {
+  // Case ROUTE-SCOPE — a list route MUST NOT inherit its child [id] object
+  // page's raw <table>; the list itself is a clean DataGrid grid.
+  const scopeRoot = join(tmp, 'scope');
+  writeFixture(scopeRoot, {
     'scripts/fidelity-map.json': JSON.stringify({
-      forbidPatterns: [{ pattern: 'className="tbl"', message: 'mock table class tbl transcribed' }],
-      routes: [{ route: '/admin/crm/customers/[id]', requiredComponents: [], forbidRawTable: false }],
+      routes: [{
+        route: '/admin/things',
+        requiredComponents: ['DataGrid'],
+        requiredSections: ['grid'],
+      }],
     }),
-    'apps/web/src/app/admin/crm/customers/[id]/page.tsx':
-      'export default function P(){ return <table className="tbl"><tbody/></table>; }',
+    'apps/web/src/app/admin/things/page.tsx': `
+      import { DataGrid } from '@/components/ui/data-grid';
+      export default function Page() { return <DataGrid<Row> rows={[]} columns={[]} />; }`,
+    // child route segment — owns its own page.tsx and a raw <table>; must be
+    // excluded from the list route's source.
+    'apps/web/src/app/admin/things/[id]/page.tsx': `
+      export default function Detail() { return <table className="tbl"><tbody /></table>; }`,
   });
-  const r5 = runGate(forbidRoot);
-  assert('FORBID-PATTERN fires with forbidRawTable:false', r5.code === 1);
-  assert('FORBID-PATTERN uses custom message', r5.err.join('\n').includes('mock table class tbl transcribed'));
+  const r4 = runGate(scopeRoot);
+  assert('ROUTE-SCOPE list route exits 0 (child [id] table not inherited)', r4.code === 0);
+  assert('ROUTE-SCOPE reports 1 screen checked', r4.out.join('\n').includes('1 mapped screen'));
 
   // Guard against false-positive floods: the PASS fixture must produce ZERO
   // failure lines (a gate that fails a correct screen is worse than useless).

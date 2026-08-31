@@ -287,10 +287,19 @@ A task is done only when:
   to the deploy branch until the operator approves — merging the PR is the deploy.
 
 ### Background-session hygiene (control plane)
+- **Concurrency cap: ≤3-4 full-gate bg workers at once.** Each worker that runs
+  `validate` (typecheck + `next build` + tests) is CPU-heavy; dispatching 5+ at once
+  thrashes the box (observed load 328 with ~6 workers all validating → every gate
+  crawls, appears hung). Cap concurrent full-gate workers at 3-4; queue the rest and
+  dispatch as slots free (a completion notification frees a slot). Read-only scouts
+  are cheap and exempt. This cap is NOT optional — over-dispatch is slower, not
+  faster, because thrash inflates each validate from minutes to tens of minutes.
 - **Isolation hazard.** Dispatching multiple `--bg` sessions with OVERLAPPING file
   scope produces divergence + duplicated work that must later be reconciled into ONE
   verified-green branch (expensive). Give each bg task a non-overlapping scope; when
-  overlap is unavoidable, plan the reconcile step up front.
+  overlap is unavoidable, plan the reconcile step up front. Never let two sessions
+  share one worktree (`EnterWorktree` with the same branch name reuses it → a race on
+  the git index); verify each dispatch spawned its OWN worktree before dispatching more.
 - **Base worktrees off `origin/<branch>` (fetched), never the local checkout.** A bg
   session that branches off a stale local ref produces a PR that conflicts with the
   real base. Always `git fetch` then base on the remote ref.
@@ -299,3 +308,12 @@ A task is done only when:
   missing generated types / node_modules — an environmental failure, not a code one.
   Note the gate runs the full validate+build at BOTH pre-commit AND pre-push (double
   cost); budget time accordingly and do not `--no-verify`.
+- **Stale-dist after pull/rebase — rebuild BEFORE trusting `validate`.** The same
+  staleness bites after a `git pull`/`rebase` that brings in new schema/types/deps
+  from other merges: the workspace `packages/*` dist + `.prisma` client + linked
+  `node_modules` are now behind the pulled source, so `validate` throws FALSE
+  typecheck errors (e.g. `Cannot find module 'exceljs'`, `property X does not exist on
+  PrismaClient`, `no exported member Y`). Do NOT diagnose these as code bugs — run
+  `pnpm install && pnpm --filter <db> run prisma:generate && pnpm -r --filter
+  "./packages/**" run build`, THEN re-run typecheck. Only a real error survives the
+  rebuild. This is a control-plane rule; the build playbook restates it at 2.6.

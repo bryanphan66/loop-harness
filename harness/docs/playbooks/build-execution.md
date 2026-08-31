@@ -178,6 +178,15 @@ Wire `validate:quick` into pre-commit (or pre-push) once reliable. The
 verify-gate (`scripts/harness-verify-gate.sh`) is the hard gate at stage close —
 **never instruct bypassing a failing verify-gate or test to close a stage.**
 
+> **Stale-dist trap (rebuild before trusting `validate`).** After a `git pull` /
+> `rebase` that pulls new schema/types/deps from other merges, the workspace
+> `packages/*` dist + `.prisma` client + linked `node_modules` lag the source, so
+> `validate` throws FALSE errors (`Cannot find module 'exceljs'`, `property X does
+> not exist on PrismaClient`, `no exported member Y`). These are NOT code bugs — run
+> `pnpm install && pnpm --filter <db> run prisma:generate && pnpm -r --filter
+> "./packages/**" run build` then re-run typecheck; only a real error survives.
+> Same rule in `AGENTS.md § Background-session hygiene`.
+
 `test:integration` / `test:e2e` / `test:release` ladder out as the project grows —
 add each when the first phase needs it, not preemptively.
 
