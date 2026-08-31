@@ -24,6 +24,23 @@ export const CLINIC = {
 // Bắt buộc hiện suốt video — ràng buộc nội dung ngành y tế.
 export const DISCLAIMER = 'Nội dung tham khảo, không thay thế việc thăm khám';
 
+/**
+ * Thẻ kết có hai biến thể — đổi một chữ ở đây là đổi cả ba video.
+ *
+ *   'giao-duc' — CHỈ nội dung giáo dục sức khoẻ. Không địa chỉ, không số điện
+ *                thoại, không giờ mở cửa. Tên phòng khám chỉ còn ở thanh trên
+ *                (ghi nguồn). Đây là biến thể ít chạm vào luật quảng cáo dịch
+ *                vụ khám chữa bệnh nhất.
+ *
+ *   'lien-he'  — Thêm thẻ đầy đủ: địa chỉ, 2 số điện thoại, giờ, web, fanpage.
+ *                Có mời gọi dùng dịch vụ, nên nhiều khả năng bị xem là quảng
+ *                cáo dịch vụ khám chữa bệnh → phải hỏi pháp chế / Sở Y Tế
+ *                TRƯỚC khi đăng.
+ *
+ * Không tự quyết hộ phòng khám: mặc định để bản an toàn hơn.
+ */
+export const END_CARD_MODE = 'giao-duc';
+
 export const VIDEOS = {
   DauLung: {
     slug: 'dau-lung',

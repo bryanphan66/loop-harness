@@ -1,7 +1,7 @@
 import React from 'react';
 import { useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import { C, T, FONT } from './theme.js';
-import { CLINIC } from '../content.mjs';
+import { CLINIC, END_CARD_MODE } from '../content.mjs';
 import { Figure } from './Figure.jsx';
 
 /** Trượt lên + hiện dần, dùng cho mọi khối chữ. */
@@ -170,34 +170,48 @@ export const OutroCard = ({ scene }) => (
     </div>
 
     <Rise delay={22}>
-      <div
-        style={{
-          background: C.card, border: `3px solid ${C.line}`, borderRadius: 36,
-          padding: '30px 34px', display: 'flex', flexDirection: 'column', gap: 12,
-        }}
-      >
-        <div style={{ fontSize: T.meta, fontWeight: 700, color: C.brandDark }}>{CLINIC.name}</div>
-        <div style={{ fontSize: 34, lineHeight: 1.34, color: C.ink }}>{CLINIC.address}</div>
-        <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginTop: 6 }}>
-          {CLINIC.phones.map((p) => (
-            <div
-              key={p}
-              style={{
-                background: C.brand, color: '#fff', borderRadius: 18,
-                padding: '14px 26px', fontSize: T.meta, fontWeight: 700,
-              }}
-            >
-              {p}
-            </div>
-          ))}
+      {END_CARD_MODE === 'lien-he' ? (
+        <div
+          style={{
+            background: C.card, border: `3px solid ${C.line}`, borderRadius: 36,
+            padding: '30px 34px', display: 'flex', flexDirection: 'column', gap: 12,
+          }}
+        >
+          <div style={{ fontSize: T.meta, fontWeight: 700, color: C.brandDark }}>{CLINIC.name}</div>
+          <div style={{ fontSize: 34, lineHeight: 1.34, color: C.ink }}>{CLINIC.address}</div>
+          <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginTop: 6 }}>
+            {CLINIC.phones.map((p) => (
+              <div
+                key={p}
+                style={{
+                  background: C.brand, color: '#fff', borderRadius: 18,
+                  padding: '14px 26px', fontSize: T.meta, fontWeight: 700,
+                }}
+              >
+                {p}
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 32, color: C.inkSoft, marginTop: 6 }}>{CLINIC.hours}</div>
+          <div style={{ fontSize: 32, color: C.inkSoft }}>
+            {CLINIC.web} · {CLINIC.facebook}
+          </div>
         </div>
-        <div style={{ fontSize: 32, color: C.inkSoft, marginTop: 6 }}>
-          {CLINIC.hours}
+      ) : (
+        <div
+          style={{
+            background: C.card, border: `3px solid ${C.line}`, borderRadius: 36,
+            padding: '34px', display: 'flex', flexDirection: 'column', gap: 14,
+          }}
+        >
+          <div style={{ fontSize: T.body, fontWeight: 700, lineHeight: 1.3, color: C.brandDark }}>
+            Đến cơ sở y tế gần nhất để được thăm khám
+          </div>
+          <div style={{ fontSize: 34, lineHeight: 1.38, color: C.inkSoft }}>
+            Bác sĩ khám trực tiếp mới biết đúng nguyên nhân và mức độ.
+          </div>
         </div>
-        <div style={{ fontSize: 32, color: C.inkSoft }}>
-          {CLINIC.web} · {CLINIC.facebook}
-        </div>
-      </div>
+      )}
     </Rise>
   </div>
 );
