@@ -8,7 +8,8 @@
     "vo": "node scripts/build-vo.mjs",
     "studio": "remotion studio src/index.jsx",
     "render": "node scripts/render-all.mjs",
-    "check": "node scripts/verify.mjs"
+    "check": "node scripts/verify.mjs",
+    "all": "node scripts/build-vo.mjs && node scripts/render-all.mjs && node scripts/verify.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.443",
