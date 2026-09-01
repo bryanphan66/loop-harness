@@ -21,7 +21,7 @@ Output root: `harness/` · Source studied (read-only): `~/Desktop/Workspace/auto
 - `harness/.claude/commands/stage-next.md`: stubbed-step failure mode deleted; 2.6 routes to `/build-phase`; Lite-lane route order added.
 
 **B. Build Manifest**
-- `harness/docs/templates/build-manifest.md`: ordered P0..PN; per phase: REQ-IDs, entities, endpoints, screens+floorplan, runnable acceptance checks, verify commands, size S/M/L (S≤3/M≤6/L≤10 files; > L = split); coverage checklist (every in-scope REQ-ID exactly once) as DoR proof; CR-NN = new appended phase.
+- `harness/docs/mau-tai-lieu/build-manifest.md`: ordered P0..PN; per phase: REQ-IDs, entities, endpoints, screens+floorplan, runnable acceptance checks, verify commands, size S/M/L (S≤3/M≤6/L≤10 files; > L = split); coverage checklist (every in-scope REQ-ID exactly once) as DoR proof; CR-NN = new appended phase.
 - `harness/docs/playbooks/build-manifest-compilation.md`: owns 2.3 manifest output; compile procedure (cluster by capability, order by dependency-then-risk, vertical slices) + anti-patterns (document phase, layer phase, kitchen-sink P1, re-reading the spine).
 - `docs/gates/dor-build.md`: + manifest-complete line; `docs/gates/dod-build.md`: + manifest-exhausted line + gate-rebalance note.
 
@@ -33,8 +33,8 @@ Output root: `harness/` · Source studied (read-only): `~/Desktop/Workspace/auto
 
 **F. Macro-1 Lite lane**
 - `docs/process/WORKFLOW.md` § Lanes: Full vs Lite; Lite route `1.1 → 1.2 → 1.5-lite → 1.9-lite → 1.10-lite → 1.11 → 1.12 (1 round) → 1.13 (owner ack; records 1.14/1.15 N/A) → 2.1`. Keeps REQ-ID grammar, floorplan classification, token chain (GAP-NNN optional — chain may start at REQ-ID).
-- `docs/templates/srs-lite.md` (new): modules + REQ-ID table + high-risk flags + feature table (= scope baseline) + NFR one-liners + freeze block.
-- `docs/templates/STAGE.md`: + `Lane:` + `Harness source:` Snapshot fields; Macro-2 pending rows renamed (walking skeleton, /build-phase loop); Lite-route note.
+- `docs/mau-tai-lieu/srs-lite.md` (new): modules + REQ-ID table + high-risk flags + feature table (= scope baseline) + NFR one-liners + freeze block.
+- `docs/mau-tai-lieu/STAGE.md`: + `Lane:` + `Harness source:` Snapshot fields; Macro-2 pending rows renamed (walking skeleton, /build-phase loop); Lite-route note.
 
 **G. Packaging**
 - `harness/scripts/install-harness.sh`: source root = `harness/`; remote tarball resolves `<top>/harness`; HARNESS_REPO now REQUIRED in remote mode (no stale default); bootstrap fills Lane + Harness-source in STAGE.md (2.4 scaffolds stack template from there); baseline commit msg renamed; final banner teaches /stage-next + /build-phase + lanes. Verified: dry-run exit 0; real `--bootstrap --spec` into temp dir → 110 files, git init, verify-gate active, STAGE.md filled, baseline commit created.

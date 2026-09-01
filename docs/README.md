@@ -11,7 +11,7 @@ fixed standard. Everything is organised by **what you need right now**.
 | **Run the next step** | the `/stage-next` command (reads `process/WORKFLOW.md` + `STAGE.md`) |
 | **Look up a recipe for a step** (how to actually DO it) | `playbooks/` (one file per reusable task/domain) |
 | **Know what a step must pass** (the checks) | `gates/` (checklists) + `docs/gates/lint-gates-registry.md` (the scripts) |
-| **Fill in a project document** (blank forms) | `templates/` (build-manifest, feature-register, SOW, prototype-prompt, …) |
+| **Fill in a project document** (blank forms) | `mau-tai-lieu/` (build-manifest, feature-register, SOW, prototype-prompt, …) |
 | **Scaffold the actual app code** | `../scaffolds/` (stack-pnpm-nest-next monorepo, steady-state scripts, ops-board) |
 | **Understand the harness itself** (design, glossary) | `about/` (HARNESS.md, STRUCTURE.md, KEYWORD-MAP.md, …) |
 
@@ -22,10 +22,10 @@ fixed standard. Everything is organised by **what you need right now**.
 - **playbooks/** — RECIPES used AT a step (e.g. "how to compile the build-manifest",
   "how to author an issue"). A step points to its playbook(s).
 - **gates/** — CHECKS a step must pass before the next may start.
-- **templates/** — blank DOCUMENT forms a project fills (Markdown). NOT code.
+- **mau-tai-lieu/** — blank DOCUMENT forms a project fills (Markdown). NOT code.
 - **`../scaffolds/`** (repo root, one level up) — the CODE scaffolds copied into a
   new project's filesystem. This is the *only* "templates that are code"; the doc
-  forms live in `templates/` here. Two different things, two different names.
+  forms live in `mau-tai-lieu/` here. Two different things, two different names.
 
 ## How the Build phase (Macro-2) is wired
 
@@ -59,5 +59,5 @@ If a doc describes a mechanism, check its tag before trusting it exists.
 - `about/` — HARNESS (3-layer model), STRUCTURE (this repo's map), KEYWORD-MAP (term → owner file), UNDERSTANDING (narrative + honest scorecard), DOC-STANDARD, TEST_MATRIX, HARNESS_CHANGELOG
 - `playbooks/` — reusable recipes (`playbooks/README.md` indexes them)
 - `gates/` — gate checklists + `lint-gates-registry.md` (the mechanical checks)
-- `templates/` — blank doc forms (`locale-vi/` = VN bilingual fork)
+- `mau-tai-lieu/` — blank doc forms (`locale-vi/` = VN bilingual fork)
 - `decisions/` — ADRs · `design-system/` — 3-tier UI contract

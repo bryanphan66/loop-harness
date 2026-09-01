@@ -1,7 +1,7 @@
 # Phase 1 — Harness v2 docs + control plane
 
 **Output root:** `/Users/bryan/Desktop/Workspace/videcode-harness/harness/`
-**Source to copy-then-improve (READ-ONLY):** `/Users/bryan/Desktop/Workspace/auto-script` — files: `STAGE.md` (template form), `AGENTS.md`, `docs/{WORKFLOW,STAGE_GOALS,HARNESS,TRACE_SPEC,ROLE_MAP,CONTEXT_RULES,TEST_MATRIX}.md`, `docs/gates/`, `docs/playbooks/`, `docs/templates/`, `docs/design-system/`, `.claude/{agents,commands,hooks}/`, `scripts/{install-harness.sh,harness-verify-gate.sh}`, `.githooks/`. Do NOT copy project-specific content (auto-script requirements/design/discovery/etc.) — harness must be project-agnostic; STAGE.md ships as the blank template from `docs/templates/STAGE.md`.
+**Source to copy-then-improve (READ-ONLY):** `/Users/bryan/Desktop/Workspace/auto-script` — files: `STAGE.md` (template form), `AGENTS.md`, `docs/{WORKFLOW,STAGE_GOALS,HARNESS,TRACE_SPEC,ROLE_MAP,CONTEXT_RULES,TEST_MATRIX}.md`, `docs/gates/`, `docs/playbooks/`, `docs/mau-tai-lieu/`, `docs/design-system/`, `.claude/{agents,commands,hooks}/`, `scripts/{install-harness.sh,harness-verify-gate.sh}`, `.githooks/`. Do NOT copy project-specific content (auto-script requirements/design/discovery/etc.) — harness must be project-agnostic; STAGE.md ships as the blank template from `docs/mau-tai-lieu/STAGE.md`.
 
 ## Deliverables (fix-design items A, B, D, E, F, G)
 
@@ -11,7 +11,7 @@
 - `.claude/commands/stage-next.md`: delete the "stubbed step" failure mode; add routing: step 2.6 → `/build-phase` loop instead of single stage-runner call.
 
 ### B. Build Manifest artifact
-- New template `docs/templates/build-manifest.md` + new playbook `docs/playbooks/build-manifest-compilation.md` (owns step 2.3 output).
+- New template `docs/mau-tai-lieu/build-manifest.md` + new playbook `docs/playbooks/build-manifest-compilation.md` (owns step 2.3 output).
 - Manifest = ordered phases P0..PN. P0 = walking skeleton (from template, phase 2 of this plan). Each phase: id, name, REQ-IDs covered, entities touched, API endpoints, screens (+floorplan class), acceptance checks (concrete, runnable), verify commands, est. size (S/M/L). Rule: a phase must be completable in one agent session (≤~10 files touched); split otherwise.
 - 2.3 gate (DoR) now additionally requires: build-manifest complete, every in-scope REQ-ID appears in exactly one phase, P0 defined.
 
@@ -24,7 +24,7 @@
 
 ### F. Macro-1 Lite lane
 - `docs/process/WORKFLOW.md` new § Lanes: **Full** (paid client, current flow) vs **Lite** (internal/small): 1.1+1.2 merged intake → 1.5-lite (SRS-lite: modules + REQ-IDs table only, scenarios ONLY for high-risk money/auth/async reqs) → 1.9-lite feature list (scope freeze = owner ack) → 1.10-lite (tokens + Tier-1 pin only) → 1.12 prototype ONE round → 1.13 freeze (owner ack) → skip 1.14/1.15 (N/A-by-decision auto) → 2.1. Lite keeps: REQ-ID grammar, screen-inventory floorplan classification, token chain (GAP optional in Lite — chain may start at REQ-ID).
-- New template `docs/templates/srs-lite.md`. STAGE.md template gets a `Lane:` field (Full|Lite).
+- New template `docs/mau-tai-lieu/srs-lite.md`. STAGE.md template gets a `Lane:` field (Full|Lite).
 
 ### G. Packaging
 - Adapt `scripts/install-harness.sh` paths for new home (`harness/` as source root); keep Independence Principle (no ck-* hard deps; preflight warns only).

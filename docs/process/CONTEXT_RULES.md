@@ -34,7 +34,7 @@ for the current step at the lowest token cost.
 |---|---|---|---|
 | `docs/discovery/*` (raw client inputs) | Should | Must | Must |
 | `docs/intake/*` (prior briefs this project) | Skip | Must | Must |
-| `docs/templates/client-intake-brief.md` (+ `locale-vi/`) | Skip | Must | Must |
+| `docs/mau-tai-lieu/client-intake-brief.md` (+ `locale-vi/`) | Skip | Must | Must |
 | `docs/gates/pb-g1-intake.md` | Skip | Must | Must |
 | Conditional-probe checklist (compliance / brownfield) | Should | Must | Must |
 
@@ -65,7 +65,7 @@ for the current step at the lowest token cost.
 |---|---|---|---|
 | `docs/scope-baseline/feature-register.*` (frozen) | Skip | Must | Must |
 | `docs/visuals/prototype/feedback-final.md` (frozen, PB-G3) | Skip | Must | Must |
-| `docs/templates/locale-vi/bao-gia/*` (+ contract / SOW) | Skip | Must | Must |
+| `docs/mau-tai-lieu/locale-vi/bao-gia/*` (+ contract / SOW) | Skip | Must | Must |
 | `docs/gates/pb-g4-contract-deposit.md` | Skip | Must | Must |
 | `docs/ROADMAP.md` (skeleton, born here) | Skip | Must at 1.15 | Must at 1.15 |
 
@@ -80,7 +80,7 @@ for the current step at the lowest token cost.
 | `docs/requirements/srs/nfr.md` (at 2.2) | Should | Must | Must |
 | `docs/visuals/diagrams/screen-inventory.md` (at 2.3) | Must | Must | Must |
 | `docs/gates/dor-build.md` (at 2.3) | Must | Must | Must |
-| `docs/templates/build-manifest.md` + `playbooks/build-manifest-compilation.md` (at 2.3) | Must | Must | Must |
+| `docs/mau-tai-lieu/build-manifest.md` + `playbooks/build-manifest-compilation.md` (at 2.3) | Must | Must | Must |
 
 ### Walking skeleton + seed (2.4–2.5)
 
@@ -118,9 +118,9 @@ for the current step at the lowest token cost.
 
 | Source | When |
 |---|---|
-| `docs/templates/project-closure-story/*` + `docs/runbook/*` | 3.1 handover |
+| `docs/mau-tai-lieu/project-closure-story/*` + `docs/runbook/*` | 3.1 handover |
 | SLA terms (contract §, Full lane) or owner-declared window | 3.2 hypercare |
-| `docs/templates/maintenance-proposal.md` | 3.4 |
+| `docs/mau-tai-lieu/maintenance-proposal.md` | 3.4 |
 | `docs/requirements/change-requests/*` + `docs/build-manifest.md` (CR → new phase) | 3.5 any CR-NN |
 | `playbooks/session-retrospective.md` + session traces | 3.6 retro |
 | `docs/process/TRACE_SPEC.md` — every released REQ-ID in the handover; every `CR-NN` resolved | 3.1–3.6 |

@@ -19,7 +19,7 @@
 #     playbooks: -> the RECIPE(s). Each name is a file ../playbooks/<name>.md
 #                   telling you HOW to do this step.
 #     inputs/output -> which documents flow in and out (doc forms live in
-#                   ../templates/, e.g. build-manifest.md, feature-register.md).
+#                   ../mau-tai-lieu/, e.g. build-manifest.md, feature-register.md).
 #   So: pick a step -> read its `playbooks` for HOW, its `gates` for the bar to pass.
 #
 # CONVENTIONS

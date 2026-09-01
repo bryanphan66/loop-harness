@@ -37,5 +37,5 @@ A single self-contained HTML page showing project status for the internal team.
 - **When:** optional; only if you want a visual internal status page.
 
 ---
-**Don't confuse with `docs/templates/`:** those are blank *document* forms (a build
+**Don't confuse with `docs/mau-tai-lieu/`:** those are blank *document* forms (a build
 plan, a feature list, a quote) you fill in with words. `scaffolds/` here is *code*.

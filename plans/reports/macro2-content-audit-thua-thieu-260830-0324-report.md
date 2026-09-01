@@ -27,7 +27,7 @@ Sự thật nền: bề mặt enforcement thật = **3 script** (`check-universa
 | 2 HIGH | không có bước "lật Mode A → Mode B" khi go-live | 2.13/2.13b action: flip STAGE.md → Steady-state, drop current-step, ghi board link (OPERATING-MODES.md:50-56) | handoff không artifact — "mùi graduated nhưng chưa lật mode" |
 | 3 HIGH | 27 chốt phần lớn prose không script, doc nói như tự-chặn | banner ENFORCEMENT-STATUS trên phase-acceptance.md (giống visual-fidelity.md:3-15): chốt nào auto-script (3) vs người-kiểm (còn lại) | L14/L16 "hứa răng không có răng" |
 | 4 MED | 2.13 Manual?=no mâu thuẫn deploy-standard (prod = named-endpoint human) | WORKFLOW.md:181 → MANUAL_CHECKPOINT | Rule 5 go-live-deploy-verify.md:94 |
-| 5 MED | không có migration-plan template + không có `migration` phase-type | `docs/templates/migration-plan.md` + thêm `migration` vào build-manifest.md:120 | handoff 2.1→2.1b→2.6 |
+| 5 MED | không có migration-plan template + không có `migration` phase-type | `docs/mau-tai-lieu/migration-plan.md` + thêm `migration` vào build-manifest.md:120 | handoff 2.1→2.1b→2.6 |
 | 6 MED | DoR coverage kiểm tay (mechanical được) | `check-manifest-coverage.mjs` (feature-register REQ-ID ⟷ manifest) vào lint:gates | G3/G4 |
 | 7-8 LOW | Lite QA-video waiver ẩn; threat-ID ⟷ 2.9-disposition không trace | surface ở WORKFLOW 2.10; artifact trace 2.2→2.9 | — |
 

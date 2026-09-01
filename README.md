@@ -33,16 +33,19 @@ badged *real / in-progress / not-yet* (from the `KEYWORD-MAP.md § H` audit):
 
 ## Repo layout
 
-**Hard boundary: the product is `harness/` (self-contained); everything at root is the workshop that builds it.**
+**The repo root IS the harness** (flattened 2026-09-01 — no more `harness/` subdir).
+The product/workshop boundary is `SKELETON_PATHS` in `scripts/install-harness.sh`
+(what gets copied into a project), not a directory.
 
 | Path | What | Installed into a project? |
 |---|---|---|
-| `harness/` | **The product** — the installable skeleton (self-contained, never references outside its own tree): `AGENTS.md`, `docs/`, `.claude/` (commands + stage-runner agent + hooks), `scripts/` + `.githooks/` (non-bypassable verify gate), `templates/` | **yes** |
-| `plans/` | Workshop: harness-development plans + reports + the harness's own `lessons-log.md` + `team-playbook-human-agent.md` | no |
-| `CLAUDE.md` | Workshop: control-session brief (role, auto-loaded by cwd) | no |
-| `.claude/` | Workshop, dev-local: Claude Code session config for working ON this repo (personal parts gitignored). NOT the shipped `.claude/`. | no |
+| `AGENTS.md` · `docs/` · `.claude/` · `scripts/` · `.githooks/` | **The product** — operating guide, all knowledge (`docs/process`, `docs/about`, `playbooks`, `gates`, `mau-tai-lieu` doc-forms), the `/stage-next` etc. commands, the install + non-bypassable verify gate. | **yes** |
+| `scaffolds/` | **The product** — ready-made CODE copied in (app skeleton, steady-state kit, ops-board). | **yes** (via installer) |
+| `plans/` | Workshop: harness-development plans + reports + the harness's own lessons-log. | no |
+| `CLAUDE.md` | Workshop: control-session brief (role, auto-loaded by cwd). | no |
+| `.claude/` runtime (`worktrees/`, `agent-memory/`, `settings.local.json`) | Workshop, dev-local — **gitignored**, never committed. | no |
 
-Full file-by-file map with each part's role: **`docs/about/STRUCTURE.md`**.
+Full file-by-file map: **`docs/about/STRUCTURE.md`** or the visual map artifact.
 
 ## Install into a fresh project
 

@@ -70,7 +70,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 | Một lần bị đau → rút ra luật ("chart rỗng = lỗi CSS") | **lessons-log** | dự án: `docs/lessons-log.md` · harness: `plans/lessons-log.md` | Phiên sau đọc trước khi lặp sai |
 | Cấu hình/vận hành RIÊNG 1 dự án (deploy host, R2 bucket, env, CI/CD) | **runbook** (của dự án) | `<dự-án>/docs/runbook/*.md` | Người vận hành dự án đó đọc; KHÔNG lẫn vào harness |
 | Fact bền CONTROL cần nhớ, không suy từ repo (slug/key/host, quyết định business) | **memory** | `~/.claude/projects/<key>/memory/` (key theo dự án) | Tự nạp context phiên sau |
-| Loại FILE mới harness kỳ vọng dự án có | **template** | `templates/*.md` + `templates/README.md` | scaffold copy vào dự án |
+| Loại FILE mới harness kỳ vọng dự án có | **template** | `mau-tai-lieu/*.md` + `mau-tai-lieu/README.md` | scaffold copy vào dự án |
 | Chốt chặn / luật cứng mới (phải PASS) | **gate / WORKFLOW** | `gates/*.md` / `WORKFLOW.md` | verify-gate + review chặn khi vi phạm |
 | Đổi bản thân harness (cơ chế, version) | **HARNESS_CHANGELOG** | `HARNESS_CHANGELOG.md` | Ghi tiến hoá harness |
 

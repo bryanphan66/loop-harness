@@ -49,7 +49,7 @@
 | File | Đổi gì |
 |---|---|
 | `docs/gates/phase-acceptance.md` | **MỚI** — gate định nghĩa 2 leg, verdict block, cadence table, auto-block rule, incremental preview |
-| `docs/templates/build-manifest.md` | header: cadence knob + Preview command; Progress table: cột Verify-by + Accepted; AC nâng thành 3 hạng mục BẮT BUỘC (functional + negative-path + visual-fidelity / `n/a — no screens`); phase block field Verify-by; coverage checklist 2 dòng mới |
+| `docs/mau-tai-lieu/build-manifest.md` | header: cadence knob + Preview command; Progress table: cột Verify-by + Accepted; AC nâng thành 3 hạng mục BẮT BUỘC (functional + negative-path + visual-fidelity / `n/a — no screens`); phase block field Verify-by; coverage checklist 2 dòng mới |
 | `.claude/commands/build-phase.md` | step 2 precondition (refuse khi phase trước chưa accepted); step 5 mới ACCEPTANCE VERIFICATION (a-d); step 6 report; Rules thêm "verifier ≠ implementer"; packet nhắc preview |
 | `.claude/agents/stage-runner.md` | 2.6: không tự certify acceptance / không tự fill Accepted cell; để preview bootable; nếu được invoke LÀM verifier thì theo verdict block, không đụng code |
 | `docs/process/STAGE_GOALS.md` § 2.6 | Gate line + goal text: acceptance verification sau commit; Manual? = cadence-driven (page operator) |
@@ -59,7 +59,7 @@
 | `docs/gates/dor-build.md` | dòng mới: mọi phase có AC 3 hạng mục + Verify-by; header khai cadence + preview — DoR yêu cầu trước khi build start |
 | `docs/gates/dod-build.md` | dòng mới: acceptance record đầy đủ mọi phase (không hồi tố); rebalance note update |
 | `docs/gates/README.md` | index row + đoạn mô tả (walked by `/build-phase`, không phải `/gate-check`) |
-| `docs/templates/STAGE.md` | cell gate 2.6 |
+| `docs/mau-tai-lieu/STAGE.md` | cell gate 2.6 |
 | `AGENTS.md` | bullet 2.6 invoke |
 | `docs/about/HARNESS_CHANGELOG.md` | **v4** entry — thiết kế + trade-off + token rationale + cite auto-script |
 

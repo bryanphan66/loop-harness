@@ -21,7 +21,7 @@ notes), and — forward — the SA's ERD freeze (2.1).
   `board.html` via **Claude Code + a taste/anti-slop frontend skill** (default
   `design-taste-frontend`, BETA/swappable; engage the taste skill for the PUB
   landing/auth zone only, design-system for product screens). Board adds pan/zoom +
-  per-screen comments. See `docs/templates/prototype-build-prompt.md` + the 1.12 ADR
+  per-screen comments. See `docs/mau-tai-lieu/prototype-build-prompt.md` + the 1.12 ADR
   amendment.
 - **Diagram rendering:** `mermaidjs-v11` (inline) or `tech-graph` (publish-grade
   SVG for client surfaces).
@@ -101,7 +101,7 @@ floorplan from `docs/design-system/design-rules.md` (or `CUSTOM` + a one-line
 rationale per §4.7 → `docs/decisions/<slug>.md`), plus its table / message /
 modal / create behaviors. Write it to
 `docs/visuals/diagrams/screen-inventory.md` (template:
-`docs/templates/screen-inventory.md`).
+`docs/mau-tai-lieu/screen-inventory.md`).
 
 Classification is **MANDATORY for any grid/form screen REGARDLESS of lane** —
 including Tiny / internal. The drift this prevents is born in fast internal
@@ -249,7 +249,7 @@ delete the original shape.)
 - `ui-design-system-contract.md` — sub-step A source (1.10).
 - `docs/design-system/design-rules.md` — Tier-1 §4 floorplans + behavior the C.0
   classification assigns; §4.7 CUSTOM escape hatch.
-- `docs/templates/screen-inventory.md` — the C.0 screen-inventory template.
+- `docs/mau-tai-lieu/screen-inventory.md` — the C.0 screen-inventory template.
 - `design-system-3-tier.md` — cross-stage 3-tier enforcement (owns the 1.11
   screen-inventory as part of the chain).
 - `ba-core-doc-bundle.md` — the 1.7 BPMN diagrams the workflows reconcile with.

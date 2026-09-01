@@ -10,7 +10,7 @@ Status: **COMPLETE** — all 18 friction items dispositioned (17 fixed, 1 fixed-
 
 | # | Disposition | What was done | Where |
 |---|---|---|---|
-| F1 | **fixed** | Commit-SHA back-fill convention documented: write `— (this commit)`, back-fill previous row's SHA in the next boundary commit; `git log --grep 'step X'` stays source of truth | `docs/templates/STAGE.md` § History |
+| F1 | **fixed** | Commit-SHA back-fill convention documented: write `— (this commit)`, back-fill previous row's SHA in the next boundary commit; `git log --grep 'step X'` stays source of truth | `docs/mau-tai-lieu/STAGE.md` § History |
 | F2 | **fixed** | Skeleton now ships committed `.claude/settings.json` with `"worktree": {"bgIsolation": "none"}` (copied by installer automatically — key shape verified against a live project). AGENTS.md adds the fallback rule for sessions already fenced: run the WHOLE flow in one worktree, fast-forward main at the end, never scaffold/git-init inside a worktree | `harness/.claude/settings.json` (new) + `AGENTS.md` § Stage Orchestration |
 | F3 | **fixed** | Agent-registry caveat documented: `stage-runner` resolves only in sessions started after install; same-session runs use `fullstack-developer` fallback | `AGENTS.md` § Stage Orchestration + `.claude/commands/build-phase.md` step 4 |
 | F4 | **fixed** | DB image → `pgvector/pgvector:pg16` in dev compose, prod compose, CI service (postgres:16 superset, matches hasi-hub benchmark, cached on team machines); "any postgres-16-compatible image works" noted in compose comment + README | template `docker-compose.yml`, `docker-compose.prod.yml`, `.github/workflows/ci.yml`, `README.md`, `TEMPLATE_VERSION` |
@@ -60,4 +60,4 @@ Scratch stack torn down (compose down -v, dev servers killed).
 ## Unresolved questions
 
 1. Playwright `webServer` auto-boot (F15's "ideal" fix) deferred — worth a template 0.2.0 item so `pnpm e2e` is self-contained.
-2. `docs/discovery/README.md` Source Map has a named home but no template file; add one to `docs/templates/` if 1.1 runs prove the section shape unstable.
+2. `docs/discovery/README.md` Source Map has a named home but no template file; add one to `docs/mau-tai-lieu/` if 1.1 runs prove the section shape unstable.

@@ -34,7 +34,7 @@ Fix:
 - `build-execution.md` § Prototype → Code Fidelity + build-manifest template: PUB product-shot capture is a LATE phase, sequenced AFTER APP screens are built+styled (or a 2.10 sub-step). Manifest must order the PUB-capture phase to depend on the APP screen phases.
 
 ### Meta — build-manifest completeness
-- `docs/templates/build-manifest.md`: each screen phase must cite its prototype export source file + require a fidelity check; add an explicit "port from export" vs "rebuild (recorded decision)" column.
+- `docs/mau-tai-lieu/build-manifest.md`: each screen phase must cite its prototype export source file + require a fidelity check; add an explicit "port from export" vs "rebuild (recorded decision)" column.
 
 ## Deliverables
 1. Edits across `harness/` per BS1–BS5 + meta, cross-references consistent (grep pass: no dangling refs).

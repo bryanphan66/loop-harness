@@ -116,7 +116,7 @@ Stop after 20 turns.
 ### Step 1.5-lite — SRS-lite (modules + REQ-ID table) *(Lite lane)*
 
 - **Inputs:** intake brief + raw discovery inputs.
-- **Output path:** `docs/requirements/srs-lite.md` (template: `docs/templates/srs-lite.md`).
+- **Output path:** `docs/requirements/srs-lite.md` (template: `docs/mau-tai-lieu/srs-lite.md`).
 - **Gate:** every requirement carries a **REQ-ID** `MODULE.AREA.NN`; high-risk reqs flagged.
 - **Manual?** no.
 
@@ -277,7 +277,7 @@ grid/form screen left unclassified is a freeze blocker.** STAGE.md Current =
   tool as context; keep build instructions as **versioned files in the repo** —
   `docs/visuals/prototype/build-prompt-v<N>-*.md` (one per round) — and paste
   only a short pointer prompt in the tool's chat. Template:
-  `docs/templates/prototype-build-prompt-external.md`.
+  `docs/mau-tai-lieu/prototype-build-prompt-external.md`.
 - **Gate:** each screen ≥1 sample-data state + ≥1 empty/error state; each export conforms to its floorplan + design-system-compliance gate passes.
 - **Manual?** **yes** — the Designer builds the prototype in the external tool; emit MANUAL_CHECKPOINT.
 
@@ -461,7 +461,7 @@ STAGE.md Current = 2.3. Stop after 15 turns.
 - **Manual?** no.
 
 Goal:
-`docs/build-manifest.md` exists per `docs/templates/build-manifest.md`,
+`docs/build-manifest.md` exists per `docs/mau-tai-lieu/build-manifest.md`,
 compiled per `docs/playbooks/build-manifest-compilation.md`: ordered phases
 **P0..PN** where **P0 = walking skeleton** (stack-template scaffold + boot +
 seed-admin login) and each later phase block lists: id, name, REQ-IDs covered,
@@ -714,7 +714,7 @@ sign-off. STAGE.md Current = 2.13 only after sign-off. Stop after 10 turns.
 ### Step 2.13 — Release
 
 - **Inputs:** accepted build + sign-off.
-- **Output path:** release note (template `docs/templates/release-note.md`, `locale-vi/` fork) + git tag + deployed production.
+- **Output path:** release note (template `docs/mau-tai-lieu/release-note.md`, `locale-vi/` fork) + git tag + deployed production.
 - **Gate:** release-note lists every released REQ-ID; **verify-at-source PASS** (not a smoke-200) + rollback = one `IMAGE_TAG` line — the 5 release rules + Post-Deploy Checklist are the SoT in `docs/playbooks/go-live-deploy-verify.md`.
 - **Manual?** **MANUAL_CHECKPOINT** — the prod deploy is a named-endpoint human decision (`go-live-deploy-verify.md` Rule 5).
 

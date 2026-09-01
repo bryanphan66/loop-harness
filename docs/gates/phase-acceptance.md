@@ -122,7 +122,7 @@ app**, never by reading the diff and assuming:
    FAIL, per the no-error-swallow floor rule).
 4. **Type-specific categories (non-CRUD phase-types only)** — when the phase's
    `Phase-type` ≠ `crud`, the verifier ALSO exercises that type's categories
-   against the running preview (`docs/templates/build-manifest.md` § Non-CRUD
+   against the running preview (`docs/mau-tai-lieu/build-manifest.md` § Non-CRUD
    phase-types + the named playbook):
    - `async-job` — idempotency-key holds (same key → one run), a forced failure
      retries then dead-letters, the status endpoint reports terminal state, the

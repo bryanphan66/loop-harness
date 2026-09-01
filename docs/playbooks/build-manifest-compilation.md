@@ -11,7 +11,7 @@
 > manifest half of Build & Go-live **step 2.3**.
 
 **Macro-stage / step:** Build & Go-live · 2.3 (after 2.2 TDR, before the DoR
-gate closes). **Template:** `docs/templates/build-manifest.md`.
+gate closes). **Template:** `docs/mau-tai-lieu/build-manifest.md`.
 
 ## Engine
 
@@ -58,7 +58,7 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
    `transcode`, `HLS`, `upload`, `queue`, `webhook`, `signed-url`, `storage`,
    `PDF-render`, `email-blast`, `stream`, `bitrate`, `SES`, `Zalo`, `provider` —
    **MUST** get the matching non-CRUD phase-type carrying its type-specific
-   acceptance categories (`docs/templates/build-manifest.md` § Non-CRUD
+   acceptance categories (`docs/mau-tai-lieu/build-manifest.md` § Non-CRUD
    phase-types + the named playbook). **Folding such a REQ-ID into a CRUD phase is
    a 2.3 compile defect** — the CRUD trio can't assert the idempotency / signed-URL
    / entitlement / multi-bitrate / webhook-verify NFRs, so the build agent
@@ -130,7 +130,7 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
 
 ## Related
 
-- `docs/templates/build-manifest.md` — the artifact shape.
+- `docs/mau-tai-lieu/build-manifest.md` — the artifact shape.
 - `docs/process/WORKFLOW.md` § Macro-Stage 2 — the 2.3 row + Build Manifest note.
 - `.claude/commands/build-phase.md` — the loop that executes the manifest.
 - `build-execution.md` — per-phase discipline (commits, hooks, fidelity).
