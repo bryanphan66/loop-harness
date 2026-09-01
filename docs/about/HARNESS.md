@@ -152,6 +152,10 @@ never silently dropped.
 
 ## Status Artifact — the human tracking surface
 
+> **Note (2026-09-01):** the `ops-board/` scaffold that implemented this was removed
+> as unverified (never run on real data). The design below stays as reference; a
+> project builds its own surface if it needs one.
+
 The reports under `plans/reports/` are the machine's memory — dense, per-phase,
 read on demand. The human running the build needs the opposite: **one glanceable
 page that is always current**, so tracking progress never means scrolling a

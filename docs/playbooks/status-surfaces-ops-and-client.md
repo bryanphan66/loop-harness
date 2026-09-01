@@ -1,5 +1,10 @@
 # Status Surfaces — Ops-Board + Client Roadmap
 
+> **Note (2026-09-01):** the shipped `ops-board/` scaffold (an HTML dashboard) was
+> **removed** — it was never run on real data (unverified). The internal-ops-board
+> spec below is kept as a design reference; build it fresh only if a project needs
+> a visual internal surface. The **client-facing roadmap** half is unaffected.
+
 **When To Run:** standing up or updating the two status trackers — the internal ops-board (team) and the client-facing roadmap (buyer). **Skip when:** no external client and no status-tracking need.
 
 **Lifecycle:** experimental · **First use:** 2026-07-11 (Nhất Nghệ eLearning) · **Verified by:** none
