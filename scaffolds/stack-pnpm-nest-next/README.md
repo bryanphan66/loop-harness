@@ -1,8 +1,19 @@
 # __PROJECT_SLUG__
 
-Walking-skeleton monorepo: NestJS 11 API (Prisma + Postgres, JWT auth, RBAC) + Next.js 15 web
-(App Router, Tailwind v4, shadcn-style UI) + shared TypeScript types. Generic domain only
-(auth / users / health) — add your product's domains as feature modules on top.
+> `__PROJECT_SLUG__` is a placeholder — the installer replaces it with your project name.
+
+**What this is:** a small app that already runs, so you build features on top instead
+of from zero. It has a backend (NestJS + Postgres database, login + roles), a website
+(Next.js), and shared types between them — plus tests and Docker set up.
+
+**What's NOT here:** any real feature. It only knows about login / users / a health
+check. You add your product's screens and data on top as new modules.
+
+**Try it:** `docker compose up` → the app boots → open the site → the seeded admin
+account logs in. If that works, the plumbing (database → API → website → deploy) is
+proven, and any later bug is in your feature code, not the setup.
+
+*(Below: the full tech stack + how each folder is laid out.)*
 
 ## Run it (3 commands)
 
