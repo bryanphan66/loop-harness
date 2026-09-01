@@ -147,7 +147,7 @@ Produce three artifacts. Save the summary to
    | RC-002 | <one-line description> | QA | medium |
 
    The composite **REQ-ID** `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) is minted at 1.5
-   when the candidate lands in an SRS module (see `docs/TRACE_SPEC.md`).
+   when the candidate lands in an SRS module (see `docs/process/TRACE_SPEC.md`).
 
 2. **Decisions log** — markdown list. Each entry: decision name + 1-line summary
    + link to a draft `docs/decisions/<slug>.md` (stable slug, even if the file
@@ -186,9 +186,9 @@ delete the original shape.)
 
 ## Related
 
-- `docs/TRACE_SPEC.md` § Token Types — REQ-ID format the candidates become.
-- `docs/WORKFLOW.md` § 1.3 — the step this playbook owns.
+- `docs/process/TRACE_SPEC.md` § Token Types — REQ-ID format the candidates become.
+- `docs/process/WORKFLOW.md` § 1.3 — the step this playbook owns.
 - `gap-analysis.md` — consumes the REQ candidate list (1.4).
 - `ba-core-doc-bundle.md` — downstream spine the discovery output anchors.
 - `scenario-taxonomy-playbook.md` — consumes high-risk REQ-IDs (1.8).
-- `docs/ROLE_MAP.md` — BA role + `ck-rri` engine binding.
+- `docs/process/ROLE_MAP.md` — BA role + `ck-rri` engine binding.

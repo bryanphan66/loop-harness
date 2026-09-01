@@ -3,9 +3,9 @@
 #
 # Invoked by .githooks/pre-commit (arg: pre-commit) and .githooks/pre-push
 # (arg: pre-push). Blocks the git action (non-zero exit) when any gate fails.
-# Authority: AGENTS.md § Verify Gate — No Bypass, docs/WORKFLOW.md § Always-On
-# Layer (stage-boundary commits), docs/TRACE_SPEC.md (token chain), and the
-# Verification Register format in docs/TEST_MATRIX.md.
+# Authority: AGENTS.md § Verify Gate — No Bypass, docs/process/WORKFLOW.md § Always-On
+# Layer (stage-boundary commits), docs/process/TRACE_SPEC.md (token chain), and the
+# Verification Register format in docs/about/TEST_MATRIX.md.
 #
 # A self-check FAILS CLOSED when the gate is not armed (core.hooksPath does not
 # resolve to this repo's .githooks and no husky hook chains this script) — a gate
@@ -19,7 +19,7 @@
 #   1b. Test suite — on PUSH only (pre-push), runs the project's `test` script so
 #      a green lint can't stand in for green behaviour. e2e/Playwright-fidelity
 #      need a running app → left to CI + the phase verifier (recorded in Gate 2).
-#   2. Verification Register integrity (docs/TEST_MATRIX.md) — blocks on any
+#   2. Verification Register integrity (docs/about/TEST_MATRIX.md) — blocks on any
 #      `Result: fail` row; on a stage-close commit (STAGE.md staged) it also
 #      blocks any `never-run` row AND blocks a ZERO-row register (a stage cannot
 #      close having recorded no verification, unless marked `verify-exempt`).
@@ -44,7 +44,7 @@ mode="${1:-pre-commit}"
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 cd "$repo_root" || exit 0
 
-matrix="docs/TEST_MATRIX.md"
+matrix="docs/about/TEST_MATRIX.md"
 fail=0
 
 say() { printf '%s\n' "$*" >&2; }
@@ -174,7 +174,7 @@ if [ "$mode" = "pre-commit" ]; then
 fi
 
 # --- Gate 2: Verification Register integrity --------------------------------
-# Parse docs/TEST_MATRIX.md § Verification Register. The register is a markdown
+# Parse docs/about/TEST_MATRIX.md § Verification Register. The register is a markdown
 # table; the second-to-last column is `Result` (pass / fail / never-run). Block
 # on any `Result: fail`. On a stage-close commit, also block `never-run`.
 check_register() {

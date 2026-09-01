@@ -6,15 +6,15 @@ the **two modes** (`OPERATING-MODES.md`): **Mode A — Build** = macro-stages
 the loop** = macro-stage **(3) Post-Build**'s continuous parts (3.3/3.5), driven
 by the issue-pipeline, NOT `/stage-next`. The three "macro-stages" below are just
 this file's **grouping of the numbered steps inside those modes** — not a third
-model. Every step has a goal block in `docs/STAGE_GOALS.md` and can be run by
+model. Every step has a goal block in `docs/process/STAGE_GOALS.md` and can be run by
 `/stage-next` (and, for 2.6, the `/build-phase` loop).
 
-**Authority:** this file. Per-step goal text: `docs/STAGE_GOALS.md`. Current
+**Authority:** this file. Per-step goal text: `docs/process/STAGE_GOALS.md`. Current
 stage: read `STAGE.md` at repo root — updated at every stage-boundary commit.
 
 Each step table column: **# · Step · Role · Engine · Inputs · Output path · Gate
 · Manual?**. *Engine* names the `ck-*` skill or global agent that performs the
-step (the live engine — never vendored; see `docs/HARNESS.md` § Independence
+step (the live engine — never vendored; see `docs/about/HARNESS.md` § Independence
 Principle). *Manual?* = does the step page the client/owner for offline action.
 
 ---
@@ -158,7 +158,7 @@ The invariants that STAY non-negotiable even in Lite: REQ-ID grammar, screen-inv
 
 ## Macro-Stage 2 — BUILD & GO-LIVE
 
-> **Canonical process shape = `docs/macro-2.pipeline.yaml`.** This table is the
+> **Canonical process shape = `docs/process/macro-2.pipeline.yaml`.** This table is the
 > human-readable view; the yaml is what /stage-next + the RTM dashboard read.
 > Folded steps (2026-09-01): **2.5→2.4**, **2.7→2.10**, **2.11→2.13**; security
 > is one VERIFY pass at 2.9. The rows below keep the folded steps' detail, tagged.
@@ -337,7 +337,7 @@ Independent of macro-stage, running across all three:
 
 ## Token Chain
 
-End-to-end traceability (full spec: `docs/TRACE_SPEC.md`). The canonical scheme
+End-to-end traceability (full spec: `docs/process/TRACE_SPEC.md`). The canonical scheme
 — **the only scheme; do NOT use `US-NNN.REQ-MMM`**:
 
 ```text
@@ -375,10 +375,10 @@ DoR gate reads the manifest rule.
 
 ## Quick Links
 
-- **Per-step goal text:** `docs/STAGE_GOALS.md`
-- **Operating model:** `docs/HARNESS.md`
-- **Roles:** `docs/ROLE_MAP.md`
-- **Token grammar:** `docs/TRACE_SPEC.md`
+- **Per-step goal text:** `docs/process/STAGE_GOALS.md`
+- **Operating model:** `docs/about/HARNESS.md`
+- **Roles:** `docs/process/ROLE_MAP.md`
+- **Token grammar:** `docs/process/TRACE_SPEC.md`
 - **Build manifest:** template `docs/templates/build-manifest.md` · playbook `docs/playbooks/build-manifest-compilation.md`
 - **Non-CRUD delivery playbooks:** `docs/playbooks/async-job-queue.md` · `object-storage.md` · `media-pipeline.md` · `external-integration.md`
 - **SRS-lite (Lite lane):** `docs/templates/srs-lite.md`

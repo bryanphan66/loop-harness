@@ -116,4 +116,4 @@ wiring from scratch.
 - `docs/gates/phase-acceptance.md` — the per-phase gate this playbook's categories feed.
 - `docs/templates/build-manifest.md` — the `Phase-type: async-job` block shape.
 - `docs/playbooks/code-review-scoring.md` — the no-error-swallow floor rule.
-- `docs/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles.
+- `docs/process/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles.

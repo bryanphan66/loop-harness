@@ -4,7 +4,7 @@ Macro-stage: 3 Post-Build · Step 3.1 Handover package
 Role: Support/SRE + PM · Engine: ck-handover
 Gate: HANDOVER ACCEPTANCE (client, countersigned)
 Bilingual: EN canonical base — VN fork at locale-vi/project-closure-story/01-handover-docs.md
-Tokens: REQ-ID MODULE.AREA.NN · SC-NNN (docs/TRACE_SPEC.md)
+Tokens: REQ-ID MODULE.AREA.NN · SC-NNN (docs/process/TRACE_SPEC.md)
 -->
 
 # Handover Docs Index — <project name>
@@ -12,13 +12,13 @@ Tokens: REQ-ID MODULE.AREA.NN · SC-NNN (docs/TRACE_SPEC.md)
 ## Read In This Order
 
 1. `README.md` — project overview, run commands, quick start.
-2. `docs/HARNESS.md` — operating model (if the project is harnessed).
+2. `docs/about/HARNESS.md` — operating model (if the project is harnessed).
 3. `docs/requirements/` — SRS, RTM, GLOSSARY: the product contract.
 4. `docs/decisions/*` — why important choices were made (by slug).
 5. `docs/stories/` — recent + open story packets (`<module>-NN-<slug>.md`).
 6. `docs/system-architecture.md` — ERD + topology.
 7. `docs/runbook/` — release procedure, escalation, failover SOPs.
-8. `docs/TEST_MATRIX.md` — proof status (provably covered vs not).
+8. `docs/about/TEST_MATRIX.md` — proof status (provably covered vs not).
 
 ## Key Decisions Still In Force
 

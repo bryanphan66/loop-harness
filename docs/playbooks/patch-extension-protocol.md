@@ -13,8 +13,8 @@
 
 Do NOT use this for:
 
-- Changes to operating-contract docs — `AGENTS.md`, `docs/HARNESS.md`,
-  `docs/WORKFLOW.md`, `docs/TRACE_SPEC.md`, `docs/ROLE_MAP.md`. If you need to
+- Changes to operating-contract docs — `AGENTS.md`, `docs/about/HARNESS.md`,
+  `docs/process/WORKFLOW.md`, `docs/process/TRACE_SPEC.md`, `docs/process/ROLE_MAP.md`. If you need to
   change them, fork the harness.
 - New playbooks. Add new playbook files directly; markers are for amending
   existing ones.
@@ -39,7 +39,7 @@ Rules:
 |---|---|
 | `docs/playbooks/*.md` (except `README.md` and `template.md`) | yes |
 | `docs/templates/**/*.md` | yes |
-| `docs/HARNESS.md`, `docs/WORKFLOW.md`, `docs/TRACE_SPEC.md`, `docs/ROLE_MAP.md`, `AGENTS.md` | no — fork instead |
+| `docs/about/HARNESS.md`, `docs/process/WORKFLOW.md`, `docs/process/TRACE_SPEC.md`, `docs/process/ROLE_MAP.md`, `AGENTS.md` | no — fork instead |
 | `docs/decisions/*.md` | no — write a new superseding decision |
 | `docs/playbooks/README.md` | no — register playbooks by editing the index directly |
 
@@ -93,7 +93,7 @@ the file and fix the pair.
 
 ## Related
 
-- `docs/HARNESS.md` § Independence Principle — why operating docs are
+- `docs/about/HARNESS.md` § Independence Principle — why operating docs are
   fork-not-patch.
 - `bilingual-delivery-template-pattern.md` — locale forks (a different fork axis).
 - `README.md` § Index — where new playbooks register (no markers).

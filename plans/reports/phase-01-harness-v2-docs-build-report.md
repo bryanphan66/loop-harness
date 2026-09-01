@@ -16,7 +16,7 @@ Output root: `harness/` · Source studied (read-only): `~/Desktop/Workspace/auto
 ## What was built (deliverable → files)
 
 **A. Macro-2/3 goals unstubbed**
-- `harness/docs/STAGE_GOALS.md` (730 loc): full goal blocks 2.1–2.13 + 3.1–3.6 (3.1/3.6 full; 3.2–3.5 concise but executable), + Lite variants. Lookup convention updated (`stage-2.6-p3` → `### Step 2.6`).
+- `harness/docs/process/STAGE_GOALS.md` (730 loc): full goal blocks 2.1–2.13 + 3.1–3.6 (3.1/3.6 full; 3.2–3.5 concise but executable), + Lite variants. Lookup convention updated (`stage-2.6-p3` → `### Step 2.6`).
 - `harness/.claude/agents/stage-runner.md`: stub-BLOCKED behavior deleted; new "Build steps (2.x) — execution rules" (2.6 = ONE PHASE per invocation, delegate to `fullstack-developer`, pipeline implement→validate:quick→smoke→register→token commit; Status block now carries phase id + verify results). Kept `model: sonnet` for doc steps per phase spec.
 - `harness/.claude/commands/stage-next.md`: stubbed-step failure mode deleted; 2.6 routes to `/build-phase`; Lite-lane route order added.
 
@@ -29,10 +29,10 @@ Output root: `harness/` · Source studied (read-only): `~/Desktop/Workspace/auto
 - `harness/.claude/commands/build-phase.md` (new): picks next incomplete phase, assembles the MINIMAL context packet (phase block + ERD + SRS module file(s) + quoted screen-inventory rows + tokens paths), spawns one stage-runner, relays Status; one phase per invocation, never auto-loops, scope-widening → new phase/CR.
 
 **E. Gate rebalance**
-- `docs/WORKFLOW.md` note + `dod-build.md`: per-phase floor self-check (validate:quick + design-system floor + phase smoke) in 2.6; heavy 2.7/2.9/2.10 run once at manifest completion (+ mid-point 2.7 review if >6 phases).
+- `docs/process/WORKFLOW.md` note + `dod-build.md`: per-phase floor self-check (validate:quick + design-system floor + phase smoke) in 2.6; heavy 2.7/2.9/2.10 run once at manifest completion (+ mid-point 2.7 review if >6 phases).
 
 **F. Macro-1 Lite lane**
-- `docs/WORKFLOW.md` § Lanes: Full vs Lite; Lite route `1.1 → 1.2 → 1.5-lite → 1.9-lite → 1.10-lite → 1.11 → 1.12 (1 round) → 1.13 (owner ack; records 1.14/1.15 N/A) → 2.1`. Keeps REQ-ID grammar, floorplan classification, token chain (GAP-NNN optional — chain may start at REQ-ID).
+- `docs/process/WORKFLOW.md` § Lanes: Full vs Lite; Lite route `1.1 → 1.2 → 1.5-lite → 1.9-lite → 1.10-lite → 1.11 → 1.12 (1 round) → 1.13 (owner ack; records 1.14/1.15 N/A) → 2.1`. Keeps REQ-ID grammar, floorplan classification, token chain (GAP-NNN optional — chain may start at REQ-ID).
 - `docs/templates/srs-lite.md` (new): modules + REQ-ID table + high-risk flags + feature table (= scope baseline) + NFR one-liners + freeze block.
 - `docs/templates/STAGE.md`: + `Lane:` + `Harness source:` Snapshot fields; Macro-2 pending rows renamed (walking skeleton, /build-phase loop); Lite-route note.
 
@@ -46,7 +46,7 @@ Output root: `harness/` · Source studied (read-only): `~/Desktop/Workspace/auto
 3. **Stack template location contract**: template stays in the harness source (never copied at install); installed projects find it via STAGE.md Snapshot `Harness source:` (filled by installer with local path or repo@ref). Avoids bloating every project with a starter monorepo.
 4. **2.2 stack default** = the shipped stack template; deviation needs NFR-based ADR reasons.
 5. **2.6 phase commits are stage-boundary commits**: STAGE.md stays Current=2.6 but History gains `2.6/P<N>` rows; manifest checkbox + ROADMAP progress flip in the same commit (satisfies verify-gate atomicity).
-6. **Decision labels D1–D6** (formerly PROPOSAL.md refs) now defined in `docs/HARNESS.md` § Locked Decisions; all PROPOSAL.md references removed.
+6. **Decision labels D1–D6** (formerly PROPOSAL.md refs) now defined in `docs/about/HARNESS.md` § Locked Decisions; all PROPOSAL.md references removed.
 
 **Genericization**
 - AGENTS.md project intro → bootstrap placeholder; all auto-script/YouTube/PROPOSAL.md/vibecode strings removed (`grep -rniE 'auto.script|youtube|PROPOSAL\.md|vibecode' harness/` → 0). CONTEXT_RULES got full Macro-2/3 reading tables incl. the phase-loop read discipline (phase block + named files ONLY; whole spine = Skip-by-design).

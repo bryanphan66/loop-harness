@@ -180,5 +180,5 @@ Either party may terminate with <N> days notice. On termination:
 - VN commercial set: `docs/bao-gia/` (quote + warranty + technical overview + contract).
 - Change requests: `docs/templates/change-request-log.md`.
 - Maintenance after delivery: `docs/templates/maintenance-proposal.md`.
-- Token chain: `docs/TRACE_SPEC.md`.
+- Token chain: `docs/process/TRACE_SPEC.md`.
 - Localization: forks to `docs/templates/locale-vi/proposal-sow.md` (D4).

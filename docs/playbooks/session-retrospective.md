@@ -11,7 +11,7 @@
 multi-task session in any macro-stage.
 
 > Runs across all three macro-stages — every multi-task session ends with it
-> (`docs/WORKFLOW.md` § Always-On).
+> (`docs/process/WORKFLOW.md` § Always-On).
 
 ## Engine
 
@@ -29,7 +29,7 @@ Run when EITHER holds:
   decision triggered a plan, that plan touched multiple files).
 
 Skip a single-task session with one focused change — the per-task `Trace` block
-(`docs/TRACE_SPEC.md`) is sufficient.
+(`docs/process/TRACE_SPEC.md`) is sufficient.
 
 ## When NOT To Use
 
@@ -64,7 +64,7 @@ Variant added? (link / no).
 ## Lifecycle Promotion Candidates
 Each `experimental` playbook exercised this session without modification —
 candidates to promote to `verified` in this commit batch (see
-`docs/HARNESS.md` § Playbook Lifecycle).
+`docs/about/HARNESS.md` § Playbook Lifecycle).
 
 ## Backlog Candidates
 Per missing harness capability: Title · one-line problem · demand evidence
@@ -82,7 +82,7 @@ smoothly: "none — session ran clean".
 Items the session did not close; each links to where it lives now.
 
 ## Trace
-One trace block per `docs/TRACE_SPEC.md`, self-scored to the highest lane the
+One trace block per `docs/process/TRACE_SPEC.md`, self-scored to the highest lane the
 session touched. The durable evidence record — files read/changed, verify command
 + result, friction, outcome, N/A-by-decision marks. One consolidated trace for a
 multi-task session is enough.
@@ -116,8 +116,8 @@ delete the original recipe.)
 
 ## Related
 
-- `docs/HARNESS.md` § Growth Rule — the principle this mechanizes; § Playbook
+- `docs/about/HARNESS.md` § Growth Rule — the principle this mechanizes; § Playbook
   Lifecycle — the promotion target this checks.
-- `docs/TRACE_SPEC.md` § Trace Block — the trace this consolidates.
-- `docs/WORKFLOW.md` § 3.6 / Always-On — the step this playbook owns.
-- `docs/ROLE_MAP.md` — Docs/Audit role + `retro` / `journal` engine binding.
+- `docs/process/TRACE_SPEC.md` § Trace Block — the trace this consolidates.
+- `docs/process/WORKFLOW.md` § 3.6 / Always-On — the step this playbook owns.
+- `docs/process/ROLE_MAP.md` — Docs/Audit role + `retro` / `journal` engine binding.

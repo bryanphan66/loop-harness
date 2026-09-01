@@ -117,4 +117,4 @@ Common incidents and first-response steps. Add entries as incidents occur.
 
 - Per-release notes: `docs/templates/release-note.md`.
 - Handover credentials (secrets rotated at handover, 3.1): `docs/handover/`.
-- Conditional gates: `docs/WORKFLOW.md` § Conditional enterprise gates.
+- Conditional gates: `docs/process/WORKFLOW.md` § Conditional enterprise gates.

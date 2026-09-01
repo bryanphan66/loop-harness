@@ -4,7 +4,7 @@ Macro-stage: 2 Build & Go-live · Step 2.12–2.13 client comms
 Role: PM · Engine: ck-client-update
 Gate: comms (no gate) — accompanies ACCEPTANCE
 Bilingual: EN canonical base — VN fork at locale-vi/delivery-closure-story/03-client-update.md
-Tokens: REQ-ID MODULE.AREA.NN (docs/TRACE_SPEC.md)
+Tokens: REQ-ID MODULE.AREA.NN (docs/process/TRACE_SPEC.md)
 -->
 
 # Client Update — <release / story id>

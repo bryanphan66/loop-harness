@@ -1,7 +1,7 @@
 # Gate DoR — Definition of Ready (Enter Build)
 
 > **Type:** internal. The entry gate to Macro-Stage 2 (Build & Go-live).
-> **Step:** 2.3 (`docs/WORKFLOW.md`). Cannot be reached before **PB-G4** (Full
+> **Step:** 2.3 (`docs/process/WORKFLOW.md`). Cannot be reached before **PB-G4** (Full
 > lane) / the PB-G3 freeze + recorded 1.14/1.15 N/A-by-decision (Lite lane).
 
 DoR confirms the project is genuinely ready to build — not just signed. Every item

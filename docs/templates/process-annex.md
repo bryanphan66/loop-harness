@@ -4,7 +4,7 @@ Used by: WORKFLOW step 1.13 (review loop + FREEZE). Reviewed WITH the prototype.
 Role: Designer + PM · Engine: facilitation (walk the client through the diagrams).
 Output path: docs/visuals/prototype/process-annex.md   (lives with the prototype it accompanies).
 Bilingual: CLIENT-FACING — write in the client locale (locale-vi for VN clients) per D4.
-Authority: docs/STAGE_GOALS.md § Step 1.13 (Process-annex rule), docs/gates/pb-g3-prototype-frozen.md.
+Authority: docs/process/STAGE_GOALS.md § Step 1.13 (Process-annex rule), docs/gates/pb-g3-prototype-frozen.md.
 
 WHY THIS EXISTS
   A clickable prototype freezes SCREEN STATES, not PROCESS LOGIC. Async/scheduled
@@ -86,7 +86,7 @@ Recorded in:                         docs/visuals/prototype/feedback-final.md
 
 ## Cross-References
 
-- Loop spec: `docs/STAGE_GOALS.md` § Step 1.13 (Process-annex rule).
+- Loop spec: `docs/process/STAGE_GOALS.md` § Step 1.13 (Process-annex rule).
 - Freeze gate: `docs/gates/pb-g3-prototype-frozen.md`.
 - Feedback rounds: `docs/templates/prototype-feedback-round.md` (Process-Logic Review block).
 - Source diagrams: `docs/visuals/diagrams/` (1.11) + `docs/requirements/BPMN_DIAGRAMS.md` (1.7).

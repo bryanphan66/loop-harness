@@ -4,9 +4,9 @@ Per-step `/goal` condition text the human or the `stage-runner` subagent uses to
 drive one workflow step to a verifiable finish. Use with the interactive
 `/goal <condition>` command or headless `claude -p "/goal …"`.
 
-**Authority:** `docs/WORKFLOW.md` step tables. **Token grammar:**
-`docs/TRACE_SPEC.md` (`GAP-NNN → REQ-ID = MODULE.AREA.NN → SC-NNN → TC-NNN`,
-`CR-NN` — never `US-NNN.REQ-MMM`). **Lanes:** `docs/WORKFLOW.md` § Lanes — in
+**Authority:** `docs/process/WORKFLOW.md` step tables. **Token grammar:**
+`docs/process/TRACE_SPEC.md` (`GAP-NNN → REQ-ID = MODULE.AREA.NN → SC-NNN → TC-NNN`,
+`CR-NN` — never `US-NNN.REQ-MMM`). **Lanes:** `docs/process/WORKFLOW.md` § Lanes — in
 the **Lite** lane the route is `1.1 → 1.2 → 1.5-lite → 1.9-lite → 1.10-lite →
 1.11 → 1.12 → 1.13 → 2.1` (1.14/1.15 auto-N/A-by-decision); Macro 2 and 3 are
 identical in both lanes.
@@ -62,7 +62,7 @@ Goal:
 `docs/intake/{date}-intake-brief.md` exists with every section from the
 client-intake-brief template filled from `docs/discovery/*`. A decision is
 recorded: proceed / park / decline (PB-G1, internal — no client page). The
-**Lane** is declared (Full | Lite per `docs/WORKFLOW.md` § Lanes) and recorded
+**Lane** is declared (Full | Lite per `docs/process/WORKFLOW.md` § Lanes) and recorded
 in the STAGE.md Snapshot. During intake, the conditional probes are asked and
 recorded or marked N/A by decision: compliance / data-residency / DPA, and
 brownfield (replacing a legacy system → migration needed?). STAGE.md Snapshot
@@ -299,7 +299,7 @@ internal with no external client to show, the classified screen inventory
 described per screen) may substitute for the visual prototype. Record
 `1.12 — N/A by decision (written screen specs substitute)` at the PB-G3 freeze;
 floorplan classification and the design-system gate still apply
-(`docs/WORKFLOW.md` § Lanes, item 5).
+(`docs/process/WORKFLOW.md` § Lanes, item 5).
 
 ### Step 1.13 — Review loop + FREEZE *(CLIENT GATE; Lite: one round + owner ack)*
 
@@ -372,7 +372,7 @@ contract + deposit confirmed. Stop after 8 turns.
 
 ## Macro-Stage 2 — BUILD & GO-LIVE
 
-> **Canonical process shape = `docs/macro-2.pipeline.yaml`** (step → driver →
+> **Canonical process shape = `docs/process/macro-2.pipeline.yaml`** (step → driver →
 > gate → playbook → output → exit). That file is the SoT for the SHAPE; this
 > file is the goal-prose each step runs against. As of 2026-09-01 three steps are
 > **folded** to cut duplication (the goal text stays below, tagged): **2.5 → 2.4**
@@ -437,7 +437,7 @@ Goal:
 `docs/decisions/<project>-stack-selection.md` records the stack **vs the NFRs**.
 **Default = the harness walking-skeleton stack template** (pnpm workspaces
 monorepo; NestJS + Prisma + PostgreSQL API; Next.js App Router + Tailwind web;
-shared-types package — `templates/stack-pnpm-nest-next/` in the harness source);
+shared-types package — `scaffolds/stack-pnpm-nest-next/` in the harness source);
 choosing it needs one paragraph, deviating needs explicit NFR-based reasons. The
 API contract lists every endpoint per module (path, method, auth, roles,
 request/response shape) covering every in-scope REQ-ID that has an API surface.
@@ -488,7 +488,7 @@ Stop after 15 turns.
 
 ### Step 2.4 — Walking skeleton (manifest P0) + env + CI/CD + observability
 
-- **Inputs:** stack decision + manifest P0 + the stack template — **primary:** the embedded copy at `.harness/stack-template/` (placed by `install-harness.sh` at install time; see `STAGE.md` Snapshot § Harness source); **fallback only** (embed missing/stale): the harness source itself — local clone or repo tarball (`templates/stack-pnpm-nest-next/`; see the template README).
+- **Inputs:** stack decision + manifest P0 + the stack template — **primary:** the embedded copy at `.harness/stack-template/` (placed by `install-harness.sh` at install time; see `STAGE.md` Snapshot § Harness source); **fallback only** (embed missing/stale): the harness source itself — local clone or repo tarball (`scaffolds/stack-pnpm-nest-next/`; see the template README).
 - **Output path:** scaffolded monorepo at repo root + `.github/workflows/ci.yml` + `docker-compose.yml` + `.env.example`.
 - **Gate:** **WALKING SKELETON** — install/build green, compose boots, health OK, CI(-equivalent local) green, secret scan clean (gitleaks, or the template's `scripts/secret-scan.sh` grep fallback).
 - **Manual?** no.
@@ -538,7 +538,7 @@ Current = 2.6. Stop after 12 turns.
 ### Step 2.6 — Code feature by phase (`/build-phase` loop)
 
 - **Inputs:** `docs/build-manifest.md` (next incomplete phase block) + frozen ERD + the SRS module file(s) the phase names + the screen-inventory rows for its screens + design tokens.
-- **Output path:** code + tests + verification-register rows (`docs/TEST_MATRIX.md`) + manifest progress (incl. the `Accepted` cell).
+- **Output path:** code + tests + verification-register rows (`docs/about/TEST_MATRIX.md`) + manifest progress (incl. the `Accepted` cell).
 - **Gate:** per phase — compiles/runs, `validate:quick` green, phase e2e smoke passes, design-system floor self-check clean, commit cites ≥1 token, manifest checkbox flipped, **+ PHASE ACCEPTANCE** (`docs/gates/phase-acceptance.md`): independent agent verifier PASS on the phase's Acceptance checks against the running preview; human checkpoint per the manifest cadence when `Verify-by: both`.
 - **Manual?** **cadence-driven** — phases with `Verify-by: both` emit a MANUAL_CHECKPOINT (internal, pages the operator — not the client).
 
@@ -612,7 +612,7 @@ Current = 2.8. Stop after 15 turns.
 ### Step 2.8 — E2E from BA docs + user manual
 
 - **Inputs:** BA acceptance criteria (SRS/srs-lite + scenarios) — not the code.
-- **Output path:** E2E test suite + **TC-NNN** rows in `docs/TEST_MATRIX.md` + user manual under `docs/`.
+- **Output path:** E2E test suite + **TC-NNN** rows in `docs/about/TEST_MATRIX.md` + user manual under `docs/`.
 - **Gate:** every in-scope REQ-ID ≥1 passing E2E + TC row.
 - **Manual?** no.
 
@@ -738,7 +738,7 @@ Checklist** before declaring the release done:
    `MANUAL_CHECKPOINT` naming the target host; never auto-fire a prod deploy
    (Rule 5).
 
-**Then flip Mode A → Mode B (graduation — `docs/OPERATING-MODES.md` § The
+**Then flip Mode A → Mode B (graduation — `docs/process/OPERATING-MODES.md` § The
 graduation).** Go-live is the graduation point; in the SAME close edit `STAGE.md`:
 its Macro-stage flips to **Steady-state (Macro 3)**, the **"current step" field is
 dropped** (meaningless now) and replaced with **"Steady-state since {date}; board

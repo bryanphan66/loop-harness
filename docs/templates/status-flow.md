@@ -140,5 +140,5 @@ requires that role's relevant resource × action cell to be non-`N`.
 
 - Playbook: `docs/playbooks/visual-and-behavioral-modeling.md`.
 - Cross-check: `docs/templates/role-permission-matrix.md`.
-- Token grammar: `docs/TRACE_SPEC.md`.
+- Token grammar: `docs/process/TRACE_SPEC.md`.
 - Localization: forks to `docs/templates/locale-vi/status-flow.md` (D4).

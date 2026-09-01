@@ -145,5 +145,5 @@ If you see anything unexpected, reply to this thread.
 - ACCEPTANCE gate that gates this release: WORKFLOW 2.12.
 - Released REQ-IDs trace forward to handover: `docs/handover/` (3.1).
 - CRs that landed in this release: `change-request-log.md` (filter by release tag).
-- Token chain: `docs/TRACE_SPEC.md`.
+- Token chain: `docs/process/TRACE_SPEC.md`.
 - Localization: forks to `docs/templates/locale-vi/release-note.md` (D4).

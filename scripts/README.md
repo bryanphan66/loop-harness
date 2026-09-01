@@ -119,14 +119,14 @@ Gates that run:
    in for green behaviour. Kept off pre-commit so commits stay fast; the push is
    the last backstop before work is shared.
 2. **Verification Register integrity** — parses
-   `docs/TEST_MATRIX.md` § Verification Register. Blocks on any `Result: fail`
+   `docs/about/TEST_MATRIX.md` § Verification Register. Blocks on any `Result: fail`
    row. On a **stage-close commit** (`STAGE.md` staged) it also blocks any
    `never-run` row **and a zero-row register** — a stage cannot close with
    unproven (or entirely absent) behavior.
 3. **Stage-boundary atomicity** — on a stage-close commit, `docs/ROADMAP.md`
    must be staged in the **same** commit as `STAGE.md`. The current-stage pointer
    and module progress advance together or not at all
-   (`docs/WORKFLOW.md` § Always-On Layer).
+   (`docs/process/WORKFLOW.md` § Always-On Layer).
 
 Run it by hand any time:
 
@@ -179,7 +179,7 @@ node scripts/run-log.mjs report --by repo --since 2026-08-01
   repo**. Not in the project repo: an append-only log there means merge
   conflicts and pollutes a client's tree, and the question worth answering
   ("is v7.3 better than v7.2?") is cross-project by nature.
-- **Harness version is auto-read** from `docs/HARNESS_CHANGELOG.md`
+- **Harness version is auto-read** from `docs/about/HARNESS_CHANGELOG.md`
   (`Current version: **vX.Y**`) — never hand-declared, so the comparison axis
   can't quietly go stale.
 - **Outcomes:** `done` (met the AC) · `blocked` (stopped for a human) ·

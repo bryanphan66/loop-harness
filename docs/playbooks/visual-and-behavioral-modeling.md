@@ -244,7 +244,7 @@ delete the original shape.)
 
 ## Related
 
-- `docs/WORKFLOW.md` § 1.11 — the step this playbook owns; § 2.1 — ERD freeze.
+- `docs/process/WORKFLOW.md` § 1.11 — the step this playbook owns; § 2.1 — ERD freeze.
 - `solo-dev-client-delivery.md` § 1.10–1.13 — caller.
 - `ui-design-system-contract.md` — sub-step A source (1.10).
 - `docs/design-system/design-rules.md` — Tier-1 §4 floorplans + behavior the C.0
@@ -255,4 +255,4 @@ delete the original shape.)
 - `ba-core-doc-bundle.md` — the 1.7 BPMN diagrams the workflows reconcile with.
 - `mermaidjs-v11` (skill) — diagram syntax; `tech-graph` — publish-grade SVG.
 - `bilingual-delivery-template-pattern.md` — RPM + status-flow `locale-vi/` forks.
-- `docs/ROLE_MAP.md` — Designer role + `ck-ux-design` engine binding.
+- `docs/process/ROLE_MAP.md` — Designer role + `ck-ux-design` engine binding.

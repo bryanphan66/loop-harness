@@ -198,4 +198,4 @@ Không sửa analysis tại chỗ — ghi chú trỏ tới `CR-NN`.
 - Đầu ra discovery: `docs/intake/YYYY-MM-DD-discovery-summary.md` (1.3, engine `ck-rri`).
 - Forward: SRS REQ-ID (1.5, engine `ck-xre EXTRACT`) → `docs/requirements/srs/<module>.md`.
 - Forward: feature-register in-scope (1.9) → `docs/templates/locale-vi/feature-register.md`.
-- Token grammar đầy đủ: `docs/TRACE_SPEC.md`.
+- Token grammar đầy đủ: `docs/process/TRACE_SPEC.md`.

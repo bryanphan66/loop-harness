@@ -98,4 +98,4 @@ Giữ token tiếng Anh — đây là ngữ pháp truy vết của dự án.]
 
 > Bảng thuật ngữ này giúp các bên hiểu chung một ngôn ngữ trong suốt dự án.
 > Nguồn chuẩn (song ngữ): `docs/requirements/GLOSSARY.md`. Token grammar đầy đủ:
-> `docs/TRACE_SPEC.md`.
+> `docs/process/TRACE_SPEC.md`.

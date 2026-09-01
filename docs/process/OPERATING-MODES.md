@@ -93,7 +93,7 @@ These are development directions, not yet built — do them under Frontier 1 fir
 └───────────────────────────────────────────────┘
 ```
 
-**Context engineering is not a missing 4th ring** — it lives *inside* the harness (memory + what reaches the model): `docs/CONTEXT_RULES.md`, `.claude/hooks/context-monitor.sh`, on-demand skills.
+**Context engineering is not a missing 4th ring** — it lives *inside* the harness (memory + what reaches the model): `docs/process/CONTEXT_RULES.md`, `.claude/hooks/context-monitor.sh`, on-demand skills.
 
 > **Ordering note (settled — `decisions/layer-nesting-harness-outermost.md`).** Two industry framings disagree about what wraps what. LangChain draws the loop *outermost* (it decides whether to re-run the machine). We use **harness outermost** because it orders layers by **authority / blast radius** — nothing escapes the sandbox, including the loop controller — and our real incidents have been authority incidents, not stop-rule incidents. Do not flip this back without reading the decision record.
 
@@ -134,6 +134,6 @@ These are development directions, not yet built — do them under Frontier 1 fir
 These are pointers, not adoptions — Independence Principle (D1) still holds: the harness must run on a bare agent + git + bash.
 
 ## Reference implementation + packaged kit
-Proven on **elearning-platform**: `docs/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human operating playbook (công thức vận hành tái dùng — in the loop-harness workshop, not shipped): `plans/team-playbook-human-agent.md`.
+Proven on **elearning-platform**: `docs/process/WORKFLOW.md § Quy trình code issue` (state model + rules), `scripts/issue-state.mjs`, `scripts/qc-checklist.mjs`, `.github/ISSUE_TEMPLATE/bug-report.md`, `docs/qc/regression-checklist.md`. Human operating playbook (công thức vận hành tái dùng — in the loop-harness workshop, not shipped): `plans/team-playbook-human-agent.md`.
 
-**Packaged into the harness (reusable):** the project-agnostic (không lệ thuộc dự án) Mode-B kit lives at **`templates/steady-state/`** + the operating manual **`docs/playbooks/steady-state-issue-pipeline.md`**. Copy it in at graduation (tốt nghiệp — thời điểm app chuyển sang Mode B) and set `git config deploy.stagingurl`; the scripts resolve the repo dynamically (`gh repo view`) so they are not project-bound.
+**Packaged into the harness (reusable):** the project-agnostic (không lệ thuộc dự án) Mode-B kit lives at **`scaffolds/steady-state/`** + the operating manual **`docs/playbooks/steady-state-issue-pipeline.md`**. Copy it in at graduation (tốt nghiệp — thời điểm app chuyển sang Mode B) and set `git config deploy.stagingurl`; the scripts resolve the repo dynamically (`gh repo view`) so they are not project-bound.

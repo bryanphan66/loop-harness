@@ -2,7 +2,7 @@
 
 > **Type:** **CLIENT** — pages the client (emit `MANUAL_CHECKPOINT`). The visual
 > contract (D2). Clears step 1.13 and the Design Prototype block.
-> **Step:** 1.13 (`docs/WORKFLOW.md`). **Output:** `docs/visuals/prototype/feedback-final.md`.
+> **Step:** 1.13 (`docs/process/WORKFLOW.md`). **Output:** `docs/visuals/prototype/feedback-final.md`.
 
 PB-G3 freezes the **visual contract** before any price is set. This is the
 **PROTOTYPE-THEN-QUOTE invariant**: the bao-gia (1.14) must anchor to a frozen

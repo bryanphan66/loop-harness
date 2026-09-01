@@ -13,11 +13,11 @@
 ## Đọc theo thứ tự này
 
 1. `README.md` — tổng quan dự án, lệnh chạy, quick start.
-2. `docs/HARNESS.md` — mô hình vận hành (Independence Principle: chạy được trên bare agent + git + bash).
+2. `docs/about/HARNESS.md` — mô hình vận hành (Independence Principle: chạy được trên bare agent + git + bash).
 3. `docs/requirements/` — SRS + hợp đồng sản phẩm hiện hành.
 4. `docs/decisions/*` — vì sao các lựa chọn quan trọng được đưa ra (tham chiếu theo slug).
 5. `docs/scope-baseline/feature-register.{md,xlsx}` — scope đã đóng băng (PB-G2).
-6. `docs/TEST_MATRIX.md` — trạng thái bằng chứng (REQ-ID nào đã có TC-NNN pass).
+6. `docs/about/TEST_MATRIX.md` — trạng thái bằng chứng (REQ-ID nào đã có TC-NNN pass).
 
 ## Các Decision còn hiệu lực
 
@@ -78,4 +78,4 @@ vault. **Rotate mọi secret tại bàn giao** (yêu cầu cổng HANDOVER).
 - Bản gốc tiếng Anh (chuẩn): `docs/templates/project-closure-story/01-handover-docs.md`.
 - Đề xuất bảo trì (gửi kèm bàn giao): `docs/templates/locale-vi/maintenance-proposal.md`.
 - Scope đóng băng: `docs/templates/locale-vi/feature-register.md`.
-- Token grammar: `docs/TRACE_SPEC.md`. Cổng HANDOVER + macro-stage: `docs/WORKFLOW.md`.
+- Token grammar: `docs/process/TRACE_SPEC.md`. Cổng HANDOVER + macro-stage: `docs/process/WORKFLOW.md`.

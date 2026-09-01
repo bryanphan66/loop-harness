@@ -4,7 +4,7 @@ Used by: WORKFLOW step 1.13 (review loop + FREEZE) — one copy per round.
 Role: Designer + PM · Engine: facilitation; mint CR-NN via docs/templates/change-request-log.md on feature-change.
 Output path: docs/visuals/prototype/feedback-NN.md   (NN = round number, 01-based). The freeze record is feedback-final.md.
 Bilingual: INTERNAL — English only (no locale-vi fork) per D4.
-Authority: docs/STAGE_GOALS.md § Step 1.13 (Loop mechanics + Feature-change rule), docs/gates/pb-g3-prototype-frozen.md.
+Authority: docs/process/STAGE_GOALS.md § Step 1.13 (Loop mechanics + Feature-change rule), docs/gates/pb-g3-prototype-frozen.md.
 Triage rule (D-prototype-external-design-tool): the "Type" column forces visual-only vs feature-change at intake.
   - visual-only   → fix in the external tool, re-validate conformance, stays in the loop.
   - feature-change→ scope drift (feature-register froze at PB-G2) → mint a CR-NN; do NOT edit feature docs in this loop.
@@ -55,7 +55,7 @@ Next:                  re-review  /  proceed to freeze (feedback-final.md, PB-G3
 
 ## Cross-References
 
-- Loop spec: `docs/STAGE_GOALS.md` § Step 1.13 · `docs/WORKFLOW.md` row 1.13.
+- Loop spec: `docs/process/STAGE_GOALS.md` § Step 1.13 · `docs/process/WORKFLOW.md` row 1.13.
 - Freeze gate: `docs/gates/pb-g3-prototype-frozen.md`.
 - Change requests: `docs/templates/change-request-log.md` (where each `CR-NN` is logged).
 - Prototype record: `docs/visuals/prototype/README.md`.

@@ -142,4 +142,4 @@ Chỉ thêm. Sau ACCEPTANCE, thay đổi đi qua `CR-NN`.
 - Playbook: `docs/playbooks/visual-and-behavioral-modeling.md`.
 - Ma trận Vai trò - Quyền hạn (cross-check): `docs/templates/locale-vi/role-permission-matrix.md`.
 - UAT cross-check: `docs/templates/locale-vi/delivery-closure-story/01-uat-plan.md`.
-- Token grammar: `docs/TRACE_SPEC.md`. Cổng: `docs/WORKFLOW.md`.
+- Token grammar: `docs/process/TRACE_SPEC.md`. Cổng: `docs/process/WORKFLOW.md`.

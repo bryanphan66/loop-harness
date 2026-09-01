@@ -8,14 +8,14 @@
 > produces it. **Pointers only — no new mechanics.** Honors
 > `../UNDERSTANDING-loop-harness.md` § 10 (composition): this composes, it never duplicates.
 
-**Authority:** `docs/WORKFLOW.md` (step tables) + the locked decisions D1–D6
-(`docs/HARNESS.md` § Locked Decisions). The map below is a commercial wrapper
-around `docs/WORKFLOW.md`; when this file disagrees with it, `WORKFLOW.md` wins.
+**Authority:** `docs/process/WORKFLOW.md` (step tables) + the locked decisions D1–D6
+(`docs/about/HARNESS.md` § Locked Decisions). The map below is a commercial wrapper
+around `docs/process/WORKFLOW.md`; when this file disagrees with it, `WORKFLOW.md` wins.
 
 ## Engine
 
 The harness invokes `ck-*` skills as the **live engine** per macro-step (see the
-Engine column in `docs/WORKFLOW.md`). This meta-playbook names no single engine;
+Engine column in `docs/process/WORKFLOW.md`). This meta-playbook names no single engine;
 it routes to per-step engines: `ck-intake-file` (1.1), `ck-rri` (1.3),
 `ck-xre` (1.5/1.6), `ck-scenario` (1.8), `ck-scope-package` (1.9),
 `ck-design-system` (1.10), `ck-ux-design` (1.11). The 1.12 prototype is built in
@@ -119,7 +119,7 @@ The full step-by-step 3-macro flow (steps + gates + the PROTOTYPE-THEN-QUOTE inv
 
 ## Macro-Stage 2 — Build & Go-live
 
-Entry PB-G4. The step table in `docs/WORKFLOW.md` §2.1–2.13 is authoritative.
+Entry PB-G4. The step table in `docs/process/WORKFLOW.md` §2.1–2.13 is authoritative.
 Key playbooks:
 `build-execution.md` (2.6), `code-review-scoring.md` (2.7),
 `canonical-e2e-flow-playbook.md` + `e2e-qa-field-by-field-verify-with-report.md`
@@ -129,7 +129,7 @@ two separate roles (D5). ACCEPTANCE (2.12) is the client gate.
 
 ## Macro-Stage 3 — Post-Build
 
-Entry production deployed + sign-off signed. `docs/WORKFLOW.md` §3.1–3.6.
+Entry production deployed + sign-off signed. `docs/process/WORKFLOW.md` §3.1–3.6.
 HANDOVER (3.1) is the client gate; change-control (3.5) runs always-on and
 re-enters the pipeline at 2.3/2.6. `session-retrospective.md` closes every
 multi-task session (3.6).
@@ -164,9 +164,9 @@ delete the original shape.)
 
 ## Related
 
-- `docs/WORKFLOW.md` — the authoritative 3-macro step map this composes.
-- `docs/TRACE_SPEC.md` — token grammar (`GAP→REQ→SC→TC`, `CR`).
-- `docs/ROLE_MAP.md` — role → agent + skill engine binding (SA vs Tech Lead, D5).
+- `docs/process/WORKFLOW.md` — the authoritative 3-macro step map this composes.
+- `docs/process/TRACE_SPEC.md` — token grammar (`GAP→REQ→SC→TC`, `CR`).
+- `docs/process/ROLE_MAP.md` — role → agent + skill engine binding (SA vs Tech Lead, D5).
 - `../UNDERSTANDING-loop-harness.md` § 10 (composition) — composition rules this honors.
 - `bilingual-delivery-template-pattern.md` — locale fork pattern (D4).
 - `ba-core-doc-bundle.md` — step 1.7 (the load-bearing BA spine).

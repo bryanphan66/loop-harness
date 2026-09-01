@@ -4,7 +4,7 @@ A **countersignable checklist** per canonical gate. Each file is a checklist plu
 a sign-off line — the durable record that a gate was cleared (or a conditional
 gate marked **N/A by decision**) before the next step started.
 
-**Authority:** `docs/WORKFLOW.md` § Canonical Gate List + the per-step Gate
+**Authority:** `docs/process/WORKFLOW.md` § Canonical Gate List + the per-step Gate
 columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-process-conditional-enterprise-gates.md`).
 
 ## Gate Index
@@ -62,7 +62,7 @@ columns. **Decision weight:** D2 (balanced process — `docs/decisions/balanced-
 > Gate List + the 2.12 / 3.1 goal blocks; their sign-off records use the
 > delivery-closure-story and project-closure-story templates. In the **Lite
 > lane** the paging gates page the owner; a one-line written ack clears them
-> (`docs/WORKFLOW.md` § Lanes).
+> (`docs/process/WORKFLOW.md` § Lanes).
 
 ## Conditional Enterprise Gates
 
@@ -86,12 +86,12 @@ Post-Build; their **single tracked toggle table (SoT)** is `dod-build.md`
   nor marked N/A by decision).
 - **verify-gate** (`scripts/harness-verify-gate.sh`, run by `.githooks/`) is
   mechanical: it blocks a stage-close commit when the **verification register**
-  (`docs/TEST_MATRIX.md`) carries a `Result: fail` or a `never-run` on a
+  (`docs/about/TEST_MATRIX.md`) carries a `Result: fail` or a `never-run` on a
   stage-close. The gate **checklist** is the human-judgment half; the verify-gate
   is the machine half. A client-paging gate clears only when the human's
   countersign line is filled in **and** the verify-gate is green.
 - A gate file is filled **in the same stage-boundary commit** as the step's
-  artifact (`docs/WORKFLOW.md` § Always-On Layer — stage-boundary commits).
+  artifact (`docs/process/WORKFLOW.md` § Always-On Layer — stage-boundary commits).
 
 ## Filling A Gate File
 

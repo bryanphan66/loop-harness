@@ -8,7 +8,7 @@ CI, e2e), then runs the **loop** that keeps it evolving. Value converges in the
 loop, not the paperwork — so the linear build stays a lean on-ramp.
 
 It runs on a bare **agent + git + bash**; `ck-*` skills only accelerate it
-(Independence Principle, `docs/HARNESS.md`).
+(Independence Principle, `docs/about/HARNESS.md`).
 
 ## The single spine: two modes, split at go-live
 
@@ -22,9 +22,9 @@ It runs on a bare **agent + git + bash**; `ck-*` skills only accelerate it
 ```
 
 Two older framings are kept but **subordinate**: the *3 macro-stages* (Pre/Build/Post)
-are just the step-grouping inside the modes (`docs/WORKFLOW.md`), and
+are just the step-grouping inside the modes (`docs/process/WORKFLOW.md`), and
 *Loop Engineering* (`prompt -> context -> harness -> loop`) is a diagnostic lens, not a
-third model. Full detail + honest scorecard: **`docs/UNDERSTANDING-loop-harness.md`**.
+third model. Full detail + honest scorecard: **`docs/about/UNDERSTANDING-loop-harness.md`**.
 
 **Visual concept map (Vietnamese)** — every repo term mapped to its 2026 industry name,
 badged *real / in-progress / not-yet* (from the `KEYWORD-MAP.md § H` audit):
@@ -42,7 +42,7 @@ badged *real / in-progress / not-yet* (from the `KEYWORD-MAP.md § H` audit):
 | `CLAUDE.md` | Workshop: control-session brief (role, auto-loaded by cwd) | no |
 | `.claude/` | Workshop, dev-local: Claude Code session config for working ON this repo (personal parts gitignored). NOT the shipped `.claude/`. | no |
 
-Full file-by-file map with each part's role: **`docs/STRUCTURE.md`**.
+Full file-by-file map with each part's role: **`docs/about/STRUCTURE.md`**.
 
 ## Install into a fresh project
 
@@ -63,7 +63,7 @@ commits the baseline. It never touches your global `~/.claude`.
 
 Open Claude Code in the project and repeat:
 
-1. **`/stage-next`** — runs the next `docs/WORKFLOW.md` step via the `stage-runner`
+1. **`/stage-next`** — runs the next `docs/process/WORKFLOW.md` step via the `stage-runner`
    subagent (isolated context), enforces the step's gate, updates `STAGE.md`, lands
    one stage-boundary commit.
 2. **Gates** — internal gates assert with evidence; client/owner-paging gates
@@ -79,7 +79,7 @@ Open Claude Code in the project and repeat:
 
 ## Run — Mode B (the loop), after go-live
 
-Copy `templates/steady-state/` into the project and work the issue board:
+Copy `scaffolds/steady-state/` into the project and work the issue board:
 **discover -> dispatch -> verify -> recover -> persist -> decide-next**. Operating manual:
 `docs/playbooks/steady-state-issue-pipeline.md`. Issue-authoring contract:
 `docs/playbooks/github-issue-standard.md`.
@@ -108,10 +108,10 @@ acceptance test for the harness itself.
 
 ## Key docs (read in this order)
 
-1. `docs/UNDERSTANDING-loop-harness.md` — narrative onboarding + honest scorecard + where new knowledge goes (decision table) + reuse/extend — **read first**
-2. `docs/KEYWORD-MAP.md` — glossary of every concept + where it lives
-3. `docs/STRUCTURE.md` — file-by-file directory map
-4. `docs/OPERATING-MODES.md` — the two modes + the loop (the spine's precise spec)
-5. `docs/HARNESS.md` — operating model + Independence Principle + locked decisions
-6. `docs/WORKFLOW.md` — step tables (inside the two modes), gates, lanes
-7. `docs/TRACE_SPEC.md` — token grammar · `docs/DOC-STANDARD.md` — doc-writing rubric · `docs/playbooks/README.md` — recipes
+1. `docs/about/UNDERSTANDING-loop-harness.md` — narrative onboarding + honest scorecard + where new knowledge goes (decision table) + reuse/extend — **read first**
+2. `docs/about/KEYWORD-MAP.md` — glossary of every concept + where it lives
+3. `docs/about/STRUCTURE.md` — file-by-file directory map
+4. `docs/process/OPERATING-MODES.md` — the two modes + the loop (the spine's precise spec)
+5. `docs/about/HARNESS.md` — operating model + Independence Principle + locked decisions
+6. `docs/process/WORKFLOW.md` — step tables (inside the two modes), gates, lanes
+7. `docs/process/TRACE_SPEC.md` — token grammar · `docs/about/DOC-STANDARD.md` — doc-writing rubric · `docs/playbooks/README.md` — recipes

@@ -2,7 +2,7 @@
 
 > **Type:** **CLIENT — the hardest gate** (D2). Pages the client (emit
 > `MANUAL_CHECKPOINT`). **The hard "no build code before this" line.** Exits
-> Pre-Build. **Step:** 1.15 (`docs/WORKFLOW.md`). **Output:** signed contract +
+> Pre-Build. **Step:** 1.15 (`docs/process/WORKFLOW.md`). **Output:** signed contract +
 > deposit record; `docs/ROADMAP.md` skeleton.
 
 PB-G4 is the single line the whole Pre-Build foundation defends: **not one line of

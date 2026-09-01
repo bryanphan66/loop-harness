@@ -4,7 +4,7 @@ Used by: step 1.5-lite (written), 1.9-lite (feature table frozen by owner ack),
   2.1 ERD, 2.3 build-manifest compilation.
 Role: BA (Lite lane). Replaces: gap-analysis + full SRS + CLARIFICATIONS +
   VISION/use-cases/RTM for internal/small projects. GAP-NNN optional — the
-  token chain may start at REQ-ID (docs/TRACE_SPEC.md still governs grammar).
+  token chain may start at REQ-ID (docs/process/TRACE_SPEC.md still governs grammar).
 Output path: <project-root>/docs/requirements/srs-lite.md
 Bilingual: INTERNAL — English only.
 Shape-only scaffold. Replace <placeholders>.

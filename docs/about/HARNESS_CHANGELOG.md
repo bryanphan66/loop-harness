@@ -49,7 +49,7 @@ Fixed a real cross-repo defect: **Module was an org-level GitHub Issue Field** �
 Reframed the harness identity: it is a **loop-engineering system with a lean linear build on-ramp**, not a document-heavy staged process. Evidence from our own trials — auto-script stuck in the linear front underdelivered; elearning reached the steady-state loop (per-AC + human checklist, repeating) and came out solid — so the loop, not the paperwork, is where quality converges.
 
 - **New spine `OPERATING-MODES.md`**: Mode A (Build, `/stage-next`) vs Mode B (Steady-state = the loop, issue-pipeline); graduation at go-live; the 6 loop primitives (discover/dispatch/verify/recover/persist/decide); recover + autonomy frontiers; framed with the context/harness/loop layers. README re-anchored loop-first.
-- **Mode-B kit packaged** at `templates/steady-state/` (generalized `issue-state.mjs` + `qc-checklist.mjs`, bug-report + regression templates) + `playbooks/steady-state-issue-pipeline.md` — a fresh project gets the loop out of the box.
+- **Mode-B kit packaged** at `scaffolds/steady-state/` (generalized `issue-state.mjs` + `qc-checklist.mjs`, bug-report + regression templates) + `playbooks/steady-state-issue-pipeline.md` — a fresh project gets the loop out of the box.
 - **Macro-1 slimmed to Lite-by-default** — Full lane only for large paid clients; slim principles cap the REQ-ID / scenario / prototype-round explosion (freeze gates + REQ-ID grammar stay non-negotiable).
 - **Scope-hygiene**: flow/ctl demoted to personal convenience (not harness canon; ship-standard = per-repo `release.sh` + CI/CD; control role loads from the repo's own `CLAUDE.md`).
 
@@ -694,14 +694,14 @@ construction and the glance stays a quick check that scales to many screens.
   step 4/5** — the packet says adopt-as-code + encode fidelity assertions; the
   acceptance leg RUNS the assertions + captures the screenshot (no LLM
   image-compare).
-- **FC6 + FC7 control rules** (`docs/HARNESS.md` § Control-Plane Failure
+- **FC6 + FC7 control rules** (`docs/about/HARNESS.md` § Control-Plane Failure
   Classes, referenced from `build-execution.md`): **FC6** — verify at the real
   source, never trust a wrapper exit/signal (evidence: a `git push … | tail`
   reported exit 0 while git actually REJECTED the push and the orchestrator
   relayed false success); **FC7** — make human review real: surface the built
   screenshot side-by-side, don't accept a blind rubber-stamp.
-- **Wiring:** `docs/HARNESS.md` Growth-Rule latest = v6; `docs/STAGE_GOALS.md`
-  2.6 + `docs/WORKFLOW.md` fidelity references updated to assertions + glance.
+- **Wiring:** `docs/about/HARNESS.md` Growth-Rule latest = v6; `docs/process/STAGE_GOALS.md`
+  2.6 + `docs/process/WORKFLOW.md` fidelity references updated to assertions + glance.
   **Independence Principle intact** — Playwright already ships in the stack; no
   new hard `ck-*` dependency (adoption engines are `frontend-development` /
   `ui-styling` accelerators with bare-agent fallbacks).
@@ -710,7 +710,7 @@ construction and the glance stays a quick check that scales to many screens.
 
 `install-harness.sh` shipped the harness skeleton into a project but never
 placed the stack template anywhere the project could actually reach it: step
-2.4 (`docs/STAGE_GOALS.md`) told scaffold to pull `templates/stack-pnpm-nest-next/`
+2.4 (`docs/process/STAGE_GOALS.md`) told scaffold to pull `scaffolds/stack-pnpm-nest-next/`
 "from the harness source — local clone or repo tarball", but nothing told the
 *installed project* where that source was once the installer had finished and
 moved on. **Field evidence (elearning-platform):** at scaffold time the
@@ -730,7 +730,7 @@ the entire point of shipping proven template code.
   project's own repo — done before the bootstrap baseline auto-commit.
   `STAGE.md` Snapshot § Harness source now also records the embedded path +
   `TEMPLATE_VERSION` when bootstrap fills it.
-- **`docs/STAGE_GOALS.md` step 2.4** + **`docs/templates/build-manifest.md` P0
+- **`docs/process/STAGE_GOALS.md` step 2.4** + **`docs/templates/build-manifest.md` P0
   block**: scaffold's PRIMARY path is now the embedded copy
   (`.harness/stack-template/scripts/scaffold.sh <target> <slug>`); the
   harness-source clone/tarball is a fallback only for a missing/stale embed. A
@@ -910,7 +910,7 @@ gates — each surfaced as a manual UAT-fix round that a gate should have caught
 
 Control-plane + stack-template fixes (F1..F18) from the walking-skeleton proof
 run benchmarked against hasi-hub (9/9 criteria); stack template at
-`templates/stack-pnpm-nest-next/` (see its `TEMPLATE_VERSION`).
+`scaffolds/stack-pnpm-nest-next/` (see its `TEMPLATE_VERSION`).
 
 ## v1 — 2026-07-05 — initial import
 

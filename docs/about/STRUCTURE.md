@@ -9,9 +9,9 @@ Trước đây sản phẩm nằm lồng trong `harness/`; đã **làm phẳng**
 ```
 loop-harness/   (= chính là harness — không còn thư mục con harness/)
 ├── AGENTS.md ········· [SẢN PHẨM] operating model cho agent (task loop + gate + thứ tự đọc)
-├── docs/ ············· [SẢN PHẨM] tri thức harness (bảng bên dưới) + macro-2.pipeline.yaml
+├── docs/ ············· [SẢN PHẨM] tri thức harness — chia process/ (cách CHẠY) + about/ (về chính harness) + playbooks/ gates/ templates/ (bảng dưới). Vào cửa: docs/README.md
 ├── scripts/ ·········· [SẢN PHẨM] install-harness.sh + harness-verify-gate.sh + run-log/wait-workers
-├── templates/ ········ [SẢN PHẨM] scaffold: stack (Mode A) + steady-state (Mode B) + ops-board + doc-stubs
+├── scaffolds/ ········ [SẢN PHẨM] scaffold CODE bê vào project: stack (Mode A) + steady-state (Mode B) + ops-board
 ├── .claude/ ·········· [SẢN PHẨM, tracked] commands + agents + hooks (ship khi cài); +[XƯỞNG, gitignore] worktrees/agent-memory/settings.local
 ├── .githooks/ ········ [SẢN PHẨM] pre-commit + pre-push (gate fail-closed, không bypass)
 ├── README.md ········· [XƯỞNG] cửa vào: harness là gì, cài, chạy loop
@@ -19,11 +19,12 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 └── plans/ ············ [XƯỞNG] kế hoạch + reports + lessons-log/team-playbook CỦA harness (KHÔNG ship)
 ```
 
-> **Ranh giới sản-phẩm vs xưởng (định nghĩa MỚI):** không còn theo thư mục. **Sản phẩm** = những gì `install-harness.sh` bê đi (SKELETON_PATHS: `AGENTS.md docs .claude .githooks scripts/{harness-verify-gate,install-harness,README}` + `templates/`). **Xưởng** (chỉ để làm ra harness, KHÔNG ship) = `CLAUDE.md`, `plans/`, và phần runtime của `.claude/` (worktrees/agent-memory/settings.local — đã gitignore). Docs sản phẩm vẫn **tự-đủ** (self-contained — không `../../` ra ngoài root). Tri thức "cho dự án" (VD lessons-log của dự án) là **template** trong `docs/templates/`, không phải lessons-log dev của harness.
+> **Ranh giới sản-phẩm vs xưởng:** **Sản phẩm** = những gì `install-harness.sh` bê đi (SKELETON_PATHS: `AGENTS.md docs .claude .githooks scripts/{harness-verify-gate,install-harness,README}`) + `scaffolds/stack-pnpm-nest-next` (qua STACK_TEMPLATE_RELDIR). **Xưởng** (KHÔNG ship) = `CLAUDE.md`, `plans/`, runtime của `.claude/` (worktrees/agent-memory/settings.local — gitignore).
+> **2 thứ tên khác nhau, đừng nhầm:** `docs/templates/` = MẪU TÀI LIỆU (form Markdown: build-manifest, feature-register, SOW…). `scaffolds/` (root) = SCAFFOLD CODE (app monorepo). Doc-form ≠ code-scaffold.
 
-## `docs/` — tri thức (4 nhóm, phân theo VAI TRÒ + AI ĐỌC)
+## `docs/` — tri thức (chia folder theo VAI TRÒ, từ 2026-09-01)
 
-> `ls docs/` ra nhiều file loose (rời, không nằm trong thư mục con) là bình thường: chúng KHÔNG gom vào 1 folder (foldering = sửa ~250 path máy-móc tham chiếu, lợi 0 hành vi) mà gom bằng bảng dưới đây. Mỗi nhóm ghi rõ **ai đọc** để tra ngay "file này là gì, cho ai". 14 file loose = ① 6 + ② 5 + ④ 3.
+> Trước để 14 file .md rời ở `docs/` root (khó tra). Đã gom: **`process/`** (cách harness CHẠY: WORKFLOW, STAGE_GOALS, macro-2.pipeline.yaml, OPERATING-MODES, TRACE_SPEC, ROLE_MAP, CONTEXT_RULES) + **`about/`** (về chính harness: HARNESS, STRUCTURE, KEYWORD-MAP, UNDERSTANDING, DOC-STANDARD, TEST_MATRIX, HARNESS_CHANGELOG). `docs/README.md` là bản đồ vào cửa. Bảng dưới ghi rõ **ai đọc** từng file.
 
 **① Xương sống — NGƯỜI đọc (onboarding — nhập môn, theo thứ tự này):**
 | File | Vai trò |
@@ -66,12 +67,12 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 - `settings.json` + `scripts/notifier-send.sh`.
 
 ## `scripts/` + `.githooks/` — gate + cài đặt (index: `scripts/README.md`)
-- `install-harness.sh`: bê toàn bộ `harness/` vào dự án mới + init git + bật verify-gate (cổng kiểm chứng không bỏ qua được).
+- `install-harness.sh`: bê skeleton (từ repo root) vào dự án mới + init git + bật verify-gate (cổng kiểm chứng không bỏ qua được).
 - `harness-verify-gate.sh` + `pre-commit`/`pre-push`: **gate fail-closed (mặc định CHẶN khi nghi ngờ/lỗi) không bypass (không bỏ qua được)** (chặn commit lỗi lint/typecheck/register).
 - `wait-workers.sh`: ctl chờ bg-worker tới tín hiệu DONE (PR MERGEABLE hoặc worker terminal) — thay vòng poll tự chế.
 - `run-log.mjs`: **cái cân** — 1 dòng JSONL / 1 lần dispatch, `report` so các bản harness. Ghi NGOÀI git (`~/.claude/loop-harness/run-log.jsonl`), dùng chung mọi repo.
 
-## `templates/` — 3 scaffold
+## `scaffolds/` — 3 scaffold code (root)
 - `stack-pnpm-nest-next/`: khung app **Mode A (chế độ A — Build)** (walking skeleton (bộ xương biết đi) — NestJS+Prisma+Postgres+Next.js+CI+e2e+docker). Dùng ở bước 2.4.
 - `steady-state/` (trạng thái vận hành ổn định sau go-live): kit (bộ đồ nghề) **Mode B** — `issue-state.mjs` (đặt state + **ép cạnh chuyển hợp lệ**), `qc-checklist.mjs`, `push-retry.sh` (Recover (tự-sửa khi lỗi) R2), `ship-and-verify.sh` (Recover R3), `bug-report.md`, `regression-checklist.md`. Copy vào dự án khi go-live (thời điểm app lên môi trường thật).
 - `ops-board/`: **mặt phẳng trạng thái nội bộ** (internal status surface) đã đặc tả ở `HARNESS.md` § Status Artifact — 1 file HTML tự-đủ + `Dockerfile` nginx. Đọc `run-log.jsonl` + `board.json` đặt cạnh nó; thiếu file thì rơi về dữ liệu mẫu và **nói thẳng trên banner**. Nhãn `experimental` — chưa chạy trên dữ liệu thật. KHÔNG đưa cho khách (mặt khách là file/URL riêng — D4).

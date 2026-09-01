@@ -83,5 +83,5 @@ Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `style`,
 ## Cross-Reference
 
 - Stack authority: `docs/decisions/<stack-selection-slug>.md` (2.2).
-- Token grammar: `docs/TRACE_SPEC.md`.
+- Token grammar: `docs/process/TRACE_SPEC.md`.
 - Verify-gate: `scripts/harness-verify-gate.sh`.

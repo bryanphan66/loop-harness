@@ -9,20 +9,20 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 ---
 
 ## A. Xương sống — 2 chế độ + vòng lặp
-> Owner: [`OPERATING-MODES.md`](./OPERATING-MODES.md) — ĐỌC ĐẦU TIÊN.
+> Owner: [`OPERATING-MODES.md`](../process/OPERATING-MODES.md) — ĐỌC ĐẦU TIÊN.
 
 | Keyword | Nghĩa 1 dòng |
 |---|---|
 | **Mode A — Build** | Chế độ dựng app: hữu hạn, 1 chiều (spec → app chạy được). Driver = `/stage-next`. |
 | **Mode B — Steady-state = the loop** | Chế độ nuôi app sau go-live (thời điểm app lên môi trường thật): vòng lặp vô hạn trên bảng issue (phiếu việc/vấn đề trên bảng theo dõi). Steady-state = trạng thái vận hành ổn định sau go-live. Nơi **chất lượng hội tụ**. |
 | **the loop** (vòng lặp) | **Đồ vật cụ thể** = chu trình vận hành Mode B. Trả lời "mỗi vòng LÀM GÌ": 6 **nhịp** discover (phát hiện việc) → dispatch (giao việc cho agent) → verify (xác minh) → recover (tự-sửa khi lỗi) → persist (lưu trạng thái) → decide-next (quyết việc kế). Dùng khi **vận hành** dự án live. |
-| **3 lớp bọc nhau** (framing) | `model+prompt ⊂ **loop** ⊂ **graph** ⊂ **harness**` — **harness NGOÀI CÙNG**, model là hộp NHỎ NHẤT. Mỗi lớp trả lời 1 câu: loop = *lặp lại* · graph = *địa hình* · harness = *thực tế/chạm được gì*. Thiếu lớp nào ra triệu chứng nấy: **không loop → không bao giờ dừng · không graph → không thấy VÌ SAO · không harness → chạm được mọi thứ**. Owner: [`OPERATING-MODES.md`](./OPERATING-MODES.md). Quyết định thứ tự: [`decisions/layer-nesting-harness-outermost.md`](./decisions/layer-nesting-harness-outermost.md). |
+| **3 lớp bọc nhau** (framing) | `model+prompt ⊂ **loop** ⊂ **graph** ⊂ **harness**` — **harness NGOÀI CÙNG**, model là hộp NHỎ NHẤT. Mỗi lớp trả lời 1 câu: loop = *lặp lại* · graph = *địa hình* · harness = *thực tế/chạm được gì*. Thiếu lớp nào ra triệu chứng nấy: **không loop → không bao giờ dừng · không graph → không thấy VÌ SAO · không harness → chạm được mọi thứ**. Owner: [`OPERATING-MODES.md`](../process/OPERATING-MODES.md). Quyết định thứ tự: [`decisions/layer-nesting-harness-outermost.md`](../decisions/layer-nesting-harness-outermost.md). |
 | **the loop ⟂ Loop Engineering** | KHÔNG cạnh tranh: *Loop Engineering* = **bộ môn** (1 trong 3 lớp); *the loop* = **đồ vật** (6 nhịp Mode B). ⚠️ Loop là lớp **TRONG CÙNG**, không phải trên cùng — sửa loop không sửa được lỗi thuộc harness (VD L15: worker treo vì quyền, không vì vòng lặp). |
 | **context engineering** | KHÔNG phải lớp thứ 4 — nằm **bên trong harness** (memory + cái gì tới được model): `CONTEXT_RULES.md`, `context-monitor.sh`, skill nạp theo nhu cầu. |
 | **go-live (graduation — tốt nghiệp)** | Điểm chuyển A→B: app deploy lên env thường trực đầu tiên. |
 
 ## B. Quy trình Build (Mode A)
-> Owner: [`WORKFLOW.md`](./WORKFLOW.md) (bước + gate), [`STAGE_GOALS.md`](./STAGE_GOALS.md) (mục tiêu từng bước).
+> Owner: [`WORKFLOW.md`](../process/WORKFLOW.md) (bước + gate), [`STAGE_GOALS.md`](../process/STAGE_GOALS.md) (mục tiêu từng bước).
 
 | Keyword | Nghĩa 1 dòng |
 |---|---|
@@ -34,11 +34,11 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **Lane (làn quy trình) (Full / Lite)** | Chọn ở intake (tiếp nhận đầu vào): Full = việc khách trả tiền (BA (Business Analyst — phân tích nghiệp vụ) đầy đủ); Lite = tool nội bộ (SRS (Software Requirements Specification — đặc tả yêu cầu phần mềm)-lite 1 file). Macro 2–3 giống nhau. |
 | **walking skeleton** (bộ xương biết đi) | Bộ khung app tối thiểu chạy được (login + 1 CRUD (Create/Read/Update/Delete — thêm/đọc/sửa/xoá)) scaffold (khung dựng sẵn) ở 2.4 từ stack template (khung code mẫu). |
 | **BUILD MANIFEST** (bản kê thi công) | `docs/build-manifest.md`: các phase P0..PN, mỗi REQ-ID (mã yêu cầu) in-scope (trong phạm vi) nằm đúng 1 phase. |
-| **token chain / REQ-ID** (chuỗi truy vết yêu cầu / mã yêu cầu) | Chuỗi truy vết `GAP → REQ-ID → SC → TC`. Owner: [`TRACE_SPEC.md`](./TRACE_SPEC.md). |
+| **token chain / REQ-ID** (chuỗi truy vết yêu cầu / mã yêu cầu) | Chuỗi truy vết `GAP → REQ-ID → SC → TC`. Owner: [`TRACE_SPEC.md`](../process/TRACE_SPEC.md). |
 | **stack template** (khung code mẫu) | Bộ starter (khung khởi đầu) monorepo (1 repo chứa nhiều package) (pnpm + NestJS/Prisma/Postgres + Next.js + CI (Continuous Integration — tự động tích hợp) + e2e (end-to-end — kiểm thử đầu-cuối)) hình mẫu hasi-hub. |
 
 ## C. Vòng lặp issue (Mode B)
-> Owner: [`playbooks/steady-state-issue-pipeline.md`](./playbooks/steady-state-issue-pipeline.md) (bản đầy đủ + Recover). Chuẩn tạo issue: [`playbooks/github-issue-standard.md`](./playbooks/github-issue-standard.md).
+> Owner: [`playbooks/steady-state-issue-pipeline.md`](../playbooks/steady-state-issue-pipeline.md) (bản đầy đủ + Recover). Chuẩn tạo issue: [`playbooks/github-issue-standard.md`](../playbooks/github-issue-standard.md).
 
 | Keyword | Nghĩa 1 dòng |
 |---|---|
@@ -52,7 +52,7 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **issue-state.mjs / qc-checklist.mjs** | Script đổi state / sinh QC checklist cho 1 issue. |
 
 ## D. Gate (fail-closed = đỏ thì chặn)
-> Owner: [`WORKFLOW.md`](./WORKFLOW.md) (định nghĩa gate (chốt kiểm — điều kiện phải đạt mới qua)) + [`scripts/harness-verify-gate.sh`](../scripts/harness-verify-gate.sh) (gate không bypass được).
+> Owner: [`WORKFLOW.md`](../process/WORKFLOW.md) (định nghĩa gate (chốt kiểm — điều kiện phải đạt mới qua)) + [`scripts/harness-verify-gate.sh`](../scripts/harness-verify-gate.sh) (gate không bypass được).
 
 | Keyword | Nghĩa 1 dòng |
 |---|---|
@@ -65,7 +65,7 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 ## E. Kho tri thức (4 loại — đừng lẫn)
 | Keyword | Nghĩa 1 dòng | Ở đâu |
 |---|---|---|
-| **playbook** | Công thức TÁI DÙNG cho mọi dự án (1 bước macro / 1 domain). 35 cái. | [`playbooks/`](./playbooks/) (index [`README.md`](./playbooks/README.md)) |
+| **playbook** | Công thức TÁI DÙNG cho mọi dự án (1 bước macro / 1 domain). 35 cái. | [`playbooks/`](../playbooks/) (index [`README.md`](../playbooks/README.md)) |
 | **runbook** | Quy trình vận hành RIÊNG 1 dự án (deploy/seed/env của repo đó). | `docs/` của từng repo dự án |
 | **lessons-log** | Sổ bài học & sai lầm (triệu chứng → nguyên nhân → luật). Mỗi DỰ ÁN tự nuôi 1 cuốn. | `docs/lessons-log.md` (template: `templates/lessons-log.md`) |
 | **memory** | Trí nhớ bền của CONTROL qua các phiên (fact ngắn có frontmatter). | `~/.claude/projects/.../memory/` |
@@ -73,7 +73,7 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **HARNESS.md** | Operating model + Independence Principle + quyết định đã khoá. | [`HARNESS.md`](./HARNESS.md) |
 
 ## F. Domain runbook (gặp gì mở nấy)
-> Owner: [`playbooks/`](./playbooks/) — mở đúng cái khi chạm domain đó.
+> Owner: [`playbooks/`](../playbooks/) — mở đúng cái khi chạm domain đó.
 
 - **Hạ tầng:** `object-storage` (lưu file/S3), `async-job-queue` (BullMQ/queue), `media-pipeline` (video/HLS), `config-driven-identity`, `seed-data-pattern`, `go-live-deploy-verify`.
 - **Tích hợp:** `payment-integration`, `external-integration` (bên thứ 3).
@@ -89,7 +89,7 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **`flow`** | Ceremony (nghi thức) git+gh cắt release/ship (có xác nhận). Chỉ git+gh, không đụng worktree/Claude. |
 | **`wait-workers.sh`** | ctl chờ bg-worker tới tín hiệu DONE (PR MERGEABLE / worker terminal) — thay vòng poll tự chế. |
 | **`run-log.mjs`** (cái cân) | 1 dòng JSONL / 1 lần dispatch (`start`→`end`), `report --by harness` so các bản harness. Ghi NGOÀI git, dùng chung mọi repo. **Bắt buộc kẹp quanh mọi dispatch** — không có nó thì hill-climbing loop không có số để leo. |
-| **ops-board** | Mặt phẳng trạng thái NỘI BỘ (`templates/ops-board/`): worker đang chạy · số của kỳ · so bản harness · chỗ ùn. Cố ý KHÔNG vẽ lại bảng 10-state. Khách xem mặt riêng (D4). |
+| **ops-board** | Mặt phẳng trạng thái NỘI BỘ (`scaffolds/ops-board/`): worker đang chạy · số của kỳ · so bản harness · chỗ ùn. Cố ý KHÔNG vẽ lại bảng 10-state. Khách xem mặt riêng (D4). |
 | **verify-at-source** | (xem C) nguyên tắc deploy xuyên suốt: xác nhận artifact chạy = commit đã ship. |
 
 ---

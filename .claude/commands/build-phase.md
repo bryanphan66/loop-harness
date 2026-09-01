@@ -63,7 +63,7 @@ Do NOT implement the phase in the main session — orchestrate only.
    Prompt template:
    ```
    Run WORKFLOW step 2.6 for build-manifest phase <P-id> ONLY (one phase per
-   invocation — docs/STAGE_GOALS.md ### Step 2.6).
+   invocation — docs/process/STAGE_GOALS.md ### Step 2.6).
 
    Phase block (scope contract — do not exceed it):
    <verbatim phase block>
@@ -99,7 +99,7 @@ Do NOT implement the phase in the main session — orchestrate only.
    Pipeline, in order: implement → validate:quick green → phase e2e smoke
    (the journeys the acceptance checks name) passes against the running app →
    add verification-register row(s) (TC-NNN, Result: pass) in
-   docs/TEST_MATRIX.md → design-system floor self-check on touched screens
+   docs/about/TEST_MATRIX.md → design-system floor self-check on touched screens
    (§4 floorplan / §7 actions / §8 modals, Tier-2 tokens only, Tier-3 reuse) →
    visual-fidelity: each screen's fidelity assertions GREEN (element
    completeness + interaction behaviour) + capture the running screenshot for
@@ -142,7 +142,7 @@ Do NOT implement the phase in the main session — orchestrate only.
       `BLOCKED` — page the human. Never start the next phase on a FAIL.
    c. **PASS → record it:** fill the phase's `Accepted` cell
       (`agent-pass <date>`) in the manifest Progress table + a TC-NNN
-      acceptance row in `docs/TEST_MATRIX.md`, committed as one small
+      acceptance row in `docs/about/TEST_MATRIX.md`, committed as one small
       `test(<scope>):` commit citing the TC token.
    d. **Human checkpoint — when the phase's `Verify-by` is `both`** (compiled
       from the manifest-header cadence knob; default `per-ui-phase`): emit the

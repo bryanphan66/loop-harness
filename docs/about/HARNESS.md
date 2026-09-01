@@ -16,7 +16,7 @@ tác) producers, executed by **role players** (người đóng vai các vai trò
 
 | Layer | Role | Components |
 |---|---|---|
-| **Control plane** | decides *what runs next* + *did the gate (chốt kiểm) pass* | `STAGE.md`, the canonical gates (`docs/WORKFLOW.md`), the verify-gate (cổng kiểm chứng không bỏ qua được) hook (`scripts/harness-verify-gate.sh`), stage-boundary commits, the `stage-runner` orchestrator (bộ điều phối) + `/stage-next` |
+| **Control plane** | decides *what runs next* + *did the gate (chốt kiểm) pass* | `STAGE.md`, the canonical gates (`docs/process/WORKFLOW.md`), the verify-gate (cổng kiểm chứng không bỏ qua được) hook (`scripts/harness-verify-gate.sh`), stage-boundary commits, the `stage-runner` orchestrator (bộ điều phối) + `/stage-next` |
 | **Engine** | *produces* the artifact each step | the `ck-*` skills (live, **invoked** — never vendored / không sao-chép nhúng) + `cook` / `ship` / `deploy` / `devops` |
 | **Role players** | *execute* each SDLC (vòng đời phát triển phần mềm) role's work | the global agents (planner, researcher, fullstack-developer, code-reviewer, tester, debugger, ui-ux-designer, docs-manager, project-manager, git-manager, code-simplifier, journal-writer, brainstormer), orchestrated by `stage-runner` |
 
@@ -26,8 +26,8 @@ ngoài chính nó). The engine and role players are
 playbooks (công thức tái dùng) can play every role and
 produce every artifact without any `ck-*` skill.
 
-Full role → engine binding: `docs/ROLE_MAP.md`. Step-by-step map:
-`docs/WORKFLOW.md`.
+Full role → engine binding: `docs/process/ROLE_MAP.md`. Step-by-step map:
+`docs/process/WORKFLOW.md`.
 
 ## Independence Principle
 
@@ -43,8 +43,8 @@ agent + git + bash.
 
 Specifically:
 
-- `AGENTS.md`, `STAGE.md`, `docs/WORKFLOW.md`, `docs/HARNESS.md`,
-  `docs/TRACE_SPEC.md`, and `scripts/install-harness.sh` MUST NOT reference any
+- `AGENTS.md`, `STAGE.md`, `docs/process/WORKFLOW.md`, `docs/about/HARNESS.md`,
+  `docs/process/TRACE_SPEC.md`, and `scripts/install-harness.sh` MUST NOT reference any
   `ck-*` skill as a **required** step.
 - `install-harness.sh` **preflight-checks** (kiểm tra điều kiện trước khi chạy)
   that `~/.claude/skills` and
@@ -60,20 +60,20 @@ entry. Decision record: `docs/decisions/ck-skill-engine-not-vendored.md`.
 
 ## How ck-Skills Bind As Engine
 
-For each step, `docs/WORKFLOW.md` names an **Engine** (a `ck-*` skill or a global
+For each step, `docs/process/WORKFLOW.md` names an **Engine** (a `ck-*` skill or a global
 agent). At run time:
 
 1. `install-harness.sh` already ran the preflight. If `~/.claude/skills`
    exists, the named `ck-*` skill is the **fast path**.
 2. `stage-runner` invokes the skill to produce the step's artifact at the path in
-   `docs/WORKFLOW.md`.
+   `docs/process/WORKFLOW.md`.
 3. If the skill is **absent** (preflight warned), the role's global agent runs
    the playbook's core logic instead and produces the same artifact shape.
 
 The skill never owns the contract (giao kèo — chuẩn bắt buộc) — the **artifact
 path + shape** in
-`docs/WORKFLOW.md` and the **token grammar** (ngữ pháp token truy vết) in
-`docs/TRACE_SPEC.md` are the
+`docs/process/WORKFLOW.md` and the **token grammar** (ngữ pháp token truy vết) in
+`docs/process/TRACE_SPEC.md` are the
 contract. The skill is one way to fill it.
 
 ## Source Hierarchy
@@ -130,15 +130,15 @@ candidate set.
 ## Coverage
 
 All three macro-stages are **built fully**: step tables + gates
-(`docs/WORKFLOW.md`), per-step goal text (`docs/STAGE_GOALS.md`), templates and
+(`docs/process/WORKFLOW.md`), per-step goal text (`docs/process/STAGE_GOALS.md`), templates and
 playbooks. Macro 2 executes through the **build-manifest** (bản kê thi công —
 compiled at 2.3
 from the frozen spec) and the **`/build-phase` loop** (one manifest phase per
 isolated invocation) on top of the **walking-skeleton (bộ xương biết đi — app
 tối thiểu chạy được đầu-cuối) stack template** (khung code mẫu)
-(`templates/stack-pnpm-nest-next/` in the harness source, scaffolded (dựng khung
+(`scaffolds/stack-pnpm-nest-next/` in the harness source, scaffolded (dựng khung
 sẵn) at 2.4).
-Macro-1 weight is lane-scaled (`docs/WORKFLOW.md` § Lanes: Full vs Lite).
+Macro-1 weight is lane-scaled (`docs/process/WORKFLOW.md` § Lanes: Full vs Lite).
 
 Conditional enterprise gates (data-migration/cutover (chuyển đổi sang hệ mới),
 NFR/load (Non-Functional Requirements — yêu cầu phi chức năng / kiểm tải), DR
@@ -207,12 +207,12 @@ The harness grows from friction (vướng mắc — chỗ agent bị cấn/lặp
 agent is confused, repeats manual
 reasoning, finds a missing rule, or hits a recurring failure, it must improve the
 harness directly or record the friction. The capture mechanism is the **Friction**
-field in every session trace (vết phiên) (`docs/TRACE_SPEC.md`); friction that
+field in every session trace (vết phiên) (`docs/process/TRACE_SPEC.md`); friction that
 should become
 work graduates into a plan or a decision. Harness-version changes are logged in
-`docs/HARNESS_CHANGELOG.md` (one entry per hardening round (vòng gia cố), naming
+`docs/about/HARNESS_CHANGELOG.md` (one entry per hardening round (vòng gia cố), naming
 the failures
-it closes). Full per-round version history + the failure-class taxonomy live in `docs/HARNESS_CHANGELOG.md` (one entry per hardening round); do not inline them here.
+it closes). Full per-round version history + the failure-class taxonomy live in `docs/about/HARNESS_CHANGELOG.md` (one entry per hardening round); do not inline them here.
 
 ### Growth must be measured, not remembered
 
@@ -237,13 +237,13 @@ next runs can be **compared against the ones before it**:
 
 Industry names for this layer are **evals** and **observability**; `run-log.mjs`
 is the minimum viable version of both, not the finished article. It is the
-instrument the **hill-climbing loop** (`docs/OPERATING-MODES.md` § four nested
+instrument the **hill-climbing loop** (`docs/process/OPERATING-MODES.md` § four nested
 layers) was missing.
 
 ## Control-Plane Failure Classes
 
 Recurring build failures are classified so the harness fixes the **class**, not
-the instance (full taxonomy + evidence in `docs/HARNESS_CHANGELOG.md`). Two are
+the instance (full taxonomy + evidence in `docs/about/HARNESS_CHANGELOG.md`). Two are
 control-plane rules every orchestrator + verifier obeys:
 
 - **FC6 — verify at the real source, never trust a wrapper signal.** A tool's
@@ -269,7 +269,7 @@ control-plane rules every orchestrator + verifier obeys:
 
 Pointer only — the full grammar, chain, and RTM (Requirements Traceability
 Matrix — ma trận truy vết yêu cầu) completeness rule live in
-`docs/TRACE_SPEC.md`. In short: `GAP-NNN → REQ-ID (MODULE.AREA.NN) → use-case +
+`docs/process/TRACE_SPEC.md`. In short: `GAP-NNN → REQ-ID (MODULE.AREA.NN) → use-case +
 RTM row → SC-NNN → feature-register line → SOW line → TC-NNN`, with `CR-NN` for
 change requests. **`US-NNN.REQ-MMM` is not used** in this harness.
 

@@ -200,7 +200,7 @@ delete the original shape.)
 
 ## Related
 
-- `docs/WORKFLOW.md` § 1.10 — the step this playbook owns.
+- `docs/process/WORKFLOW.md` § 1.10 — the step this playbook owns.
 - `docs/design-system/design-rules.md` — Tier-1 floorplans + behavior this
   contract CONSUMES (pinned in §0) and never re-authors.
 - `design-system-3-tier.md` — the cross-stage 3-tier enforcement chain; this
@@ -208,4 +208,4 @@ delete the original shape.)
 - `visual-and-behavioral-modeling.md` — sub-step A consumer (1.11).
 - `solo-dev-client-delivery.md` § 1.10 — caller.
 - `docs/decisions/<slug>-design-direction.md` — the persisted style decision.
-- `docs/ROLE_MAP.md` — Designer role + `ck-design-system` engine binding.
+- `docs/process/ROLE_MAP.md` — Designer role + `ck-design-system` engine binding.

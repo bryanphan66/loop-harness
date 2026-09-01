@@ -4,7 +4,7 @@ Macro-stage: 2 Build & Go-live · Step 2.13 Sign-off (nghiệm thu) + release
 Role: Release Manager + PM + Client · Engine: ck-signoff
 Gate: ACCEPTANCE (client, countersigned) — the billable milestone
 Bilingual: EN canonical base — VN fork at locale-vi/delivery-closure-story/02-signoff-nghiem-thu.md
-Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/TRACE_SPEC.md)
+Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/process/TRACE_SPEC.md)
 -->
 
 # Sign-off — <release / project id>

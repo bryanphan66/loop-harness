@@ -154,5 +154,5 @@ screens are children of it.
   = Tier-3.
 - `ui-design-system-contract.md` — the design-system build used in the fallback
   (no frozen export).
-- `docs/HARNESS.md` § Control-Plane Failure Classes — FC7 (human review must be
+- `docs/about/HARNESS.md` § Control-Plane Failure Classes — FC7 (human review must be
   real) governs step 6's glance.

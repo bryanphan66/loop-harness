@@ -1,83 +1,46 @@
-# Documentation Map — Crosswalk
+# loop-harness docs — START HERE (the map)
 
-This directory holds the harness operating model plus the project contract a
-bootstrapped project derives across the 3 macro-stages. This file is the
-**crosswalk**: it maps the harness **process-folders** to the global-`CLAUDE.md`
-expected doc names, and states which are a **LIVING CONTRACT** (agents update as
-the source of truth) vs a **DERIVED VIEW** (generated on demand, never hand-kept
-in sync).
+This repo IS a reusable delivery harness: run it and a project comes out to a
+fixed standard. Everything is organised by **what you need right now**.
 
-This is a **reference table, not a sync chore**. When a tool or rule asks for one
-of the expected paths and the harness equivalent is enough, the harness layout
-wins — create a one-line redirect rather than duplicating content.
+## What are you trying to do?
 
-## Core Operating Docs
-
-| File | Purpose |
+| I want to… | Go to |
 |---|---|
-| `HARNESS.md` | 3-layer architecture, Independence Principle, Playbook Lifecycle, ck-skills-as-engine. |
-| `WORKFLOW.md` | The 3-macro-stage map — per-step tables, canonical gates, token chain. |
-| `ROLE_MAP.md` | Role → agent + skill engine binding; SA vs Tech Lead (D5). |
-| `TRACE_SPEC.md` | Token grammar (`GAP→REQ→SC→TC`, `CR`), RTM completeness rule. |
-| `README.md` | This crosswalk. |
+| **Understand how the harness runs** (the process) | `process/WORKFLOW.md` (the step map) + `process/macro-2.pipeline.yaml` (Build phase as a machine-readable spec) |
+| **Run the next step** | the `/stage-next` command (reads `process/WORKFLOW.md` + `STAGE.md`) |
+| **Look up a recipe for a step** (how to actually DO it) | `playbooks/` (one file per reusable task/domain) |
+| **Know what a step must pass** (the checks) | `gates/` (checklists) + `docs/gates/lint-gates-registry.md` (the scripts) |
+| **Fill in a project document** (blank forms) | `templates/` (build-manifest, feature-register, SOW, prototype-prompt, …) |
+| **Scaffold the actual app code** | `../scaffolds/` (stack-pnpm-nest-next monorepo, steady-state scripts, ops-board) |
+| **Understand the harness itself** (design, glossary) | `about/` (HARNESS.md, STRUCTURE.md, KEYWORD-MAP.md, …) |
 
-## Process-Folder → Expected-Doc Crosswalk
+## The four kinds of thing (don't confuse them)
 
-| Harness process-folder | Backs expected doc (global `CLAUDE.md`) | Kind | Notes |
-|---|---|---|---|
-| `discovery/` (raw, append-only) + `intake/` (vendor briefs) | `project-overview-pdr.md` | **LIVING CONTRACT** | Together with `requirements/VISION_SCOPE.md` they ARE the PDR — background, objectives, scope. |
-| `requirements/` (SRS + REQ-ID + RTM + use-cases + GLOSSARY + CLARIFICATIONS + BPMN) | `project-overview-pdr.md` (requirements half) | **LIVING CONTRACT** | The BA spine. The RTM is the traceability backbone (`TRACE_SPEC.md`). |
-| `scope-baseline/` (feature-register + scope matrix) | `project-roadmap.md` (scope half) | **LIVING CONTRACT** | Frozen at PB-G2. Every line traces to ≥1 REQ-ID. |
-| `decisions/` (ADR by stable **slug**) | `system-architecture.md` | **LIVING CONTRACT** | Architecture/stack/ERD decisions by slug, never by number. SA owns ERD-freeze; Tech Lead owns stack. |
-| `system-architecture.md` (root of docs/) | `system-architecture.md` | **LIVING CONTRACT** | Same name — written at step 2.1 (ERD) / 2.2 (stack). Born in Build & Go-live increment. |
-| `design-system/` (Tier-1 `design-rules.md` — floorplans + screen behavior) | — (doctrine, no per-project equivalent) | **SHARED DOCTRINE** | Tier-1 UI doctrine — identical across projects, version-pinned. Ships with the harness like a playbook; CONSUMED by the per-project design contract, never per-project-authored. Distinct from `design/` + `design-guidelines.md` below. |
-| `design/` + `design-guidelines.md` + `visuals/` (diagrams + prototype) | `design-guidelines.md` | **LIVING CONTRACT** | Tokens + RPM + status-flow + frozen prototype (PB-G3). Per-project; CONSUMES Tier-1 `design-system/design-rules.md`. Same name as the expected doc. |
-| `stories/` (FLAT `<module>-NN-<slug>.md`) | `project-roadmap.md` (delivery half) | **LIVING CONTRACT** | Story queue = the delivery order. Born in Build & Go-live increment. |
-| `ROADMAP.md` (module / milestone / timeline / %) | `project-roadmap.md` | **LIVING CONTRACT** | Skeleton born at PB-G4 (1.15); enriched + advanced in Build & Go-live. |
-| `bao-gia/` (VN quote + contract + technical overview) | — (commercial, no global equivalent) | **LIVING CONTRACT** | Priced from frozen feature-register; PROTOTYPE-THEN-QUOTE invariant. |
-| `git log` + `decisions/` | `project-changelog.md` | **DERIVED VIEW** | Reconstruct from commit history + dated decisions. Generate on demand. |
-| generated on demand (e.g. `docs` skill) | `codebase-summary.md` | **DERIVED VIEW** | Skip until an agent asks; never hand-kept. |
-| `templates/code-standards.md` → `code-standards.md` | `code-standards.md` | **DERIVED VIEW** | Stub ships in templates; project fills after stack-selection (2.2). |
-| `templates/deployment-guide.md` → `deployment-guide.md` | `deployment-guide.md` | **DERIVED VIEW** | Stub ships in templates; project fills at first release (2.13). |
+- **process/** — the PROCESS: the ordered steps (Pre-Build 1.x, Build 2.x, Post 3.x)
+  and their spec. This is *how the harness runs*.
+- **playbooks/** — RECIPES used AT a step (e.g. "how to compile the build-manifest",
+  "how to author an issue"). A step points to its playbook(s).
+- **gates/** — CHECKS a step must pass before the next may start.
+- **templates/** — blank DOCUMENT forms a project fills (Markdown). NOT code.
+- **`../scaffolds/`** (repo root, one level up) — the CODE scaffolds copied into a
+  new project's filesystem. This is the *only* "templates that are code"; the doc
+  forms live in `templates/` here. Two different things, two different names.
 
-## Living Contract vs Derived View
+## How the Build phase (Macro-2) is wired
 
-- **LIVING CONTRACT** — agents must keep current as the source of truth. Drift
-  here silently invalidates downstream work (a feature with no REQ-ID, a frozen
-  prototype that no longer matches the build). The verify-gate and RTM
-  completeness rule guard these.
-- **DERIVED VIEW** — regenerated from a contract on demand. Never hand-maintained
-  in sync; if it is stale, regenerate it rather than patch it. Treating a derived
-  view as a contract is the sync-chore anti-pattern this crosswalk avoids.
-- **SHARED DOCTRINE** — ships with the harness identically to every project (like
-  a playbook), version-pinned, and CONSUMED by per-project contracts rather than
-  authored per project. `design-system/design-rules.md` (Tier-1 UI doctrine) is
-  the one such folder; the per-project Tier-2/Tier-3 contract pins its version.
+`process/macro-2.pipeline.yaml` is the single machine-readable spec: for **each
+step** it lists `driver · inputs · gates · playbooks · output · exit_when`. Read
+that one file to see, e.g., "step 2.6 uses `/build-phase`, gates
+`check-prototype-fidelity` + `check-ac-coverage`, playbooks `build-execution` +
+`prototype-export-adoption`". `process/WORKFLOW.md` is the human table; the yaml
+is what `/stage-next` and the RTM dashboard read.
 
-## Folder Reference (target structure)
+## Folder index
 
-```text
-docs/
-├── HARNESS.md  WORKFLOW.md  ROLE_MAP.md  TRACE_SPEC.md  README.md
-├── decisions/            # ADR by stable slug (not number)
-├── design-system/        # Tier-1 UI doctrine (design-rules.md) — SHARED, version-pinned
-├── playbooks/            # reusable recipes (experimental | verified | deprecated)
-├── templates/            # scaffolds + locale-vi/ (client-facing forks) + STAGE.md (per-project)
-├── discovery/  intake/   # raw append-only / vendor briefs
-├── requirements/         # BA spine: srs/ + VISION_SCOPE + GLOSSARY + CLARIFICATIONS
-│                         #   + BPMN + use-cases/ + traceability/RTM + scenarios/ + change-requests/
-├── scope-baseline/       # feature-register.{md,xlsx} + diagrams/
-├── design/  design-guidelines.md  visuals/{diagrams,prototype}/
-├── stories/              # FLAT <module>-NN-<slug>.md
-├── bao-gia/  uat/  runbook/  handover/  journals/
-└── system-architecture.md  project-changelog.md   # shared names with global convention
-```
-
-## Bilingual Surfaces (D4)
-
-`locale-vi/` forks exist for **all client-facing surfaces**: intake-brief,
-gap-analysis, feature-register, bao-gia, change-request-log, release-note,
-maintenance-proposal, role-permission-matrix, status-flow, plus handover docs and
-user-guide. Internal technical artifacts stay **English**: SRS, ADR/decisions,
-code, stories, spec-intake, validation, playbooks, `AGENTS.md`, `WORKFLOW.md`,
-`TRACE_SPEC.md`. IDs/paths/code stay EN even inside VN files.
+- `process/` — WORKFLOW, STAGE_GOALS, macro-2.pipeline.yaml, OPERATING-MODES, TRACE_SPEC (token grammar), ROLE_MAP, CONTEXT_RULES
+- `about/` — HARNESS (3-layer model), STRUCTURE (this repo's map), KEYWORD-MAP (term → owner file), UNDERSTANDING (narrative + honest scorecard), DOC-STANDARD, TEST_MATRIX, HARNESS_CHANGELOG
+- `playbooks/` — reusable recipes (`playbooks/README.md` indexes them)
+- `gates/` — gate checklists + `lint-gates-registry.md` (the mechanical checks)
+- `templates/` — blank doc forms (`locale-vi/` = VN bilingual fork)
+- `decisions/` — ADRs · `design-system/` — 3-tier UI contract

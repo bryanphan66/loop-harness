@@ -25,7 +25,7 @@
 >   `--advisory` (reports, does not block) until the backlog burns down.
 >
 > Plus `scripts/harness-verify-gate.sh` greps the verification register
-> (`docs/TEST_MATRIX.md`) for `fail` / `never-run`.
+> (`docs/about/TEST_MATRIX.md`) for `fail` / `never-run`.
 >
 > **What the coverage gates DO vs DON'T (the honest limit).** The four
 > coverage/presence gates (`new-screen-fidelity-required`, `manifest-coverage`,
@@ -57,9 +57,9 @@
 
 > **Type:** internal HARD gate (auto-block), **per build-manifest phase**.
 > **Read by:** the `/build-phase` loop at step **2.6** (the orchestrator enforces
-> it between phases), `docs/STAGE_GOALS.md` § 2.6, and **DoD** at 2.10 (which
+> it between phases), `docs/process/STAGE_GOALS.md` § 2.6, and **DoD** at 2.10 (which
 > confirms every phase carried an acceptance record). **Authority:**
-> `docs/WORKFLOW.md` § Gate rebalance + the phase's own Acceptance-checks block
+> `docs/process/WORKFLOW.md` § Gate rebalance + the phase's own Acceptance-checks block
 > in `docs/build-manifest.md`.
 
 A phase is **not done when its commit lands — it is done when its Acceptance
@@ -466,7 +466,7 @@ Reasons (on FAIL): <concrete, reproducible — what to fix>
   The next phase MUST NOT start on a FAIL.
 - **PASS → record it:** flip the phase's `Accepted` cell in the manifest
   Progress table (`agent-pass <date>`) + add a TC-NNN verification-register row
-  (`docs/TEST_MATRIX.md`, `Result: pass`) for the acceptance run. Recorded in
+  (`docs/about/TEST_MATRIX.md`, `Result: pass`) for the acceptance run. Recorded in
   one small `test(<scope>):` commit citing the TC token — the verification
   event is distinct from the phase's implementation commit, so the
   stage-boundary-commit atomicity rule is not violated.
@@ -536,7 +536,7 @@ block** — the record is per-phase evidence, not retroactively fillable.
 ## Sign-Off (per phase — lives in the manifest, not here)
 
 The durable record is the manifest Progress table (`Verify-by` + `Accepted`
-columns) plus the TC-NNN rows in `docs/TEST_MATRIX.md`. This gate file defines
+columns) plus the TC-NNN rows in `docs/about/TEST_MATRIX.md`. This gate file defines
 the mechanic; it is not filled per project.
 
 > Relationship to the end-of-manifest gates: 2.7 (review), 2.8 (e2e from BA

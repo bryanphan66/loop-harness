@@ -197,5 +197,5 @@ Chúc dự án thành công.
 - Bản gốc tiếng Anh (chuẩn): `docs/templates/client-intake-brief.md`.
 - Discovery interview (1.3): `docs/playbooks/discovery-interview-playbook.md` (5 persona × 3 mode). **Engine:** `ck-rri`.
 - Tiếp theo (1.4): `docs/templates/locale-vi/gap-analysis.md` (sinh `GAP-NNN`).
-- Bản đồ macro-stage + danh sách cổng: `docs/WORKFLOW.md`.
-- Token grammar (GAP-NNN → REQ-ID → SC-NNN → TC-NNN → CR-NN): `docs/TRACE_SPEC.md`.
+- Bản đồ macro-stage + danh sách cổng: `docs/process/WORKFLOW.md`.
+- Token grammar (GAP-NNN → REQ-ID → SC-NNN → TC-NNN → CR-NN): `docs/process/TRACE_SPEC.md`.
