@@ -144,7 +144,7 @@ delete the original shape.)
 
 - `docs/design-system/design-rules.md` — Tier-1 rule book (§3/§4/§4.7/§5/§7/§8/§10/§11).
 - `docs/gates/design-system-compliance.md` — per-screen §12 gate (1.12/2.7/2.10).
-- `docs/templates/screen-inventory.md` — the classification record template.
+- `docs/mau-tai-lieu/screen-inventory.md` — the classification record template.
 - `docs/decisions/three-tier-design-system-floorplan-enforcement.md` — the decision.
 - `docs/playbooks/ui-design-system-contract.md` — Tier-2 token contract (1.10).
 - `docs/playbooks/code-review-scoring.md` — the floor-rule lives at 2.7.

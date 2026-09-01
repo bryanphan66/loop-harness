@@ -110,5 +110,5 @@ Visual-fidelity + negative-path legs still apply to any screen the phase ships
   (PDF render, transcode) compose the two.
 - `media-pipeline.md` — the meta-playbook composing this + async-job + ffmpeg.
 - `docs/gates/phase-acceptance.md` — the per-phase gate this playbook's categories feed.
-- `docs/templates/build-manifest.md` — the `Phase-type: storage` block shape.
+- `docs/mau-tai-lieu/build-manifest.md` — the `Phase-type: storage` block shape.
 - `docs/process/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles.

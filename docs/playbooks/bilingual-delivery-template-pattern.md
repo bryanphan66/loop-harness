@@ -57,7 +57,7 @@ client reads it, localize it.
 Place locale variants next to defaults:
 
 ```text
-docs/templates/
+docs/mau-tai-lieu/
 ├── feature-register.md            # default (English structure)
 ├── locale-vi/
 │   ├── feature-register.md        # Vietnamese titles + body, EN IDs
@@ -110,7 +110,7 @@ locale-neutral):
 
 ```text
 <org-repo>/docs/locales.md
-- locale-vi: synced 2026-06-03 with templates/ @ commit abc123
+- locale-vi: synced 2026-06-03 with mau-tai-lieu/ @ commit abc123
 ```
 
 The harness never assumes a specific locale list — the org owns its inventory.

@@ -57,7 +57,7 @@ gh api repos/<owner>/<repo>/contents/scripts/install-harness.sh \
    private `.claude/.env` + `settings.local.json`).
 3. **`git init`** — only if `.git` is missing. Sets `core.hooksPath=.githooks`
    so the verify gate is active.
-4. **STAGE.md** — copies `docs/templates/STAGE.md` to the repo root and fills the
+4. **STAGE.md** — copies `docs/mau-tai-lieu/STAGE.md` to the repo root and fills the
    Snapshot for a fresh Pre-Build project.
 5. **`.claude/settings.local.json`** — writes it with the notifier hooks
    pre-registered (gitignored — fill `.claude/.env` to activate).

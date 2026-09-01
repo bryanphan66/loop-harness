@@ -111,6 +111,6 @@ credentials to see what happens. Log every outbound + inbound event:
   PCI + reconciliation); this generalizes its webhook + abstraction rigor.
 - `async-job-queue.md` — bulk/deferred outbound (email-blast) enqueues here.
 - `docs/gates/phase-acceptance.md` — the per-phase gate this playbook's categories feed.
-- `docs/templates/build-manifest.md` — the `Phase-type: external-integration` block shape.
+- `docs/mau-tai-lieu/build-manifest.md` — the `Phase-type: external-integration` block shape.
 - `docs/playbooks/code-review-scoring.md` — the no-error-swallow floor rule.
 - `docs/process/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles.

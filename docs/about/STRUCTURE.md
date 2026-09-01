@@ -9,7 +9,7 @@ Trước đây sản phẩm nằm lồng trong `harness/`; đã **làm phẳng**
 ```
 loop-harness/   (= chính là harness — không còn thư mục con harness/)
 ├── AGENTS.md ········· [SẢN PHẨM] operating model cho agent (task loop + gate + thứ tự đọc)
-├── docs/ ············· [SẢN PHẨM] tri thức harness — chia process/ (cách CHẠY) + about/ (về chính harness) + playbooks/ gates/ templates/ (bảng dưới). Vào cửa: docs/README.md
+├── docs/ ············· [SẢN PHẨM] tri thức harness — chia process/ (cách CHẠY) + about/ (về chính harness) + playbooks/ gates/ mau-tai-lieu/ (bảng dưới). Vào cửa: docs/README.md
 ├── scripts/ ·········· [SẢN PHẨM] install-harness.sh + harness-verify-gate.sh + run-log/wait-workers
 ├── scaffolds/ ········ [SẢN PHẨM] scaffold CODE bê vào project: stack (Mode A) + steady-state (Mode B) + ops-board
 ├── .claude/ ·········· [SẢN PHẨM, tracked] commands + agents + hooks (ship khi cài); +[XƯỞNG, gitignore] worktrees/agent-memory/settings.local
@@ -20,7 +20,7 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 ```
 
 > **Ranh giới sản-phẩm vs xưởng:** **Sản phẩm** = những gì `install-harness.sh` bê đi (SKELETON_PATHS: `AGENTS.md docs .claude .githooks scripts/{harness-verify-gate,install-harness,README}`) + `scaffolds/stack-pnpm-nest-next` (qua STACK_TEMPLATE_RELDIR). **Xưởng** (KHÔNG ship) = `CLAUDE.md`, `plans/`, runtime của `.claude/` (worktrees/agent-memory/settings.local — gitignore).
-> **2 thứ tên khác nhau, đừng nhầm:** `docs/templates/` = MẪU TÀI LIỆU (form Markdown: build-manifest, feature-register, SOW…). `scaffolds/` (root) = SCAFFOLD CODE (app monorepo). Doc-form ≠ code-scaffold.
+> **2 thứ tên khác nhau, đừng nhầm:** `docs/mau-tai-lieu/` = MẪU TÀI LIỆU (form Markdown: build-manifest, feature-register, SOW…). `scaffolds/` (root) = SCAFFOLD CODE (app monorepo). Doc-form ≠ code-scaffold.
 
 ## `docs/` — tri thức (chia folder theo VAI TRÒ, từ 2026-09-01)
 
@@ -50,7 +50,7 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 |---|---|---|---|
 | `playbooks/` | 34 | công thức TÁI DÙNG (1 bước macro / 1 domain) | `playbooks/README.md` |
 | `gates/` | 11 | định nghĩa gate (PB-G, DoR, DoD, phase-acceptance, visual-fidelity…) | `gates/README.md` |
-| `templates/` | >40 (gồm `locale-vi/` fork song ngữ) | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…) | `templates/README.md` |
+| `mau-tai-lieu/` | >40 (gồm `locale-vi/` fork song ngữ) | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…) | `mau-tai-lieu/README.md` |
 | `design-system/` | 3 | quy tắc UI 3-tier (floorplan/action/modal) | `design-system/README.md` |
 
 **④ Meta / tham chiếu — HỖN HỢP (không thuộc xương sống lẫn máy-móc):**

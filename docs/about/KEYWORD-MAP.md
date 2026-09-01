@@ -67,7 +67,7 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 |---|---|---|
 | **playbook** | Công thức TÁI DÙNG cho mọi dự án (1 bước macro / 1 domain). 35 cái. | [`playbooks/`](../playbooks/) (index [`README.md`](../playbooks/README.md)) |
 | **runbook** | Quy trình vận hành RIÊNG 1 dự án (deploy/seed/env của repo đó). | `docs/` của từng repo dự án |
-| **lessons-log** | Sổ bài học & sai lầm (triệu chứng → nguyên nhân → luật). Mỗi DỰ ÁN tự nuôi 1 cuốn. | `docs/lessons-log.md` (template: `templates/lessons-log.md`) |
+| **lessons-log** | Sổ bài học & sai lầm (triệu chứng → nguyên nhân → luật). Mỗi DỰ ÁN tự nuôi 1 cuốn. | `docs/lessons-log.md` (template: `mau-tai-lieu/lessons-log.md`) |
 | **memory** | Trí nhớ bền của CONTROL qua các phiên (fact ngắn có frontmatter). | `~/.claude/projects/.../memory/` |
 | **HARNESS_CHANGELOG** | Lịch sử version của harness (v7.0…). | [`HARNESS_CHANGELOG.md`](./HARNESS_CHANGELOG.md) |
 | **HARNESS.md** | Operating model + Independence Principle + quyết định đã khoá. | [`HARNESS.md`](./HARNESS.md) |

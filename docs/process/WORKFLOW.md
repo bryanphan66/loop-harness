@@ -37,7 +37,7 @@ hold):**
 1. **1.1+1.2 merged intake** — raw inputs land append-only in `docs/discovery/`
    + ONE combined intake brief with the go/no-go decision (PB-G1, internal).
 2. **1.5-lite SRS-lite** — `docs/requirements/srs-lite.md` from
-   `docs/templates/srs-lite.md`: module list + one REQ-ID table
+   `docs/mau-tai-lieu/srs-lite.md`: module list + one REQ-ID table
    (`MODULE.AREA.NN`, full grammar) + NFR one-liners. Scenarios (1.8) run **only
    for high-risk reqs** (money / auth / async / destructive); everything else is
    skipped with one recorded line. 1.3/1.4/1.6/1.7 fold into this step: open
@@ -187,7 +187,7 @@ release note → production release. *(payment milestones attach here in Full)*
 
 > **Build Manifest (step 2.3 output — the spec→code conversion layer).** ONE
 > file, `docs/build-manifest.md` (template:
-> `docs/templates/build-manifest.md`, playbook:
+> `docs/mau-tai-lieu/build-manifest.md`, playbook:
 > `docs/playbooks/build-manifest-compilation.md`), compressing the whole BA
 > spine into ordered executable phases **P0..PN**. P0 = walking skeleton
 > (scaffolded from the stack template). Each later phase: REQ-IDs covered,
@@ -379,8 +379,8 @@ DoR gate reads the manifest rule.
 - **Operating model:** `docs/about/HARNESS.md`
 - **Roles:** `docs/process/ROLE_MAP.md`
 - **Token grammar:** `docs/process/TRACE_SPEC.md`
-- **Build manifest:** template `docs/templates/build-manifest.md` · playbook `docs/playbooks/build-manifest-compilation.md`
+- **Build manifest:** template `docs/mau-tai-lieu/build-manifest.md` · playbook `docs/playbooks/build-manifest-compilation.md`
 - **Non-CRUD delivery playbooks:** `docs/playbooks/async-job-queue.md` · `object-storage.md` · `media-pipeline.md` · `external-integration.md`
-- **SRS-lite (Lite lane):** `docs/templates/srs-lite.md`
+- **SRS-lite (Lite lane):** `docs/mau-tai-lieu/srs-lite.md`
 - **Docs crosswalk:** `docs/README.md`
-- **Per-project stage tracker:** `docs/templates/STAGE.md`
+- **Per-project stage tracker:** `docs/mau-tai-lieu/STAGE.md`

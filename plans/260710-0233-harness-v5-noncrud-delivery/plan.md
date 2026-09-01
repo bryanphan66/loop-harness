@@ -36,7 +36,7 @@ Build-manifest phase block assumes every phase = entities + endpoints + screens 
 
 ## Files touched (est.)
 New: `docs/playbooks/{async-job-queue,object-storage,media-pipeline,external-integration}.md` · stack `apps/worker/**`, `apps/api/src/common/{queue,storage}/**`, compose Redis.
-Modified: `docs/templates/build-manifest.md`, `docs/playbooks/build-manifest-compilation.md`, `docs/gates/phase-acceptance.md`, `docs/process/STAGE_GOALS.md` (2.2/2.3), `docs/process/WORKFLOW.md`, `docs/playbooks/README.md`, `docs/about/HARNESS.md`, `docs/about/HARNESS_CHANGELOG.md`, stack `docker-compose*`, `TEMPLATE_VERSION`.
+Modified: `docs/mau-tai-lieu/build-manifest.md`, `docs/playbooks/build-manifest-compilation.md`, `docs/gates/phase-acceptance.md`, `docs/process/STAGE_GOALS.md` (2.2/2.3), `docs/process/WORKFLOW.md`, `docs/playbooks/README.md`, `docs/about/HARNESS.md`, `docs/about/HARNESS_CHANGELOG.md`, stack `docker-compose*`, `TEMPLATE_VERSION`.
 
 ## Success criteria
 - A build-manifest can express a media/async/storage/integration phase with runnable, type-correct acceptance.

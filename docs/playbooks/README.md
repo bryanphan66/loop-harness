@@ -105,7 +105,7 @@ REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN`
 Post-Build steps (3.1 handover `ck-handover`, 3.2 hypercare `ck-hypercare`, 3.4
 maintenance proposal, 3.5 change-control `ck-xre CHANGE-REQUEST`) are
 skill-driven with goal blocks in `docs/process/STAGE_GOALS.md` + templates under
-`docs/templates/` (closure stories, maintenance-proposal, change-request-log).
+`docs/mau-tai-lieu/` (closure stories, maintenance-proposal, change-request-log).
 `session-retrospective.md` (3.6) is listed under always-on.
 
 ## Cross-Project Use

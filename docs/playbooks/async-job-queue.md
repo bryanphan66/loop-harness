@@ -114,6 +114,6 @@ wiring from scratch.
 - `media-pipeline.md` — the meta-playbook composing this + object-storage + ffmpeg.
 - `external-integration.md` — webhook handlers are often the enqueue trigger.
 - `docs/gates/phase-acceptance.md` — the per-phase gate this playbook's categories feed.
-- `docs/templates/build-manifest.md` — the `Phase-type: async-job` block shape.
+- `docs/mau-tai-lieu/build-manifest.md` — the `Phase-type: async-job` block shape.
 - `docs/playbooks/code-review-scoring.md` — the no-error-swallow floor rule.
 - `docs/process/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles.

@@ -18,7 +18,7 @@
 #     vendors the ck-* skills/agents — they are the live engine, not a payload.
 #   - `git init` only if it created .git; sets core.hooksPath=.githooks so the
 #     verify gate is active.
-#   - Copies docs/templates/STAGE.md to the project root STAGE.md and fills the
+#   - Copies docs/mau-tai-lieu/STAGE.md to the project root STAGE.md and fills the
 #     Snapshot section for a fresh project.
 #   - Writes .claude/settings.local.json (gitignored) with the notifier hooks
 #     pre-registered.
@@ -905,7 +905,7 @@ if [ "$BOOTSTRAP" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
 
   # 3. STAGE.md root tracker — copy the per-project template to repo root and
   #    fill the Snapshot for a fresh Pre-Build project.
-  stage_template="$TARGET_DIR/docs/templates/STAGE.md"
+  stage_template="$TARGET_DIR/docs/mau-tai-lieu/STAGE.md"
   stage_root="$TARGET_DIR/STAGE.md"
   today="$(date +%Y-%m-%d)"
   if [ -e "$stage_root" ] && [ "$FORCE" -eq 0 ]; then
@@ -917,7 +917,7 @@ if [ "$BOOTSTRAP" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
     # if a line is absent.
     if command -v sed >/dev/null 2>&1; then
       tmp="$stage_root.tmp.$$"
-      # Field labels match docs/templates/STAGE.md § Snapshot. Step-specific
+      # Field labels match docs/mau-tai-lieu/STAGE.md § Snapshot. Step-specific
       # fields (Client-paging?, Conditional gates) keep their placeholders —
       # the agent sets those as the project advances.
       harness_source_note="$SOURCE_ROOT"
@@ -939,7 +939,7 @@ if [ "$BOOTSTRAP" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
     fi
     log "  STAGE.md: copied template to repo root + filled Snapshot for Pre-Build"
   else
-    log "  STAGE.md: SKIPPED — template not found at docs/templates/STAGE.md"
+    log "  STAGE.md: SKIPPED — template not found at docs/mau-tai-lieu/STAGE.md"
   fi
 
   # 4. .claude/settings.local.json — pre-register notifier hooks (gitignored).
@@ -1029,7 +1029,7 @@ SETTINGSJSON
 Next step — open Claude Code in this directory and paste the first goal:
 
   /goal docs/intake/${today}-intake-brief.md exists, faithfully restating the
-  aggregate of docs/discovery/* per docs/templates/client-intake-brief.md (and
+  aggregate of docs/discovery/* per docs/mau-tai-lieu/client-intake-brief.md (and
   its locale-vi fork) — no derivations, open questions + assumptions logged. Mark
   the PB-G1 intake go/no-go decision (proceed | park | decline) INTERNALLY — do
   NOT page the client. Update STAGE.md Snapshot to Current = Pre-Build / 1.3

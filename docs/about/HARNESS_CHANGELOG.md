@@ -47,7 +47,7 @@ nesting the product one level deep.
   ships), not a directory.
 - Docs regrouped: `docs/process/` (how it runs) + `docs/about/` (about the
   harness itself). Root `templates/` renamed to **`scaffolds/`** so code-scaffolds
-  no longer collide in name with `docs/templates/` (blank doc forms).
+  no longer collide in name with `docs/mau-tai-lieu/` (blank doc forms).
 - `docs/README.md` is a plain "what are you trying to do → which file" map, now
   fronted by the PROVEN/PATCHED/ASPIRATIONAL maturity scorecard so a reader knows
   what to trust before relying on it.
@@ -741,7 +741,7 @@ construction and the glance stays a quick check that scales to many screens.
   glance before phase-close); explicitly does NOT rely on agent self-cert or LLM
   image-compare; auto-block on missing/RED assertions or missing glance;
   per-screen table gains fidelity-spec + assertions + glance columns.
-- **`docs/templates/build-manifest.md`** — screens carry a **Fidelity contract
+- **`docs/mau-tai-lieu/build-manifest.md`** — screens carry a **Fidelity contract
   (executable, not prose)**: required-element + interaction assertions to encode
   as a Playwright fidelity spec; strategy renamed `port from export` →
   `adopt from export`; visual-fidelity acceptance category = assertions green +
@@ -785,7 +785,7 @@ the entire point of shipping proven template code.
   project's own repo — done before the bootstrap baseline auto-commit.
   `STAGE.md` Snapshot § Harness source now also records the embedded path +
   `TEMPLATE_VERSION` when bootstrap fills it.
-- **`docs/process/STAGE_GOALS.md` step 2.4** + **`docs/templates/build-manifest.md` P0
+- **`docs/process/STAGE_GOALS.md` step 2.4** + **`docs/mau-tai-lieu/build-manifest.md` P0
   block**: scaffold's PRIMARY path is now the embedded copy
   (`.harness/stack-template/scripts/scaffold.sh <target> <slug>`); the
   harness-source clone/tarball is a fallback only for a missing/stale embed. A
@@ -816,7 +816,7 @@ in-context fix; the same defect surfacing at 2.10/2.12 costs cross-phase rework 
 v4 lesson, now extended to non-CRUD). CRUD-only projects pay **nothing** — tier-2 is
 opt-in (YAGNI); the walking skeleton stays `db+api+web`.
 
-- **Manifest `Phase-type`** (`docs/templates/build-manifest.md`): enum `crud`
+- **Manifest `Phase-type`** (`docs/mau-tai-lieu/build-manifest.md`): enum `crud`
   (default) `| async-job | media-pipeline | external-integration | storage`. For
   non-CRUD types Entities/API/Screens are optional; the block adds type-specific
   fields + **type-specific acceptance categories** that extend the CRUD trio

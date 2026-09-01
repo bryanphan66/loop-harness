@@ -38,7 +38,7 @@ Rules:
 | File path | Patchable? |
 |---|---|
 | `docs/playbooks/*.md` (except `README.md` and `template.md`) | yes |
-| `docs/templates/**/*.md` | yes |
+| `docs/mau-tai-lieu/**/*.md` | yes |
 | `docs/about/HARNESS.md`, `docs/process/WORKFLOW.md`, `docs/process/TRACE_SPEC.md`, `docs/process/ROLE_MAP.md`, `AGENTS.md` | no — fork instead |
 | `docs/decisions/*.md` | no — write a new superseding decision |
 | `docs/playbooks/README.md` | no — register playbooks by editing the index directly |
@@ -85,7 +85,7 @@ an override.
 List every active extension:
 
 ```bash
-grep -rn "HARNESS:EXT:START" docs/playbooks docs/templates
+grep -rn "HARNESS:EXT:START" docs/playbooks docs/mau-tai-lieu
 ```
 
 The canonical inventory. A block without a matching END marker is broken — open

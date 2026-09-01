@@ -80,7 +80,7 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
    playbook's core is executable by a plain agent. `ck-*` skills are
    **accelerators, not dependencies** (`docs/about/HARNESS.md` § Independence
    Principle). Never treat a missing skill as a blocker.
-3. Read the template under `docs/templates/` (use the `locale-vi/` variant for
+3. Read the template under `docs/mau-tai-lieu/` (use the `locale-vi/` variant for
    the bilingual client-facing surfaces named in the WORKFLOW row: intake
    brief, gap-analysis, feature-register, bao-gia, change-request-log,
    release-note, maintenance-proposal, role-permission-matrix, status-flow,

@@ -148,7 +148,7 @@ screens are children of it.
   implements; § Before Coding A Screen — the pre-flight.
 - `docs/gates/visual-fidelity.md` — the toothy gate (Playwright element +
   interaction assertions + human side-by-side glance) each adopted screen passes.
-- `docs/templates/build-manifest.md` — the phase block carries each screen's
+- `docs/mau-tai-lieu/build-manifest.md` — the phase block carries each screen's
   export source + required-element + interaction assertions.
 - `design-system-3-tier.md` — the adopted `tokens.css` = Tier-2; the ported kit
   = Tier-3.
