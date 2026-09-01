@@ -1,0 +1,269 @@
+<title>Flow UAT: từ Google Sheet sang Plane</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --panel:#ffffff; --ink:#1a1d26; --muted:#5b6172; --faint:#8b91a1;
+    --line:#e3e6ec; --line-strong:#cdd2de;
+    --plane:#5b5bd6; --plane-soft:#ecebfb;
+    --sheet:#1a8a5f; --sheet-soft:#e3f5ec;
+    --git:#59606e; --git-soft:#edeff3;
+    --pass:#1a8a5f; --pass-soft:#e3f5ec;
+    --fail:#c2540a; --fail-soft:#fbeee1;
+    --hold:#b7791f; --hold-soft:#fbf2df;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#111319; --panel:#1a1d25; --ink:#e9ebf1; --muted:#9aa0b0; --faint:#6b7180;
+      --line:#282c37; --line-strong:#3a4051;
+      --plane:#9491f5; --plane-soft:#23234a;
+      --sheet:#43c78d; --sheet-soft:#123026;
+      --git:#aab2c2; --git-soft:#232832;
+      --pass:#43c78d; --pass-soft:#123026;
+      --fail:#e8935a; --fail-soft:#3a2415;
+      --hold:#e0b45a; --hold-soft:#33280f;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f4f6f9; --panel:#ffffff; --ink:#1a1d26; --muted:#5b6172; --faint:#8b91a1;
+    --line:#e3e6ec; --line-strong:#cdd2de;
+    --plane:#5b5bd6; --plane-soft:#ecebfb; --sheet:#1a8a5f; --sheet-soft:#e3f5ec;
+    --git:#59606e; --git-soft:#edeff3; --pass:#1a8a5f; --pass-soft:#e3f5ec;
+    --fail:#c2540a; --fail-soft:#fbeee1; --hold:#b7791f; --hold-soft:#fbf2df;
+  }
+  :root[data-theme="dark"]{
+    --bg:#111319; --panel:#1a1d25; --ink:#e9ebf1; --muted:#9aa0b0; --faint:#6b7180;
+    --line:#282c37; --line-strong:#3a4051;
+    --plane:#9491f5; --plane-soft:#23234a; --sheet:#43c78d; --sheet-soft:#123026;
+    --git:#aab2c2; --git-soft:#232832; --pass:#43c78d; --pass-soft:#123026;
+    --fail:#e8935a; --fail-soft:#3a2415; --hold:#e0b45a; --hold-soft:#33280f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased;padding:clamp(16px,3.5vw,44px)}
+  .wrap{max-width:1000px;margin:0 auto}
+  .eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 8px}
+  h1{font-size:clamp(24px,4vw,36px);line-height:1.12;margin:0 0 12px;font-weight:750;letter-spacing:-.01em;text-wrap:balance}
+  .lede{color:var(--muted);max-width:70ch;margin:0 0 26px;font-size:15.5px}
+  .lede b{color:var(--ink);font-weight:650}
+
+  .callout{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);
+    border-left:4px solid var(--sheet);border-radius:12px;padding:16px 18px;margin:0 0 30px}
+  .callout .ic{font-size:22px;line-height:1.2;flex-shrink:0}
+  .callout h3{margin:0 0 4px;font-size:15px;font-weight:700}
+  .callout p{margin:0;font-size:14px;color:var(--muted)}
+  .callout .arrowline{margin-top:8px;font-family:var(--mono);font-size:13px;color:var(--ink)}
+  .callout .arrowline .a{color:var(--sheet);font-weight:700}
+  .callout .arrowline .b{color:var(--plane);font-weight:700}
+
+  h2.sec{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700;
+    margin:34px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+
+  /* flow */
+  .flow{display:flex;flex-direction:column;gap:0;align-items:center}
+  .node{background:var(--panel);border:1px solid var(--line-strong);border-radius:14px;padding:15px 18px;
+    width:100%;max-width:560px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .node .step{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--faint);text-transform:uppercase}
+  .node h4{margin:3px 0 5px;font-size:16px;font-weight:700}
+  .node p{margin:0;font-size:13.5px;color:var(--muted)}
+  .node .who{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:9px}
+  .who.cust{background:var(--plane-soft);color:var(--plane)}
+  .who.team{background:var(--git-soft);color:var(--git)}
+
+  .conn{width:2px;height:22px;background:var(--line-strong)}
+  .conn.tall{height:30px}
+
+  .branch{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:640px;margin-top:4px}
+  @media (max-width:600px){.branch{grid-template-columns:1fr}}
+  .lane{border-radius:14px;padding:2px;display:flex;flex-direction:column;align-items:center}
+  .tag{font-family:var(--mono);font-size:12px;font-weight:750;padding:4px 12px;border-radius:20px;margin-bottom:8px}
+  .tag.pass{background:var(--pass-soft);color:var(--pass);border:1px solid var(--pass)}
+  .tag.fail{background:var(--fail-soft);color:var(--fail);border:1px solid var(--fail)}
+  .node.pass{border-color:var(--pass)}
+  .node.fail{border-color:var(--fail)}
+  .node.small{max-width:100%;padding:13px 15px}
+  .node.small h4{font-size:14.5px}
+
+  .loopnote{display:flex;align-items:center;gap:8px;background:var(--hold-soft);color:var(--hold);
+    border:1px dashed var(--hold);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;
+    margin-top:6px;max-width:640px;width:100%;justify-content:center}
+
+  .done{background:var(--pass-soft);border:1px solid var(--pass);color:var(--pass);border-radius:14px;
+    padding:14px 18px;max-width:560px;width:100%;text-align:center;font-weight:700;font-size:15px}
+
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
+  .badge.git{background:var(--git-soft);color:var(--git)}
+  .badge.plane{background:var(--plane-soft);color:var(--plane)}
+
+  /* compare */
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.cmp{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .card.sheet{border-top:3px solid var(--sheet)}
+  .card.plane{border-top:3px solid var(--plane)}
+  .card h3{margin:0 0 3px;font-size:16px;font-weight:750;display:flex;align-items:center;gap:8px}
+  .card .role{font-size:12px;color:var(--faint);margin:0 0 12px;font-weight:600}
+  .card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+  .card li{font-size:13.5px;color:var(--muted);padding-left:20px;position:relative}
+  .card li::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;border-radius:2px}
+  .card.sheet li::before{background:var(--sheet)}
+  .card.plane li::before{background:var(--plane)}
+  .card li b{color:var(--ink);font-weight:650}
+  .win{margin-top:12px;font-size:12.5px;background:var(--plane-soft);color:var(--plane);border-radius:8px;padding:9px 12px;font-weight:600}
+
+  /* status legend */
+  .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:700px){.legend{grid-template-columns:1fr}}
+  .leg{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .leg .h{font-size:13px;font-weight:750;margin:0 0 8px;display:flex;align-items:center;gap:7px}
+  .leg .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .leg.ok .dot{background:var(--pass)} .leg.auto .dot{background:var(--hold)} .leg.gap .dot{background:var(--fail)}
+  .leg ul{margin:0;padding-left:16px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+  .leg li b{color:var(--ink);font-weight:650}
+
+  .future{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:4px}
+  .future .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14px}
+  .future .chip{font-family:var(--mono);font-size:12.5px;padding:5px 11px;border-radius:8px;background:var(--git-soft);color:var(--ink);font-weight:600;white-space:nowrap}
+  .future .chip.tg{background:var(--plane-soft);color:var(--plane)}
+  .future .chip.gc{background:var(--sheet-soft);color:var(--sheet)}
+  .future .to{color:var(--faint);font-weight:800}
+  .future p{margin:12px 0 0;font-size:13px;color:var(--muted)}
+
+  footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--faint);font-family:var(--mono)}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Nghiệm thu khách hàng (UAT) - mục tiêu anh Nghĩa</p>
+  <h1>Vòng lặp UAT: chuyển từ Google Sheet sang Plane</h1>
+  <p class="lede">UAT (User Acceptance Test - khách kiểm thử xem tính năng có đạt không). Khách chấm từng tính năng,
+    cái nào lỗi thì <b>đẻ việc con</b> cho team sửa, sửa xong báo lại, <b>lặp tới khi khách duyệt</b> - và mọi bước
+    <b>tự đồng bộ với Git</b> để không phải chép tay 2 nơi.</p>
+
+  <div class="callout">
+    <div class="ic">📄</div>
+    <div>
+      <h3>Hiện tại khách giao tiếp ở đâu? -> Google Sheet</h3>
+      <p>Đúng vậy. Bây giờ khách nghiệm thu trên một <b>UAT sheet</b> (Google Sheet): khách ghi Đạt/Chưa đạt và nhận xét
+        vào các cột. Mục tiêu của anh Nghĩa là dời hẳn việc này sang Plane.</p>
+      <div class="arrowline"><span class="a">Google Sheet (đang dùng)</span> &nbsp;-&gt;&nbsp; <span class="b">Plane (mục tiêu)</span></div>
+    </div>
+  </div>
+
+  <h2 class="sec">Vòng lặp UAT - 1 tính năng đi qua các bước</h2>
+  <div class="flow">
+    <div class="node">
+      <div class="step">Bước 0 - Danh sách</div>
+      <h4>Task cha "Trang danh sách khoá học" ở trạng thái <em>Đang UAT</em></h4>
+      <p>Mỗi tính năng = 1 task cha trong danh sách nghiệm thu (Sheet nay, Plane sau).</p>
+    </div>
+    <div class="conn"></div>
+
+    <div class="node">
+      <div class="step">Bước 1 - Khách chấm</div>
+      <h4>Khách test tính năng và cho kết quả</h4>
+      <p>Khách dùng thử rồi chọn: đạt hay chưa đạt.</p>
+      <span class="who cust">Khách hàng</span>
+    </div>
+    <div class="conn"></div>
+
+    <div class="branch">
+      <div class="lane">
+        <span class="tag pass">ĐẠT ✓</span>
+        <div class="node pass small">
+          <h4>Task tự chuyển <em>Done</em> <span class="badge git">-&gt; đẩy về Git</span></h4>
+          <p>Trạng thái Done tự đồng bộ về Git (issue GitHub đóng lại). Xong, hết vòng.</p>
+        </div>
+      </div>
+      <div class="lane">
+        <span class="tag fail">CHƯA ĐẠT ✕</span>
+        <div class="node fail small">
+          <h4>Khách comment + đẻ task con</h4>
+          <p>Khách ghi nhận xét (VD "nút Tìm kiếm không ra kết quả") rồi tạo <b>task con Bug / Enhancement</b>.
+            Task cha <b>vẫn để Đang UAT</b>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="conn tall"></div>
+    <div class="node">
+      <div class="step">Bước 2 - Team sửa</div>
+      <h4>Dev sửa xong <em>toàn bộ</em> task con -> đánh dấu "Dev đã fix"</h4>
+      <p>Khi mọi task con của cha đó xong, đặt cha sang trạng thái/nhãn <b>"Dev đã fix"</b> để báo khách test lại.
+        <span class="badge plane">lọc được</span> <span class="badge git">-&gt; đồng bộ Git</span></p>
+      <span class="who team">Team dev</span>
+    </div>
+    <div class="conn"></div>
+    <div class="loopnote">🔁 Lặp Bước 1 - 2 (thường 2-3 vòng) đến khi khách chấm ĐẠT</div>
+    <div class="conn"></div>
+    <div class="done">✓ Khách duyệt ĐẠT -> Task Done -> đồng bộ Git -> kết thúc tính năng</div>
+  </div>
+
+  <h2 class="sec">Vì sao chuyển sang Plane - và điều anh Nghĩa lo</h2>
+  <div class="cmp">
+    <div class="card sheet">
+      <h3>📄 Google Sheet <span style="font-weight:600;font-size:12px;color:var(--faint)">(đang dùng)</span></h3>
+      <p class="role">Khách ghi trực tiếp vào cột</p>
+      <ul>
+        <li><b>Lọc (filter) rất tiện:</b> cột "dev status" lọc cái rụp ra task nào đã fix chờ test lại.</li>
+        <li>Khách quen thao tác, dễ nhìn tổng thể.</li>
+        <li><b>Nhược:</b> tách rời Git, phải chép tay qua lại; không gắn được code/issue.</li>
+      </ul>
+    </div>
+    <div class="card plane">
+      <h3>🗂️ Plane <span style="font-weight:600;font-size:12px;color:var(--faint)">(mục tiêu)</span></h3>
+      <p class="role">Khách comment thẳng trên task</p>
+      <ul>
+        <li><b>Đồng bộ 2 chiều với Git</b> tự động ở mỗi bước - dev chỉ nhìn 1 nơi.</li>
+        <li>Task con Bug/Enhancement + quan hệ cha-con là tính năng có sẵn.</li>
+        <li>Comment của khách gắn thẳng vào task, có lịch sử rõ ràng.</li>
+      </ul>
+      <div class="win">💡 Lo lắng của anh Nghĩa "comment thì không lọc được task đã fix" -> Plane khắc phục: dùng
+        <b>Trạng thái / Nhãn "Dev đã fix"</b> thay cho comment -> <b>lọc được ngay</b>, bằng hoặc hơn sheet.</div>
+    </div>
+  </div>
+
+  <h2 class="sec">Plane đáp ứng tới đâu</h2>
+  <div class="legend">
+    <div class="leg ok">
+      <p class="h"><span class="dot"></span> Có sẵn / đã làm</p>
+      <ul>
+        <li>Danh sách task + <b>task con Bug/Enhancement</b></li>
+        <li>Comment của khách trên task</li>
+        <li><b>Lọc theo trạng thái / loại</b> (thay cột sheet)</li>
+        <li>Đồng bộ Git -> Plane (issue, comment mới, cha-con)</li>
+      </ul>
+    </div>
+    <div class="leg auto">
+      <p class="h"><span class="dot"></span> Cần tự động hoá (tạm làm tay OK)</p>
+      <ul>
+        <li>Đạt -> <b>tự</b> chuyển Done</li>
+        <li>Chưa đạt -> <b>tự</b> tạo task con</li>
+        <li>Xong hết con -> <b>tự</b> báo cha "đã fix"</li>
+      </ul>
+    </div>
+    <div class="leg gap">
+      <p class="h"><span class="dot"></span> Còn thiếu / cần kiểm</p>
+      <ul>
+        <li>Comment <b>cũ</b> không tự kéo về (chỉ comment mới)</li>
+        <li>Xoá comment chưa đồng bộ ngược</li>
+        <li>Chiều <b>Plane -> Git</b> cần bật + test thật</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="sec">Mục tiêu xa của anh Nghĩa</h2>
+  <div class="future">
+    <div class="row">
+      <span class="chip tg">Anh chat trong Telegram</span>
+      <span class="to">-&gt;</span>
+      <span class="chip gc">Agent (từ goclaw)</span>
+      <span class="to">-&gt;</span>
+      <span class="chip">Tự comment / reply khách trên Plane</span>
+    </div>
+    <p>Đích cuối: anh chỉ nói chuyện với 1 <b>agent (trợ lý AI)</b> trong Telegram, nó tự trả lời khách ngay trên Plane;
+      về sau gắn hẳn <b>agent CS (chăm sóc khách hàng)</b> vào Plane. Con agent này <b>làm từ goclaw</b> - Plane không tự đẻ
+      agent, chỉ mở sẵn chỗ (API comment) để agent goclaw cắm vào. Trước mắt cứ đi từng bước, phần nào chưa auto thì làm tay vẫn ổn.</p>
+  </div>
+
+  <footer>Nguồn: đề xuất flow UAT của Nguyễn Hữu Nghĩa (Telegram) · đối chiếu năng lực Plane fork RenoAI-Labs · 2026-08-21</footer>
+</div>

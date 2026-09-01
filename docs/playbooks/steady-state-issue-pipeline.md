@@ -13,7 +13,7 @@
 How the harness runs a project **after go-live**. This operationalizes `WORKFLOW.md` Macro 3 steps **3.3 steady-state** + **3.5 change-control**. Model + when-to-switch: `../OPERATING-MODES.md`.
 
 ## Install (once, at graduation to Mode B)
-From `harness/templates/steady-state/`, copy into the project:
+From `templates/steady-state/`, copy into the project:
 - `scripts/issue-state.mjs` — set an issue's State (resolves the org Issue Field by name, re-sends other field values so nothing is wiped, `gh` only). **Enforces the legal transitions below** — the 10 states are a barrier, not paint on the floor.
 - `scripts/qc-checklist.mjs` — generate a QC checklist from an issue's Acceptance Criteria (happy path + 6 slices), post it as a comment (idempotent).
 - `.github/ISSUE_TEMPLATE/bug-report.md` — the bug form (repro / expected / actual / severity / evidence + env).

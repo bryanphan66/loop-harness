@@ -31,7 +31,7 @@
 #
 # Clean POSIX-leaning bash. No network needed in local mode (the common case:
 # run from a clone of the harness repo, where the skeleton lives under
-# harness/). Remote mode (no local clone found) fetches the repo as a tarball
+# the repo root). Remote mode (no local clone found) fetches the repo as a tarball
 # into a temp dir, then installs with the same copy logic — so you do NOT need
 # the harness checked out locally; set HARNESS_REPO (owner/repo). Private repos are
 # fetched via `gh` (or a GitHub token in GH_TOKEN/GITHUB_TOKEN); public repos
@@ -90,10 +90,10 @@ Preflight (Independence Principle, decision D1/D6):
 
 Remote (no local clone — fetches the repo as a tarball into a temp dir).
   HARNESS_REPO (owner/repo) is REQUIRED in remote mode; there is no default:
-    gh api repos/<owner>/<repo>/contents/harness/scripts/install-harness.sh \
+    gh api repos/<owner>/<repo>/contents/scripts/install-harness.sh \
       -H "Accept: application/vnd.github.raw" \
       | HARNESS_REPO=<owner>/<repo> bash -s -- --bootstrap ./my-new-project
-    curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/harness/scripts/install-harness.sh \
+    curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/install-harness.sh \
       | HARNESS_REPO=<owner>/<repo> bash -s -- --bootstrap ./my-new-project
   Pin a branch/tag with HARNESS_REF (default: main).
 
@@ -440,7 +440,7 @@ cleanup_harness_tmp() {
 
 materialize_remote_source() {
   local repo="$HARNESS_REPO" ref="$HARNESS_REF"
-  [ -n "$repo" ] || fail "no local harness clone found and HARNESS_REPO is unset. Run from a clone (harness/scripts/install-harness.sh) or export HARNESS_REPO=owner/repo."
+  [ -n "$repo" ] || fail "no local harness clone found and HARNESS_REPO is unset. Run from a clone (scripts/install-harness.sh) or export HARNESS_REPO=owner/repo."
   command -v tar >/dev/null 2>&1 || fail "tar is required for remote installation."
 
   HARNESS_TMP="$(mktemp -d "${TMPDIR:-/tmp}/loop-harness.XXXXXX")" \
@@ -479,15 +479,15 @@ materialize_remote_source() {
 
   tar -xzf "$tarball" -C "$HARNESS_TMP" || fail "could not extract the harness tarball."
   # GitHub tarballs wrap the tree in a single top dir: <owner>-<repo>-<sha>/.
-  # The skeleton lives under harness/ inside the repo.
+  # The skeleton lives at the repo root (flattened 2026-09-01).
   local top
   top="$(find "$HARNESS_TMP" -mindepth 1 -maxdepth 1 -type d ! -name '.*' | head -n1)"
-  [ -n "$top" ] && [ -f "$top/harness/AGENTS.md" ] && [ -f "$top/harness/docs/HARNESS.md" ] \
-    || fail "extracted tarball missing harness/AGENTS.md or harness/docs/HARNESS.md — unexpected archive layout."
+  [ -n "$top" ] && [ -f "$top/AGENTS.md" ] && [ -f "$top/docs/HARNESS.md" ] \
+    || fail "extracted tarball missing AGENTS.md or docs/HARNESS.md — unexpected archive layout."
 
   # Flip to local mode pointing at the extracted tree; all later copy logic
   # (collect_skeleton_files / copy_file / write_source_file) then just works.
-  SOURCE_ROOT="$top/harness"
+  SOURCE_ROOT="$top"
   SOURCE_MODE="local"
 }
 

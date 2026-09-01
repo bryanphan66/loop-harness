@@ -40,7 +40,7 @@ scripts/install-harness.sh --dry-run --bootstrap ./preview
 # Remote — NO local clone needed. Fetches the repo tarball into a temp dir.
 # HARNESS_REPO (owner/repo) is required; authenticate first for a private repo
 # ('gh auth login' or export GH_TOKEN), then pull the script and pipe to bash:
-gh api repos/<owner>/<repo>/contents/harness/scripts/install-harness.sh \
+gh api repos/<owner>/<repo>/contents/scripts/install-harness.sh \
   -H "Accept: application/vnd.github.raw" \
   | HARNESS_REPO=<owner>/<repo> bash -s -- --bootstrap ./my-new-project
 ```
@@ -162,16 +162,16 @@ smallest thing that produces real evidence.
 
 ```bash
 # at dispatch — prints the run id on stdout (stderr carries the human line)
-RUN=$(node harness/scripts/run-log.mjs start --issue 123 --worker 1a2b3c4d \
+RUN=$(node scripts/run-log.mjs start --issue 123 --worker 1a2b3c4d \
         --task "fix upload" --model opus)
 
 # when the worker finishes (or dies — a dead run is the interesting data)
-node harness/scripts/run-log.mjs end --run "$RUN" --outcome done \
+node scripts/run-log.mjs end --run "$RUN" --outcome done \
         --qc-fails 1 --retries 0 --tokens 180000
 
 # any time
-node harness/scripts/run-log.mjs report                 # grouped by harness version
-node harness/scripts/run-log.mjs report --by repo --since 2026-08-01
+node scripts/run-log.mjs report                 # grouped by harness version
+node scripts/run-log.mjs report --by repo --since 2026-08-01
 ```
 
 - **Where it writes:** `$LOOP_HARNESS_RUNLOG`, default

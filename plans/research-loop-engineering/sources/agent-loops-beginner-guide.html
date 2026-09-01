@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Loops, Made Simple</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f172a; --blue:#2563eb; --blued:#1e40af; --amber:#f59e0b; --green:#16a34a;
+    --red:#ef4444; --bg:#ffffff; --soft:#f6f8fc; --line:#e2e8f0; --mut:#64748b; --sky:#eff6ff;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;font-size:16px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  h1,h2,h3,.mono-h{font-family:'Montserrat',sans-serif}
+  .mono{font-family:'Roboto Mono',monospace}
+  /* hero */
+  .hero{background:radial-gradient(120% 120% at 50% 0%,#1e3a8a 0%,#0f172a 70%);color:#fff;text-align:center;padding:64px 0 72px}
+  .hero .tag{font-family:'Roboto Mono',monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#93c5fd}
+  .hero h1{font-size:46px;font-weight:800;letter-spacing:-.02em;margin:14px 0 10px}
+  .hero p{font-size:19px;color:#cbd5e1;max-width:660px;margin:0 auto 30px}
+  .hero .one{font-size:20px;color:#fff;background:rgba(255,255,255,.07);border:1px solid rgba(147,197,253,.3);border-radius:14px;padding:16px 22px;max-width:700px;margin:0 auto;font-weight:500}
+  .hero .one b{color:#93c5fd;font-weight:700}
+  /* sections */
+  section{padding:62px 0;border-bottom:1px solid var(--line)}
+  section.alt{background:var(--soft)}
+  .eyebrow{font-family:'Roboto Mono',monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:500;margin-bottom:8px}
+  h2{font-size:32px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;line-height:1.12}
+  .sub{font-size:18px;color:var(--mut);max-width:700px;margin:0 0 28px}
+  .center{text-align:center}
+  .center .sub{margin-left:auto;margin-right:auto}
+  .subhead{font-family:'Montserrat';font-size:20px;font-weight:700;text-align:center;margin:0 0 6px}
+  .gloss{background:var(--sky);border:1px solid #bfdbfe;border-radius:12px;padding:12px 18px;font-size:14.5px;color:#1e3a8a;max-width:760px;margin:0 0 26px}
+  .gloss b{color:var(--blued)}
+  .cap{text-align:center;font-size:14.5px;color:var(--mut);margin:16px auto 0;max-width:700px}
+  .cap b{color:var(--ink)}
+  /* svg figure */
+  .fig{width:100%;height:auto;display:block}
+  .figwrap{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 8px 30px rgba(15,23,42,.06)}
+  /* analogy */
+  .analogy{display:flex;gap:16px;align-items:flex-start;background:var(--sky);border:1px solid #bfdbfe;border-radius:16px;padding:18px 22px;max-width:820px;margin:0 auto 26px;text-align:left}
+  .analogy .em{font-size:30px;line-height:1}
+  .analogy p{margin:0;font-size:15.5px;color:#1e3a8a}
+  .analogy b{color:var(--blued)}
+  /* ambiguity cards */
+  .shapes{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px}
+  .shape{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 14px 16px;text-align:center;display:flex;flex-direction:column}
+  .shape svg{height:132px;width:100%;margin-bottom:6px}
+  .shape h4{font-family:'Montserrat';font-size:14px;margin:0 0 4px;font-weight:700}
+  .shape p{font-size:12.5px;color:var(--mut);margin:0;line-height:1.35}
+  .shape .src{font-family:'Roboto Mono';font-size:10px;color:#b0bac9;margin-top:7px;letter-spacing:.02em}
+  .unify{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;background:#0f172a;border-radius:16px;padding:18px 24px;font-size:17px;font-weight:600;color:#fff}
+  .unify b{color:#93c5fd}
+  /* pattern cards */
+  .patterns{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .pat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 16px rgba(15,23,42,.04)}
+  .pat h3{font-size:17px;margin:0 0 2px;font-weight:700}
+  .pat .when{font-size:13px;color:var(--blue);font-weight:600;margin-bottom:12px}
+  .pat svg{height:96px;width:100%;margin:4px 0}
+  .pat p{font-size:14px;color:var(--mut);margin:10px 0 0}
+  .pat .from{font-family:'Roboto Mono';font-size:11px;color:#94a3b8;margin-top:8px}
+  .bridge{background:var(--sky);border:1px solid #bfdbfe;border-radius:12px;padding:13px 18px;font-size:15px;color:var(--blued);margin-bottom:22px;font-weight:500}
+  /* check types */
+  .checks{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:8px}
+  .chk{display:flex;gap:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .chk .ico{flex:0 0 52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+  .chk h3{font-size:17px;margin:0 0 2px}
+  .chk .tw{font-size:13px;color:var(--mut);margin:0 0 6px}
+  .chk .ex{font-size:13px;color:var(--ink);background:var(--soft);border-radius:8px;padding:6px 10px;display:inline-block}
+  .chk .ex b{color:var(--blue)}
+  .chk .ease{display:block;font-size:11.5px;color:var(--green);margin-top:7px;font-weight:600}
+  .ico.f{background:#dcfce7;color:#15803d}.ico.v{background:#dbeafe;color:#1d4ed8}
+  .ico.s{background:#fef3c7;color:#b45309}.ico.h{background:#fee2e2;color:#b91c1c}
+  .pickcue{text-align:center;font-family:'Roboto Mono';font-size:13px;color:var(--blue);margin:0 auto 14px;background:var(--sky);border:1px solid #bfdbfe;border-radius:20px;padding:6px 16px;display:inline-block}
+  .pickwrap{text-align:center}
+  /* questions */
+  .qs{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:840px;margin:0 auto 14px}
+  .qcard{display:flex;gap:16px;background:#fff;border:2px solid var(--blue);border-radius:16px;padding:20px 22px;text-align:left;align-items:flex-start}
+  .qcard .qn{flex:0 0 42px;height:42px;border-radius:50%;background:var(--blue);color:#fff;font-family:'Montserrat';font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center}
+  .qcard h3{margin:2px 0 6px;font-size:18px}
+  .qcard p{margin:0;color:var(--mut);font-size:14.5px}
+  /* big idea */
+  .bigidea{background:linear-gradient(135deg,#2563eb,#1e3a8a);color:#fff;border-radius:22px;padding:34px 36px;text-align:center;margin-bottom:30px}
+  .bigidea .eyebrow{color:#bfdbfe}
+  .bigidea h2{color:#fff;font-size:32px;margin:0 0 6px}
+  .bigidea p{font-size:18px;color:#dbeafe;margin:0 auto;max-width:660px}
+  /* 8 principles */
+  .eight{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .e{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 18px 18px;box-shadow:0 2px 10px rgba(15,23,42,.04)}
+  .e .ei{width:44px;height:44px;border-radius:12px;background:var(--sky);color:var(--blue);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .e h3{font-size:15px;margin:0 0 5px;font-weight:700}
+  .e p{font-size:13px;color:var(--mut);margin:0 0 11px;line-height:1.45}
+  .e .ex{font-family:'Roboto Mono';font-size:11px;color:var(--blue);background:var(--sky);border-radius:6px;padding:3px 8px;display:inline-block}
+  .e .recap{display:inline-block;font-size:10px;font-family:'Roboto Mono';color:#94a3b8;border:1px solid var(--line);border-radius:10px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+  /* prompt template */
+  .promptcard{background:#0f172a;border-radius:18px;overflow:hidden;box-shadow:0 16px 40px rgba(15,23,42,.25)}
+  .promptcard .bar{background:#1e293b;padding:11px 18px;display:flex;align-items:center;gap:8px;font-family:'Roboto Mono';font-size:12px;color:#94a3b8}
+  .promptcard .dot{width:11px;height:11px;border-radius:50%}
+  .promptcard .body{padding:24px 26px;font-family:'Roboto Mono';font-size:15px;line-height:1.95;color:#e2e8f0}
+  .promptcard .lbl{color:#64748b}
+  .ph{background:rgba(245,158,11,.16);color:#fbbf24;border:1px solid rgba(245,158,11,.4);border-radius:6px;padding:1px 8px;font-weight:500}
+  .ph.g{background:rgba(34,197,94,.14);color:#4ade80;border-color:rgba(34,197,94,.4)}
+  .ph.b{background:rgba(59,130,246,.16);color:#93c5fd;border-color:rgba(59,130,246,.4)}
+  .swap{background:#fff;border:1px dashed #cbd5e1;border-radius:14px;padding:16px 20px;margin-top:14px;font-size:14px}
+  .swap b{color:var(--blue)}
+  .swap .mono{font-size:13px;color:var(--ink);background:var(--soft);border-radius:6px;padding:2px 7px}
+  .swap .note{display:block;font-size:12.5px;color:var(--mut);margin-top:8px}
+  .gate{background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px 18px;margin-top:14px;font-size:14px;color:#b91c1c}
+  .gate b{color:#991b1b}
+  /* steps */
+  .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+  .st{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;position:relative}
+  .st .n{position:absolute;top:-16px;left:20px;width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-family:'Montserrat';font-weight:800;display:flex;align-items:center;justify-content:center}
+  .st .tieback{font-family:'Roboto Mono';font-size:10.5px;color:#94a3b8;display:block;margin-top:12px}
+  .st h3{font-size:16px;margin:14px 0 6px}
+  .st p{font-size:14px;color:var(--mut);margin:0}
+  /* do/dont */
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+  .do,.dont{border-radius:16px;padding:20px 22px}
+  .do{background:#f0fdf4;border:1px solid #bbf7d0}
+  .dont{background:#fef2f2;border:1px solid #fecaca}
+  .do h3{color:#15803d;margin:0 0 12px;font-size:16px}.dont h3{color:#b91c1c;margin:0 0 12px;font-size:16px}
+  .do li,.dont li{font-size:14.5px;margin-bottom:8px;list-style:none}
+  .do ul,.dont ul{padding:0;margin:0}
+  .do li:before{content:"✓ ";color:#16a34a;font-weight:700}
+  .dont li:before{content:"✕ ";color:#ef4444;font-weight:700}
+  .foot{padding:40px 0 60px;text-align:center;color:var(--mut);font-size:14px}
+  .receipt{display:inline-flex;align-items:center;gap:10px;background:var(--sky);border:1px solid #bfdbfe;border-radius:30px;padding:10px 20px;color:var(--blued);font-weight:600;font-size:14px;text-decoration:none}
+  .receipt b{font-family:'Montserrat'}
+  @media(max-width:860px){.shapes,.patterns,.checks,.steps3,.twocol,.qs,.eight{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:34px}}
+  @media(max-width:560px){.shapes,.patterns,.checks,.steps3,.twocol,.qs,.eight{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div class="tag">Agent Loops · Beginner Guide</div>
+    <h1>Agent loops, made simple</h1>
+    <p>Everyone online means something a little different by "agent loop." This is the version that's simple, correct, and something you can build tonight.</p>
+    <div class="one">An agent loop is just an AI that <b>reasons</b> what to do, <b>acts</b>, and <b>observes</b> the result, over and over, until the goal is met.</div>
+  </div>
+</div>
+
+<!-- 1. THE AMBIGUITY -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Why you're confused (it's not you)</div>
+    <h2>Nobody draws it the same way</h2>
+    <p class="sub">Watch five videos and you'll see five different pictures. They're all the same idea from different angles. Here are the four you'll bump into most:</p>
+    <div class="gloss">New here? An <b>LLM</b> is just an AI model, the kind of thing behind ChatGPT. <b>"Tools"</b> are things it can do for itself: search the web, run code, edit a file. That's all those words mean below.</div>
+    <div class="shapes">
+      <div class="shape">
+        <svg viewBox="0 0 230 132" class="fig">
+          <defs><marker id="a1" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#2563eb"/></marker></defs>
+          <rect x="83" y="26" width="64" height="28" rx="8" fill="#dbeafe"/><text x="115" y="44" font-size="12" font-family="Inter" font-weight="600" fill="#1e40af" text-anchor="middle">Reason</text>
+          <rect x="150" y="84" width="64" height="28" rx="8" fill="#dbeafe"/><text x="182" y="102" font-size="12" font-family="Inter" font-weight="600" fill="#1e40af" text-anchor="middle">Act</text>
+          <rect x="16" y="84" width="64" height="28" rx="8" fill="#dbeafe"/><text x="48" y="102" font-size="12" font-family="Inter" font-weight="600" fill="#1e40af" text-anchor="middle">Observe</text>
+          <path d="M142,54 C170,64 182,72 182,82" stroke="#2563eb" stroke-width="2.5" fill="none" marker-end="url(#a1)"/>
+          <path d="M150,98 L82,98" stroke="#2563eb" stroke-width="2.5" marker-end="url(#a1)"/>
+          <path d="M48,84 C48,62 78,54 86,53" stroke="#2563eb" stroke-width="2.5" fill="none" marker-end="url(#a1)"/>
+        </svg>
+        <h4>"Think → Act → See"</h4>
+        <p>The same three beats, older words.</p>
+        <div class="src">the ReAct paper</div>
+      </div>
+      <div class="shape">
+        <svg viewBox="0 0 230 132" class="fig">
+          <defs><marker id="a2" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#2563eb"/></marker></defs>
+          <rect x="22" y="53" width="74" height="32" rx="9" fill="#dbeafe"/><text x="59" y="73" font-size="13" font-family="Inter" font-weight="600" fill="#1e40af" text-anchor="middle">AI model</text>
+          <rect x="134" y="53" width="74" height="32" rx="9" fill="#dbeafe"/><text x="171" y="73" font-size="13" font-family="Inter" font-weight="600" fill="#1e40af" text-anchor="middle">Tools</text>
+          <path d="M96,63 L130,63" stroke="#2563eb" stroke-width="2.5" marker-end="url(#a2)"/>
+          <path d="M134,75 L100,75" stroke="#2563eb" stroke-width="2.5" marker-end="url(#a2)"/>
+        </svg>
+        <h4>"Model uses tools, on repeat"</h4>
+        <p>The simplest version. A model calling tools, over and over.</p>
+        <div class="src">Anthropic</div>
+      </div>
+      <div class="shape">
+        <svg viewBox="0 0 230 132" class="fig">
+          <defs><marker id="a3" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#f59e0b"/></marker></defs>
+          <rect x="26" y="52" width="64" height="32" rx="9" fill="#fef3c7"/><text x="58" y="72" font-size="12" font-family="Inter" font-weight="600" fill="#b45309" text-anchor="middle">Goal</text>
+          <rect x="140" y="52" width="72" height="32" rx="9" fill="#fef3c7"/><text x="176" y="72" font-size="11" font-family="Inter" font-weight="600" fill="#b45309" text-anchor="middle">Self-prompt</text>
+          <path d="M90,68 L136,68" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#a3)"/>
+          <path d="M176,84 C176,112 58,112 58,86" stroke="#f59e0b" stroke-width="2.5" fill="none" marker-end="url(#a3)"/>
+          <text x="117" y="127" font-size="10" fill="#b45309" text-anchor="middle" font-family="Inter">runs unattended</text>
+        </svg>
+        <h4>"Runs on its own"</h4>
+        <p>The same loop, just left to run unattended toward a goal.</p>
+        <div class="src">AutoGPT</div>
+      </div>
+      <div class="shape">
+        <svg viewBox="0 0 230 132" class="fig">
+          <defs><marker id="a4" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#2563eb"/></marker></defs>
+          <rect x="82" y="35" width="66" height="28" rx="8" fill="#dbeafe"/><text x="115" y="53" font-size="11" font-family="Inter" font-weight="600" fill="#1e40af" text-anchor="middle">Manager</text>
+          <rect x="20" y="91" width="54" height="26" rx="7" fill="#e0e7ff"/><rect x="88" y="91" width="54" height="26" rx="7" fill="#e0e7ff"/><rect x="156" y="91" width="54" height="26" rx="7" fill="#e0e7ff"/>
+          <text x="47" y="108" font-size="10" fill="#3730a3" text-anchor="middle" font-family="Inter">helper</text><text x="115" y="108" font-size="10" fill="#3730a3" text-anchor="middle" font-family="Inter">helper</text><text x="183" y="108" font-size="10" fill="#3730a3" text-anchor="middle" font-family="Inter">helper</text>
+          <path d="M105,63 L55,89" stroke="#2563eb" stroke-width="2.5" marker-end="url(#a4)"/><path d="M115,63 L115,87" stroke="#2563eb" stroke-width="2.5" marker-end="url(#a4)"/><path d="M125,63 L175,89" stroke="#2563eb" stroke-width="2.5" marker-end="url(#a4)"/>
+        </svg>
+        <h4>"One boss, many helpers"</h4>
+        <p>A lead agent hands tasks to sub-agents.</p>
+        <div class="src">multi-agent</div>
+      </div>
+    </div>
+    <div class="unify">
+      <span>Four pictures.</span>
+      <svg width="40" height="24" viewBox="0 0 40 24"><defs><marker id="uar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#93c5fd"/></marker></defs><path d="M2,12 L34,12" stroke="#93c5fd" stroke-width="3" marker-end="url(#uar)"/></svg>
+      <span>One <b>skeleton</b> underneath. That's the part you actually learn 👇</span>
+    </div>
+  </div>
+</section>
+
+<!-- 2. THE CORE LOOP -->
+<section class="alt center">
+  <div class="wrap">
+    <div class="eyebrow">The one picture that matters</div>
+    <h2>Underneath, it's always this</h2>
+    <p class="sub">Strip the jargon and every agent loop is the same three beats, <b>reason → act → observe</b>, repeating toward a goal until a "done?" check says stop.</p>
+    <div class="analogy">
+      <div class="em">🧑‍💼</div>
+      <p>Think of a smart <b>intern</b> you don't micromanage. You hand them the goal. They figure out the next step, do it, <b>check their own work</b>, and go again, only coming back when it's actually done, or stuck. An agent loop is that, in software.</p>
+    </div>
+    <div class="figwrap">
+      <svg viewBox="0 0 1020 430" class="fig" role="img" aria-label="The core agent loop: reason, act, observe, repeat until done">
+        <defs>
+          <marker id="arr" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2563eb"/></marker>
+          <marker id="arrG" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#16a34a"/></marker>
+          <marker id="arrA" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f59e0b"/></marker>
+        </defs>
+        <!-- goal -->
+        <rect x="40" y="66" width="172" height="84" rx="16" fill="#1e3a8a"/>
+        <text x="126" y="104" font-size="19" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">Your goal</text>
+        <text x="126" y="128" font-size="12.5" font-family="Inter" fill="#93c5fd" text-anchor="middle">+ what "done" means</text>
+        <!-- reason -->
+        <rect x="408" y="66" width="232" height="84" rx="16" fill="#fff" stroke="#2563eb" stroke-width="2.5"/>
+        <text x="524" y="102" font-size="20" font-family="Montserrat" font-weight="700" fill="#0f172a" text-anchor="middle">Reason</text>
+        <text x="524" y="126" font-size="13" font-family="Inter" fill="#64748b" text-anchor="middle">think the next step</text>
+        <!-- stop -->
+        <rect x="818" y="66" width="172" height="84" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+        <text x="904" y="104" font-size="19" font-family="Montserrat" font-weight="700" fill="#15803d" text-anchor="middle">✓ Done</text>
+        <text x="904" y="128" font-size="13" font-family="Inter" fill="#15803d" text-anchor="middle">stop</text>
+        <!-- act -->
+        <rect x="600" y="300" width="232" height="84" rx="16" fill="#2563eb"/>
+        <text x="716" y="336" font-size="20" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">Act</text>
+        <text x="716" y="360" font-size="13" font-family="Inter" fill="#bfdbfe" text-anchor="middle">use a tool</text>
+        <!-- observe -->
+        <rect x="200" y="300" width="232" height="84" rx="16" fill="#2563eb"/>
+        <text x="316" y="336" font-size="20" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">Observe</text>
+        <text x="316" y="360" font-size="13" font-family="Inter" fill="#bfdbfe" text-anchor="middle">read what just happened</text>
+        <!-- done? diamond -->
+        <polygon points="524,164 580,210 524,256 468,210" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+        <text x="524" y="216" font-size="16" font-family="Montserrat" font-weight="700" fill="#92400e" text-anchor="middle">done?</text>
+        <!-- arrows -->
+        <path d="M212,108 L402,108" stroke="#2563eb" stroke-width="3" marker-end="url(#arr)"/>
+        <path d="M524,150 L524,162" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrA)"/>
+        <!-- yes -> done -->
+        <path d="M580,205 C690,190 700,108 812,108" stroke="#16a34a" stroke-width="3" fill="none" marker-end="url(#arrG)"/>
+        <text x="690" y="150" font-size="13.5" font-family="Roboto Mono" fill="#15803d" text-anchor="middle">yes ✓</text>
+        <!-- no -> act -->
+        <path d="M560,238 C620,285 670,298 712,298" stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+        <text x="612" y="270" font-size="13" font-family="Roboto Mono" fill="#2563eb" text-anchor="middle">no → act</text>
+        <!-- act -> observe -->
+        <path d="M598,342 L436,342" stroke="#2563eb" stroke-width="3" marker-end="url(#arr)"/>
+        <!-- observe -> reason -->
+        <path d="M316,300 C316,210 380,165 470,150" stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+      </svg>
+    </div>
+    <p class="cap">Each lap is one step. The agent keeps circling (<b>act, observe, act, observe</b>) until the "done?" check passes, or a guardrail (a safety limit, like a max number of tries) stops it. The <b>Observe</b> beat is the mechanism that makes a loop work: it reads its own output instead of assuming it worked. That's exactly why the "done?" check (coming up next) is everything.</p>
+  </div>
+</section>
+
+<!-- 3. SHOULD YOU EVEN USE ONE -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Where loops actually fit</div>
+    <h2>Most tasks don't need a loop</h2>
+    <p class="sub">A loop is worth the setup only when a couple of things are true. Run your task down this ladder before you build anything.</p>
+    <div class="figwrap">
+      <svg viewBox="0 0 1000 430" class="fig" role="img" aria-label="Should you use a loop decision flow">
+        <defs><marker id="d" markerWidth="11" markerHeight="11" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/></marker></defs>
+        <rect x="370" y="14" width="260" height="50" rx="14" fill="#1e3a8a"/><text x="500" y="45" font-size="17" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">Your task</text>
+        <path d="M500,64 L500,92" stroke="#64748b" stroke-width="2.5" marker-end="url(#d)"/>
+        <!-- Q1 -->
+        <polygon points="500,96 700,150 500,204 300,150" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+        <text x="500" y="143" font-size="15" font-family="Montserrat" font-weight="700" fill="#1e40af" text-anchor="middle">Does it repeat, or take</text>
+        <text x="500" y="165" font-size="15" font-family="Montserrat" font-weight="700" fill="#1e40af" text-anchor="middle">many unknown steps?</text>
+        <path d="M700,150 L838,150" stroke="#64748b" stroke-width="2.5" marker-end="url(#d)"/>
+        <rect x="747" y="127" width="40" height="22" rx="6" fill="#fff"/><text x="767" y="143" font-size="13" font-family="Roboto Mono" fill="#ef4444" text-anchor="middle">no</text>
+        <rect x="840" y="120" width="150" height="60" rx="14" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/><text x="915" y="146" font-size="13.5" font-family="Inter" font-weight="600" fill="#475569" text-anchor="middle">Just prompt it</text><text x="915" y="166" font-size="11.5" font-family="Inter" fill="#64748b" text-anchor="middle">one shot is faster</text>
+        <path d="M500,204 L500,232" stroke="#64748b" stroke-width="2.5" marker-end="url(#d)"/>
+        <rect x="478" y="209" width="44" height="22" rx="6" fill="#fff"/><text x="500" y="225" font-size="13" font-family="Roboto Mono" fill="#16a34a" text-anchor="middle">yes</text>
+        <!-- Q2 -->
+        <polygon points="500,236 700,294 500,352 300,294" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+        <text x="500" y="285" font-size="15" font-family="Montserrat" font-weight="700" fill="#1e40af" text-anchor="middle">Can the AI check</text>
+        <text x="500" y="305" font-size="15" font-family="Montserrat" font-weight="700" fill="#1e40af" text-anchor="middle">"done" by itself?</text>
+        <text x="500" y="324" font-size="11.5" font-family="Inter" font-style="italic" fill="#64748b" text-anchor="middle">e.g. run the tests, count the words</text>
+        <path d="M700,294 L838,294" stroke="#64748b" stroke-width="2.5" marker-end="url(#d)"/>
+        <rect x="747" y="271" width="40" height="22" rx="6" fill="#fff"/><text x="767" y="287" font-size="13" font-family="Roboto Mono" fill="#ef4444" text-anchor="middle">no</text>
+        <rect x="840" y="262" width="150" height="64" rx="14" fill="#fef2f2" stroke="#fecaca" stroke-width="1.5"/><text x="915" y="290" font-size="13" font-family="Inter" font-weight="600" fill="#b91c1c" text-anchor="middle">Do it yourself</text><text x="915" y="309" font-size="11.5" font-family="Inter" fill="#b91c1c" text-anchor="middle">it can't tell when</text><text x="915" y="324" font-size="11.5" font-family="Inter" fill="#b91c1c" text-anchor="middle">it's done yet</text>
+        <path d="M500,352 L500,378" stroke="#64748b" stroke-width="2.5" marker-end="url(#d)"/>
+        <rect x="478" y="356" width="44" height="22" rx="6" fill="#fff"/><text x="500" y="372" font-size="13" font-family="Roboto Mono" fill="#16a34a" text-anchor="middle">yes</text>
+        <rect x="330" y="380" width="340" height="46" rx="14" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/><text x="500" y="409" font-size="17" font-family="Montserrat" font-weight="800" fill="#15803d" text-anchor="middle">✓ Build a loop</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 4. PATTERNS -->
+<section class="alt">
+  <div class="wrap">
+    <div class="eyebrow">Pick a shape</div>
+    <h2>Three loops you'll actually use</h2>
+    <p class="sub">Start with the first one. Reach for the others only when a single agent genuinely can't keep up.</p>
+    <div class="bridge">↑ These are the same shapes from up top, just grouped by <b>when you'd actually reach for one</b>. ("Runs on its own" isn't a separate shape; it's any of these left unattended, which is exactly why those need the strongest stop-limits.)</div>
+    <div class="patterns">
+      <div class="pat">
+        <h3>Solo loop</h3>
+        <div class="when">Start here, covers most work</div>
+        <svg viewBox="0 0 260 96" class="fig">
+          <defs><marker id="p1" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker></defs>
+          <rect x="80" y="20" width="100" height="40" rx="11" fill="#1e3a8a"/><text x="130" y="45" font-size="14" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">1 agent</text>
+          <path d="M180,55 C232,70 232,18 184,30" stroke="#2563eb" stroke-width="2.5" fill="none" marker-end="url(#p1)"/>
+          <text x="130" y="84" font-size="11" fill="#64748b" text-anchor="middle" font-family="Inter">reason → act → observe → repeat</text>
+        </svg>
+        <p>One agent runs the loop on one task. Easiest to build and debug.</p>
+        <div class="from">= "Think → Act → See" / "model + tools"</div>
+      </div>
+      <div class="pat">
+        <h3>Maker → Checker</h3>
+        <div class="when">When quality matters</div>
+        <svg viewBox="0 0 260 96" class="fig">
+          <defs><marker id="p2" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker><marker id="p2r" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#f59e0b"/></marker></defs>
+          <rect x="14" y="28" width="96" height="40" rx="11" fill="#1e3a8a"/><text x="62" y="53" font-size="13" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">Maker</text>
+          <rect x="150" y="28" width="96" height="40" rx="11" fill="#15803d"/><text x="198" y="53" font-size="13" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">Checker</text>
+          <path d="M110,42 L146,42" stroke="#2563eb" stroke-width="2.5" marker-end="url(#p2)"/>
+          <path d="M150,58 L114,58" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#p2r)"/>
+          <text x="130" y="90" font-size="11" fill="#64748b" text-anchor="middle" font-family="Inter">fix until it passes</text>
+        </svg>
+        <p>One agent does the work, a <b>second</b> grades it: a fresh AI given only the grading job, so it can't rubber-stamp its own work.</p>
+        <div class="from">= the "Observe / check" beat, given its own agent</div>
+      </div>
+      <div class="pat">
+        <h3>Manager → Helpers</h3>
+        <div class="when">When the job is big</div>
+        <svg viewBox="0 0 260 96" class="fig">
+          <defs><marker id="p3" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2563eb"/></marker></defs>
+          <rect x="92" y="8" width="76" height="32" rx="9" fill="#1e3a8a"/><text x="130" y="29" font-size="12" font-family="Montserrat" font-weight="700" fill="#fff" text-anchor="middle">Manager</text>
+          <rect x="20" y="60" width="58" height="28" rx="8" fill="#3730a3"/><rect x="101" y="60" width="58" height="28" rx="8" fill="#3730a3"/><rect x="182" y="60" width="58" height="28" rx="8" fill="#3730a3"/>
+          <text x="49" y="78" font-size="11" fill="#fff" text-anchor="middle" font-family="Inter">helper</text><text x="130" y="78" font-size="11" fill="#fff" text-anchor="middle" font-family="Inter">helper</text><text x="211" y="78" font-size="11" fill="#fff" text-anchor="middle" font-family="Inter">helper</text>
+          <path d="M118,40 L55,58" stroke="#2563eb" stroke-width="2" marker-end="url(#p3)"/><path d="M130,40 L130,56" stroke="#2563eb" stroke-width="2" marker-end="url(#p3)"/><path d="M142,40 L205,58" stroke="#2563eb" stroke-width="2" marker-end="url(#p3)"/>
+        </svg>
+        <p>A lead splits the goal and hands pieces to sub-agents working in parallel.</p>
+        <div class="from">= "one boss, many helpers"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. THE BIG IDEA: DEFINE DONE + VERIFY -->
+<section>
+  <div class="wrap center">
+    <div class="bigidea">
+      <div class="eyebrow">Where beginners actually go wrong</div>
+      <h2>A loop is only as good as its "done" check</h2>
+      <p>The loop will happily produce confident, polished, <i>wrong</i> work and call it finished, unless you tell it exactly what "done" means and give it a way to check.</p>
+    </div>
+    <div class="eyebrow center" style="text-align:center">Before you build</div>
+    <p class="subhead">Lock your finish line: answer these two first</p>
+    <p class="sub" style="margin:0 auto 24px">These two answers <i>are</i> the "done?" check from the loop diagram.</p>
+    <div class="qs">
+      <div class="qcard">
+        <div class="qn">1</div>
+        <div><h3>What does "done" mean?</h3><p>Write it so a machine could check it. "The tests pass." "Under 50 words and mentions the price." Not "make it good."</p></div>
+      </div>
+      <div class="qcard">
+        <div class="qn">2</div>
+        <div><h3>How will it check?</h3><p>Different jobs need different checks. Pick the one that fits 👇</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="pickwrap"><span class="pickcue">↓ that's question 2: pick one of these four ↓</span></div>
+    <div class="checks">
+      <div class="chk">
+        <div class="ico f"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><h3>Functional</h3><div class="tw">A machine can answer yes/no with zero opinion.</div><span class="ex">e.g. <b>tests pass, the app runs, the build compiles</b></span><span class="ease">easiest: start here</span></div>
+      </div>
+      <div class="chk">
+        <div class="ico v"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg></div>
+        <div><h3>Visual</h3><div class="tw">It has to be <i>seen</i> to be judged.</div><span class="ex">e.g. <b>UI, a thumbnail, a layout</b></span><span class="ease">most agents can look at images for you</span></div>
+      </div>
+      <div class="chk">
+        <div class="ico s"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.8l6.9-.7L12 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <div><h3>Judgment</h3><div class="tw">Needs taste, but you can write a checklist.</div><span class="ex">score it against <b>your rubric</b></span><span class="ease">a second AI does the scoring for you</span></div>
+      </div>
+      <div class="chk">
+        <div class="ico h"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M8 13V5a2 2 0 014 0v6m0-4a2 2 0 014 0v6m0-3a2 2 0 014 0v5a7 7 0 01-7 7h-1a7 7 0 01-6-3.5L5 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><h3>You decide</h3><div class="tw">Irreversible, or pure taste no rubric captures.</div><span class="ex">loop <b>pauses, you approve</b>, then continues</span><span class="ease">for risky or one-way-door steps</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. BUILD ONE TONIGHT -->
+<section class="alt">
+  <div class="wrap">
+    <div class="eyebrow">Your turn</div>
+    <h2>Build your first loop tonight</h2>
+    <p class="sub">You don't need a framework. If you have <b>Claude Code</b> (a free AI assistant you run on your computer, and it already works as a loop), just tell it the goal, what "done" means, and how to check. The same pattern works in any agent tool. Copy this:</p>
+    <div class="promptcard">
+      <div class="bar"><span class="dot" style="background:#ef4444"></span><span class="dot" style="background:#f59e0b"></span><span class="dot" style="background:#22c55e"></span><span style="margin-left:8px">your first agent loop · paste into Claude Code</span></div>
+      <div class="body">
+<span class="lbl"># the goal</span><br>
+Here's the task: <span class="ph b">fix the one failing test in this project</span><br><br>
+<span class="lbl"># what "done" means (make it checkable)</span><br>
+You're done when: <span class="ph g">that test passes when you run the test suite</span><br><br>
+<span class="lbl"># how to check it</span><br>
+Verify by: <span class="ph">running the tests and reading the output</span><br><br>
+<span class="lbl"># the guardrail</span><br>
+Keep going until it passes, <span class="ph">or stop after 5 tries</span> and tell me.
+      </div>
+    </div>
+    <div class="swap">📝 <b>Not a coder?</b> Same exact shape, different job:&nbsp; goal = <span class="mono">rewrite this paragraph</span> · done = <span class="mono">under 50 words AND mentions the price</span> · check = <span class="mono">count the words, look for "price"</span> · guardrail = <span class="mono">stop after 5 tries</span>.<span class="note">That's a Functional check: it checks the rules, not whether it reads well. Judging the writing would be a Judgment check.</span></div>
+    <div class="gate">🔒 <b>Risky task?</b> Add a human gate to the prompt: <i>"Pause and ask me before deleting, sending, or paying for anything."</i> That's the "You decide" check from above.</div>
+    <div class="steps3">
+      <div class="st"><div class="n">1</div><h3>Name the goal</h3><p>One clear sentence. "Fix the failing test." Not "improve the code."</p><span class="tieback">↳ that's the GOAL box</span></div>
+      <div class="st"><div class="n">2</div><h3>Define + check "done"</h3><p>Give it a finish line it can verify itself, plus a hard stop so it can't run forever.</p><span class="tieback">↳ that's the DONE? check</span></div>
+      <div class="st"><div class="n">3</div><h3>Watch the first run</h3><p>See where it trips. Fix the instructions, not the output. Then let it run on its own.</p><span class="tieback">↳ that's reason → act → observe</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. LEVEL UP: 8 PRINCIPLES -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">Once it works, make it solid</div>
+    <h2>8 things that make a loop actually work</h2>
+    <p class="sub">You've already met a few of these (tagged <span style="font-family:'Roboto Mono';font-size:11px;color:#94a3b8;border:1px solid var(--line);border-radius:10px;padding:1px 7px">recap</span>). Here they are as one checklist to run before you trust a loop to go on its own. Most loops fail for boring reasons: they run forever, burn money, or ship junk. The good ones get these right.</p>
+    <div class="eight">
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></div><h3>A checkable goal<span class="recap">recap</span></h3><p>Define "done" so a machine could verify it, not "make it good."</p><span class="ex">tests pass / under 50 words</span></div>
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><h3>A hard stop<span class="recap">recap</span></h3><p>Max tries, a budget, or a time limit. Always. So it can't run forever.</p><span class="ex">stop after 5 tries</span></div>
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14 7a4 4 0 01-5 5L4 17l3 3 5-5a4 4 0 005-5l-2 2-3-3 2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><h3>Good tools</h3><p>The actions it can take must be reliable and clearly described.</p><span class="ex">search · run code · edit a file</span></div>
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="6" rx="8" ry="3" stroke="currentColor" stroke-width="2"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" stroke="currentColor" stroke-width="2"/></svg></div><h3>Memory</h3><p>Keep the history, but summarize it so the context doesn't bloat.</p><span class="ex">a running notes file</span></div>
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/></svg></div><h3>A separate checker<span class="recap">recap</span></h3><p>Generate → judge → fix → repeat. The maker never grades itself.</p><span class="ex">a 2nd agent scores it</span></div>
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 3v12m0 0a3 3 0 100 6 3 3 0 000-6zm12-6a3 3 0 11-6 0 3 3 0 016 0zm-3 3v3a4 4 0 01-4 4H6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Plan first?</h3><p>Big, multi-step job? Have it write a plan before acting. Small job? Skip it.</p><span class="ex">outline before building</span></div>
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><h3>Logging</h3><p>Save every thought, action, and result so you can debug at 3am.</p><span class="ex">log each step</span></div>
+      <div class="e"><div class="ei"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M9.5 9.2c0-1 1.1-1.7 2.5-1.7s2.5.7 2.5 1.7-1.1 1.6-2.5 1.6-2.5.7-2.5 1.7 1.1 1.7 2.5 1.7 2.5-.7 2.5-1.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div><h3>Cost sense</h3><p>Loops burn tokens fast. Start small and bounded, then scale.</p><span class="ex">watch the first runs</span></div>
+    </div>
+    <div class="twocol">
+      <div class="do"><h3>Do this</h3><ul>
+        <li>Start with one small, repeatable task</li>
+        <li>Make "done" something a machine can check</li>
+        <li>Always set a max number of tries</li>
+        <li>Use a separate agent to grade important work</li>
+      </ul></div>
+      <div class="dont"><h3>Skip this (for now)</h3><ul>
+        <li>24/7 swarms of 10 agents prompting 10 agents</li>
+        <li>Letting it run with no stop limit</li>
+        <li>Trusting "looks done" with no real check</li>
+        <li>Looping a one-off task you could just prompt</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<div class="foot">
+  <a class="receipt" href="agent-loop-source-audit-report.html">📑 Every claim here was checked against <b>45 real sources</b> → see the full audit</a>
+  <p style="margin-top:20px">Six named here (Anthropic, OpenAI, Google, LangChain, the ReAct paper, Simon Willison), plus 39 more, each independently verified.</p>
+</div>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4868e381f8a54ebfbc60b84ddac1396f","r":1}' crossorigin="anonymous"></script>
+</body>
+</html>

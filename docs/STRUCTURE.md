@@ -2,28 +2,26 @@
 
 Cây thư mục THẬT + vai trò từng phần, để biết **sửa/đọc file nào cho việc gì** và **cái gì được cài vào dự án vs cái gì chỉ để phát triển harness**. Tra khái niệm → [`KEYWORD-MAP.md`](./KEYWORD-MAP.md); hiểu tổng thể → [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md).
 
-## Cây repo (2 tầng)
+## Cây repo (PHẲNG — root LÀ sản phẩm, từ 2026-09-01)
+
+Trước đây sản phẩm nằm lồng trong `harness/`; đã **làm phẳng** ra root (bỏ 1 lớp `harness/harness` thừa + dedup `plans/`). Giờ **repo root CHÍNH LÀ harness**; ranh giới sản-phẩm-vs-xưởng không còn theo thư mục mà theo **`SKELETON_PATHS` trong `scripts/install-harness.sh`** (danh sách cái gì được bê đi cài).
 
 ```
-loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN PHẨM] trong harness/
-├── README.md ············ [workshop] cửa vào: harness là gì, cài, chạy loop
-├── CLAUDE.md ··········· [workshop] brief control-session (nạp tự động theo cwd)
-├── .gitignore ·········· ignore .claude phiên-dev (worktrees/settings.local/agent-memory)
-├── .claude/ ············ [workshop, dev-local] config phiên Claude Code làm việc TRÊN repo này
-│                          (KHÁC harness/.claude — quy ước Claude Code, phần cá nhân bị gitignore)
-├── plans/ ············· [workshop] kế hoạch + reports + lessons-log/team-playbook của HARNESS
-└── harness/ ··········· ⭐ [SẢN PHẨM] tự-đủ — install-harness.sh bê nguyên cây này vào dự án mới
-    ├── AGENTS.md ········· operating model cho agent (task loop + gate + thứ tự đọc)
-    ├── docs/ ············· tri thức harness (bảng bên dưới) — DUY NHẤT 1 cây docs được-track
-    ├── .claude/ ········· tự động hoá SHIP: commands + agent + hooks
-    ├── scripts/ ········· install-harness.sh + harness-verify-gate.sh
-    ├── .githooks/ ······· pre-commit + pre-push (gate fail-closed, không bypass)
-    └── templates/ ······· scaffold: stack (Mode A) + steady-state (Mode B) + ops-board + doc-stubs (gồm lessons-log)
+loop-harness/   (= chính là harness — không còn thư mục con harness/)
+├── AGENTS.md ········· [SẢN PHẨM] operating model cho agent (task loop + gate + thứ tự đọc)
+├── docs/ ············· [SẢN PHẨM] tri thức harness (bảng bên dưới) + macro-2.pipeline.yaml
+├── scripts/ ·········· [SẢN PHẨM] install-harness.sh + harness-verify-gate.sh + run-log/wait-workers
+├── templates/ ········ [SẢN PHẨM] scaffold: stack (Mode A) + steady-state (Mode B) + ops-board + doc-stubs
+├── .claude/ ·········· [SẢN PHẨM, tracked] commands + agents + hooks (ship khi cài); +[XƯỞNG, gitignore] worktrees/agent-memory/settings.local
+├── .githooks/ ········ [SẢN PHẨM] pre-commit + pre-push (gate fail-closed, không bypass)
+├── README.md ········· [XƯỞNG] cửa vào: harness là gì, cài, chạy loop
+├── CLAUDE.md ········· [XƯỞNG] brief control-session (KHÔNG ship — dev-only)
+└── plans/ ············ [XƯỞNG] kế hoạch + reports + lessons-log/team-playbook CỦA harness (KHÔNG ship)
 ```
 
-> **Ranh giới cứng (chuẩn dài hạn):** `harness/` là SẢN PHẨM, **tự-đủ tuyệt đối** (self-contained — không trỏ/phụ thuộc ra ngoài chính nó) — docs trong đó KHÔNG `../../` ra ngoài cây; khi cài đi đâu cũng chạy. Mọi thứ ở root là XƯỞNG (workshop — làm ra harness): `plans/` chứa lessons-log (sổ bài học) + team-playbook (công thức tái dùng của team) + reports CỦA harness; `.claude/` là config phiên dev (gitignore phần cá nhân). Tri thức "cho dự án" (VD lessons-log của dự án) là 1 **template** (khung mẫu) trong `harness/docs/templates/`, không phải lessons-log dev của harness.
+> **Ranh giới sản-phẩm vs xưởng (định nghĩa MỚI):** không còn theo thư mục. **Sản phẩm** = những gì `install-harness.sh` bê đi (SKELETON_PATHS: `AGENTS.md docs .claude .githooks scripts/{harness-verify-gate,install-harness,README}` + `templates/`). **Xưởng** (chỉ để làm ra harness, KHÔNG ship) = `CLAUDE.md`, `plans/`, và phần runtime của `.claude/` (worktrees/agent-memory/settings.local — đã gitignore). Docs sản phẩm vẫn **tự-đủ** (self-contained — không `../../` ra ngoài root). Tri thức "cho dự án" (VD lessons-log của dự án) là **template** trong `docs/templates/`, không phải lessons-log dev của harness.
 
-## `harness/docs/` — tri thức (4 nhóm, phân theo VAI TRÒ + AI ĐỌC)
+## `docs/` — tri thức (4 nhóm, phân theo VAI TRÒ + AI ĐỌC)
 
 > `ls docs/` ra nhiều file loose (rời, không nằm trong thư mục con) là bình thường: chúng KHÔNG gom vào 1 folder (foldering = sửa ~250 path máy-móc tham chiếu, lợi 0 hành vi) mà gom bằng bảng dưới đây. Mỗi nhóm ghi rõ **ai đọc** để tra ngay "file này là gì, cho ai". 14 file loose = ① 6 + ② 5 + ④ 3.
 
@@ -61,19 +59,19 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 | `DOC-STANDARD.md` | Rubric (thước đo) C1-C10 để viết/refactor bất kỳ doc; có When-To-Run. | người (tác giả doc) |
 | `HARNESS_CHANGELOG.md` | Version log (nhật ký phiên bản) của CHÍNH mô hình harness (docs/playbook/gate/template); **dòng `Current version:` ở đầu file là NGUỒN DUY NHẤT** — `run-log.mjs` đọc chính dòng đó, nên đừng chép số version sang file khác. State dự án KHÔNG ở đây. | tham chiếu |
 
-## `harness/.claude/` — tự động hoá (index: `.claude/README.md`)
+## `.claude/` — tự động hoá (index: `.claude/README.md`)
 - `commands/`: **`/stage-next`** (chạy bước kế), **`/build-phase`** (vòng code phase), **`/gate-check`**.
 - `agents/stage-runner.md`: subagent (agent con) chạy 1 bước trong context riêng (isolated — cô lập).
 - `hooks/`: `stage-deliver`, `qa-deliver`, `context-monitor` (cảnh báo 40/60/80/95% token), `notify`.
 - `settings.json` + `scripts/notifier-send.sh`.
 
-## `harness/scripts/` + `.githooks/` — gate + cài đặt (index: `scripts/README.md`)
+## `scripts/` + `.githooks/` — gate + cài đặt (index: `scripts/README.md`)
 - `install-harness.sh`: bê toàn bộ `harness/` vào dự án mới + init git + bật verify-gate (cổng kiểm chứng không bỏ qua được).
 - `harness-verify-gate.sh` + `pre-commit`/`pre-push`: **gate fail-closed (mặc định CHẶN khi nghi ngờ/lỗi) không bypass (không bỏ qua được)** (chặn commit lỗi lint/typecheck/register).
 - `wait-workers.sh`: ctl chờ bg-worker tới tín hiệu DONE (PR MERGEABLE hoặc worker terminal) — thay vòng poll tự chế.
 - `run-log.mjs`: **cái cân** — 1 dòng JSONL / 1 lần dispatch, `report` so các bản harness. Ghi NGOÀI git (`~/.claude/loop-harness/run-log.jsonl`), dùng chung mọi repo.
 
-## `harness/templates/` — 3 scaffold
+## `templates/` — 3 scaffold
 - `stack-pnpm-nest-next/`: khung app **Mode A (chế độ A — Build)** (walking skeleton (bộ xương biết đi) — NestJS+Prisma+Postgres+Next.js+CI+e2e+docker). Dùng ở bước 2.4.
 - `steady-state/` (trạng thái vận hành ổn định sau go-live): kit (bộ đồ nghề) **Mode B** — `issue-state.mjs` (đặt state + **ép cạnh chuyển hợp lệ**), `qc-checklist.mjs`, `push-retry.sh` (Recover (tự-sửa khi lỗi) R2), `ship-and-verify.sh` (Recover R3), `bug-report.md`, `regression-checklist.md`. Copy vào dự án khi go-live (thời điểm app lên môi trường thật).
 - `ops-board/`: **mặt phẳng trạng thái nội bộ** (internal status surface) đã đặc tả ở `HARNESS.md` § Status Artifact — 1 file HTML tự-đủ + `Dockerfile` nginx. Đọc `run-log.jsonl` + `board.json` đặt cạnh nó; thiếu file thì rơi về dữ liệu mẫu và **nói thẳng trên banner**. Nhãn `experimental` — chưa chạy trên dữ liệu thật. KHÔNG đưa cho khách (mặt khách là file/URL riêng — D4).
@@ -81,7 +79,7 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 ## 4 kho tri thức — VỊ TRÍ ("cất gì vào đâu" xem [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) §5)
 | Kho | Ở đâu |
 |---|---|
-| **playbook** | `harness/docs/playbooks/` |
+| **playbook** | `docs/playbooks/` |
 | **runbook** | `docs/runbook/` của TỪNG dự án |
 | **lessons-log** | mỗi dự án `docs/lessons-log.md`; của chính harness `plans/lessons-log.md` |
 | **memory** | `~/.claude/projects/<key>/memory/` (fact riêng dự án ở key dự án đó, không ở key harness) |
