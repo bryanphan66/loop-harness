@@ -49,9 +49,9 @@ loop-harness/                    ← ranh giới: [WORKSHOP] ở root · [SẢN 
 **③ Thư viện (thư mục) — MỖI zone có `README.md` liệt kê từng file 1-dòng. Không hiểu file nào → mở README của zone đó.**
 | Thư mục | Số | Vai trò | Index (mở để biết từng file là gì) |
 |---|---|---|---|
-| `playbooks/` | 33 | công thức TÁI DÙNG (1 bước macro / 1 domain) | `playbooks/README.md` |
-| `gates/` | 10 | định nghĩa gate (PB-G, DoR, DoD, phase-acceptance, visual-fidelity…) | `gates/README.md` |
-| `templates/` | 27 (25 file + 2 packet) | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…); `locale-vi/` = bản dịch, không tính | `templates/README.md` |
+| `playbooks/` | 34 | công thức TÁI DÙNG (1 bước macro / 1 domain) | `playbooks/README.md` |
+| `gates/` | 11 | định nghĩa gate (PB-G, DoR, DoD, phase-acceptance, visual-fidelity…) | `gates/README.md` |
+| `templates/` | >40 (gồm `locale-vi/` fork song ngữ) | mẫu file dự án (build-manifest, srs-lite, bao-gia, STAGE.md…) | `templates/README.md` |
 | `design-system/` | 3 | quy tắc UI 3-tier (floorplan/action/modal) | `design-system/README.md` |
 
 **④ Meta / tham chiếu — HỖN HỢP (không thuộc xương sống lẫn máy-móc):**
