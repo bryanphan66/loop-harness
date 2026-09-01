@@ -47,6 +47,36 @@ The product/workshop boundary is `SKELETON_PATHS` in `scripts/install-harness.sh
 
 Full file-by-file map: **`docs/about/STRUCTURE.md`** or the visual map artifact.
 
+### Where everything lives — the one rule (stop hunting)
+
+Files sit by **mechanism**, and a manifest relates them — you don't browse folders:
+
+| Kind of thing | Lives in | Why there |
+|---|---|---|
+| A **slash command** (`/stage-next`) an agent invokes | `.claude/commands/` | Claude Code loads it as a command |
+| A **subagent** / Claude Code **hook** / **skill** | `.claude/agents` · `.claude/hooks` · `.claude/skills` | Claude Code loads/fires these |
+| A **terminal CLI tool** (`install-harness.sh`, `run-log.mjs`) | `scripts/` | plain `bash`/`node`, not a Claude command — wrap as a skill only if an agent must call it |
+| A **git hook** (pre-commit/pre-push) | `.githooks/` | git's mechanism, not Claude's |
+| The **app's own gate scripts** (`check-*.mjs`) | `scaffolds/stack-.../scripts/` | they belong to the scaffolded app |
+| A **recipe** (how to do a step) | `docs/playbooks/` | one per reusable task/domain |
+| A **check** (gate) | `docs/gates/` | one per gate |
+| A **blank doc form** to fill | `docs/mau-tai-lieu/` | Markdown forms (NOT code) |
+
+**The manifest that relates a step to its files = the macro spine** (below).
+
+### The whole process in one place (the spine)
+
+Don't read 7 docs to understand a step. Open the **spine** — one table where each
+step maps to its playbook + gate + form + script:
+
+- **Macro-1 (Pre-Build):** [`docs/process/macro-1.md`](docs/process/macro-1.md)
+- **Macro-2 (Build & Go-live):** [`docs/process/macro-2.md`](docs/process/macro-2.md)
+- **Macro-3 (Post-Build / the loop):** [`docs/process/macro-3.md`](docs/process/macro-3.md)
+
+Full step-order + lane detail (all 3 macros, authoritative): [`docs/process/WORKFLOW.md`](docs/process/WORKFLOW.md).
+
+Drill into a `playbooks/` or `gates/` file only when you need the depth of ONE step.
+
 ## Install into a fresh project
 
 ```bash
@@ -109,12 +139,16 @@ green CI with unit + integration + build, Playwright e2e per critical journey, h
 hooks, complete `.env.example`, docs, deployable Dockerfiles). That checklist is the
 acceptance test for the harness itself.
 
-## Key docs (read in this order)
+## Understand it fast — you don't need to read everything
 
-1. `docs/about/UNDERSTANDING-loop-harness.md` — narrative onboarding + honest scorecard + where new knowledge goes (decision table) + reuse/extend — **read first**
-2. `docs/about/KEYWORD-MAP.md` — glossary of every concept + where it lives
-3. `docs/about/STRUCTURE.md` — file-by-file directory map
-4. `docs/process/OPERATING-MODES.md` — the two modes + the loop (the spine's precise spec)
-5. `docs/about/HARNESS.md` — operating model + Independence Principle + locked decisions
-6. `docs/process/WORKFLOW.md` — step tables (inside the two modes), gates, lanes
-7. `docs/process/TRACE_SPEC.md` — token grammar · `docs/about/DOC-STANDARD.md` — doc-writing rubric · `docs/playbooks/README.md` — recipes
+This README + the **spine** (above) is the entry. Everything else is drill-down,
+opened only when you need one thing:
+
+- **The map** (what every file is): `docs/about/STRUCTURE.md` or the visual artifact.
+- **The narrative + honest maturity scorecard** (what's proven vs not-built): `docs/about/UNDERSTANDING-loop-harness.md`.
+- **A term you don't know:** `docs/about/KEYWORD-MAP.md` (glossary → owner file).
+- **The design + locked decisions:** `docs/about/HARNESS.md`.
+- **A recipe / a gate / a form:** `docs/playbooks/` · `docs/gates/` · `docs/mau-tai-lieu/`.
+
+The 5 docs above are five *genres* (map / narrative / glossary / design / index) —
+you consult one when you need it, you don't read all five to "get it".

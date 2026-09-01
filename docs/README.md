@@ -36,22 +36,13 @@ that one file to see, e.g., "step 2.6 uses `/build-phase`, gates
 `prototype-export-adoption`". `process/WORKFLOW.md` is the human table; the yaml
 is what `/stage-next` and the RTM dashboard read.
 
-## Maturity — what to TRUST (read before relying on anything)
+## Maturity — what to TRUST
 
-Not everything here is equally real. Every capability is tagged in
-`about/UNDERSTANDING-loop-harness.md` (the honest scorecard):
-
-- **PROVEN** — run for real on a project (elearning / hasi-hub). Trust it. (Most of
-  the spine: build-manifest, walking-skeleton, `/build-phase`, the Mode-A gates,
-  the Mode-B 10-state loop, verify-at-source, R2/R3 recover.)
-- **PATCHED** — born from one real failure, turned into a rule. Correct but may be
-  heavy/specific (e.g. REQ-ID token chain, Full-vs-Lite lanes).
-- **ASPIRATIONAL** — designed, **NOT built**. Do not assume it works. Currently:
-  **R1 auto re-dispatch on BLOCKED**
-  real data), **graph/incremental-preview** (OPERATING-MODES admits no executable
-  graph yet), Mode-B auto-QC (frontier, not formalized).
-
-If a doc describes a mechanism, check its tag before trusting it exists.
+Not everything here is equally real. Before relying on a capability, check its
+tag (**PROVEN / PATCHED / ASPIRATIONAL**) in the honest scorecard —
+**owner: `about/UNDERSTANDING-loop-harness.md`** (§ nhãn + §7). Quick warning:
+the ASPIRATIONAL ones (R1 auto re-dispatch, graph/incremental-preview, Mode-B
+auto-QC) are **designed but NOT built** — don't assume they work.
 
 ## Folder index
 

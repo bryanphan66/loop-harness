@@ -76,10 +76,5 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 - `stack-pnpm-nest-next/`: khung app **Mode A (chế độ A — Build)** (walking skeleton (bộ xương biết đi) — NestJS+Prisma+Postgres+Next.js+CI+e2e+docker). Dùng ở bước 2.4.
 - `steady-state/` (trạng thái vận hành ổn định sau go-live): kit (bộ đồ nghề) **Mode B** — `issue-state.mjs` (đặt state + **ép cạnh chuyển hợp lệ**), `qc-checklist.mjs`, `push-retry.sh` (Recover (tự-sửa khi lỗi) R2), `ship-and-verify.sh` (Recover R3), `bug-report.md`, `regression-checklist.md`. Copy vào dự án khi go-live (thời điểm app lên môi trường thật).
 
-## 4 kho tri thức — VỊ TRÍ ("cất gì vào đâu" xem [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) §5)
-| Kho | Ở đâu |
-|---|---|
-| **playbook** | `docs/playbooks/` |
-| **runbook** | `docs/runbook/` của TỪNG dự án |
-| **lessons-log** | mỗi dự án `docs/lessons-log.md`; của chính harness `plans/lessons-log.md` |
-| **memory** | `~/.claude/projects/<key>/memory/` (fact riêng dự án ở key dự án đó, không ở key harness) |
+## 4 kho tri thức — VỊ TRÍ
+> Owner: [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) §5 ("cất gì vào đâu"). 4 kho = playbook · runbook · lessons-log · memory. Chi tiết + luật tái dùng ở đó (không lặp bảng ở đây nữa).
