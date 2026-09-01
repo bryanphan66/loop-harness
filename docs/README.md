@@ -36,6 +36,23 @@ that one file to see, e.g., "step 2.6 uses `/build-phase`, gates
 `prototype-export-adoption`". `process/WORKFLOW.md` is the human table; the yaml
 is what `/stage-next` and the RTM dashboard read.
 
+## Maturity — what to TRUST (read before relying on anything)
+
+Not everything here is equally real. Every capability is tagged in
+`about/UNDERSTANDING-loop-harness.md` (the honest scorecard):
+
+- **PROVEN** — run for real on a project (elearning / hasi-hub). Trust it. (Most of
+  the spine: build-manifest, walking-skeleton, `/build-phase`, the Mode-A gates,
+  the Mode-B 10-state loop, verify-at-source, R2/R3 recover.)
+- **PATCHED** — born from one real failure, turned into a rule. Correct but may be
+  heavy/specific (e.g. REQ-ID token chain, Full-vs-Lite lanes).
+- **ASPIRATIONAL** — designed, **NOT built**. Do not assume it works. Currently:
+  **R1 auto re-dispatch on BLOCKED**, **ops-board** (experimental, never run on
+  real data), **graph/incremental-preview** (OPERATING-MODES admits no executable
+  graph yet), Mode-B auto-QC (frontier, not formalized).
+
+If a doc describes a mechanism, check its tag before trusting it exists.
+
 ## Folder index
 
 - `process/` — WORKFLOW, STAGE_GOALS, macro-2.pipeline.yaml, OPERATING-MODES, TRACE_SPEC (token grammar), ROLE_MAP, CONTEXT_RULES
