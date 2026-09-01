@@ -78,4 +78,4 @@ vault. **Rotate mọi secret tại bàn giao** (yêu cầu cổng HANDOVER).
 - Bản gốc tiếng Anh (chuẩn): `docs/mau-tai-lieu/project-closure-story/01-handover-docs.md`.
 - Đề xuất bảo trì (gửi kèm bàn giao): `docs/mau-tai-lieu/locale-vi/maintenance-proposal.md`.
 - Scope đóng băng: `docs/mau-tai-lieu/locale-vi/feature-register.md`.
-- Token grammar: `docs/process/TRACE_SPEC.md`. Cổng HANDOVER + macro-stage: `docs/process/WORKFLOW.md`.
+- Token grammar: `docs/about/TRACE_SPEC.md`. Cổng HANDOVER + macro-stage: `docs/process/WORKFLOW.md`.

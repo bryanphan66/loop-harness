@@ -65,6 +65,6 @@ with no SC-NNN and no skip note is an **incomplete RTM** — resolve before clos
 
 **Pointers**
 
-- RTM completeness rule: `docs/process/TRACE_SPEC.md` § RTM Completeness Rule.
+- RTM completeness rule: `docs/about/TRACE_SPEC.md` § RTM Completeness Rule.
 - Verify-gate: `scripts/harness-verify-gate.sh` (reads the verification register).
 - DoD gate: WORKFLOW 2.10.

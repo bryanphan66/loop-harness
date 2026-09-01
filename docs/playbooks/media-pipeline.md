@@ -182,4 +182,4 @@ screens, ported from their prototype exports.
 - `docs/gates/phase-acceptance.md` — the per-phase gate (incl. the streaming NFR).
 - `docs/mau-tai-lieu/build-manifest.md` — the `Phase-type: media-pipeline` block shape.
 - `media-processing` (engine) — FFmpeg ladder + thumbnails.
-- `docs/process/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles.
+- `docs/about/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles.

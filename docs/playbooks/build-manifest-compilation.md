@@ -137,4 +137,4 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
 - `docs/gates/dor-build.md` — the gate the manifest must satisfy.
 - `docs/gates/phase-acceptance.md` — the per-phase gate the acceptance checks
   + `Verify-by` + cadence knob feed.
-- `docs/process/TRACE_SPEC.md` — REQ-ID grammar; the coverage rule is a trace rule.
+- `docs/about/TRACE_SPEC.md` — REQ-ID grammar; the coverage rule is a trace rule.

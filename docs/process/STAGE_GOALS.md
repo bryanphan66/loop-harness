@@ -5,7 +5,7 @@ drive one workflow step to a verifiable finish. Use with the interactive
 `/goal <condition>` command or headless `claude -p "/goal …"`.
 
 **Authority:** `docs/process/WORKFLOW.md` step tables. **Token grammar:**
-`docs/process/TRACE_SPEC.md` (`GAP-NNN → REQ-ID = MODULE.AREA.NN → SC-NNN → TC-NNN`,
+`docs/about/TRACE_SPEC.md` (`GAP-NNN → REQ-ID = MODULE.AREA.NN → SC-NNN → TC-NNN`,
 `CR-NN` — never `US-NNN.REQ-MMM`). **Lanes:** `docs/process/WORKFLOW.md` § Lanes — in
 the **Lite** lane the route is `1.1 → 1.2 → 1.5-lite → 1.9-lite → 1.10-lite →
 1.11 → 1.12 → 1.13 → 2.1` (1.14/1.15 auto-N/A-by-decision); Macro 2 and 3 are
@@ -738,7 +738,7 @@ Checklist** before declaring the release done:
    `MANUAL_CHECKPOINT` naming the target host; never auto-fire a prod deploy
    (Rule 5).
 
-**Then flip Mode A → Mode B (graduation — `docs/process/OPERATING-MODES.md` § The
+**Then flip Mode A → Mode B (graduation — `docs/about/OPERATING-MODES.md` § The
 graduation).** Go-live is the graduation point; in the SAME close edit `STAGE.md`:
 its Macro-stage flips to **Steady-state (Macro 3)**, the **"current step" field is
 dropped** (meaningless now) and replaced with **"Steady-state since {date}; board

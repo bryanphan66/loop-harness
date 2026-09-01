@@ -1034,8 +1034,8 @@ Next step — open Claude Code in this directory and paste the first goal:
   the PB-G1 intake go/no-go decision (proceed | park | decline) INTERNALLY — do
   NOT page the client. Update STAGE.md Snapshot to Current = Pre-Build / 1.3
   (discovery) and add the 1.2 row to History in the same stage-boundary commit.
-  Read STAGE.md, AGENTS.md, docs/process/WORKFLOW.md, docs/process/ROLE_MAP.md, and
-  docs/process/TRACE_SPEC.md first. Stop after 10 turns.
+  Read STAGE.md, AGENTS.md, docs/process/WORKFLOW.md, docs/about/ROLE_MAP.md, and
+  docs/about/TRACE_SPEC.md first. Stop after 10 turns.
 
 What you bootstrapped:
   - The harness skeleton + STAGE.md root tracker (Snapshot pre-filled for

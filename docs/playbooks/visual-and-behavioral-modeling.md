@@ -255,4 +255,4 @@ delete the original shape.)
 - `ba-core-doc-bundle.md` — the 1.7 BPMN diagrams the workflows reconcile with.
 - `mermaidjs-v11` (skill) — diagram syntax; `tech-graph` — publish-grade SVG.
 - `bilingual-delivery-template-pattern.md` — RPM + status-flow `locale-vi/` forks.
-- `docs/process/ROLE_MAP.md` — Designer role + `ck-ux-design` engine binding.
+- `docs/about/ROLE_MAP.md` — Designer role + `ck-ux-design` engine binding.

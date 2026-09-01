@@ -176,4 +176,4 @@ the 2.9 security review.
   verify.
 - `canonical-e2e-flow-playbook.md` — E2E tests for payment journeys.
 - `ck-security` (engine) — STRIDE+OWASP review for the money surface (2.9).
-- `docs/process/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles + `ck-payment-integration`.
+- `docs/about/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles + `ck-payment-integration`.

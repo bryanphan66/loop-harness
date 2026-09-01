@@ -200,4 +200,4 @@ Cập nhật tiếp theo: trong vòng <N> giờ
 - SOW § 9 Chính sách Change Request: `docs/mau-tai-lieu/locale-vi/proposal-sow.md`.
 - Nguồn scope đóng băng (PB-G2): `docs/mau-tai-lieu/locale-vi/feature-register.md`.
 - Maintenance SLA cho cửa sổ phản hồi: `docs/mau-tai-lieu/locale-vi/maintenance-proposal.md` § 5.
-- Token grammar (CR-NN → REQ-ID): `docs/process/TRACE_SPEC.md`. Lớp always-on: `docs/process/WORKFLOW.md`.
+- Token grammar (CR-NN → REQ-ID): `docs/about/TRACE_SPEC.md`. Lớp always-on: `docs/process/WORKFLOW.md`.

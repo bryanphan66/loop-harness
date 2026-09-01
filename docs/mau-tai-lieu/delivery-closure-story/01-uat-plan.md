@@ -3,7 +3,7 @@ Template: delivery-closure-story/01-uat-plan.md
 Macro-stage: 2 Build & Go-live · Step 2.12 UAT / client acceptance
 Role: BA + Client · Engine: ck-uat · Gate: ACCEPTANCE (client, countersigned)
 Bilingual: EN canonical base — VN fork at locale-vi/delivery-closure-story/01-uat-plan.md
-Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/process/TRACE_SPEC.md)
+Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/about/TRACE_SPEC.md)
 -->
 
 # UAT Plan — <release / module id>

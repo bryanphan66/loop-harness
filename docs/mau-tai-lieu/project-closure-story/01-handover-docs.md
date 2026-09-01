@@ -4,7 +4,7 @@ Macro-stage: 3 Post-Build · Step 3.1 Handover package
 Role: Support/SRE + PM · Engine: ck-handover
 Gate: HANDOVER ACCEPTANCE (client, countersigned)
 Bilingual: EN canonical base — VN fork at locale-vi/project-closure-story/01-handover-docs.md
-Tokens: REQ-ID MODULE.AREA.NN · SC-NNN (docs/process/TRACE_SPEC.md)
+Tokens: REQ-ID MODULE.AREA.NN · SC-NNN (docs/about/TRACE_SPEC.md)
 -->
 
 # Handover Docs Index — <project name>

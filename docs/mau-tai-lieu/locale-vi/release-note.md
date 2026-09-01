@@ -152,4 +152,4 @@ Nếu thấy gì khác lạ, anh/chị phản hồi giúp em ngay tại thread n
 - Hồ sơ signoff: `docs/mau-tai-lieu/locale-vi/delivery-closure-story/02-signoff-nghiem-thu.md`.
 - Template báo khách: `docs/mau-tai-lieu/locale-vi/delivery-closure-story/03-client-update.md`.
 - Change request đã vào release này: `docs/mau-tai-lieu/locale-vi/change-request-log.md` (lọc theo release tag).
-- Token grammar: `docs/process/TRACE_SPEC.md`. Cổng + macro-stage: `docs/process/WORKFLOW.md`.
+- Token grammar: `docs/about/TRACE_SPEC.md`. Cổng + macro-stage: `docs/process/WORKFLOW.md`.

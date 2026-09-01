@@ -4,7 +4,7 @@
 # Invoked by .githooks/pre-commit (arg: pre-commit) and .githooks/pre-push
 # (arg: pre-push). Blocks the git action (non-zero exit) when any gate fails.
 # Authority: AGENTS.md § Verify Gate — No Bypass, docs/process/WORKFLOW.md § Always-On
-# Layer (stage-boundary commits), docs/process/TRACE_SPEC.md (token chain), and the
+# Layer (stage-boundary commits), docs/about/TRACE_SPEC.md (token chain), and the
 # Verification Register format in docs/about/TEST_MATRIX.md.
 #
 # A self-check FAILS CLOSED when the gate is not armed (core.hooksPath does not

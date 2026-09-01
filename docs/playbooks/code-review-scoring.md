@@ -147,7 +147,7 @@ delete the original dimensions or weights.)
 
 - `docs/process/WORKFLOW.md` § 2.7 — the step this playbook owns; § 2.9/2.10 — red-team
   gates.
-- `docs/process/TRACE_SPEC.md` — REQ-ID / SC-NNN / TC-NNN tokens cited in review reports.
+- `docs/about/TRACE_SPEC.md` — REQ-ID / SC-NNN / TC-NNN tokens cited in review reports.
 - `scenario-taxonomy-playbook.md` — the SC-NNN the Correctness dimension validates.
 - `canonical-e2e-flow-playbook.md` — the TC-NNN the Tests dimension checks.
 - `payment-integration.md` — the Security auto-block source for money surfaces.
@@ -161,4 +161,4 @@ delete the original dimensions or weights.)
 - `docs/design-system/design-rules.md` — Tier-1 floorplan + behavior doctrine the
   floor rule enforces (§4 floorplans, §7 actions, §8 modals, §10 states).
 - `design-system-3-tier.md` — the cross-stage playbook that owns 3-tier enforcement.
-- `docs/process/ROLE_MAP.md` — Tech Lead (reviewer hat) + `ck-code-review` engine binding.
+- `docs/about/ROLE_MAP.md` — Tech Lead (reviewer hat) + `ck-code-review` engine binding.

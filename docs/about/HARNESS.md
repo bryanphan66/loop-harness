@@ -26,7 +26,7 @@ ngoài chính nó). The engine and role players are
 playbooks (công thức tái dùng) can play every role and
 produce every artifact without any `ck-*` skill.
 
-Full role → engine binding: `docs/process/ROLE_MAP.md`. Step-by-step map:
+Full role → engine binding: `docs/about/ROLE_MAP.md`. Step-by-step map:
 `docs/process/WORKFLOW.md`.
 
 ## Independence Principle
@@ -44,7 +44,7 @@ agent + git + bash.
 Specifically:
 
 - `AGENTS.md`, `STAGE.md`, `docs/process/WORKFLOW.md`, `docs/about/HARNESS.md`,
-  `docs/process/TRACE_SPEC.md`, and `scripts/install-harness.sh` MUST NOT reference any
+  `docs/about/TRACE_SPEC.md`, and `scripts/install-harness.sh` MUST NOT reference any
   `ck-*` skill as a **required** step.
 - `install-harness.sh` **preflight-checks** (kiểm tra điều kiện trước khi chạy)
   that `~/.claude/skills` and
@@ -73,7 +73,7 @@ agent). At run time:
 The skill never owns the contract (giao kèo — chuẩn bắt buộc) — the **artifact
 path + shape** in
 `docs/process/WORKFLOW.md` and the **token grammar** (ngữ pháp token truy vết) in
-`docs/process/TRACE_SPEC.md` are the
+`docs/about/TRACE_SPEC.md` are the
 contract. The skill is one way to fill it.
 
 ## Source Hierarchy
@@ -211,7 +211,7 @@ The harness grows from friction (vướng mắc — chỗ agent bị cấn/lặp
 agent is confused, repeats manual
 reasoning, finds a missing rule, or hits a recurring failure, it must improve the
 harness directly or record the friction. The capture mechanism is the **Friction**
-field in every session trace (vết phiên) (`docs/process/TRACE_SPEC.md`); friction that
+field in every session trace (vết phiên) (`docs/about/TRACE_SPEC.md`); friction that
 should become
 work graduates into a plan or a decision. Harness-version changes are logged in
 `docs/about/HARNESS_CHANGELOG.md` (one entry per hardening round (vòng gia cố), naming
@@ -241,7 +241,7 @@ next runs can be **compared against the ones before it**:
 
 Industry names for this layer are **evals** and **observability**; `run-log.mjs`
 is the minimum viable version of both, not the finished article. It is the
-instrument the **hill-climbing loop** (`docs/process/OPERATING-MODES.md` § four nested
+instrument the **hill-climbing loop** (`docs/about/OPERATING-MODES.md` § four nested
 layers) was missing.
 
 ## Control-Plane Failure Classes
@@ -273,7 +273,7 @@ control-plane rules every orchestrator + verifier obeys:
 
 Pointer only — the full grammar, chain, and RTM (Requirements Traceability
 Matrix — ma trận truy vết yêu cầu) completeness rule live in
-`docs/process/TRACE_SPEC.md`. In short: `GAP-NNN → REQ-ID (MODULE.AREA.NN) → use-case +
+`docs/about/TRACE_SPEC.md`. In short: `GAP-NNN → REQ-ID (MODULE.AREA.NN) → use-case +
 RTM row → SC-NNN → feature-register line → SOW line → TC-NNN`, with `CR-NN` for
 change requests. **`US-NNN.REQ-MMM` is not used** in this harness.
 

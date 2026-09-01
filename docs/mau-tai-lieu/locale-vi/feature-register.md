@@ -138,4 +138,4 @@ Chỉ thêm. Mọi thay đổi sau PB-G2 phải qua `CR-NN`.
 - Clarifications (BLOCKER): `docs/requirements/CLARIFICATIONS.md` (1.6).
 - Forward: báo giá (1.14) `docs/mau-tai-lieu/locale-vi/bao-gia/` + SOW `docs/mau-tai-lieu/locale-vi/proposal-sow.md`.
 - Change requests sau đóng băng: `docs/mau-tai-lieu/locale-vi/change-request-log.md`.
-- Token grammar + RTM completeness rule: `docs/process/TRACE_SPEC.md`. Cổng: `docs/process/WORKFLOW.md`.
+- Token grammar + RTM completeness rule: `docs/about/TRACE_SPEC.md`. Cổng: `docs/process/WORKFLOW.md`.

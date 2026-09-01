@@ -4,7 +4,7 @@ Maps product **behavior → proof**, and carries the **Verification Register** t
 the verify-gate parses on every commit. Empty but well-formed — rows are added in
 Build & Go-live (step 2.8), born from the BA acceptance criteria, never from code.
 
-**Token grammar (D3, the only scheme — `docs/process/TRACE_SPEC.md`):**
+**Token grammar (D3, the only scheme — `docs/about/TRACE_SPEC.md`):**
 `TC-NNN ← SC-NNN ← REQ-ID (MODULE.AREA.NN)`. A test (`TC-NNN`) proves a scenario
 (`SC-NNN`), which decomposes a requirement (`REQ-ID`). **Do not use
 `US-NNN.REQ-MMM`.**
@@ -80,4 +80,4 @@ on any `fail` (and on any `never-run` at a stage-close).
   real work remains.
 
 See the enforcement detail in `AGENTS.md` § Verify Gate and the RTM completeness
-rule in `docs/process/TRACE_SPEC.md`.
+rule in `docs/about/TRACE_SPEC.md`.

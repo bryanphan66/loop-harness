@@ -138,4 +138,4 @@ Dự án xây dựng <mô tả giải pháp To-Be>, phục vụ <các luồng ng
 >
 > **Tham chiếu:** gap-analysis `docs/mau-tai-lieu/locale-vi/gap-analysis.md` ·
 > feature-register `docs/mau-tai-lieu/locale-vi/feature-register.md` · token grammar
-> `docs/process/TRACE_SPEC.md`.
+> `docs/about/TRACE_SPEC.md`.

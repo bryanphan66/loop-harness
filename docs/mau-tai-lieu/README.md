@@ -12,7 +12,7 @@ and code fences stay English even inside a VN fork.
 
 **Token grammar (D3 — the only scheme):** `REQ-ID = MODULE.AREA.NN` (e.g.
 `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN` · `CR-NN`. Do **not** use
-`US-NNN.REQ-MMM`. Full chain: `docs/process/TRACE_SPEC.md`.
+`US-NNN.REQ-MMM`. Full chain: `docs/about/TRACE_SPEC.md`.
 
 ## Index
 
@@ -103,7 +103,7 @@ and the user-guide. **Internal technical** artifacts stay English: `spec-intake`
 ## Cross-References
 
 - 3-macro step tables + gates: `docs/process/WORKFLOW.md`.
-- Token grammar + RTM rule: `docs/process/TRACE_SPEC.md`.
-- Role → agent + engine binding: `docs/process/ROLE_MAP.md`.
+- Token grammar + RTM rule: `docs/about/TRACE_SPEC.md`.
+- Role → agent + engine binding: `docs/about/ROLE_MAP.md`.
 - Docs crosswalk (which template backs which expected doc): `docs/README.md`.
 - Per-project stage tracker lands at the project **repo root** as `STAGE.md`.
