@@ -45,6 +45,11 @@
 ## Mode-B (steady-state) — KHÔNG phải Macro-2
 - QC trên staging = **human** (cố ý, `steady-state-issue-pipeline.md`). Auto-QC-thay-human = **Frontier-2 aspiration** (`OPERATING-MODES.md:66-70`): `qc-checklist.mjs` + auto-run e2e ở `Ready for Test → QC Testing`, để dành human cho hành vi mới/visual/business. Lần dogfood 2026-08-31 chạy auto-QC 17 issue = bản thử của frontier này, chưa formalize thành state-transition.
 
+## Observability + completeness (RTM)
+| Gate script | Bước guard | Bắt gì |
+|---|---|---|
+| `rtm-status.mjs` 🆕 | 2.3 + xuyên suốt | bảng REQ-ID × [register, issue, test, prototype-freeze]; `--gate` fail nếu REQ-ID in-scope thiếu cột bắt buộc; `--json` cho dashboard. Neo = REQ-ID (SRS là universe). Đây là câu trả lời cơ học cho "module đủ chưa" + "đang ở đâu". |
+
 ## Bổ sung sau Phase-2 run (changelog)
 - 🆕 `check-ac-coverage.mjs`, `check-hardcoded-ui-strings.mjs` (2026-08-31).
 - fidelity-gate: route-scope `collectScreenTsx` + JSX generic matcher + forbidPatterns (giữ; chỉ gỡ seed `tbl` khỏi map-data vì `tbl` là class adopted dùng chung).
