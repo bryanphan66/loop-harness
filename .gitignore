@@ -1,5 +1,6 @@
-# Dev-session local config for working ON this repo (Claude Code convention).
-# NOT the shipped product config — that is harness/.claude/ (installed into projects).
+# The repo root IS the harness product (flattened 2026-09-01: no more harness/
+# subdir). Tracked .claude/ content (commands, agents, hooks, scripts) ships to
+# installed projects; only the workspace RUNTIME below is dev-local and ignored.
 .claude/worktrees/
 .claude/settings.local.json
 .claude/agent-memory/

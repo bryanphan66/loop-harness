@@ -35,7 +35,7 @@ Two optional files, fetched from the same directory as `index.html`:
 
 | File | Produced by | Missing → |
 |---|---|---|
-| `run-log.jsonl` | `harness/scripts/run-log.mjs` (`start` / `end` around each dispatch) | that half falls back to demo numbers |
+| `run-log.jsonl` | `scripts/run-log.mjs` (`start` / `end` around each dispatch) | that half falls back to demo numbers |
 | `board.json` | **not built yet** — see below. Shape: `board.sample.json` | that half falls back to demo numbers |
 
 **The banner tells the truth about which half is real.** A page that silently
@@ -63,7 +63,7 @@ Static image, one port, no env, no secret.
 1. Dokploy → project → **Create Application** → source **Git**, repo
    `loop-harness`, branch of your choice.
 2. **Build Type: Dockerfile**, Docker context path
-   `harness/templates/ops-board`.
+   `templates/ops-board`.
 3. **Domains** → add the host, port **80**, HTTPS on. A `*.sslip.io` host
    resolves to the IP embedded in its own name, so no DNS record is needed.
 4. Deploy, then **verify at source** — never trust the green deploy line:

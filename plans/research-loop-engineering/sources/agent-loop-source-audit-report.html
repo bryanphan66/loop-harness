@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Loops — Source Audit & Definition Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1d4ed8; --blue2:#3b82f6; --ink:#0f172a; --slate:#475569; --mut:#94a3b8;
+    --line:#e2e8f0; --bg:#f8fafc; --card:#ffffff; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; --mutb:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Montserrat',system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px 100px}
+  code,.mono{font-family:'Roboto Mono',monospace}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header.hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%);color:#fff;padding:54px 0 46px;margin-bottom:0}
+  header.hero .wrap{padding-bottom:0}
+  .kicker{font-family:'Roboto Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#93c5fd;margin-bottom:14px}
+  header.hero h1{font-size:40px;line-height:1.1;margin:0 0 14px;font-weight:800;letter-spacing:-.02em}
+  header.hero p.sub{font-size:17px;color:#cbd5e1;max-width:760px;margin:0}
+  .statbar{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+  .stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:14px 18px;min-width:120px}
+  .stat .n{font-size:26px;font-weight:800;color:#fff}
+  .stat .l{font-size:12px;color:#bfdbfe;text-transform:uppercase;letter-spacing:.06em}
+  section{margin-top:48px}
+  h2{font-size:26px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;padding-bottom:10px;border-bottom:3px solid var(--blue);display:inline-block}
+  .lead{color:var(--slate);font-size:16px;max-width:820px;margin:14px 0 22px}
+  h3{font-size:19px;font-weight:700;margin:26px 0 10px}
+  .spectrum{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:12px;padding:20px 24px;font-size:15px;color:#1e293b}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .card h4{margin:0 0 8px;font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .card .cnt{font-family:'Roboto Mono',monospace;font-size:11px;background:#eff6ff;color:var(--blue);padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap}
+  .card .claim{margin:0 0 10px;font-size:14px;color:#1e293b}
+  .card .trait{margin:0;font-size:13px;color:var(--slate)}
+  .div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:12px}
+  .div .axis{font-weight:700;font-size:15px;margin-bottom:10px;color:var(--blue)}
+  .positions{display:flex;flex-wrap:wrap;gap:10px}
+  .pos{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:13px}
+  .pos .dot{width:8px;height:8px;border-radius:50%;background:var(--blue2)}
+  .pos .pcnt{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--mutb);background:#fff;border:1px solid var(--line);border-radius:10px;padding:0 6px}
+  ul.clean{list-style:none;padding:0;margin:0}
+  ul.clean li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin-bottom:9px;font-size:14px}
+  ul.clean li b{color:var(--ink)}
+  .callout{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:18px 22px;margin-top:18px}
+  .callout h3{margin:0 0 8px;color:var(--blue)}
+  .callout p{margin:0;font-size:15px;color:#1e3a8a}
+  table.src{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13.5px}
+  table.src th{background:#0f172a;color:#fff;text-align:left;padding:11px 12px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+  table.src td{padding:12px;border-top:1px solid var(--line);vertical-align:top}
+  table.src tr:hover td{background:#f8fafc}
+  td.num{color:var(--mut);font-family:'Roboto Mono',monospace;width:30px}
+  td .meta{font-size:12px;color:var(--mutb);margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .defcell{max-width:480px}
+  .defcell .def{color:#1e293b}
+  .defcell .evid{font-style:italic;color:var(--slate);font-size:12.5px;margin-top:6px;border-left:2px solid var(--line);padding-left:8px}
+  .defcell .shape{font-size:12px;color:var(--mutb);margin-top:6px}
+  .badge{font-family:'Roboto Mono',monospace;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;white-space:nowrap}
+  .badge.ok{background:#dcfce7;color:#166534}
+  .badge.warn{background:#fef3c7;color:#92400e}
+  .badge.bad{background:#fee2e2;color:#991b1b}
+  .badge.mute{background:#f1f5f9;color:#475569}
+  .tbadge{font-size:11px;padding:2px 8px;border-radius:6px;background:#f1f5f9;color:#475569;font-weight:600}
+  .t-vendor-docs{background:#ede9fe;color:#6d28d9}
+  .t-framework-docs{background:#e0f2fe;color:#0369a1}
+  .t-academic-paper{background:#fef9c3;color:#854d0e}
+  .t-newsletter,.t-blog{background:#fce7f3;color:#9d174d}
+  .t-youtube{background:#fee2e2;color:#b91c1c}
+  .t-forum{background:#dcfce7;color:#166534}
+  .t-x-thread{background:#e2e8f0;color:#1e293b}
+  .tag-grass{font-size:10px;background:#16a34a;color:#fff;padding:2px 7px;border-radius:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .fcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .fcard h4{margin:0 0 6px;color:var(--blue);font-size:16px}
+  .fcard p{margin:0 0 8px;font-size:14px}
+  .fcard .why{font-size:12.5px;color:var(--mutb);margin:0}
+  ol.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+  ol.steps li{display:flex;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:11px}
+  .stepnum{flex:0 0 34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Roboto Mono',monospace}
+  .stepbody{font-size:14px}
+  .stepdetail{font-size:13px;color:var(--slate);margin-top:6px}
+  .example{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:20px 24px;font-size:14.5px;line-height:1.6}
+  .example b{color:#93c5fd}
+  .oneliner{font-size:21px;font-weight:700;color:var(--ink);background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:20px 24px;line-height:1.4}
+  details.method{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 20px;margin-top:14px}
+  details.method summary{font-weight:700;cursor:pointer;padding:12px 0;font-size:15px}
+  details.method table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 16px}
+  details.method td{padding:9px 8px;border-top:1px solid var(--line);vertical-align:top}
+  details.method td.num{width:40px}
+  .queries code{display:inline-block;background:#f1f5f9;color:#475569;padding:2px 7px;border-radius:5px;margin:2px 3px 2px 0;font-size:11px}
+  .warnbox{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;color:#92400e;font-size:14px;margin-top:14px}
+  .footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);color:var(--mutb);font-size:13px}
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+  .pill{font-family:'Roboto Mono',monospace;font-size:12px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:5px 12px;color:var(--slate)}
+  .pill b{color:var(--ink)}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Agent Loops · Source Audit & Definition Map</div>
+    <h1>What people actually mean when they say "agent loop"</h1>
+    <p class="sub">A multi-agent scrape of real YouTube videos, vendor docs, frameworks, papers, and community threads — every source independently re-fetched and verified by a separate checker agent. Built to answer one question: does the field agree on what an agent loop is? (It doesn't.)</p>
+    <div class="statbar">
+      <div class="stat"><div class="n">45</div><div class="l">sources verified</div></div>
+      <div class="stat"><div class="n">43</div><div class="l">confirmed</div></div>
+      <div class="stat"><div class="n">11</div><div class="l">definition camps</div></div>
+      <div class="stat"><div class="n">6</div><div class="l">axes of disagreement</div></div>
+      <div class="stat"><div class="n">~109</div><div class="l">Opus agents run</div></div>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+
+  <section>
+    <h2>The short answer</h2>
+    <p class="lead">Your gut was right. Across 45 verified sources, there is <b>no single agreed definition of an agent loop.</b> Two big vendors and the most-cited blogger have converged on one tidy one-liner ("an LLM using tools in a loop"), but step outside that and the definitions fracture into 11 distinct camps that disagree on who owns the loop, what counts as one iteration, whether verification is part of it, and even whether "loop" is the right word at all.</p>
+    <div class="spectrum">Across the verified sources (34 confirmed/partial formal + the new grassroots set) the definitions run on one minimal-to-maximal axis, and the grassroots material lands at BOTH ends, not the middle. MOST MINIMAL: the near-identical one-liners. Simon Willison's &quot;An LLM agent runs tools in a loop to achieve a goal,&quot; LangChain's &quot;a model calling tools in a loop,&quot; and Anthropic's two phrasings (&quot;LLMs autonomously using tools in a loop&quot; / &quot;LLMs using tools based on environmental feedback in a loop&quot;) are the polished formal convergence. swyx's tweet QUOTES this exact shape (&quot;agent = llm + tools + loop + goal&quot;) but only to reject it -- it is a strawman he cites from &quot;keep it simple stupid opinions going around,&quot; not his own definition. NAMED INNER CYCLE: the ReAct camp (Yao et al., the architecture survey, MindStudio, smolagents, LlamaIndex, Pydantic, Bedrock's rationale-action-observation) defines reason/think -&gt; act -&gt; observe -&gt; repeat-until-done. The grassroots inner-cycle voices sit just outside this: Firecrawl states &quot;act, observe, reason, repeat&quot; (note the ordering is the loop-engineering framing, act-first, NOT classic ReAct reason-first), and the YouTube Short reportedly frames load-reason-act-evaluate (unverified, search-summary paraphrase only). VERIFICATION-GATED: self-verification by the same agent (Anthropic Agent SDK's &quot;gather context -&gt; take action -&gt; verify work -&gt; repeat&quot;; Voyager's code-correctness self-check inside a 4-round refinement loop -- a narrower mechanism than the SDK's general principle) versus a separate evaluator (evaluator-optimizer, planner-generator-evaluator). RUNTIME OBJECT: a Runner/orchestrator owns the loop (OpenAI SDK, Google ADK, Bedrock) with handoffs and max_turns. MOST MAXIMAL: the loop becomes a self-designing, scheduled, multi-session SYSTEM, and this is where grassroots dominates: Steinberger's &quot;you should be designing loops that prompt your agents,&quot; Osmani's &quot;loop engineering,&quot; Huntley's Ralph (literal &quot;while :; do cat PROMPT.md | npx amp; done&quot;, documented by HumanLayer), and Owain Lewis's scheduled manager-loop/worker-loop over a GitHub Issues control plane (reported, unverified -- video could not be re-fetched). Reflexion's cross-trial memory loop sits at this end. A separate TERMINOLOGICAL TRAP runs alongside everything: Zapier, LangChain HITL, and Microsoft HITL use &quot;loop&quot; to mean human-in-the-loop OVERSIGHT and define no agent loop. Two camps reject &quot;loop&quot; as the right primitive: swyx (tweet + Latent.Space IMPACT) treats it as just the control-flow piece of a 6-element system, and the autonomous-agents survey uses a four-module architecture (profiling/memory/planning/action) instead. Net: two genuinely different things travel under &quot;loop&quot; -- the agent's INTERNAL reason-act-observe cognition cycle, and an OUTER scheduled/automated/human-designed orchestration loop the agent runs inside. The grassroots leans hard toward the outer one, but it has NOT abandoned the inner one (Firecrawl and the Short are still about the inner cycle).</div>
+    <div class="callout"><h3>Grassroots vs. the textbook</h3><p>The grassroots and formal sources agree on the SKELETON but split on WHERE THE INTERESTING PART IS. Five differences, stated honestly: (1) Different center of gravity, not a clean 'moved on.' Formal vendor/academic sources still define the inner cycle (reason-act-observe, tools-in-a-loop, a Runner with max_turns). The loudest grassroots voices (Steinberger, Huntley, Osmani, Lewis) have shifted to who DESIGNS the loop -- Steinberger's 'stop prompting agents, design loops that prompt your agents' is the rallying cry. But the grassroots has NOT abandoned the inner cycle: Firecrawl still teaches 'act, observe, reason, repeat,' the YouTube Short is an inner-cycle explainer, and Hesamation is about orchestration mechanics, not loop-design philosophy. So the shift is real for the frontier voices, partial across the set. (2) Grassroots is more literal and operational. Where formal docs give prose, grassroots gives runnable code: HumanLayer/Huntley's 'while :; do cat PROMPT.md | npx amp; done' IS the definition. The grassroots cares about throughput, scheduling, worktrees, permissions, and token cost. (3) Grassroots foregrounds GUARDRAILS and human approval as the real work. Osmani warns against 'cognitive surrender'; Lewis reportedly frames guardrails as the main engineering and humans approving every PR (this specific framing is unverified -- his video could not be re-fetched, treat as anecdote). Formal docs mention human checkpoints (Anthropic) but treat them as optional. (4) Grassroots argues openly; formal sources state and move on. Rhys Sullivan mocks both 'tokenmaxxing inference looping' and 'promptchud' prompting and lands in the middle; swyx publicly rejects the minimalist take. Formal sources present one confident definition each. (5) Grassroots is messier on provenance. Two of the new grassroots sources could not be confirmed against actual content (the Short's definition came only from a search-summary paraphrase; Lewis's video text failed to re-fetch), and several entries are one-line provocations (Steinberger, Sullivan) with NO stated loop steps. Important caveats this synthesis must own: the Boris Cherny quote ('I don't prompt Claude anymore, I have loops running') has NO primary source in the set -- it survives only embedded inside Firecrawl/Steinberger discourse, so it is anecdote, not independent evidence. Firecrawl is a company blog quoting tweets, not grassroots-proper, so contrasts that lean on it being grassroots are soft. And the BIGGEST gap: the audit ran a full community lane (10+ Reddit/HN queries for 'an agent is just a while loop', r/AI_Agents, r/LocalLLaMA) and ZERO verifiable community/forum posts survived. The actual beginner grassroots Nate teaches is absent from this evidence base; every 'grassroots' source here is a named practitioner's tweet, blog, or video. Bottom line: formal sources answer 'what is an agent loop'; the frontier grassroots voices have moved to 'how do I run many of them safely and unattended,' answering in shell scripts and guardrails -- but that 'moved on' story rests on a handful of named practitioners, two shaky sources, and a missing community voice, so it is directionally right rather than sweeping.</p></div>
+  </section>
+
+  <section>
+    <h2>The 11 definition camps</h2>
+    <p class="lead">Each camp is a genuinely different mental model of "the loop." A beginner reading across creators will hit several of these and assume they're the same thing. They're not.</p>
+    <div class="grid">
+  <div class="card">
+    <h4>Minimalist 'tools in a loop' <span class="cnt">5 src</span></h4>
+    <p class="claim">An agent is just an LLM (or model) calling tools in a loop until a goal or task is complete. The loop is trivial; the craft is the tools, the prompt, and the stop condition.</p>
+    <p class="trait"><b>What's distinct:</b> Defines the agent AS the loop in one sentence. This is the formal convergence Willison and Anthropic present as hard-won consensus. It is NOT swyx's view: swyx quotes this exact one-liner only to attack it as 'too minimalist to be useful,' so the minimalist line is now the thing practitioners argue WITH, not the frontier.</p>
+  </div>
+
+  <div class="card">
+    <h4>Inner reason-act-observe cycle (ReAct canon) <span class="cnt">8 src</span></h4>
+    <p class="claim">Each iteration is reason/think -&gt; act (tool/function call) -&gt; observe (the result) -&gt; repeat until done. Reasoning is interleaved with acting rather than done once up front.</p>
+    <p class="trait"><b>What's distinct:</b> The only camp that names an explicit internal cognition cycle, and it is almost entirely formal/academic. ReAct's exact device: a 'thought' is an action in language space that yields NO observation, so reason-act-observe is the canonical order. Grassroots inner-cycle takes do NOT cleanly join this camp: Firecrawl reorders it to act-observe-reason (the loop-engineering framing) and is kept in the loop-engineering cluster, and the only grassroots Short on the inner cycle is unverified, so neither sits in this cluster's sources.</p>
+  </div>
+
+  <div class="card">
+    <h4>Self-verification loop (same agent checks its own work) <span class="cnt">2 src</span></h4>
+    <p class="claim">The loop's defining step is the agent checking its own output before continuing: gather context -&gt; act -&gt; verify -&gt; repeat.</p>
+    <p class="trait"><b>What's distinct:</b> Elevates 'verify your work' to a named stage INSIDE the same agent, but the two sources mean different things: Anthropic's SDK states it as a general design principle ('the most underrated step'), while Voyager's self-verification is a narrow code-correctness gate inside a 4-round code-refinement loop that then commits a skill. A defensible pairing, but a broad principle plus a specific mechanism, not one uniform pattern.</p>
+  </div>
+
+  <div class="card">
+    <h4>Separate-evaluator verification loop <span class="cnt">2 src</span></h4>
+    <p class="claim">A separate evaluator agent scores the generator's output; the loop reruns with feedback until PASS or a score threshold. The worker never grades itself.</p>
+    <p class="trait"><b>What's distinct:</b> The grader is distinct from the generator (evaluator-optimizer; planner-generator-evaluator), and the loop terminates on the evaluator's verdict rather than the agent deciding for itself. Hesamation's grassroots 'verification specialist subagent that tries to BREAK the work' is a possible adversarial extension of this, but he flags it as inference from a system-prompt read, gated behind external flags and possibly inactive, so it is noted as speculative, not folded in as evidence.</p>
+  </div>
+
+  <div class="card">
+    <h4>Runtime/orchestration loop owned by a Runner <span class="cnt">4 src</span></h4>
+    <p class="claim">The loop is a runtime primitive owned by a Runner/orchestrator object, not the agent. One run = one application-level turn: call model -&gt; inspect output -&gt; branch (run tools / hand off / return final), looping until a stopping point or max_turns.</p>
+    <p class="trait"><b>What's distinct:</b> Handoffs are a first-class loop branch (OpenAI); the loop carries a hard turn ceiling. Entirely formal/vendor -- no grassroots source frames the loop as a Runner object, which is itself a clean grassroots/formal split.</p>
+  </div>
+
+  <div class="card">
+    <h4>Agent-as-decision-loop (plan-act-learn) <span class="cnt">1 src</span></h4>
+    <p class="claim">The agent IS a decision-making loop oriented toward a goal: it plans, acts, and learns, autonomously or with a human optionally in the loop. The rest is plumbing.</p>
+    <p class="trait"><b>What's distinct:</b> The only source making LEARNING a first-class loop step alongside plan and act, and the only one that explicitly says the loop is 'not just tool use,' dropping the tool requirement the convergence one-liners treat as central.</p>
+  </div>
+
+  <div class="card">
+    <h4>Autonomous goal loop (self-prompting, scheduled, self-terminating) <span class="cnt">5 src</span></h4>
+    <p class="claim">The loop runs unattended toward a goal: it self-prompts or wakes on a schedule, completes a cycle, assesses state against success criteria, writes results back, and repeats with no human re-prompting between iterations.</p>
+    <p class="trait"><b>What's distinct:</b> The differentiator from a chatbot is autonomy. AutoGPT is the formal anchor (self-prompt -&gt; respond -&gt; repeat until goal). Grassroots enriches it most: Huntley's 'everything is a ralph loop' ('allocate a spec array -&gt; give a goal -&gt; loop the goal') and HumanLayer's literal 'while :; do cat PROMPT.md | npx amp; done.' Owain Lewis's scheduled manager/worker-loop-over-GitHub-Issues version is directionally consistent but cited as reported, unverified (video could not be re-fetched), so it is not load-bearing here.</p>
+  </div>
+
+  <div class="card">
+    <h4>Loop engineering / design-the-loop-not-the-prompt <span class="cnt">5 src</span></h4>
+    <p class="claim">You stop prompting the agent turn-by-turn and instead design the loop SYSTEM that prompts the agent. The human becomes the loop architect; the agent externalizes state and runs across many sessions.</p>
+    <p class="trait"><b>What's distinct:</b> The frontier grassroots stance, anchored by Steinberger's viral 'design loops that prompt your agents' tweet, which the company-blog tier (Firecrawl, Osmani) quotes and builds on. Firecrawl belongs here, not in the ReAct cluster: its 'act, observe, reason, repeat' ordering is the loop-engineering framing of the inner cycle. Note Firecrawl is a company blog quoting tweets, not pure grassroots. Anthropic's harness piece is the formal voice in this camp (state externalized to git + progress files across context windows).</p>
+  </div>
+
+  <div class="card">
+    <h4>Cross-trial self-improvement / memory loop <span class="cnt">1 src</span></h4>
+    <p class="claim">The loop spans episodes: act -&gt; get feedback -&gt; verbally reflect -&gt; store reflection in episodic memory -&gt; retry better next trial. Improvement happens through language, not weight updates.</p>
+    <p class="trait"><b>What's distinct:</b> The only camp whose loop closes over MULTIPLE attempts with a persistent episodic-memory buffer as the learning substrate. Centers on reflection and memory rather than tool use.</p>
+  </div>
+
+  <div class="card">
+    <h4>'Loop' is not the right primitive <span class="cnt">3 src</span></h4>
+    <p class="claim">The agent is better described as a set of components than as a loop; the loop is just one piece (control flow) or an emergent behavior of a larger architecture.</p>
+    <p class="trait"><b>What's distinct:</b> swyx is consistent across formats: his tweet calls the loop 'just the control-flow piece' of a 6-element IMPACT system, matching his Latent.Space framework. The autonomous-agents survey independently uses a four-module architecture (profiling/memory/planning/action) and never names an 'agent loop.' Together they are the strongest counter to 'agent = loop.'</p>
+  </div>
+
+  <div class="card">
+    <h4>'Loop' means human oversight (terminological trap) <span class="cnt">3 src</span></h4>
+    <p class="claim">'Loop' here refers to human-in-the-loop oversight (approval checkpoints, escalation, feedback), not any agent cognition loop. These pages define no agent loop at all.</p>
+    <p class="trait"><b>What's distinct:</b> A pure naming collision, split out from the swyx critique because it is a different point entirely. These three pages use 'loop' for human approval gates and explicitly contain no reason-act-observe definition. Worth flagging so the word 'loop' is not double-counted as agreement.</p>
+  </div></div>
+  </section>
+
+  <section>
+    <h2>Where they disagree</h2>
+    <p class="lead">The fault lines the one-line definitions paper over. Each row is a real axis of disagreement; the chips are the positions sources actually take.</p>
+    
+  <div class="div">
+    <div class="axis">Who owns/drives the loop</div>
+    <div class="positions">
+      <div class="pos"><span class="dot"></span>The agent/model itself drives its own process (model is the loop) <span class="pcnt">4</span></div><div class="pos"><span class="dot"></span>A separate Runner/orchestrator object owns and drives the loop <span class="pcnt">4</span></div><div class="pos"><span class="dot"></span>A HUMAN designs/owns the loop and the agent just runs inside it (loop engineering) <span class="pcnt">5</span></div>
+    </div>
+  </div>
+
+  <div class="div">
+    <div class="axis">Is 'verify/evaluate' a named step, and who verifies</div>
+    <div class="positions">
+      <div class="pos"><span class="dot"></span>Yes, by the SAME agent (self-verification) <span class="pcnt">2</span></div><div class="pos"><span class="dot"></span>Yes, by a SEPARATE evaluator agent <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>No explicit verify step (loop is reason-act-observe, ends on no tool calls) <span class="pcnt">3</span></div>
+    </div>
+  </div>
+
+  <div class="div">
+    <div class="axis">What terminates the loop</div>
+    <div class="positions">
+      <div class="pos"><span class="dot"></span>Model decides it's done / returns a final answer with no more tool calls <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>An evaluator / self-verification verdict (PASS / score threshold) <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>A hard iteration/turn ceiling (max_turns, max iterations) <span class="pcnt">2</span></div><div class="pos"><span class="dot"></span>A user-defined goal / success criteria the loop self-checks against <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>No model-side terminator -- runs unattended until an operator, schedule, or CTRL+C stops it <span class="pcnt">3</span></div>
+    </div>
+  </div>
+
+  <div class="div">
+    <div class="axis">Scope of one loop iteration</div>
+    <div class="positions">
+      <div class="pos"><span class="dot"></span>One model call / tool call (fine-grained inner step) <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>One whole context window / session, or one scheduled wake-up <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>One trial/episode, with memory carried to the next trial <span class="pcnt">2</span></div>
+    </div>
+  </div>
+
+  <div class="div">
+    <div class="axis">Is 'tools' constitutive of the loop</div>
+    <div class="positions">
+      <div class="pos"><span class="dot"></span>Yes -- tool use is the point of the loop <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>No -- the loop is defined by decision/reflection/learning/orchestration, tools optional <span class="pcnt">3</span></div>
+    </div>
+  </div>
+
+  <div class="div">
+    <div class="axis">Is 'loop' even the right primitive</div>
+    <div class="positions">
+      <div class="pos"><span class="dot"></span>Yes -- the agent is fundamentally a loop <span class="pcnt">5</span></div><div class="pos"><span class="dot"></span>It's real but too minimalist alone / the loop is just one piece of a bigger system <span class="pcnt">3</span></div><div class="pos"><span class="dot"></span>No -- agent is a set of static components (e.g. a four-module architecture), the loop is emergent or unnamed <span class="pcnt">2</span></div><div class="pos"><span class="dot"></span>The word 'loop' means human oversight (HITL), not the agent at all <span class="pcnt">3</span></div>
+    </div>
+  </div>
+  </section>
+
+  <section>
+    <h2>What every definition shares (the invariant core)</h2>
+    <p class="lead">Strip away the disagreements and this is the irreducible core present in nearly every source — the part a beginner can trust.</p>
+    <ul class="clean"><li><b>An LLM / model as the decision-maker</b> — Every source that actually describes an agent loop -- formal or grassroots -- puts a language model at the center driving each iteration. No agent-loop source omits it, including outliers like CrewAI's decision loop, Reflexion's reflecting agent, and swyx's IMPACT (which still has an LLM). The grassroots reinforces it: Firecrawl 'calling the model as a function,' Ralph piping a prompt into the agent each pass. (The HITL pages are excluded here -- they define no agent loop.)</li>
+<li><b>Iteration / repetition (the loop itself)</b> — By definition the thing being defined. Every camp agrees the model is invoked repeatedly rather than once. The grassroots phrasing is the most literal: HumanLayer/Huntley's bare 'while :; do ... done' shell loop and Firecrawl's 'a while-loop, calling the model as a function rather than chatting with it.'</li>
+<li><b>State or feedback carried into the next iteration</b> — Near-universal once stated loosely: the outcome of an iteration re-enters context so the next step is informed. Form varies (observation, tool results, environmental ground truth, episodic-memory reflection, git/progress files, the persisted code state each Ralph pass mutates). Caveat from the formal set: ReAct's 'thought' explicitly yields NO observation, so the invariant is that SOMETHING carries forward, not that every action produces environment feedback.</li>
+<li><b>A goal or objective the loop works toward</b> — Almost every source names a goal: task complete, a defined objective, a success criterion, evaluator PASS. Even the maximalist grassroots loops keep one (Huntley 'give it a goal then loop the goal'). This holds across both sets. NOTE: the related 'and a stopping condition' is NOT a clean invariant -- it has been demoted to a divergence, because the grassroots maximalist loops (Ralph, loop engineering) frequently have NO model-side terminator and run until an operator, schedule, or CTRL+C stops them. So a goal is invariant; a model-emitted stop is not.</li></ul>
+  </section>
+
+  <section>
+    <h2>What sticks out</h2>
+    <ul class="clean"><li>The frontier grassroots voices skipped the definition and went to 'loop engineering.' The most-echoed grassroots idea is Steinberger's 'you should be designing loops that prompt your agents,' quoted by Firecrawl and Osmani. But this is the FRONTIER, not the whole grassroots set, which still contains inner-cycle explainers (Firecrawl, the Short).</li>
+<li>The minimalist one-liner is a punching bag, not the frontier -- but be precise about who's swinging. swyx QUOTES 'agent = llm + tools + loop + goal' from 'keep it simple stupid opinions going around' specifically to call it 'too minimalist to be useful.' It is a strawman he cites, not his own bald definition. The formal convergence (Willison, Anthropic) still presents it as hard-won consensus.</li>
+<li>Ralph is the grassroots reductio: an agent loop defined as a literal infinite shell one-liner. 'while :; do cat PROMPT.md | npx --yes @sourcegraph/amp ; done' (HumanLayer) and Huntley's 'everything is a ralph loop' strip the concept to a Bash loop plus a static prompt file, and openly warn it produces 'bizarre emergent behavior' if left running too long. No formal source would publish that as a definition.</li>
+<li>Termination gets a distinctly-grassroots answer: no model-side stop at all. Ralph and loop-engineering loops run unattended until an operator, schedule, or CTRL+C stops them. This is why 'a stopping condition' was demoted from the invariant core to a divergence -- a goal is invariant, a model-emitted stop is not.</li>
+<li>The 'who verifies' fault line has a speculative adversarial grassroots twist, flagged as such: Hesamation reads the Claude Code system prompt as introducing a 'verification specialist' subagent meant to BREAK the work. He explicitly calls this inference (Codex-assisted), says it is gated behind external flags and possibly inactive, and concludes it is 'not intentional nerfing.' Treat as speculation, not a confirmed variant.</li>
+<li>Demote three sources from evidence to anecdote before repeating on camera: Boris Cherny ('I don't prompt Claude anymore, I have loops running') has no primary source -- it is a quote inside other people's blogs; Owain Lewis's specific claims (manager/worker loops over a GitHub Issues control plane, 'guardrails are the real work,' humans approve every PR) come from a video that could not be re-fetched; the YouTube Short's definition came only from a third-party search summary, not the video.</li>
+<li>The single biggest gap given the framing: the literal beginner/community grassroots is absent. The audit searched Reddit and HN hard (r/AI_Agents, r/LocalLLaMA, 'an agent is just a while loop') and found nothing verifiable. Every grassroots source here is a named practitioner. The 'grassroots vs formal' contrast is really 'practitioner-influencers vs vendors/academics,' not 'beginners vs experts.'</li>
+<li>The Runner-owned-loop framing is exclusively formal. OpenAI, Google ADK, and Bedrock wrap the loop in an orchestrator object with handoffs and max_turns; not one grassroots source thinks of the loop as a Runner. Grassroots thinks in schedules, shell loops, and worktrees.</li>
+<li>Two formal sources reject 'loop' as the right primitive entirely, and this strengthens the dissent: swyx's 6-element IMPACT model (loop is just control flow) and the autonomous-agents survey's four-module architecture (profiling/memory/planning/action, no named loop). Completeness note: Lilian Weng's widely-cited planning + memory + tool-use triad and BabyAGI's task-queue loop were both queried but neither survived verification, so the 'is loop the right primitive' axis is real but under-sourced relative to how prominent those two framings are in the wild.</li>
+<li>Even within the grassroots there's a sane middle and a cost skeptic. Rhys Sullivan rejects both 'tokenmaxxing inference looping your agents' and 'promptchud' prompting, landing on loops that reproduce real product problems. Osmani's 'cognitive surrender' and Firecrawl's cost/comprehension-debt warnings are the closest the set comes to a 'when NOT to loop' case -- and it is thin, carried by two or three half-lines, which is itself a gap for a practitioner briefing.</li></ul>
+  </section>
+
+  <section>
+    <h2>The beginner framework</h2>
+    <p class="lead">If a complete beginner opened Claude Code right now to design their first loop, this is the framework — built only from the elements that the sources agree on.</p>
+    <div class="oneliner">An agent loop is an LLM that calls tools, checks the result, and repeats toward a stated goal until it is done or you stop it.</div>
+    <h3>The elements you wire up</h3>
+    <div class="grid">
+  <div class="fcard">
+    <h4>The model (the decision-maker)</h4>
+    <p>A single LLM sits at the center and decides what to do on every pass. In Claude Code, this is Claude itself reading your instructions and choosing the next action. You do not script the steps; the model picks them.</p>
+    <p class="why"><b>Why it's universal:</b> Every source that actually describes an agent loop puts a model at the center driving each iteration. Anthropic's own one-line definition is literally 'LLMs autonomously using tools in a loop.' Remove the model and there is no loop, just a script.</p>
+  </div>
+
+  <div class="fcard">
+    <h4>Tools (how it acts on the world)</h4>
+    <p>The actions the model can take: read and write files, run terminal commands, run tests, search, call an API. In Claude Code these come built in (file edits, bash, web). Without tools the model can only talk, not do.</p>
+    <p class="why"><b>Why it's universal:</b> The formal convergence treats tool use as the point of the loop. Anthropic says 'it is therefore crucial to design toolsets and their documentation clearly,' meaning the craft is the tools, not the loop machinery. The loop is trivial; the tools are where the work happens.</p>
+  </div>
+
+  <div class="fcard">
+    <h4>Feedback carried into the next pass (state)</h4>
+    <p>The result of each action feeds back in so the next pass is smarter than the last. That can be a tool result in context, a test that failed, or a notes file written to disk that the agent re-reads. For anything that runs longer than one chat, write state to disk (a progress file plus git commits) so it survives.</p>
+    <p class="why"><b>Why it's universal:</b> Near-universal across sources: the outcome of one step re-enters context to inform the next. Anthropic's long-running-agents work is explicit that a raw model in a loop is not enough; the agent must externalize state to git and progress files and 'leave the environment in a clean state' so the next pass can resume.</p>
+  </div>
+
+  <div class="fcard">
+    <h4>A goal (what 'done' means)</h4>
+    <p>One clear objective the loop works toward, written plainly enough that the model can tell when it is finished. 'Make all tests in this folder pass' is a goal. 'Improve the code' is not.</p>
+    <p class="why"><b>Why it's universal:</b> Almost every source names a goal as the thing the loop targets: task complete, a defined objective, a success criterion, an evaluator PASS. It is one of the few truly invariant pieces across both formal and grassroots sources. Huntley's reductio still keeps it: 'give it a goal, then loop the goal.'</p>
+  </div>
+
+  <div class="fcard">
+    <h4>A verify step (the one beginners skip)</h4>
+    <p>Before the loop continues, the agent checks its own work against the goal: run the tests, re-read the requirement, confirm the file actually changed. In Claude Code the natural pattern is gather context, take action, verify work, repeat.</p>
+    <p class="why"><b>Why it's universal:</b> Anthropic's Agent SDK names 'verify your work' as a distinct stage and calls it 'the most underrated step.' It is what separates a loop that converges on a real result from one that confidently produces garbage. The evaluator-optimizer pattern shows the same idea: keep going until requirements are met.</p>
+  </div>
+
+  <div class="fcard">
+    <h4>A stop condition you control</h4>
+    <p>Something that ends the loop. The cleanest is the goal being met (tests pass). Add a hard ceiling too: a max number of passes, or you watching and hitting CTRL+C. Do not assume the model will always stop itself.</p>
+    <p class="why"><b>Why it's universal:</b> Sources split hard here, which is exactly why a beginner needs to set one deliberately. Formal tools ship a hard turn ceiling (max_turns); grassroots loops like Ralph have NO model-side stop and run until an operator kills them. A goal is invariant; a model-emitted stop is not, so you supply the brake.</p>
+  </div></div>
+    <h3>The build sequence</h3>
+    <ol class="steps">
+  <li><div class="stepnum">1</div><div class="stepbody"><b>Pick a task that has a clear right answer</b> — Choose work where 'done' is checkable by something other than your opinion: tests pass, a file matches a format, a script runs without errors.<div class="stepdetail">Anthropic's guidance is to use a loop only for open-ended tasks where you cannot predict the number of steps. But for your FIRST loop, narrow it further to a task with a built-in checker, so the verify step is easy. Firecrawl's framing: loops are best for repetitive, reviewable, high-value tasks, not everything.</div></div></li>
+
+  <li><div class="stepnum">2</div><div class="stepbody"><b>Write the goal in one plain sentence</b> — State the objective so Claude can tell when it is finished, e.g. 'Every test in /tests passes when I run npm test.'<div class="stepdetail">This becomes the loop's done-state. AutoGPT, CrewAI, and the Claude Code /goal pattern all hang the loop on a user-defined goal. Vague goals ('clean this up') give the loop nothing to terminate on.</div></div></li>
+
+  <li><div class="stepnum">3</div><div class="stepbody"><b>Decide which tools it gets, and what it must NOT touch</b> — In Claude Code, allow file edits, bash, and test-running for the target folder. Keep it scoped. Do not give it merge or deploy power on the first run.<div class="stepdetail">The grassroots consensus is that 'the guardrails are the real work, not the agents.' Owain Lewis's worker loop opens pull requests but never merges; a human approves. Fixed permissions are how you let a loop run without it doing something irreversible.</div></div></li>
+
+  <li><div class="stepnum">4</div><div class="stepbody"><b>Give it a place to keep state</b> — Tell Claude to write progress to a notes file and commit to git after each meaningful change, so it can pick up where it left off.<div class="stepdetail">Straight from Anthropic's long-running-agents harness: read prior state, make incremental progress, self-verify, commit, leave a clean state. This is what lets a loop survive past one context window. For a short first loop you can skip git, but the habit matters the moment the task is non-trivial.</div></div></li>
+
+  <li><div class="stepnum">5</div><div class="stepbody"><b>Wire the four-step cycle: gather context, act, verify, repeat</b> — Instruct Claude to (a) read the relevant files, (b) make ONE change, (c) run the tests to verify, (d) if not passing, repeat.<div class="stepdetail">This is the Claude Code-native loop from the Agent SDK. One change per pass is deliberate: Anthropic found 'work on only one feature at a time' was critical for long-running agents. The verify step is non-negotiable; it is the step that makes the loop converge instead of drift.</div></div></li>
+
+  <li><div class="stepnum">6</div><div class="stepbody"><b>Set a hard stop before you run it</b> — Cap it: 'Stop when all tests pass, or after 10 attempts, whichever comes first.' Watch the first run live.<div class="stepdetail">Formal SDKs ship max_turns for exactly this. Grassroots loops without a stop (Ralph) are explicitly warned to produce 'bizarre emergent behavior' if left running too long. Your stop condition is the difference between an experiment and a runaway token bill.</div></div></li>
+
+  <li><div class="stepnum">7</div><div class="stepbody"><b>Run it, watch, and tighten the prompt</b> — Run the loop, watch where it goes wrong, then fix the instructions and run again. Treat the prompt and tools as the thing you iterate on, not the loop machinery.<div class="stepdetail">Huntley calls this 'clay on the pottery wheel': when a pass fails, fix the failure domain and throw it back on the wheel. The loop itself is trivial; your leverage is in clearer instructions, better-scoped tools, and a sharper verify check.</div></div></li></ol>
+    <h3>Your first loop (copy this)</h3>
+    <div class="example">Goal: make a failing test suite pass. In a Claude Code session on a small repo, give Claude this: &quot;Goal: make every test in /tests pass when I run `npm test`. Loop: (1) run `npm test` and read the failures, (2) open the one file most responsible for the first failure and make a single fix, (3) run `npm test` again to verify, (4) if tests still fail, repeat from step 1. After each fix that improves results, write one line to PROGRESS.md and commit. Stop when all tests pass or after 10 attempts. Do not edit anything outside /src and /tests, and do not delete tests to make them pass.&quot; This is the four-step Claude Code loop (gather context, act, verify, repeat) with a checkable goal, scoped tools, a state file, and a hard stop. Watch it run and tighten the wording where it goes off track.</div>
+    <h3>Common mistakes</h3>
+    <ul class="clean"><li>No verify step. The loop acts, never checks, and confidently produces broken work. Anthropic calls 'verify your work' the most underrated step for a reason.</li>
+<li>A vague goal. 'Improve the code' gives the loop no done-state, so it never knows when to stop and wanders.</li>
+<li>No stop condition. Beginners assume the model stops itself. Many loops (Ralph) have no model-side terminator and run until you kill them; set a max-attempts cap and watch the first run.</li>
+<li>Doing too much per pass. Anthropic found 'one feature at a time' was critical. A loop told to fix everything at once thrashes; one change per pass converges.</li>
+<li>Giving it dangerous tools too early. Letting the first loop merge, deploy, or delete is how you get an irreversible mess. Scope permissions; open a PR, do not merge.</li>
+<li>Not saving state. Without a progress file and commits, a loop that runs past one context window forgets what it already tried and repeats itself.</li>
+<li>Confusing the two meanings of 'loop.' Human-in-the-loop (approval gates) is oversight, not the agent's cognition loop. Zapier, LangChain HITL, and Microsoft HITL use 'loop' for human checkpoints and define no agent loop. Do not copy a HITL guide expecting a build pattern.</li>
+<li>Cognitive surrender. Osmani's warning: handing the loop full control and stopping reading the output. You stay the reviewer, especially early.</li></ul>
+    <div class="callout"><h3>When NOT to loop</h3><p>[&quot;Skip the loop when the task is one shot or has a fixed, predictable path. Anthropic is explicit that agents are for open-ended problems where you cannot hardcode the steps; if a single prompt or a simple script does the job, that is cheaper, faster, and more reliable than a loop.&quot;,&quot;Skip it when 'done' is not checkable. If there is no test, no format to match, no clear success criterion, the loop has nothing to verify against and will drift. Fix the goal first, or do it by hand.&quot;,&quot;Be cautious when the work is irreversible or unreviewable. Firecrawl flags cost and 'comprehension debt'; Rhys Sullivan rejects 'tokenmaxxing inference looping' for its own sake. If you cannot afford the tokens or cannot review the output, do not loop it.&quot;,&quot;Bottom line for a beginner: loop repetitive, reviewable, high-value tasks with a built-in checker. For everything else, just prompt once.&quot;]</p></div>
+  </section>
+
+  <section>
+    <h2>Every source we pulled (45)</h2>
+    <p class="lead">The proof. Every row is a real URL, independently re-fetched by a second "checker" agent to confirm the definition is genuinely on the page. A second backfill pass added YouTube, Reddit/HN, and X sources (9 grassroots sources) and re-synthesized over the full combined set.</p>
+    <div class="pill-row">
+      <span class="pill"><b>15</b> Vendor docs</span><span class="pill"><b>10</b> Framework docs</span><span class="pill"><b>5</b> Academic paper</span><span class="pill"><b>3</b> Newsletter</span><span class="pill"><b>6</b> Blog</span><span class="pill"><b>2</b> YouTube</span><span class="pill"><b>4</b> X / Twitter</span>
+    </div>
+    <table class="src">
+      <thead><tr><th>#</th><th>Source</th><th>Verified</th><th>How they define the loop</th></tr></thead>
+      <tbody>
+  <tr>
+    <td class="num">1</td>
+    <td>
+      <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building Effective AI Agents</a>
+      <div class="meta">Anthropic (Erik Schluntz and Barry Zhang) <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">They are typically just LLMs using tools based on environmental feedback in a loop.</div>
+      
+      <div class="shape"><b>Loop shape:</b> act-with-tools / observe-environmental-feedback, repeated in a loop (the model is called in a loop until task completion or a stopping condition)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">2</td>
+    <td>
+      <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" target="_blank" rel="noopener">Effective Context Engineering for AI Agents</a>
+      <div class="meta">Anthropic <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Since we wrote that post, we've gravitated towards a simple definition for agents: LLMs autonomously using tools in a loop.</div>
+      
+      <div class="shape"><b>Loop shape:</b> LLM autonomously uses tools in a loop; across turns it pulls context just-in-time, generates new data each turn of inference, and cyclically refines/compacts that context (a tool-use + context-curation cycle, not a named reason-act-observe trio)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">3</td>
+    <td>
+      <a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents" target="_blank" rel="noopener">Effective Harnesses for Long-Running Agents</a>
+      <div class="meta">Anthropic <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The page does not give a single textbook definition of &quot;an agent loop.&quot; Its operative framing is the agent running &quot;in a loop across multiple context windows,&quot; and it spells the loop out as a repeated per-session cycle: each session reads prior state (git logs + progress files), picks the highest-priority unfinished feature, makes incremental progress on ONE feature, self-verifies/tests, commits to git with progress notes, and leaves the environment in a clean state for the next iteration to pick up. Verbatim anchors: &quot;Out of the box, even a frontier coding model like Opus 4.5 running on the Claude Agent SDK in a loop across multiple context windows will fall short...&quot;; &quot;Every subsequent session asks the model to make incremental progress, then leave structured updates.&quot;; &quot;the next iteration of the coding agent was then asked to work on only one feature at a time.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> multi-session iterative loop across context windows: read-state -&gt; plan/pick-one-feature -&gt; execute-incrementally -&gt; self-verify -&gt; commit/document -&gt; leave-clean-state -&gt; next iteration</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">4</td>
+    <td>
+      <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a>
+      <div class="meta">Anthropic (Erik Schluntz and Barry Zhang) <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Agents, on the other hand, are systems where LLMs dynamically direct their own processes and tool usage, maintaining control over how they accomplish tasks. They are typically just LLMs using tools based on environmental feedback in a loop.</div>
+      
+      <div class="shape"><b>Loop shape:</b> act-on-tools / observe-environmental-feedback / iterate — an LLM using tools based on environmental feedback in a loop, gaining ground truth at each step until completion or a stopping condition</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">5</td>
+    <td>
+      <a href="https://claude.com/blog/building-agents-with-the-claude-agent-sdk" target="_blank" rel="noopener">Building agents with the Claude Agent SDK</a>
+      <div class="meta">Thariq Shihipar (with notes and editing from Molly Vorwerck, Suzanne Wang, Alex Isken, Cat Wu, Keir Bradwell, Alexander Bricken &amp; Ashwin Bhat) <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">In Claude Code, Claude often operates in a specific feedback loop: gather context -&gt; take action -&gt; verify work -&gt; repeat.</div>
+      
+      <div class="shape"><b>Loop shape:</b> gather context -&gt; take action -&gt; verify work -&gt; repeat</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">6</td>
+    <td>
+      <a href="https://developers.openai.com/api/docs/guides/agents/running-agents" target="_blank" rel="noopener">Running agents | OpenAI API</a>
+      <div class="meta">OpenAI <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">One SDK run is one application-level turn. The runner keeps looping until it reaches a real stopping point. Tools, handoffs, approvals, and streaming all build on top of it rather than replacing it.</div>
+      
+      <div class="shape"><b>Loop shape:</b> call-model → inspect-output → (run tools / hand off / return final) — a single run = one application-level turn that loops until a stopping point</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">7</td>
+    <td>
+      <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/agents-how.html" target="_blank" rel="noopener">How Amazon Bedrock Agents works</a>
+      <div class="meta">Amazon Web Services <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Runtime is managed by the InvokeAgent API operation. This operation starts the agent sequence, which consists of the following three main steps. 1. Pre-processing – Manages how the agent contextualizes and categorizes user input and can be used to validate input. 2. Orchestration – Interprets the user input, invokes action groups and queries knowledge bases, and returns output to the user or as input to continued orchestration. ... 3. Post-processing – The agent formats the final response to return to the user. Within orchestration: The agent interprets the input with a foundation model and generates a rationale that lays out the logic for the next step it should take. ... The agent generates an output, known as an observation, from invoking an action and/or summarizing results from a knowledge base. The agent uses the observation to augment the base prompt, which is then interpreted with a foundation model. The agent then determines if it needs to reiterate the orchestration process. This loop continues until the agent returns a response to the user or until it needs to prompt the user for extra information.</div>
+      
+      <div class="shape"><b>Loop shape:</b> rationale (reason) -&gt; action prediction -&gt; action/knowledge-base invocation -&gt; observation -&gt; reiterate decision; an iterative orchestration loop that continues until a final response is returned to the user. Effectively a reason-act-observe loop framed around a &quot;rationale / action / observation&quot; cycle.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">8</td>
+    <td>
+      <a href="https://learn.microsoft.com/en-us/agent-framework/migration-guide/from-autogen/" target="_blank" rel="noopener">AutoGen to Microsoft Agent Framework Migration Guide</a>
+      <div class="meta">Microsoft (page author: moonbox3; ms.author: evmattso) <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The page does NOT contain a formal, named &quot;agent loop&quot; / &quot;agentic loop&quot; definition. The closest description of how an agent loops is its tool-iteration behavior, stated verbatim as: &quot;`Agent` is multi-turn by default and keeps invoking tools until it can return a final answer.&quot; This is reinforced later: &quot;Agent Framework handles tool iteration automatically at the agent level. Unlike AutoGen's `max_tool_iterations` parameter, Agent Framework agents continue tool execution until completion by default, with built-in safety mechanisms to prevent infinite loops.&quot; Neither passage uses the phrase &quot;agent loop&quot;; they describe the agent run/iteration behavior, not a named loop construct.</div>
+      
+      <div class="shape"><b>Loop shape:</b> invoke-tools -&gt; iterate -&gt; continue-until-final-answer (tool-iteration loop with infinite-loop safety); not a named reason-act-observe cycle</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">9</td>
+    <td>
+      <a href="https://blog.crewai.com/build-agents-to-be-dependable/" target="_blank" rel="noopener">Build Agents to be Dependable</a>
+      <div class="meta">João (Joe) Moura (CrewAI) <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">A decision-making loop. It plans, acts, and learns—autonomously or with humans in the loop—toward a defined goal.</div>
+      
+      <div class="shape"><b>Loop shape:</b> plan-act-learn decision-making loop (broader phrasing elsewhere on the page: observe-reason-act-learn)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">10</td>
+    <td>
+      <a href="https://www.mindstudio.ai/blog/what-is-react-loop-ai-agent-reasoning" target="_blank" rel="noopener">What Is the ReAct Loop? How AI Agents Reason, Act, and Iterate</a>
+      <div class="meta">MindStudio Team <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">ReAct stands for &quot;Reasoning + Acting&quot; — a pattern that lets AI systems alternate between reasoning and acting until a task is complete. The basic idea: instead of generating a single response, an agent alternates between two modes: (1) Reasoning — thinking through what to do next, and (2) Acting — taking an action in the world (searching, calling a function, reading a file). Each iteration runs through three phases: Thought (the agent's internal reasoning step), Action (a specific tool invocation or function call), and Observation (the result of the action comes back as an observation). &quot;That cycle — reason, act, observe, repeat — is the ReAct loop.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> reason-act-observe-repeat (Thought → Action → Observation, looping until task complete)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">11</td>
+    <td>
+      <a href="https://www.mindstudio.ai/blog/multi-agent-orchestration-patterns" target="_blank" rel="noopener">Multi-Agent Orchestration: How to Build Agent Teams That Actually Work</a>
+      <div class="meta">MindStudio Team <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The article does not define an individual &quot;agent loop&quot; (internal reason-act-observe reasoning cycle). The closest thing is a multi-agent workflow loop, the Planner-Generator-Evaluator pattern, described verbatim as: &quot;This is a three-stage loop. A planner agent defines the approach, a generator agent executes it, and an evaluator agent scores the output.&quot; and &quot;If the score is below threshold, the loop runs again with updated instructions.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> plan-generate-evaluate (a multi-agent orchestration loop, NOT a single-agent reason-act-observe loop)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">12</td>
+    <td>
+      <a href="https://www.mindstudio.ai/blog/claude-code-goal-loop-commands-autonomous-tasks" target="_blank" rel="noopener">How to Use the /goal and /loop Commands in Claude Code for Autonomous Long-Running Tasks</a>
+      <div class="meta">MindStudio Team <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Used together, `/goal` and `/loop` create a self-directing, self-terminating agent loop.</div>
+      
+      <div class="shape"><b>Loop shape:</b> execute-cycle / assess-state / repeat-until-goal (a self-directing, self-terminating goal-gated loop)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">13</td>
+    <td>
+      <a href="https://www.techtarget.com/whatis/definition/Auto-GPT" target="_blank" rel="noopener">What is AutoGPT? What You Need to Know</a>
+      <div class="meta">Ben Lutkevich (Site Editor) <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Unlike ChatGPT, AutoGPT runs in a loop. It breaks activities into subtasks, prompts itself, responds to the prompt and repeats the process until it achieves the provided goal.</div>
+      
+      <div class="shape"><b>Loop shape:</b> self-prompt -&gt; respond -&gt; repeat (autonomous subtask loop until goal reached)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">14</td>
+    <td>
+      <a href="https://platform.claude.com/cookbook/patterns-agents-evaluator-optimizer" target="_blank" rel="noopener">Evaluator-Optimizer (Claude Cookbook)</a>
+      <div class="meta">Anthropic <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Keep generating and evaluating until requirements are met.</div>
+      
+      <div class="shape"><b>Loop shape:</b> generate-evaluate-feedback (iterative refinement until PASS)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">15</td>
+    <td>
+      <a href="https://zapier.com/blog/human-in-the-loop/" target="_blank" rel="noopener">Human-in-the-loop in AI workflows: HITL meaning, benefits, and practical patterns</a>
+      <div class="meta">Zapier <span class="tbadge t-vendor-docs">Vendor docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The page does NOT define an &quot;agent loop&quot; / &quot;agentic loop&quot; / &quot;agent run loop.&quot; It is about human-in-the-loop (HITL) workflow patterns, not the internal reason-act-observe cycle of an agent. The only &quot;loop&quot; language is &quot;human-in-the-loop&quot; and &quot;feedback loops.&quot; The closest sentence describing a feedback loop is: &quot;Feedback loops allow a human to work alongside an AI agent by building feedback mechanisms directly into the workflow.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> human-in-the-loop oversight pattern (approve / route / escalate / feedback / audit) -- NOT a reason-act-observe agent loop</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">16</td>
+    <td>
+      <a href="https://docs.langchain.com/oss/python/langchain/human-in-the-loop" target="_blank" rel="noopener">Human-in-the-loop</a>
+      <div class="meta">LangChain <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The page does NOT define &quot;an agent loop&quot; / &quot;agentic loop&quot; / &quot;agent run loop&quot; anywhere. The closest content is an &quot;Execution lifecycle&quot; section describing how the HITL middleware sits inside the agent's run. The overview frames it as: &quot;The Human-in-the-Loop (HITL) middleware lets you add human oversight to agent tool calls. When a model proposes an action that might require review—for example, writing to a file or executing SQL—the middleware can pause execution and wait for a decision.&quot; The lifecycle it describes (paraphrased ordering of retrieved lines): the agent invokes the model to generate a response; the middleware inspects/interrupts when a tool call matches the configured policy; the agent waits for human decisions; based on the HITLResponse decisions the middleware executes approved or edited calls; execution resumes.</div>
+      
+      <div class="shape"><b>Loop shape:</b> invoke-model -&gt; interrupt-on-tool-call -&gt; wait-for-human-decision -&gt; execute-approved/edited-calls -&gt; resume (a human-in-the-loop gated execution lifecycle, not a named &quot;agent loop&quot;)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">17</td>
+    <td>
+      <a href="https://openai.github.io/openai-agents-python/running_agents/" target="_blank" rel="noopener">Running agents - OpenAI Agents SDK</a>
+      <div class="meta">OpenAI <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The runner then runs a loop: 1. We call the LLM for the current agent, with the current input. 2. The LLM produces its output. 1. If the LLM returns a `final_output`, the loop ends and we return the result. 2. If the LLM does a handoff, we update the current agent and input, and re-run the loop. 3. If the LLM produces tool calls, we run those tool calls, append the results, and re-run the loop. 3. If we exceed the `max_turns` passed, we raise a [`MaxTurnsExceeded`] exception.</div>
+      
+      <div class="shape"><b>Loop shape:</b> call-LLM / produce-output / branch (final-output | handoff | tool-calls) / re-run until final output or max_turns</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">18</td>
+    <td>
+      <a href="https://adk.dev/runtime/event-loop/" target="_blank" rel="noopener">Event Loop - Agent Development Kit (ADK)</a>
+      <div class="meta">Google (ADK documentation team) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The ADK Runtime operates on an Event Loop. This loop facilitates a back-and-forth communication between the `Runner` component and your defined &quot;Execution Logic&quot; (which includes your Agents, the LLM calls they make, Callbacks, and Tools).</div>
+      
+      <div class="shape"><b>Loop shape:</b> runner-query -&gt; agent-run -&gt; yield-event -&gt; runner-process -&gt; agent-resume (repeat until no more events); a yield/pause/resume cycle</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">19</td>
+    <td>
+      <a href="https://docs.langchain.com/oss/python/langchain/agents" target="_blank" rel="noopener">Agents - Docs by LangChain</a>
+      <div class="meta">LangChain (official docs) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">An agent is a model calling tools in a loop until a given task is complete.</div>
+      
+      <div class="shape"><b>Loop shape:</b> model-calls-tools-in-a-loop-until-task-complete (model + harness around the loop)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">20</td>
+    <td>
+      <a href="https://reference.langchain.com/python/langgraph.prebuilt/chat_agent_executor/create_react_agent" target="_blank" rel="noopener">create_react_agent | langgraph.prebuilt | LangChain Reference</a>
+      <div class="meta">LangChain / LangGraph (official reference) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Creates an agent graph that calls tools in a loop until a stopping condition is met. The 'agent' node calls the language model with the messages list (after applying the prompt). If the resulting AIMessage contains tool_calls, the graph will then call the tools. The 'tools' node executes the tools (1 tool per tool_call) and adds the responses to the messages list as ToolMessage objects. The agent node then calls the language model again. The process repeats until no more tool_calls are present in the response. The agent then returns the full list of messages as a dictionary containing the key 'messages'.</div>
+      
+      <div class="shape"><b>Loop shape:</b> model-call -&gt; (if tool_calls) tool-execution -&gt; back to model-call; repeat until no tool_calls (a call-tools-in-a-loop / ReAct agent loop)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">21</td>
+    <td>
+      <a href="https://microsoft.github.io/autogen/stable//user-guide/agentchat-user-guide/tutorial/agents.html" target="_blank" rel="noopener">Agents (AgentChat tutorial) - AutoGen</a>
+      <div class="meta">Microsoft (official AutoGen docs) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge warn">partial</span></td>
+    <td class="defcell">
+      <div class="def">This page does not give a single explicit &quot;an agent loop is...&quot; definition. The closest description: &quot;The method that runs the agent given a task as a string or a list of messages, and returns a `TaskResult`.&quot; paired with &quot;Unlike in v0.2 AgentChat, the tools are executed by the same agent directly within the same call to `run()`. By default, the agent will return the result of the tool call as the final response.&quot; and &quot;The list of messages in the `messages` attribute, which stores the agent's \&quot;thought process\&quot; as well as the final response.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> task-in -&gt; model generates tool calls -&gt; tools execute -&gt; summarized result returned (all inside a single run() call); message sequence stored as the agent's &quot;thought process&quot;</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">22</td>
+    <td>
+      <a href="https://huggingface.co/docs/smolagents/conceptual_guides/react" target="_blank" rel="noopener">How do multi-step agents work? - Hugging Face (smolagents)</a>
+      <div class="meta">Hugging Face (official smolagents docs) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Indeed, agents following this architecture will solve their task in as many steps as needed, each step consisting of a Reasoning step, then an Action step where it formulates tool calls that will bring it closer to solving the task at hand.</div>
+      
+      <div class="shape"><b>Loop shape:</b> reason-act (ReAct) loop: each step = Reasoning step then Action step (tool call), repeated in a while loop over a shared memory/log, with optional periodic planning</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">23</td>
+    <td>
+      <a href="https://pydantic.dev/docs/ai/core-concepts/agent/" target="_blank" rel="noopener">Agents | Pydantic Docs (Core Concepts)</a>
+      <div class="meta">Pydantic (official Pydantic AI docs; no individual author listed) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">With agents, this is much harder. The model's decisions are stochastic, and that stochasticity compounds through the agentic loop as the agent reasons, calls tools, observes results, and reasons again.</div>
+      
+      <div class="shape"><b>Loop shape:</b> reason-act-observe-reason (an iterative reasoning/tool-calling cycle, implemented under the hood as a graph that loops between ModelRequestNode and CallToolsNode until an End node is returned)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">24</td>
+    <td>
+      <a href="https://developers.llamaindex.ai/python/examples/workflow/react_agent/" target="_blank" rel="noopener">Workflow for a ReAct Agent</a>
+      <div class="meta">LlamaIndex (official OSS documentation) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">An agent consists of several steps
+1. Handling the latest incoming user message, including adding to memory and preparing the chat history
+2. Using the chat history and tools to construct a ReAct prompt
+3. Calling the llm with the react prompt, and parsing out function/tool calls
+4. If no tool calls, we can return
+5. If there are tool calls, we need to execute them, and then loop back for a fresh ReAct prompt using the latest tool calls</div>
+      
+      <div class="shape"><b>Loop shape:</b> reason-act-observe (ReAct): prompt LLM to reason -&gt; invoke tool / act -&gt; feed tool result back -&gt; re-prompt, repeating until the LLM returns a final response instead of a tool call</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">25</td>
+    <td>
+      <a href="https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop" target="_blank" rel="noopener">Microsoft Agent Framework Workflows - Human-in-the-loop (HITL)</a>
+      <div class="meta">Microsoft (TaoChenOSU / taochen) <span class="tbadge t-framework-docs">Framework docs</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The page does NOT define &quot;an agent loop&quot; (a.k.a. agentic loop / agent run loop). The term never appears. The closest thing it describes is the request/response cycle of a workflow. Verbatim: &quot;HITL is achieved through the request and response handling mechanism in workflows, which allows executors to send requests to external systems (such as human operators) and wait for their responses before proceeding with the workflow execution.&quot; The only explicit looping behavior described is the Python HITL run pattern: &quot;Run the workflow until there is no more human feedback to provide, in which case this workflow completes.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> request-respond-route-repeat-until-complete (a HITL request/response cycle, not a named reason-act-observe agent loop). Python form: run -&gt; emit request_info event -&gt; collect external/human responses -&gt; re-run with responses -&gt; repeat until no pending responses, then yield output.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">26</td>
+    <td>
+      <a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">ReAct: Synergizing Reasoning and Acting in Language Models</a>
+      <div class="meta">Yao et al. (Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao) <span class="tbadge t-academic-paper">Academic paper</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">ReAct augments the agent's action space to Â = A ∪ L, where L is the space of language. An action â_t ∈ L in the language space, which we will refer to as a thought or a reasoning trace, does not affect the external environment, thus leading to no observation feedback. Instead, a thought â_t aims to compose useful information by reasoning over the current context c_t, and update the context c_{t+1} = (c_t, â_t) to support future reasoning or acting. ReAct prompts LLMs to generate both verbal reasoning traces and actions pertaining to a task in an interleaved manner, which allows the model to perform dynamic reasoning to create, maintain, and adjust high-level plans for acting (reason to act), while also interact with the external environments to incorporate additional information into reasoning (act to reason).</div>
+      
+      <div class="shape"><b>Loop shape:</b> thought-action-observation, interleaved as a two-way synergy: &quot;reason to act&quot; (reasoning guides/updates the action plan) and &quot;act to reason&quot; (environment observations feed back into reasoning)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">27</td>
+    <td>
+      <a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener">Reflexion: Language Agents with Verbal Reinforcement Learning</a>
+      <div class="meta">Noah Shinn, Federico Cassano, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao <span class="tbadge t-academic-paper">Academic paper</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Concretely, Reflexion agents verbally reflect on task feedback signals, then maintain their own reflective text in an episodic memory buffer to induce better decision-making in subsequent trials.</div>
+      
+      <div class="shape"><b>Loop shape:</b> act-evaluate(feedback)-verbally-reflect-store-to-memory-retry (trial-and-error loop across episodes, learning via linguistic feedback rather than weight updates)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">28</td>
+    <td>
+      <a href="https://arxiv.org/abs/2305.16291" target="_blank" rel="noopener">Voyager: An Open-Ended Embodied Agent with Large Language Models</a>
+      <div class="meta">Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, Anima Anandkumar <span class="tbadge t-academic-paper">Academic paper</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">&quot;During each round of code generation, we execute the generated program to obtain environment feedback and execution errors from the code interpreter, which are incorporated into GPT-4's prompt for the next round of code refinement. This iterative process repeats until self-verification validates the task's completion, at which point we add this new skill to the skill library.&quot; Voyager itself is described as &quot;the first LLM-powered embodied lifelong learning agent in Minecraft that continuously explores the world, acquires diverse skills, and makes novel discoveries without human intervention,&quot; built from three components: &quot;an automatic curriculum that maximizes exploration,&quot; &quot;an ever-growing skill library of executable code for storing and retrieving complex behaviors,&quot; and &quot;a new iterative prompting mechanism that incorporates environment feedback, execution errors, and self-verification for program improvement.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> generate-code -&gt; execute -&gt; collect-environment-feedback-and-errors -&gt; self-verify -&gt; refine (repeat up to 4 rounds until self-verification passes, then store skill)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">29</td>
+    <td>
+      <a href="https://arxiv.org/html/2404.11584v1" target="_blank" rel="noopener">The Landscape of Emerging AI Agent Architectures for Reasoning, Planning, and Tool Calling: A Survey</a>
+      <div class="meta">Tula Masterman, Sandi Besen, Mason Sawtell, Alex Chao <span class="tbadge t-academic-paper">Academic paper</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">In the ReAct (Reason + Act) method, an agent first writes a thought about the given task. It then performs an action based on that thought, and the output is observed. This cycle can repeat until the task is complete.</div>
+      
+      <div class="shape"><b>Loop shape:</b> reason-act-observe (ReAct); also a broader plan-act-evaluate process</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">30</td>
+    <td>
+      <a href="https://arxiv.org/abs/2308.11432" target="_blank" rel="noopener">A Survey on Large Language Model based Autonomous Agents</a>
+      <div class="meta">Lei Wang, Chen Ma, Xueyang Feng, et al. (Renmin University of China) <span class="tbadge t-academic-paper">Academic paper</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">This paper does NOT define a discrete &quot;agent loop.&quot; Instead it defines a unified agent architecture of four modules (profiling, memory, planning, action) and describes their interaction flow. Closest verbatim framing: &quot;Within these modules, the profiling module impacts the memory and planning modules, and collectively, these three modules influence the action module.&quot; The iterative behavior is described separately: the action module changes the environment (&quot;one action often leads to subsequent actions&quot;) and &quot;memory streams are updated after performing actions,&quot; so the cycle is module-interaction → action → environment change → memory update → next action.</div>
+      
+      <div class="shape"><b>Loop shape:</b> profile-influences-memory-and-planning -&gt; these-three-drive-action -&gt; action-changes-environment -&gt; memory-updated -&gt; next-action (not the authors' own named loop; the survey separately cites ReAct's thought-act-observation triplet as an exemplar pattern)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">31</td>
+    <td>
+      <a href="https://simonw.substack.com/p/i-think-agent-may-finally-have-a" target="_blank" rel="noopener">I think &quot;agent&quot; may finally have a widely enough agreed upon definition to be useful jargon now</a>
+      <div class="meta">Simon Willison <span class="tbadge t-newsletter">Newsletter</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">An LLM agent runs tools in a loop to achieve a goal.</div>
+      
+      <div class="shape"><b>Loop shape:</b> tools-in-a-loop: model requests a tool action -&gt; harness executes it -&gt; outcome fed back to the model -&gt; model reasons and continues, repeating until the goal is reached</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">32</td>
+    <td>
+      <a href="https://www.latent.space/p/agent" target="_blank" rel="noopener">Agent Engineering</a>
+      <div class="meta">swyx (Shawn Wang), Latent.Space <span class="tbadge t-newsletter">Newsletter</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The article does NOT define &quot;an agent loop.&quot; It defines what an AGENT is via the &quot;IMPACT&quot; framework of six elements, and it cites OpenAI's definition: &quot;An agent is an AI application consisting of a model equipped with instructions that guide its behavior, access to tools that extend its capabilities, encapsulated in a runtime with a dynamic lifecycle.&quot; The only loop-specific language in the piece is incidental: &quot;LLMs-in-the-loop is a common line between preset 'Workflows' and autonomous 'Agents'.&quot; and, under the Memory element, &quot;Long Running Memory: which create coherence and self-improvement loops.&quot;</div>
+      
+      <div class="shape"><b>Loop shape:</b> No named loop. The piece is a static six-element framework (IMPACT), not a cyclic reason-act-observe / plan-act-reflect model. Loop language appears only as incidental phrases (&quot;LLMs-in-the-loop,&quot; &quot;self-improvement loops&quot;), not as a defined run-loop with steps.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">33</td>
+    <td>
+      <a href="https://addyo.substack.com/p/loop-engineering" target="_blank" rel="noopener">Loop Engineering</a>
+      <div class="meta">Addy Osmani (quoting Peter Steinberger and Boris Cherny) <span class="tbadge t-newsletter">Newsletter</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">A loop here can be thought of a recursive goal where you define a purpose and the AI iterates until complete.</div>
+      
+      <div class="shape"><b>Loop shape:</b> recursive-goal iteration (define purpose -&gt; AI iterates until complete -&gt; verifier checks); not a classic reason-act-observe cycle</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">34</td>
+    <td>
+      <a href="https://addyosmani.com/blog/loop-engineering/" target="_blank" rel="noopener">Loop Engineering</a>
+      <div class="meta">Addy Osmani <span class="tbadge t-blog">Blog</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">A loop here can be thought of a recursive goal where you define a purpose and the AI iterates until complete.</div>
+      
+      <div class="shape"><b>Loop shape:</b> find-the-work -&gt; hand-it-out (delegate) -&gt; check-it (verify) -&gt; write-down-what-is-done (document state) -&gt; decide-the-next-thing -&gt; repeat (a self-driving discovery-delegation-verification-documentation-decision cycle that pokes the agents instead of you)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">35</td>
+    <td>
+      <a href="https://simonwillison.net/2025/Sep/30/designing-agentic-loops/" target="_blank" rel="noopener">Designing agentic loops</a>
+      <div class="meta">Simon Willison <span class="tbadge t-blog">Blog</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">My preferred definition of an LLM agent is something that runs tools in a loop to achieve a goal.</div>
+      
+      <div class="shape"><b>Loop shape:</b> run-tools-in-a-loop-to-achieve-a-goal (tool-call -&gt; observe -&gt; correct/iterate)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">36</td>
+    <td>
+      <a href="https://ghuntley.com/ralph/" target="_blank" rel="noopener">Ralph Wiggum as a &quot;software engineer&quot;</a>
+      <div class="meta">Geoffrey Huntley <span class="tbadge t-blog">Blog</span> </div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">The way that agentic loops work is by executing a tool and then evaluating the result of that tool.</div>
+      
+      <div class="shape"><b>Loop shape:</b> execute-tool then evaluate-result, run in a continuous (Bash) loop — i.e. act-observe repeated</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">37</td>
+    <td>
+      <a href="https://www.youtube.com/watch?v=RVEaDvh6f5A" target="_blank" rel="noopener">Agent Loops: Complete Guide (Claude Code + Codex)</a>
+      <div class="meta">Owain Lewis <span class="tbadge t-youtube">YouTube</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span><div class="meta">page not fully fetched</div></td>
+    <td class="defcell">
+      <div class="def">&quot;A loop is a job an agent does on repeat: it wakes up on a schedule, reads the current state of the work, does one specific job within fixed permissions, writes the results back, and goes to sleep.&quot;</div>
+      <div class="evid">“&quot;On a schedule, or when an event happens, the agent reads the state of your project, does some work, updates the state, then goes back to sleep and repeats.&quot;”</div>
+      <div class="shape"><b>Loop shape:</b> Schedule/trigger -&gt; read state -&gt; do one scoped job within fixed permissions -&gt; write results back -&gt; sleep -&gt; repeat. Split across two coordinating loops (manager classifies/labels the backlog; worker implements low-risk tickets and opens PRs), coordinated through a GitHub Issues control plane, with human approval as the final gate.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">38</td>
+    <td>
+      <a href="https://www.youtube.com/shorts/3RgymnOnXgc" target="_blank" rel="noopener">The Agentic Loop, Explained: How AI Agents Actually Work</a>
+      <div class="meta">Unconfirmed (channel not retrievable via WebFetch or search) <span class="tbadge t-youtube">YouTube</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge warn">partial</span><div class="meta">page not fully fetched</div></td>
+    <td class="defcell">
+      <div class="def">No verbatim definition retrieved. WebFetch returned only YouTube footer/navigation (page truncated), with no description, transcript, or caption text. Per search-engine summaries (NOT the video itself, treat as third-party paraphrase): AI agents are framed as not being one-shot prompts but working in a loop where they load context, reason, use tools, evaluate the result, and repeat until the task is done.</div>
+      <div class="evid">“No defining sentence was visible in the fetched page. The closest framing (&quot;AI agents work in a loop: load context, reason, use tools, evaluate the result, and repeat until the task is done&quot;) comes from the search engine's summary of the title plus related articles, not from confirmed video content; do not quote it as the creator's words.”</div>
+      <div class="shape"><b>Loop shape:</b> Iterative loop (not one-shot): load context -&gt; reason -&gt; use tools/act -&gt; evaluate result -&gt; repeat until done. NOTE: derived from search-summary paraphrase of the title, NOT confirmed against the actual Short.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">39</td>
+    <td>
+      <a href="https://x.com/steipete/status/2063697162748260627" target="_blank" rel="noopener">Peter Steinberger: monthly reminder - stop prompting coding agents, design loops that prompt your agents</a>
+      <div class="meta">Peter Steinberger (@steipete) <span class="tbadge t-x-thread">X / Twitter</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span><div class="meta">page not fully fetched</div></td>
+    <td class="defcell">
+      <div class="def">Here's your monthly reminder that you shouldn't be prompting coding agents anymore. You should be designing loops that prompt your agents.</div>
+      <div class="evid">“You shouldn't be prompting coding agents anymore. You should be designing loops that prompt your agents.”</div>
+      <div class="shape"><b>Loop shape:</b> Steinberger's tweet does not draw a loop shape - it only asserts the abstraction shift (stop hand-prompting agents; build the program that prompts them). The loop shape attributed to the surrounding 'Loop Engineering' movement is a recurring cycle: define a goal + stopping condition, then the loop iterates act -&gt; observe -&gt; reason/decide -&gt; repeat (the agent fills each step; the structure stays fixed). Boris Cherny framed it the same way: 'I don't prompt Claude anymore. I have loops running. They're the ones prompting Claude and figuring out what to do.'</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">40</td>
+    <td>
+      <a href="https://x.com/swyx/status/1968794141778919860" target="_blank" rel="noopener">swyx on X: &quot;agent = llm + tools + loop + goal ... a minimal viable agent ... too minimalist to be useful&quot;</a>
+      <div class="meta">swyx / Shawn Wang (@swyx) <span class="tbadge t-x-thread">X / Twitter</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span><div class="meta">page not fully fetched</div></td>
+    <td class="defcell">
+      <div class="def">there's a bunch of &quot;keep it simple, stupid&quot; agent engineering opinions going around that basically reduce it to &quot;agent = llm + tools + loop + goal&quot; this is a minimal viable agent, and that's great! but the reason that this definition is too minimalist to be useful, is</div>
+      
+      <div class="shape"><b>Loop shape:</b> Minimal viable agent loop: an LLM calls tools in a loop until a goal is reached (the Simon Willison &quot;LLM agent runs tools in a loop to achieve a goal&quot; shape). swyx argues this loop framing is real but too minimalist to be useful, because it omits what makes agents good. He counters with a fuller &quot;Agent Engineering / IMPACT&quot; model: Intent, Memory, Planning, Authority (auth/trust), Control flow, Tools. So per swyx the loop is just the control-flow piece of a 6-element system, not the whole agent.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">41</td>
+    <td>
+      <a href="https://ghuntley.com/loop/" target="_blank" rel="noopener">everything is a ralph loop</a>
+      <div class="meta">Geoffrey Huntley <span class="tbadge t-blog">Blog</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">Ralph is an orchestrator pattern where you allocate the array with the required backing specifications and then give it a goal then looping the goal.</div>
+      <div class="evid">“Ralph is monolithic. Ralph works autonomously in a single repository as a single process that performs one task per loop.”</div>
+      <div class="shape"><b>Loop shape:</b> Single autonomous process in one repo, doing one task per iteration: allocate a spec/array -&gt; give it a goal -&gt; loop the goal, throwing tokens at it each cycle. Human watches and intervenes (CTRL+C / pause) to fix failure domains and re-feed the loop. Author frames it as &quot;clay on the pottery wheel&quot; - if something isn't right, throw it back on the wheel - and argues this iterative loop replaces linear &quot;brick by brick&quot; construction, hence &quot;everything is a ralph loop.&quot;</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">42</td>
+    <td>
+      <a href="https://x.com/RhysSullivan/status/2063820087061364913" target="_blank" rel="noopener">Rhys Sullivan tweet: &quot;you're either a tokenmaxxing inferencel looping your agents or you're a promptchud the truth lies somewhere in between&quot;</a>
+      <div class="meta">Rhys Sullivan (@RhysSullivan) <span class="tbadge t-x-thread">X / Twitter</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">twitter's best worst quality is that it forces all takes into an extreme
+
+you're either a tokenmaxxing inferencel looping your agents or you're a promptchud
+
+the truth lies somewhere in between
+
+you absolutely should have agents that can reproduce problems in your products,</div>
+      <div class="evid">“you're either a tokenmaxxing inferencel looping your agents or you're a promptchud the truth lies somewhere in between”</div>
+      <div class="shape"><b>Loop shape:</b> No formal agent-loop definition. Sullivan frames a false dichotomy: at one pole an agent loop is 'tokenmaxxing inference looping your agents' (burning tokens by running agents in a loop), at the other pole 'promptchud' (just prompting, no looping). His stance is the middle: you should have agents that can reproduce problems in your products. The closest he comes to describing a useful loop is a reproduce-problems cycle, but no explicit reproduce -&gt; fix -&gt; verify steps are stated in the fetched text. The tweet text in the source ends mid-sentence at 'in your products,' (display_text_range 0-276); a follow-up about 'designing loops that prompt your agents' appears only in a third-party paraphrase, not verifiable verbatim from the source, so it is excluded.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">43</td>
+    <td>
+      <a href="https://x.com/Hesamation/status/2043360686491705851" target="_blank" rel="noopener">Analysis of Claude Code system-prompt changes shifting Opus toward orchestrating an agentic loop with subagents and a verification specialist</a>
+      <div class="meta">ℏεsam / Hesam Sheikh (@Hesamation) <span class="tbadge t-x-thread">X / Twitter</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">new prompts rely heavily on forking/subagents. the main agent Opus is shifted more towards the orchestration and parallelization rather than actually solving the task itself.</div>
+      
+      <div class="shape"><b>Loop shape:</b> Orchestrator-and-subagents loop: the main Opus agent acts as an orchestrator that forks/parallelizes work into subagents (possibly lighter models like Sonnet) rather than doing the task itself, with an experimental &quot;verification specialist&quot; subagent that adversarially tries to break the resulting work. This is framed as a fan-out (orchestrate then delegate) plus a separate verify step, not a single self-contained think-act-observe loop.</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">44</td>
+    <td>
+      <a href="https://www.firecrawl.dev/blog/loop-engineering" target="_blank" rel="noopener">Loop Engineering: Should You Stop Prompting Agents and Start Designing Loops</a>
+      <div class="meta">Hiba Fathima <span class="tbadge t-blog">Blog</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">At the center of any loop is the same four-step cycle: act, observe, reason, repeat.</div>
+      <div class="evid">“The model isn't a collaborator on the other side of a chat anymore; it's a function the program calls in a `while`.”</div>
+      <div class="shape"><b>Loop shape:</b> act -&gt; observe -&gt; reason -&gt; repeat (a four-step cycle the program runs in a while-loop, calling the model as a function rather than chatting with it)</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="num">45</td>
+    <td>
+      <a href="https://www.humanlayer.dev/blog/brief-history-of-ralph" target="_blank" rel="noopener">A Brief History of Ralph | HumanLayer Blog</a>
+      <div class="meta">Dex (Dexter Horthy) <span class="tbadge t-blog">Blog</span> <span class="tag-grass">grassroots</span></div>
+    </td>
+    <td><span class="badge ok">confirmed</span></td>
+    <td class="defcell">
+      <div class="def">while :; do cat PROMPT.md | npx --yes @sourcegraph/amp ; done</div>
+      <div class="evid">“The Ralph Wiggum Technique, created by Geoff Huntley, went viral in the final weeks of 2025.”</div>
+      <div class="shape"><b>Loop shape:</b> An infinite shell while-loop that repeatedly pipes the same declarative prompt file into an AI coding agent: `while :; do cat PROMPT.md | npx --yes @sourcegraph/amp ; done`. The same PROMPT.md is fed to the agent on every iteration; each run mutates the codebase, which becomes the starting state for the next iteration, and it keeps looping until manually stopped (running too long produces &quot;bizarre emergent behavior&quot;).</div>
+    </td>
+  </tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>How this was verified</h2>
+    <p class="lead">This wasn't one model summarizing from memory. It was a two-stage multi-agent pipeline on Opus, built so the model that <i>found</i> a source never gets to <i>grade</i> it — the same maker/checker split this whole topic is about.</p>
+    <ul class="clean">
+      <li><b>Discover</b> — parallel research agents each swept a different lane (vendor docs, frameworks, papers, practitioners, community, YouTube, X) and ran real web searches.</li>
+      <li><b>Extract (maker)</b> — one agent opened each source and copied the exact sentence where it defines the loop.</li>
+      <li><b>Verify (checker)</b> — a <i>separate</i> adversarial agent re-fetched the URL and ruled it confirmed / partial / unverifiable / dead-link. Anything it couldn't confirm is flagged in the table above, not hidden.</li>
+      <li><b>Synthesize</b> — a draft synthesis was adversarially critiqued by another agent, then reconciled, so the clusters aren't tidier than the evidence supports.</li>
+    </ul>
+    <div class="warnbox"><b>Coverage &amp; limits (full transparency).</b> Of 11 discovery lanes launched across two passes, 9 returned data. A YouTube lane errored in the first pass (recovered in the backfill, hence the 2 YouTube rows above) and the Reddit/HN lane errored in the backfill — so dedicated forum threads are <i>not</i> in the verified set; the grassroots view here comes from YouTube and X instead. The first pass also capped verification at 36 sources by source-type priority, which dropped 18 lower-priority community/X candidates; the backfill re-added the YouTube and X voices. Two of the 45 sources are rated <span class="badge warn">partial</span>, not fully confirmed. Nothing here is unverified-but-presented-as-fact: every row was independently re-fetched.</div>
+    <details class="method">
+      <summary>Search lanes & exact queries run (9 lanes)</summary>
+      <table><tbody>
+  <tr><td><b>vendor-docs</b></td><td class="num">8</td><td class="queries"><code>Anthropic &quot;Building Effective Agents&quot; agent loop definition</code> <code>OpenAI Agents SDK &quot;agent loop&quot; run loop definition documentation</code> <code>Google ADK Agent Development Kit agent loop iteration runner documentation</code> <code>AWS Bedrock Agents orchestration loop reasoning action observation documentation</code> <code>Microsoft AutoGen agent &quot;loop&quot; tool call termination documentation</code> <code>&quot;docs.aws.amazon.com&quot; bedrock agents &quot;orchestration&quot; &quot;observation&quot; &quot;ReAct&quot; how agents work user guide</code> <code>Anthropic Claude Agent SDK &quot;agentic loop&quot; gather context take action verify work documentation</code></td></tr>
+
+  <tr><td><b>agent-framework-docs</b></td><td class="num">8</td><td class="queries"><code>LangGraph ReAct agent loop how it works documentation</code> <code>CrewAI agent execution loop documentation reasoning think act</code> <code>smolagents CodeAgent multi-step agent loop ReAct documentation huggingface</code> <code>OpenAI Agents SDK &quot;agent loop&quot; how run loop works documentation</code> <code>Microsoft AutoGen AgentChat agent run loop generate reply documentation</code> <code>Pydantic AI agent run &quot;agent run&quot; graph model request tool calls loop documentation</code> <code>LlamaIndex agent reasoning loop FunctionAgent ReActAgent step documentation</code> <code>CrewAI docs &quot;agent&quot; reasoning ReAct loop thought action observation crewAI.com</code></td></tr>
+
+  <tr><td><b>practitioner-blogs-newsletters</b></td><td class="num">9</td><td class="queries"><code>Addy Osmani &quot;Loop Engineering&quot; agent loop definition</code> <code>Simon Willison agentic loop definition &quot;tools in a loop&quot;</code> <code>Geoffrey Huntley Ralph Wiggum loop coding agent while loop</code> <code>Philschmid agentic loop &quot;while loop&quot; LLM agent definition</code> <code>Latent Space newsletter &quot;agent loop&quot; definition swyx agent engineering</code> <code>Hesamation agent loop newsletter &quot;the agentic loop&quot; LLM tools</code> <code>Hesam Sheikh &quot;Maven&quot; OR substack AI agents loop &quot;while loop&quot; newsletter</code> <code>Peter Steinberger steipete agent loop coding agent blog &quot;the loop&quot;</code> <code>hesamation.substack.com agent loop OR &quot;build an agent&quot; OR ReAct LLM tools</code> <code>steipete.me OR steipete.com blog agentic engineering loops designing agents</code> <code>Hesam Sheikh &quot;I built an AI agent&quot; OR &quot;agent from scratch&quot; hesamation tools loop</code> <code>Lenny's Newsletter AI agents &quot;agent loop&quot; OR &quot;agentic loop&quot; how agents work definition</code> <code>&quot;hesamation&quot; OR &quot;Hesam Sheikh&quot; agents &quot;the loop&quot; how agents work explainer thread</code> <code>Lenny Rachitsky newsletter &quot;what is an agent&quot; loop tools planning memory guide 2026</code></td></tr>
+
+  <tr><td><b>academic-foundational</b></td><td class="num">7</td><td class="queries"><code>ReAct Yao 2022 arXiv 2210.03629 reasoning and acting language models</code> <code>Lilian Weng LLM Powered Autonomous Agents blog planning memory tool use</code> <code>Reflexion Shinn 2023 arXiv verbal reinforcement learning agent loop actor evaluator self-reflection</code> <code>Voyager Wang 2023 arXiv open-ended embodied agent Minecraft iterative prompting mechanism loop</code> <code>AutoGPT autonomous agent loop think reason plan act criticize architecture how it works</code> <code>BabyAGI Yohei Nakajima task-driven autonomous agent loop execution task creation prioritization</code> <code>survey LLM autonomous agents Wang 2023 unified framework profile perception memory planning action arXiv 2308.11432</code></td></tr>
+
+  <tr><td><b>community</b></td><td class="num">10</td><td class="queries"><code>agent loop definition r/AI_Agents reddit what is an agentic loop</code> <code>&quot;agent loop&quot; OR &quot;agentic loop&quot; hacker news thread definition steps</code> <code>reddit r/LocalLLaMA agent loop &quot;while loop&quot; tool calling until done</code> <code>site:reddit.com agent loop agentic loop what is it react reason act observe</code> <code>reddit ClaudeAI &quot;agentic loop&quot; OR &quot;agent loop&quot; how it works discussion</code> <code>&quot;an agent is just a while loop&quot; twitter OR X thread LLM tool calls</code> <code>reddit.com/r/LocalLLaMA OR r/AI_Agents &quot;agents are just&quot; loop tools demystify</code> <code>r/AI_Agents reddit &quot;what exactly is an agent&quot; loop until task complete explanation</code> <code>reddit AI_Agents agent loop perception reasoning action feedback beginner question (allowed_domains reddit.com)</code> <code>&quot;r/AI_Agents&quot; agent loop definition explained reddit discussion 2025</code> <code>&quot;agents are tools in a loop&quot; Anthropic definition agent loop blog post community</code></td></tr>
+
+  <tr><td><b>competing-meanings-of-agent-loop</b></td><td class="num">11</td><td class="queries"><code>ReAct agent loop reason act observe thought action observation definition</code> <code>&quot;agent loop&quot; orchestrator manager delegating sub-agents orchestration loop</code> <code>Claude Code /loop command keep going until done automation feature</code> <code>AutoGPT autonomous agent goal loop self-prompting recursive task loop definition</code> <code>evaluator-optimizer loop agent pattern Anthropic generator checker feedback loop</code> <code>human-in-the-loop agent pattern definition approval checkpoint AI agent</code></td></tr>
+
+  <tr><td><b>agent-loops-coding-agents</b></td><td class="num">8</td><td class="queries"><code>agent loop Claude Code coding agent youtube tutorial IndyDevDan</code> <code>agentic loop coding agent explained youtube Cole Medin</code> <code>Matthew Berman agent loop autonomous coding agent youtube</code> <code>AI Jason agent loop while loop coding agent youtube tutorial</code> <code>Greg Isenberg Startup Ideas agent loop coding agent youtube</code> <code>Riley Brown agent loop Claude Code agentic coding youtube</code> <code>&quot;Agent Loops: Complete Guide (Claude Code + Codex)&quot; youtube channel</code> <code>&quot;WTF Is an AI Agent Loop&quot; youtube channel creator</code> <code>IndyDevDan youtube agentic loop closed loop prompting Claude Code video</code> <code>&quot;The NEW Way to Use Claude Code in 2026 (Loops)&quot; youtube channel creator</code> <code>&quot;One Agent Is NOT ENOUGH&quot; &quot;Agentic Coding BEYOND Claude Code&quot; youtube channel</code> <code>&quot;I just BROKE Claude Code&quot; &quot;Infinite Agentic&quot; IndyDevDan youtube</code> <code>IndyDevDan &quot;One Agent Is NOT ENOUGH&quot; multi-agent custom system video</code> <code>Cole Medin youtube 24 hour coding agent Claude SDK agent loop define</code> <code>&quot;WTF&quot; &quot;AI Agent Loop&quot; &quot;Genius or Hype&quot; youtube 7clJ8IH784Q creator channel</code> <code>AI Jason Zhou youtube build coding agent loop ReAct observe think act tutorial</code> <code>&quot;Ras Mic&quot; youtube agent loop OR &quot;AI agent loop&quot; Coderabbit channel</code> <code>&quot;Why Everyone is Talking About Agentic Loops&quot; youtube channel creator 7BrxIBkX3mg</code> <code>Chase AI youtube &quot;Claude Code&quot; loops video channel lf2lcE4YwgI</code> <code>Owain Lewis youtube channel &quot;Agent Loops&quot; Claude Code Codex aiengineer.co</code> <code>Greg Isenberg Ras Mic &quot;agent loop&quot; episode Startup Ideas Podcast youtube</code></td></tr>
+
+  <tr><td><b>Broad / general AI agent loops (non-Claude-Code creators): build-from-scratch tutorials, ReAct loop, AutoGPT/BabyAGI autonomous loop, the 2026 &quot;agentic loop&quot; trend, and agent-loop failure modes.</b></td><td class="num">9</td><td class="queries"><code>what is an agent loop agentic loop explained youtube</code> <code>&quot;agents are just a while loop&quot; youtube video</code> <code>ReAct loop reasoning acting LLM agent explained youtube tutorial</code> <code>build an AI agent from scratch python while loop tutorial youtube</code> <code>AutoGPT BabyAGI autonomous agent loop explained youtube how it works</code> <code>&quot;agentic loop&quot; OR &quot;agent loop&quot; perceive reason act observe youtube explained</code> <code>&quot;WTF Is an AI Agent Loop&quot; Genius or Hype youtube channel</code> <code>&quot;Build an AI Agent From Scratch With Python&quot; youtube Tech With Tim</code> <code>&quot;Stop Building Agent Loops&quot; &quot;This Is Replacing Them&quot; youtube channel creator</code> <code>&quot;Why Everyone is Talking About Agentic Loops&quot; youtube channel</code> <code>&quot;Understanding The Agentic Reasoning Loop&quot; youtube channel thought action observation</code> <code>James Murdza ReAct agent from scratch youtube tutorial thought action observation</code> <code>&quot;How to Build a ReAct Agent from Scratch with Python&quot; GSep4L4vS08 youtube channel</code> <code>&quot;Why Agentic AI Fails: Infinite Loops, Planning Errors&quot; youtube channel agent loop</code> <code>&quot;FORGET ChatGPT THIS AI Will Replace Humans&quot; Guide to Autonomous Agents AutoGPT BabyAGI youtube channel</code> <code>&quot;FORGET ChatGPT THIS AI Will Replace Humans&quot; autonomous agents AutoGPT 2023 which channel uploaded</code> <code>&quot;How to Build a ReAct Agent from Scratch&quot; python AI engineer youtube creator no framework June 2025</code> <code>&quot;Why Everyone is Talking About Agentic Loops&quot; 7BrxIBkX3mg creator channel name agentic loop X trending</code></td></tr>
+
+  <tr><td><b>x-twitter-agent-loop-definitions</b></td><td class="num">7</td><td class="queries"><code>&quot;an agent is just a while loop&quot; Twitter X agentic loop definition</code> <code>Peter Steinberger agent loop &quot;loop engineering&quot; X thread</code> <code>Hesamation &quot;agent loop&quot; agentic loop diagram tweet how agents work</code> <code>&quot;Ralph&quot; loop coding agent Geoffrey Huntley while loop technique</code> <code>swyx &quot;agent&quot; &quot;while loop&quot; tweet definition LLM tools loop X.com</code> <code>steipete twitter &quot;designing loops that prompt your agents&quot; 2026</code> <code>Hesamation &quot;ammaar&quot; OR &quot;the most important loop&quot; agent LLM tools observe X post</code> <code>Karpathy &quot;agent&quot; &quot;loop&quot; tweet autonomy slider while loop 2026</code> <code>Hesamation X post &quot;agentic loop&quot; OR &quot;agent loop&quot; LLM calls tools until task done explained</code> <code>&quot;steipete&quot; OR &quot;Peter Steinberger&quot; X &quot;ralph&quot; loop agents running while you sleep cost</code> <code>swyx x.com status &quot;agent = llm + memory + planning + tools + while loop&quot;</code> <code>Hesamation X &quot;Anthropic&quot; &quot;agents are models using tools in a loop&quot; simplest definition</code> <code>&quot;RhysSullivan&quot; X &quot;tokenmaxxing&quot; &quot;promptchud&quot; agents reproduce problems loop debate</code> <code>Hesamation x.com &quot;agentic&quot; &quot;system prompt&quot; Claude Code orchestration loop subagents post</code> <code>Geoffrey Huntley ghuntley X twitter &quot;Ralph&quot; &quot;it's just a while loop&quot; bash agent</code></td></tr></tbody></table>
+    </details>
+  </section>
+
+  <div class="footer">
+    Generated by a multi-agent Opus workflow (discover → extract → adversarial verify → synthesize → framework). Sources verified by independent re-fetch; flagged sources are marked, not dropped. Built for Nate Herk · Agent Loops video research.
+  </div>
+</div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4868e381f8a54ebfbc60b84ddac1396f","r":1}' crossorigin="anonymous"></script>
+</body>
+</html>

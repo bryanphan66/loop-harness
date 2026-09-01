@@ -1,0 +1,213 @@
+<title>QC #1001 & #1002 — Email hoàn thành khóa + Logo</title>
+<style>
+  :root{
+    --bg:#f3f5f2; --surface:#ffffff; --surface-2:#eef2ed; --ink:#17211c; --ink-soft:#4a574f;
+    --line:#dbe3dc; --line-strong:#c3cdc4;
+    --brand:#1f7a54; --brand-soft:#e3f1ea; --brand-ink:#14563b;
+    --amber:#b5730a; --amber-soft:#fbefd9; --blue:#1f5f9e; --blue-soft:#e2eef8;
+    --red:#b3352f; --red-soft:#f7e3e1; --green:#1f7a54;
+    --shadow:0 1px 2px rgba(20,40,30,.06),0 8px 24px -12px rgba(20,40,30,.18);
+    --radius:12px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#111613; --surface:#1a211d; --surface-2:#222b26; --ink:#e7ede9; --ink-soft:#a4b1a9;
+      --line:#2c352f; --line-strong:#3a453e;
+      --brand:#4fc48c; --brand-soft:#183a2c; --brand-ink:#9fe6c4;
+      --amber:#e0a94a; --amber-soft:#3a2e14; --blue:#7bb2e0; --blue-soft:#16283a;
+      --red:#e78a83; --red-soft:#3a1e1c; --green:#4fc48c;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f3f5f2; --surface:#ffffff; --surface-2:#eef2ed; --ink:#17211c; --ink-soft:#4a574f;
+    --line:#dbe3dc; --line-strong:#c3cdc4; --brand:#1f7a54; --brand-soft:#e3f1ea; --brand-ink:#14563b;
+    --amber:#b5730a; --amber-soft:#fbefd9; --blue:#1f5f9e; --blue-soft:#e2eef8;
+    --red:#b3352f; --red-soft:#f7e3e1; --green:#1f7a54;
+    --shadow:0 1px 2px rgba(20,40,30,.06),0 8px 24px -12px rgba(20,40,30,.18);
+  }
+  :root[data-theme="dark"]{
+    --bg:#111613; --surface:#1a211d; --surface-2:#222b26; --ink:#e7ede9; --ink-soft:#a4b1a9;
+    --line:#2c352f; --line-strong:#3a453e; --brand:#4fc48c; --brand-soft:#183a2c; --brand-ink:#9fe6c4;
+    --amber:#e0a94a; --amber-soft:#3a2e14; --blue:#7bb2e0; --blue-soft:#16283a;
+    --red:#e78a83; --red-soft:#3a1e1c; --green:#4fc48c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+    font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:40px 24px 72px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:700}
+  h1{font-size:30px;line-height:1.2;margin:.35em 0 .15em;text-wrap:balance;letter-spacing:-.01em}
+  .lede{color:var(--ink-soft);margin:0 0 8px;max-width:64ch}
+  h2{font-size:21px;margin:0;letter-spacing:-.01em}
+  h3{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)}
+  a{color:var(--brand-ink);text-decoration:underline;text-underline-offset:2px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--surface-2);padding:.12em .4em;border-radius:5px;
+    border:1px solid var(--line);word-break:break-word}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px 24px;margin:18px 0}
+  .grid2{display:grid;gap:18px}
+  @media(min-width:680px){.grid2{grid-template-columns:1fr 1fr}}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  .tblwrap{overflow-x:auto}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;
+    background:var(--surface-2)}
+  td.k{font-weight:600;white-space:nowrap}
+  td .val{font-family:var(--mono);font-size:13px}
+  .badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;
+    border:1px solid transparent;white-space:nowrap}
+  .b-issue{background:var(--brand-soft);color:var(--brand-ink);border-color:var(--line-strong)}
+  .b-warn{background:var(--amber-soft);color:var(--amber)}
+  .b-info{background:var(--blue-soft);color:var(--blue)}
+  .sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:44px 0 4px}
+  .sec-head .num{font-family:var(--mono);color:var(--brand);font-weight:700;font-size:15px}
+  ol.steps{list-style:none;counter-reset:s;margin:0;padding:0}
+  ol.steps>li{counter-increment:s;position:relative;padding:6px 0 14px 42px;border-left:2px solid var(--line);
+    margin-left:13px}
+  ol.steps>li:last-child{border-left-color:transparent}
+  ol.steps>li::before{content:counter(s);position:absolute;left:-14px;top:2px;width:26px;height:26px;
+    display:grid;place-items:center;background:var(--brand);color:#fff;border-radius:50%;font-size:13px;
+    font-weight:700;font-family:var(--mono)}
+  :root[data-theme="dark"] ol.steps>li::before,@media(prefers-color-scheme:dark){}
+  ol.steps>li b{font-weight:700}
+  .expect{background:var(--brand-soft);border:1px solid var(--line-strong);border-radius:10px;padding:14px 16px;margin-top:6px}
+  .expect .lab{font-size:12px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--brand-ink);
+    margin-bottom:6px}
+  .callout{border-left:4px solid var(--amber);background:var(--amber-soft);padding:12px 16px;border-radius:0 10px 10px 0;
+    margin:14px 0;font-size:14.5px}
+  .callout.info{border-left-color:var(--blue);background:var(--blue-soft)}
+  .callout.red{border-left-color:var(--red);background:var(--red-soft)}
+  .callout b{display:block;margin-bottom:2px}
+  ul.check{list-style:none;margin:8px 0 0;padding:0}
+  ul.check li{padding:5px 0 5px 30px;position:relative;font-size:14.5px}
+  ul.check li::before{content:"";position:absolute;left:0;top:8px;width:17px;height:17px;border:2px solid var(--line-strong);
+    border-radius:4px;background:var(--surface)}
+  .muted{color:var(--ink-soft);font-size:13.5px}
+  .kicker{font-size:13px;color:var(--ink-soft);margin:2px 0 0}
+  hr{border:none;border-top:1px solid var(--line);margin:8px 0 0}
+  .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 0}
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:13.5px}
+</style>
+
+<div class="wrap">
+
+  <div class="eyebrow">Kiểm thử chấp nhận (QC) · Môi trường staging</div>
+  <h1>Kiểm thử #1001 &amp; #1002 — Email hoàn thành khóa + Logo</h1>
+  <p class="lede">Hai lỗi (bug) đã sửa và lên staging. Làm theo từng bước dưới đây để nghiệm thu (kiểm tra đạt/không đạt) trên dữ liệu đã chuẩn bị sẵn.</p>
+  <div class="pill-row">
+    <span class="badge b-issue">#1001 · Chứng chỉ + biến brand trong email</span>
+    <span class="badge b-issue">#1002 · Logo trong email</span>
+  </div>
+
+  <div class="callout info" style="margin-top:18px">
+    <b>Đã QC tự động (agent) chạy luồng thật trên staging — cập nhật 30/08</b>
+    <b style="font-weight:600;display:inline">#1001 ĐẠT → chuyển Ready for UAT.</b> Kiểm trên email thật (Mailpit) + DB: copy mới đúng, footer thay đủ 6 giá trị brand thật (hết <code>{{brand_*}}</code>), chứng chỉ tự cấp <code>NN-2026-CR-00008</code> + email kèm PDF 863KB tải được.
+    <br><b style="font-weight:600;display:inline">#1002 phần code ĐẠT</b> (logo URL tuyệt đối, load 200 PNG, hết <code>{{brand_logo_url}}</code>) — còn phần “logo có đúng logo chuẩn không” cần <b>admin upload logo + mắt người</b>, nên giữ Ready for Test. Các bước dưới để bạn tự kiểm lại nếu muốn.
+  </div>
+
+  <!-- ACCESS -->
+  <div class="card">
+    <h3>Đường dẫn &amp; tài khoản</h3>
+    <div class="tblwrap"><table>
+      <tr><td class="k">Web học viên</td><td><a href="https://elearning-staging.reno.ai.vn">elearning-staging.reno.ai.vn</a></td></tr>
+      <tr><td class="k">Admin (quản trị)</td><td><a href="https://elearning-staging.reno.ai.vn/admin/">elearning-staging.reno.ai.vn/admin</a></td></tr>
+      <tr><td class="k">Webmail<br><span class="muted">(xem email hệ thống gửi ra)</span></td>
+          <td><a href="https://mail.elearning-staging.reno.ai.vn">mail.elearning-staging.reno.ai.vn</a><br>
+          <span class="val">admin</span> / <span class="val">p1JmaMe7xzlMFF</span></td></tr>
+      <tr><td class="k">Học viên test</td><td><span class="val">student@nhatnghe.local</span><br>
+          <span class="muted">Đăng nhập bằng OTP (One-Time Password — mã dùng 1 lần) — mã gửi vào webmail ở trên.</span></td></tr>
+    </table></div>
+  </div>
+
+  <!-- TEST DATA -->
+  <div class="card" style="border-color:var(--line-strong)">
+    <h3>Dữ liệu test đã chuẩn bị sẵn</h3>
+    <p style="margin:0 0 6px">Dùng khóa <b>“Quản lý hiệu quả dự án xây dựng”</b> (1 bài, khóa còn hiệu lực). Học viên <code>student@nhatnghe.local</code> đã được ghi danh (enrol), khóa chưa có chứng chỉ. Hoàn thành đúng 1 bài trong khóa là xong.</p>
+    <p class="muted" style="margin:0">Hoàn thành bài → khóa đạt 100% → hệ thống tự gửi email hoàn thành + cấp chứng chỉ (certificate) + email chứng chỉ kèm PDF.</p>
+    <div class="callout red" style="margin:12px 0 0"><b>Đừng dùng khóa “Lập trình Web Cơ Bản”</b> — khóa đó đã bị xoá mềm (soft-delete) trên staging, hoàn thành sẽ KHÔNG cấp được chứng chỉ (đúng thiết kế: khóa đã xoá thì không cấp). Đây là lý do lần QC đầu báo “course not found”.</div>
+  </div>
+
+  <!-- ISSUE 1001 -->
+  <div class="sec-head"><span class="num">#1001</span><h2>Chứng chỉ + biến brand trong email hoàn thành khóa</h2></div>
+  <p class="kicker">Lỗi cũ: email ghi “Chứng chỉ sẽ sớm được cấp” (gây hiểu nhầm chưa tạo), và footer hiện thô các biến chưa thay như <code>{{brand_legal_name}}</code>.</p>
+
+  <div class="card">
+    <h3>Các bước</h3>
+    <ol class="steps">
+      <li>Mở <b>webmail</b> (link ở trên), đăng nhập <code>admin / p1JmaMe7xzlMFF</code> để sẵn sàng xem email sắp nhận.</li>
+      <li>Mở <b>web học viên</b>, đăng nhập <code>student@nhatnghe.local</code>. Khi hệ thống hỏi OTP, quay lại webmail lấy mã (email tiêu đề có “mã đăng nhập”).</li>
+      <li>Vào khóa <b>“Quản lý hiệu quả dự án xây dựng”</b> → mở bài học trong khóa → xem hết bài để hệ thống đánh dấu hoàn thành (đủ ≥90% là tự hoàn thành). Khóa 1 bài này sẽ đạt 100%.</li>
+      <li>Quay lại webmail, mở email <b>“Chúc mừng … hoàn thành khóa”</b> gửi tới <code>student@nhatnghe.local</code>. Kiểm nội dung theo bảng dưới.</li>
+    </ol>
+
+    <div class="expect">
+      <div class="lab">Kết quả kỳ vọng — nội dung email</div>
+      <div class="tblwrap"><table>
+        <tr><th>Mục</th><th>Phải hiển thị</th></tr>
+        <tr><td class="k">Câu về chứng chỉ</td><td>“Chứng chỉ hoàn thành của bạn <b>đang được tạo tự động và sẽ được gửi về email này trong ít phút</b>. Bạn cũng có thể xem và tải chứng chỉ bất cứ lúc nào tại mục Chứng chỉ của tôi.” <span class="muted">(KHÔNG còn câu “sẽ sớm được cấp”.)</span></td></tr>
+        <tr><td class="k">Nút bấm (CTA)</td><td>“<b>Xem chứng chỉ của tôi</b>” → dẫn tới <span class="val">/student/certificates</span></td></tr>
+        <tr><td class="k">Footer — Công ty</td><td class="val">Công ty Cổ phần Đầu tư Nhất Nghệ</td></tr>
+        <tr><td class="k">Footer — MST</td><td class="val">0315654567</td></tr>
+        <tr><td class="k">Footer — Địa chỉ</td><td class="val">35/10E Ấp 1, Xã Xuân Thới Thượng, H. Hóc Môn, TP.HCM</td></tr>
+        <tr><td class="k">Footer — Hotline</td><td class="val">0786 776 868</td></tr>
+        <tr><td class="k">Footer — Email</td><td class="val">ngheQS@gmail.com</td></tr>
+        <tr><td class="k">Footer — Bản quyền</td><td class="val">© 2026 Nhất Nghệ</td></tr>
+      </table></div>
+      <p class="muted" style="margin:10px 0 0">Điểm mấu chốt: footer <b>không được</b> còn bất kỳ chuỗi dạng <code>{{brand_...}}</code> nào. Nếu admin đã đặt thông tin công ty khác trong site-config thì email hiển thị giá trị đó (các giá trị trên là mặc định gốc).</p>
+    </div>
+
+    <ul class="check">
+      <li>Câu về chứng chỉ đúng (không còn “sẽ sớm được cấp”)</li>
+      <li>Nút “Xem chứng chỉ của tôi” dẫn đúng trang chứng chỉ</li>
+      <li>Footer thay đủ 6 giá trị thật, không còn <code>{{brand_*}}</code></li>
+    </ul>
+
+    <div class="expect" style="margin-top:14px">
+      <div class="lab">Kết quả kỳ vọng — cấp chứng chỉ mới (đã bật sẵn)</div>
+      <p style="margin:0 0 8px">Chứng chỉ mẫu cũ đã được xoá, nên hoàn thành bài 2 sẽ <b>cấp chứng chỉ MỚI</b> và gửi email kèm PDF (Portable Document Format - tệp tài liệu).</p>
+      <ul class="check">
+        <li>Nhận thêm 1 email <b>chứng chỉ</b> (kèm tệp PDF đính kèm tải được)</li>
+        <li>Trang <span class="val">/student/certificates</span> hiện chứng chỉ mới, mã chứng chỉ <b>không</b> phải <code>SEED-*</code>, tải PDF được</li>
+      </ul>
+      <p class="muted" style="margin:8px 0 0">Chứng chỉ có thể tới sau email chúc mừng vài phút (render PDF chạy nền qua hàng đợi - queue).</p>
+    </div>
+  </div>
+
+  <!-- ISSUE 1002 -->
+  <div class="sec-head"><span class="num">#1002</span><h2>Logo trong email</h2></div>
+  <p class="kicker">Lỗi cũ: logo email bị nhúng cứng lúc gieo dữ liệu (seed), sai/ hỏng trên prod. Đã đổi sang lấy logo lúc gửi từ site-config, luôn là URL tuyệt đối.</p>
+
+  <div class="card">
+    <div class="callout"><b>Chuẩn bị trước (1 lần) — admin upload logo chuẩn</b>
+      Template email đã được cập nhật tự động khi deploy (đã dùng ô logo động). Việc còn lại: đăng nhập admin → <span class="val">/admin/website</span> → thẻ <b>“Logo”</b> → bấm Upload, tải logo chuẩn của Nhất Nghệ. Sau đó mọi email dùng logo này. <span class="muted">Nếu chưa upload, email sẽ dùng logo mặc định <code>/logo-nhatnghe.png</code> với URL tuyệt đối — vẫn phải load được, không vỡ ảnh.</span>
+    </div>
+    <h3>Các bước</h3>
+    <ol class="steps">
+      <li>(Admin) Upload logo chuẩn theo hộp “Chuẩn bị trước” ở trên.</li>
+      <li>Kích 1 email bất kỳ để kiểm — dùng luôn <b>email hoàn thành khóa ở #1001</b>, hoặc chỉ cần đăng xuất/đăng nhập lại học viên để nhận email OTP.</li>
+      <li>Mở email trong webmail, nhìn <b>logo ở đầu email (header)</b>.</li>
+    </ol>
+    <div class="expect">
+      <div class="lab">Kết quả kỳ vọng — logo</div>
+      <ul class="check">
+        <li>Logo <b>hiển thị được</b> (không vỡ ảnh, không ô trống)</li>
+        <li>Địa chỉ ảnh logo là <b>URL tuyệt đối</b> (bắt đầu bằng <code>https://</code>), <b>không</b> phải <code>localhost</code></li>
+        <li>Nếu admin đã upload logo chuẩn → logo hiển thị đúng logo Nhất Nghệ đã upload</li>
+      </ul>
+      <p class="muted" style="margin:10px 0 0">Mẹo xem URL ảnh: trong webmail bấm chuột phải vào logo → “Sao chép địa chỉ hình ảnh”, dán ra kiểm.</p>
+    </div>
+    <div class="callout red"><b>Ngoài phạm vi bản sửa này</b>
+      Avatar/logo của người gửi hiển thị trong Gmail (cơ chế BIMI — Brand Indicators for Message Identification, cần bản ghi DNS + chứng chỉ VMC phải mua) là việc hạ tầng riêng, KHÔNG kiểm ở đây.
+    </div>
+  </div>
+
+  <div class="foot">
+    <p style="margin:0 0 6px"><b>Sau khi test:</b> nếu ĐẠT hết → issue #1001/#1002 sẵn sàng chuyển tiếp; nếu có mục KHÔNG đạt → ghi rõ mục nào + ảnh chụp, issue quay lại “In Dev” để sửa (đúng luật loop).</p>
+    <p style="margin:0" class="muted">Cả hai bug đã merge vào <code>dev</code> và chạy trên staging (verify tại nguồn: container staging mang commit chứa bản sửa). Bản sửa biến brand có hiệu lực ngay ở tầng chạy; phần copy + logo lấy từ template DB đã re-seed lúc deploy.</p>
+  </div>
+
+</div>

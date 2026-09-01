@@ -8,7 +8,7 @@ CI, e2e), then runs the **loop** that keeps it evolving. Value converges in the
 loop, not the paperwork — so the linear build stays a lean on-ramp.
 
 It runs on a bare **agent + git + bash**; `ck-*` skills only accelerate it
-(Independence Principle, `harness/docs/HARNESS.md`).
+(Independence Principle, `docs/HARNESS.md`).
 
 ## The single spine: two modes, split at go-live
 
@@ -22,9 +22,9 @@ It runs on a bare **agent + git + bash**; `ck-*` skills only accelerate it
 ```
 
 Two older framings are kept but **subordinate**: the *3 macro-stages* (Pre/Build/Post)
-are just the step-grouping inside the modes (`harness/docs/WORKFLOW.md`), and
+are just the step-grouping inside the modes (`docs/WORKFLOW.md`), and
 *Loop Engineering* (`prompt -> context -> harness -> loop`) is a diagnostic lens, not a
-third model. Full detail + honest scorecard: **`harness/docs/UNDERSTANDING-loop-harness.md`**.
+third model. Full detail + honest scorecard: **`docs/UNDERSTANDING-loop-harness.md`**.
 
 **Visual concept map (Vietnamese)** — every repo term mapped to its 2026 industry name,
 badged *real / in-progress / not-yet* (from the `KEYWORD-MAP.md § H` audit):
@@ -40,18 +40,18 @@ badged *real / in-progress / not-yet* (from the `KEYWORD-MAP.md § H` audit):
 | `harness/` | **The product** — the installable skeleton (self-contained, never references outside its own tree): `AGENTS.md`, `docs/`, `.claude/` (commands + stage-runner agent + hooks), `scripts/` + `.githooks/` (non-bypassable verify gate), `templates/` | **yes** |
 | `plans/` | Workshop: harness-development plans + reports + the harness's own `lessons-log.md` + `team-playbook-human-agent.md` | no |
 | `CLAUDE.md` | Workshop: control-session brief (role, auto-loaded by cwd) | no |
-| `.claude/` | Workshop, dev-local: Claude Code session config for working ON this repo (personal parts gitignored). NOT the shipped `harness/.claude/`. | no |
+| `.claude/` | Workshop, dev-local: Claude Code session config for working ON this repo (personal parts gitignored). NOT the shipped `.claude/`. | no |
 
-Full file-by-file map with each part's role: **`harness/docs/STRUCTURE.md`**.
+Full file-by-file map with each part's role: **`docs/STRUCTURE.md`**.
 
 ## Install into a fresh project
 
 ```bash
 # from a local clone of this repo
-harness/scripts/install-harness.sh --bootstrap --spec ./your-spec.md ./my-project
+scripts/install-harness.sh --bootstrap --spec ./your-spec.md ./my-project
 
 # remote (no clone): set HARNESS_REPO explicitly
-curl -fsSL https://raw.githubusercontent.com/<owner>/loop-harness/main/harness/scripts/install-harness.sh \
+curl -fsSL https://raw.githubusercontent.com/<owner>/loop-harness/main/scripts/install-harness.sh \
   | HARNESS_REPO=<owner>/loop-harness bash -s -- --bootstrap --spec ./your-spec.md ./my-project
 ```
 
@@ -79,10 +79,10 @@ Open Claude Code in the project and repeat:
 
 ## Run — Mode B (the loop), after go-live
 
-Copy `harness/templates/steady-state/` into the project and work the issue board:
+Copy `templates/steady-state/` into the project and work the issue board:
 **discover -> dispatch -> verify -> recover -> persist -> decide-next**. Operating manual:
-`harness/docs/playbooks/steady-state-issue-pipeline.md`. Issue-authoring contract:
-`harness/docs/playbooks/github-issue-standard.md`.
+`docs/playbooks/steady-state-issue-pipeline.md`. Issue-authoring contract:
+`docs/playbooks/github-issue-standard.md`.
 
 ## Lane choice (declare at intake, step 1.2)
 
@@ -108,10 +108,10 @@ acceptance test for the harness itself.
 
 ## Key docs (read in this order)
 
-1. `harness/docs/UNDERSTANDING-loop-harness.md` — narrative onboarding + honest scorecard + where new knowledge goes (decision table) + reuse/extend — **read first**
-2. `harness/docs/KEYWORD-MAP.md` — glossary of every concept + where it lives
-3. `harness/docs/STRUCTURE.md` — file-by-file directory map
-4. `harness/docs/OPERATING-MODES.md` — the two modes + the loop (the spine's precise spec)
-5. `harness/docs/HARNESS.md` — operating model + Independence Principle + locked decisions
-6. `harness/docs/WORKFLOW.md` — step tables (inside the two modes), gates, lanes
-7. `harness/docs/TRACE_SPEC.md` — token grammar · `harness/docs/DOC-STANDARD.md` — doc-writing rubric · `harness/docs/playbooks/README.md` — recipes
+1. `docs/UNDERSTANDING-loop-harness.md` — narrative onboarding + honest scorecard + where new knowledge goes (decision table) + reuse/extend — **read first**
+2. `docs/KEYWORD-MAP.md` — glossary of every concept + where it lives
+3. `docs/STRUCTURE.md` — file-by-file directory map
+4. `docs/OPERATING-MODES.md` — the two modes + the loop (the spine's precise spec)
+5. `docs/HARNESS.md` — operating model + Independence Principle + locked decisions
+6. `docs/WORKFLOW.md` — step tables (inside the two modes), gates, lanes
+7. `docs/TRACE_SPEC.md` — token grammar · `docs/DOC-STANDARD.md` — doc-writing rubric · `docs/playbooks/README.md` — recipes

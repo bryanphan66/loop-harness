@@ -37,7 +37,7 @@ spec → REQ-ID → BUILD MANIFEST → stack template → walking skeleton → /
 ```
 1. **REQ-ID (mã yêu cầu) / token chain (chuỗi truy vết yêu cầu)** `PATCHED` — đánh số bền mỗi yêu cầu (`CM.CRUD.01`), truy vết `GAP→REQ-ID→SC→TC` (owner [`TRACE_SPEC.md`](./TRACE_SPEC.md)). *Phản biện: đúng cho việc-có-hợp-đồng (chứng minh với khách); với tool nội bộ là nghi thức thừa → dùng **Lane Lite** để bỏ bớt.*
 2. **BUILD MANIFEST (bản kê thi công — danh sách pha)** `PROVEN` — `docs/build-manifest.md`, xếp mọi REQ-ID vào các phase P0..PN theo thứ tự thi công. Biến "đống spec" thành "hàng đợi phase".
-3. **stack template (khung code mẫu)** `PROVEN (design) / PATCHED (bug)` — `harness/templates/stack-pnpm-nest-next/`, bộ khung code mẫu hình hasi-hub. *Phản biện: 3 bug chỉ lộ khi dogfood proof-run → template chỉ đáng tin SAU khi bị ép chạy thật, không phải vì có mặt.*
+3. **stack template (khung code mẫu)** `PROVEN (design) / PATCHED (bug)` — `templates/stack-pnpm-nest-next/`, bộ khung code mẫu hình hasi-hub. *Phản biện: 3 bug chỉ lộ khi dogfood proof-run → template chỉ đáng tin SAU khi bị ép chạy thật, không phải vì có mặt.*
 4. **walking skeleton (bộ xương biết đi — app tối thiểu chạy được đầu-cuối)** `PROVEN` — app tối thiểu **chạy thật đầu-cuối** (login + 1 CRUD + seed + CI xanh) dựng ở bước 2.4. Chứng minh đường ống thông TRƯỚC khi đắp thịt.
 5. **`/build-phase`** `PROVEN` — vòng lặp code 1 phase (code → `validate:quick` → e2e smoke → ghi verification-register → commit). Lặp tới hết manifest.
 
@@ -106,7 +106,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 ## 8. Dev mới bắt đầu thế nào
 1. Mở session (phiên làm việc): `cd ~/Desktop/Workspace/loop-harness && claude` (context tự nạp từ `CLAUDE.md`).
 2. Đọc theo thứ tự: file này → [`OPERATING-MODES.md`](./OPERATING-MODES.md) → [`WORKFLOW.md`](./WORKFLOW.md) → [`playbooks/README.md`](./playbooks/README.md).
-3. Dựng dự án mới: `harness/scripts/install-harness.sh --bootstrap --spec ./spec.md ./my-project` → chạy `/stage-next` lặp tới go-live → chuyển sang vòng lặp issue.
+3. Dựng dự án mới: `scripts/install-harness.sh --bootstrap --spec ./spec.md ./my-project` → chạy `/stage-next` lặp tới go-live → chuyển sang vòng lặp issue.
 4. Tra nhanh 1 keyword: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md).
 
 **Dev đóng góp ngược lại:** làm dự án bằng harness → gặp bài học/công thức mới → theo bảng §5 cất đúng chỗ → commit vào repo loop-harness → `git push`. Kho lớn dần, mọi dự án sau hưởng.
