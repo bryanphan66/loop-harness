@@ -17,7 +17,7 @@ DoD (traceable issues + UAT evidence). Shape: **structural framework**.
 > cross-artifact trace anchor is the **REQ-ID** (D3 grammar, `TRACE_SPEC.md`).
 > Issues are authored by an agent from the SRS + prototype via
 > `scripts/new-issue.mjs` (fixed 5-header + DoD-13 frame). A REQ-ID-anchored
-> generator that pulls scope+detail+visual is planned (see `macro-2.pipeline.yaml`
+> generator that pulls scope+detail+visual is planned (see `macro-2.md`
 > § issue_sourcing). There is **no** `feature-issues-sync.mjs` register->issue
 > sync script — earlier drafts described one that was never built.
 
@@ -48,7 +48,7 @@ the internal row id is a spreadsheet key, never a trace token. (A prior `F-NNN`
 
 An agent authors each issue from the SRS + frozen prototype for its REQ-ID(s) via
 `scripts/new-issue.mjs`, which writes the fixed frame. (The planned REQ-ID
-generator will pull scope+detail+visual automatically — `macro-2.pipeline.yaml`.)
+generator will pull scope+detail+visual automatically — `macro-2.md`.)
 
 - **Trace anchor: REQ-ID.** The issue's `## Liên kết` section must cite the source
   file per field (SRS path + register scope line + prototype), so every field is

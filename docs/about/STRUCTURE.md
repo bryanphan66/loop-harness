@@ -24,7 +24,7 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 
 ## `docs/` — tri thức (chia folder theo VAI TRÒ, từ 2026-09-01)
 
-> Trước để 14 file .md rời ở `docs/` root (khó tra). Đã gom: **`process/`** (cách harness CHẠY: WORKFLOW, STAGE_GOALS, macro-2.pipeline.yaml, OPERATING-MODES, TRACE_SPEC, ROLE_MAP, CONTEXT_RULES) + **`about/`** (về chính harness: HARNESS, STRUCTURE, KEYWORD-MAP, UNDERSTANDING, DOC-STANDARD, TEST_MATRIX, HARNESS_CHANGELOG). `docs/README.md` là bản đồ vào cửa. Bảng dưới ghi rõ **ai đọc** từng file.
+> Trước để 14 file .md rời ở `docs/` root (khó tra). Đã gom: **`process/`** (cách harness CHẠY: WORKFLOW, STAGE_GOALS, macro-2.md, OPERATING-MODES, TRACE_SPEC, ROLE_MAP, CONTEXT_RULES) + **`about/`** (về chính harness: HARNESS, STRUCTURE, KEYWORD-MAP, UNDERSTANDING, DOC-STANDARD, TEST_MATRIX, HARNESS_CHANGELOG). `docs/README.md` là bản đồ vào cửa. Bảng dưới ghi rõ **ai đọc** từng file.
 
 **① Xương sống — NGƯỜI đọc (onboarding — nhập môn, theo thứ tự này):**
 | File | Vai trò |

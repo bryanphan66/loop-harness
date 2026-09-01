@@ -1,7 +1,7 @@
 # Kế hoạch refactor XOÁ-TRƯỚC — harness (trọng tâm Macro-2 + luồng tạo issue)
 
 > **TRẠNG THÁI 2026-09-01: ĐÃ THỰC THI (branch `refactor/harness-macro2-delete-first`, 7 commit).**
-> - N0 `macro-2.pipeline.yaml` (spec máy-đọc) ✅
+> - N0 `macro-2.md` (spec máy-đọc) ✅
 > - Dọn dối: register-SOT/sync-script/F-NNN, reset gate pb-g2, changelog, README, STRUCTURE ✅
 > - N2 `rtm-status.mjs` (observability + gate "đủ", chạy thật elearning 816 REQ-ID) ✅
 > - Doc-merge: STAGE_GOALS + WORKFLOW trỏ pipeline.yaml, tag 3 bước gộp ✅

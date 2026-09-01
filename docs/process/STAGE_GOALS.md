@@ -372,7 +372,7 @@ contract + deposit confirmed. Stop after 8 turns.
 
 ## Macro-Stage 2 — BUILD & GO-LIVE
 
-> **Canonical process shape = `docs/process/macro-2.pipeline.yaml`** (step → driver →
+> **Canonical process shape = `docs/process/macro-2.md`** (step → driver →
 > gate → playbook → output → exit). That file is the SoT for the SHAPE; this
 > file is the goal-prose each step runs against. As of 2026-09-01 three steps are
 > **folded** to cut duplication (the goal text stays below, tagged): **2.5 → 2.4**
@@ -518,7 +518,7 @@ Observability is decided: structured logging on by
 default; alerting/SLO configured or recorded `N/A by decision` in the
 dod-build toggles. STAGE.md Current = 2.5. Stop after 25 turns.
 
-### Step 2.5 — Seed + foundation data  *(FOLDED into 2.4 — same P0 milestone; see macro-2.pipeline.yaml)*
+### Step 2.5 — Seed + foundation data  *(FOLDED into 2.4 — same P0 milestone; see macro-2.md)*
 
 - **Inputs:** frozen ERD + RBAC (permissions doc / RPM).
 - **Output path:** seed script(s) under the API app (extends the template's admin seed).
@@ -585,7 +585,7 @@ wait for the operator's OK before the next phase. STAGE.md Current stays 2.6
 while phases remain; when the last phase closes AND is accepted, Current = 2.7.
 Stop after 25 turns.
 
-### Step 2.7 — Code review (6-dim) — at manifest completion (+ mid-point if >6 phases)  *(FOLDED into 2.10 — shares DoD floor rules; see macro-2.pipeline.yaml)*
+### Step 2.7 — Code review (6-dim) — at manifest completion (+ mid-point if >6 phases)  *(FOLDED into 2.10 — shares DoD floor rules; see macro-2.md)*
 
 - **Inputs:** the full diff since P0 (or since the last 2.7 review).
 - **Output path:** review record → `plans/reports/code-review-<date>-<slug>.md`.
@@ -675,7 +675,7 @@ decision with reason + date, and the verification register has no `fail` /
 build and browser-QA in separate steps. STAGE.md Current = 2.11. Stop after
 15 turns.
 
-### Step 2.11 — Go-live readiness  *(FOLDED into 2.13 — part of the release contract; see macro-2.pipeline.yaml)*
+### Step 2.11 — Go-live readiness  *(FOLDED into 2.13 — part of the release contract; see macro-2.md)*
 
 - **Inputs:** accepted-candidate build + infra (compose/prod variant, CI).
 - **Output path:** readiness checklist → `plans/reports/go-live-readiness-<date>-<slug>.md`.

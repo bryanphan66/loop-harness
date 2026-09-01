@@ -23,7 +23,7 @@ nesting the product one level deep.
   this changelog corrected.
 
 **New spine + tools (in `docs/process/` and `scaffolds/.../scripts/`).**
-- `docs/process/macro-2.pipeline.yaml` — the **machine-readable Macro-2 spec**:
+- `docs/process/macro-2.md` — the **machine-readable Macro-2 spec**:
   per step `driver · inputs · gates · playbooks · output · exit_when`. One file
   answers "at step X, which check/recipe/doc applies". Ends the scatter across
   STAGE_GOALS/WORKFLOW/gates/lint-registry; those now point INTO it. Encodes the

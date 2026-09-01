@@ -158,7 +158,7 @@ The invariants that STAY non-negotiable even in Lite: REQ-ID grammar, screen-inv
 
 ## Macro-Stage 2 — BUILD & GO-LIVE
 
-> **Canonical process shape = `docs/process/macro-2.pipeline.yaml`.** This table is the
+> **Canonical process shape = `docs/process/macro-2.md`.** This table is the
 > human-readable view; the yaml is what /stage-next + the RTM dashboard read.
 > Folded steps (2026-09-01): **2.5→2.4**, **2.7→2.10**, **2.11→2.13**; security
 > is one VERIFY pass at 2.9. The rows below keep the folded steps' detail, tagged.
