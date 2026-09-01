@@ -2,7 +2,7 @@
 /**
  * Sinh QC checklist (danh sach kiem thu) tu Acceptance Criteria cua 1 GitHub Issue
  * va dang lam comment tren issue do. Phuc vu SOP "Quy trinh code issue"
- * (docs/WORKFLOW.md): moi issue khi vao lane test phai co checklist de QC bam-va-tick.
+ * (docs/process/WORKFLOW.md): moi issue khi vao lane test phai co checklist de QC bam-va-tick.
  *
  * Dung:
  *   node scripts/qc-checklist.mjs <issue-number> [--repo owner/name] [--force] [--dry-run]

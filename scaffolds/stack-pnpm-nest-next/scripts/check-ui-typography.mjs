@@ -33,7 +33,7 @@ const EMOJI = /(\p{Extended_Pictographic}(?:[\u{FE0F}\u{200D}]\p{Extended_Pictog
 
 /**
  * Replace the "AI typography" glyphs and strip decorative emoji from one string.
- * Mirrors the render-time clean() in scripts/feature-issues-sync.mjs, extended to
+ * Mirrors the render-time clean() used when authoring issues (strip AI-typography), extended to
  * also drop decorative emoji icons (kept there, dropped here).
  * @param {string} s @returns {string}
  */

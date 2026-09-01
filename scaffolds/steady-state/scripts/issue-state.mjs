@@ -4,7 +4,7 @@
  *
  * Truong "States" la GitHub org Issue Field (single-select) dung chung cho ca
  * org RenoAI-Labs. Script nay set gia tri States cho 1 issue, phuc vu SOP
- * "Quy trinh code issue" (docs/WORKFLOW.md).
+ * "Quy trinh code issue" (docs/process/WORKFLOW.md).
  *
  * Dung:
  *   node scripts/issue-state.mjs <issue-number> "<state name>" [--repo owner/name] [--dry-run]
