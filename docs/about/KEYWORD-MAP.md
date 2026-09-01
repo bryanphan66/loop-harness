@@ -89,7 +89,6 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **`flow`** | Ceremony (nghi thức) git+gh cắt release/ship (có xác nhận). Chỉ git+gh, không đụng worktree/Claude. |
 | **`wait-workers.sh`** | ctl chờ bg-worker tới tín hiệu DONE (PR MERGEABLE / worker terminal) — thay vòng poll tự chế. |
 | **`run-log.mjs`** (cái cân) | 1 dòng JSONL / 1 lần dispatch (`start`→`end`), `report --by harness` so các bản harness. Ghi NGOÀI git, dùng chung mọi repo. **Bắt buộc kẹp quanh mọi dispatch** — không có nó thì hill-climbing loop không có số để leo. |
-| **ops-board** | Mặt phẳng trạng thái NỘI BỘ (`scaffolds/ops-board/`): worker đang chạy · số của kỳ · so bản harness · chỗ ùn. Cố ý KHÔNG vẽ lại bảng 10-state. Khách xem mặt riêng (D4). |
 | **verify-at-source** | (xem C) nguyên tắc deploy xuyên suốt: xác nhận artifact chạy = commit đã ship. |
 
 ---

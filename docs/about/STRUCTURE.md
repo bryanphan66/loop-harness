@@ -11,7 +11,7 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 ├── AGENTS.md ········· [SẢN PHẨM] operating model cho agent (task loop + gate + thứ tự đọc)
 ├── docs/ ············· [SẢN PHẨM] tri thức harness — chia process/ (cách CHẠY) + about/ (về chính harness) + playbooks/ gates/ mau-tai-lieu/ (bảng dưới). Vào cửa: docs/README.md
 ├── scripts/ ·········· [SẢN PHẨM] install-harness.sh + harness-verify-gate.sh + run-log/wait-workers
-├── scaffolds/ ········ [SẢN PHẨM] scaffold CODE bê vào project: stack (Mode A) + steady-state (Mode B) + ops-board
+├── scaffolds/ ········ [SẢN PHẨM] scaffold CODE bê vào project: stack (Mode A) + steady-state (Mode B)
 ├── .claude/ ·········· [SẢN PHẨM, tracked] commands + agents + hooks (ship khi cài); +[XƯỞNG, gitignore] worktrees/agent-memory/settings.local
 ├── .githooks/ ········ [SẢN PHẨM] pre-commit + pre-push (gate fail-closed, không bypass)
 ├── README.md ········· [XƯỞNG] cửa vào: harness là gì, cài, chạy loop
@@ -75,7 +75,6 @@ loop-harness/   (= chính là harness — không còn thư mục con harness/)
 ## `scaffolds/` — 3 scaffold code (root)
 - `stack-pnpm-nest-next/`: khung app **Mode A (chế độ A — Build)** (walking skeleton (bộ xương biết đi) — NestJS+Prisma+Postgres+Next.js+CI+e2e+docker). Dùng ở bước 2.4.
 - `steady-state/` (trạng thái vận hành ổn định sau go-live): kit (bộ đồ nghề) **Mode B** — `issue-state.mjs` (đặt state + **ép cạnh chuyển hợp lệ**), `qc-checklist.mjs`, `push-retry.sh` (Recover (tự-sửa khi lỗi) R2), `ship-and-verify.sh` (Recover R3), `bug-report.md`, `regression-checklist.md`. Copy vào dự án khi go-live (thời điểm app lên môi trường thật).
-- `ops-board/`: **mặt phẳng trạng thái nội bộ** (internal status surface) đã đặc tả ở `HARNESS.md` § Status Artifact — 1 file HTML tự-đủ + `Dockerfile` nginx. Đọc `run-log.jsonl` + `board.json` đặt cạnh nó; thiếu file thì rơi về dữ liệu mẫu và **nói thẳng trên banner**. Nhãn `experimental` — chưa chạy trên dữ liệu thật. KHÔNG đưa cho khách (mặt khách là file/URL riêng — D4).
 
 ## 4 kho tri thức — VỊ TRÍ ("cất gì vào đâu" xem [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md) §5)
 | Kho | Ở đâu |

@@ -40,7 +40,7 @@ The product/workshop boundary is `SKELETON_PATHS` in `scripts/install-harness.sh
 | Path | What | Installed into a project? |
 |---|---|---|
 | `AGENTS.md` · `docs/` · `.claude/` · `scripts/` · `.githooks/` | **The product** — operating guide, all knowledge (`docs/process`, `docs/about`, `playbooks`, `gates`, `mau-tai-lieu` doc-forms), the `/stage-next` etc. commands, the install + non-bypassable verify gate. | **yes** |
-| `scaffolds/` | **The product** — ready-made CODE copied in (app skeleton, steady-state kit, ops-board). | **yes** (via installer) |
+| `scaffolds/` | **The product** — ready-made CODE copied in (app skeleton, steady-state kit). | **yes** (via installer) |
 | `plans/` | Workshop: harness-development plans + reports + the harness's own lessons-log. | no |
 | `CLAUDE.md` | Workshop: control-session brief (role, auto-loaded by cwd). | no |
 | `.claude/` runtime (`worktrees/`, `agent-memory/`, `settings.local.json`) | Workshop, dev-local — **gitignored**, never committed. | no |

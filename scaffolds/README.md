@@ -3,7 +3,7 @@
 These are **starting code**, not documents. When you begin a project, the harness
 copies one of these into it so you don't build from an empty folder.
 
-Three folders, three jobs:
+Two folders, two jobs:
 
 ## 1. `stack-pnpm-nest-next/` — the app skeleton (start here)
 A minimal but **already-running** app: a backend (NestJS + Postgres + login) and a
@@ -28,13 +28,6 @@ through GitHub issues (the "loop").
 - **Example:** a bug issue moves `In Dev → Deploying → Ready for Test`, and
   `ship-and-verify.sh` checks staging is actually running the merged commit before
   it flips to "Ready for Test".
-
-## 3. `ops-board/` — a status dashboard (experimental, not proven yet)
-A single self-contained HTML page showing project status for the internal team.
-
-- **Honest status:** built, renders in light/dark, but **never run on real data** —
-  don't rely on it yet.
-- **When:** optional; only if you want a visual internal status page.
 
 ---
 **Don't confuse with `docs/mau-tai-lieu/`:** those are blank *document* forms (a build

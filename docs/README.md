@@ -12,7 +12,7 @@ fixed standard. Everything is organised by **what you need right now**.
 | **Look up a recipe for a step** (how to actually DO it) | `playbooks/` (one file per reusable task/domain) |
 | **Know what a step must pass** (the checks) | `gates/` (checklists) + `docs/gates/lint-gates-registry.md` (the scripts) |
 | **Fill in a project document** (blank forms) | `mau-tai-lieu/` (build-manifest, feature-register, SOW, prototype-prompt, …) |
-| **Scaffold the actual app code** | `../scaffolds/` (stack-pnpm-nest-next monorepo, steady-state scripts, ops-board) |
+| **Scaffold the actual app code** | `../scaffolds/` (stack-pnpm-nest-next monorepo, steady-state scripts) |
 | **Understand the harness itself** (design, glossary) | `about/` (HARNESS.md, STRUCTURE.md, KEYWORD-MAP.md, …) |
 
 ## The four kinds of thing (don't confuse them)
@@ -47,7 +47,7 @@ Not everything here is equally real. Every capability is tagged in
 - **PATCHED** — born from one real failure, turned into a rule. Correct but may be
   heavy/specific (e.g. REQ-ID token chain, Full-vs-Lite lanes).
 - **ASPIRATIONAL** — designed, **NOT built**. Do not assume it works. Currently:
-  **R1 auto re-dispatch on BLOCKED**, **ops-board** (experimental, never run on
+  **R1 auto re-dispatch on BLOCKED**
   real data), **graph/incremental-preview** (OPERATING-MODES admits no executable
   graph yet), Mode-B auto-QC (frontier, not formalized).
 
