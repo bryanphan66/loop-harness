@@ -114,7 +114,7 @@ Open Claude Code in the project and repeat:
 ## Run — Mode B (the loop), after go-live
 
 Copy `scaffolds/steady-state/` into the project and work the issue board:
-**discover -> dispatch -> verify -> recover -> persist -> decide-next**. Operating manual:
+**discover -> dispatch -> verify -> recover -> persist -> decide-next** — spine: `docs/process/loop.md`. Operating manual:
 `docs/playbooks/steady-state-issue-pipeline.md`. Issue-authoring contract:
 `docs/playbooks/github-issue-standard.md`.
 

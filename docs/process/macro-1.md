@@ -13,6 +13,7 @@
 | **1.3** | Phỏng vấn khám phá (5 vai × 3 kiểu) | `discovery-interview-playbook` | phủ persona | discovery-summary | ra ứng viên yêu cầu + log quyết định |
 | **1.4** | Phân tích khoảng cách (As-Is/To-Be, MoSCoW) | `gap-analysis` | ≤2 vòng | `gap-analysis` | đẻ **GAP-NNN** |
 | **1.5** | SRS-lite (gói yêu cầu 1 file) *(lane Lite)* | — (ck-xre) | — | `srs-lite` | module + bảng REQ-ID + rủi ro |
+| **1.6** | Kiểm SRS (validate) | — (ck-xre) | — | — | (gộp vào 1.5/1.7, thường không tách bước) |
 | **1.7** | 5 tài liệu BA gốc + RTM *(lane Full)* | `ba-core-doc-bundle` | RTM đủ | (VISION/USE_CASES/GLOSSARY/BPMN/RTM) | mọi feature → ≥1 REQ-ID + use-case |
 | **1.8** | Bóc tình huống biên (rủi ro cao) | `scenario-taxonomy-playbook` | — | — | đẻ **SC-NNN** |
 | **1.9** | **Danh sách tính năng (scope)** | — (ck-scope-package) | **PB-G2** *(KHÁCH chốt scope)* | `feature-register` | scope đóng băng, RTM backward-complete |
