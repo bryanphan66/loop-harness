@@ -90,6 +90,28 @@ fix the sequence, not force past it.
 4. **Verify-at-source** after each deploy: the running artifact carries the shipped commit (container tag / health version), never trust CI-green or HTTP-200.
 5. **Progress is the board, not `STAGE.md`.** In Mode B `STAGE.md` holds only "Steady-state since <date>; board = <link>".
 
+## Bug vs UAT vs CR — where each lands (source-of-truth discipline)
+
+The board holds bugs/changes; the **feature-register** holds features; the **SRS**
+holds requirement detail. Which artifact a finding touches depends on what it is:
+
+- **Bug (QC or UAT):** a new GitHub issue, parented to the feature. It does **NOT**
+  go into the feature-register (it is a defect, not a feature). Its DoD **does**
+  require updating the SRS/docs **if the bug revealed a rule the SRS states
+  wrongly or omits** (not for a pure code defect). "Bug UAT" == "Bug QC".
+- **CR — small / free** (owner absorbs it, no re-quote): treat like a bug — a child
+  issue + update the docs it touches. No bao-gia.
+- **CR — large / billable** (new feature, costs time/money): mint a **`CR-NN`** via
+  change-control (STAGE_GOALS 3.5) — impact + re-estimate + client approval
+  BEFORE code — then it re-enters at 2.3 as a **new manifest phase**, and the new
+  feature IS added to the feature-register (so the contract appendix regenerates).
+- **The test for "does it go in the register":** is it a new FEATURE (a scope line
+  a client would pay for)? Yes -> register (+ CR-NN if post-freeze). No (a defect
+  or a clarification) -> issue only.
+
+A QC/UAT finding that turns out to be a **missing feature** (not a bug) is a CR,
+not a bug — route it to the register, not just the board.
+
 ## Recover — self-healing (Frontier 1, design)
 `verify` catches failure; **recover** acts on it automatically so the loop doesn't stall on a human. **Invariant: bounded retry, then fail-closed to a human. Never retry unboundedly, never swallow a real error, and verify-at-source stays the final arbiter.**
 

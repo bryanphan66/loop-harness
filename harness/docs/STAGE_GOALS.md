@@ -819,6 +819,10 @@ Current = 3.6 (3.5 is always-on, not a queue step). Stop after 8 turns.
 - **Output path:** `docs/requirements/change-requests/` — mints **CR-NN** (`locale-vi/` log fork).
 - **Gate:** impact + re-estimate + approval **before** code.
 - **Manual?** **yes** — push-notifies the human; never blocks the session.
+- **Small vs large:** this full flow is for a **billable / new-feature** CR. A
+  small free CR (owner absorbs it) skips the bao-gia and is handled like a bug —
+  child issue + docs update. The bug/UAT/CR routing table lives in
+  `playbooks/steady-state-issue-pipeline.md` (§ Bug vs UAT vs CR).
 
 Goal (per request):
 The request is logged as `CR-NN` in the change-request log with: impact analysis
