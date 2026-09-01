@@ -1,6 +1,8 @@
 # Macro-3 (Post-Build) — spine 1 bảng
 
-> Mở file này thấy toàn bộ Macro-3 (SAU go-live): bàn giao + vận hành + đổi/sửa qua
+> **Phần VÒNG LẶP (3.3 + 3.5) có spine RIÊNG:** [`loop.md`](./loop.md) — vì loop (Mode B) là nửa chính của harness, không chỉ 2 dòng ở đây. Macro-3 = phần hữu-hạn (bàn giao/hypercare/bảo trì/retro).
+
+> Mở file này thấy Macro-3 (SAU go-live): bàn giao + vận hành + đổi/sửa qua
 > issue. Đây là nơi **Mode B (vòng lặp)** chạy — 3.3 + 3.5 là LIÊN TỤC, không phải
 > bước tuyến tính. Chi tiết-text: `STAGE_GOALS.md`.
 

@@ -72,6 +72,7 @@ step maps to its playbook + gate + form + script:
 - **Macro-1 (Pre-Build):** [`docs/process/macro-1.md`](docs/process/macro-1.md)
 - **Macro-2 (Build & Go-live):** [`docs/process/macro-2.md`](docs/process/macro-2.md)
 - **Macro-3 (Post-Build / the loop):** [`docs/process/macro-3.md`](docs/process/macro-3.md)
+- **The Loop (Mode B, perpetual) — the primary half:** [`docs/process/loop.md`](docs/process/loop.md)
 
 Full step-order + lane detail (all 3 macros, authoritative): [`docs/process/WORKFLOW.md`](docs/process/WORKFLOW.md).
 
