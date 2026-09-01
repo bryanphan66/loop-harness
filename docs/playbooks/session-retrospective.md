@@ -29,7 +29,7 @@ Run when EITHER holds:
   decision triggered a plan, that plan touched multiple files).
 
 Skip a single-task session with one focused change — the per-task `Trace` block
-(`docs/process/TRACE_SPEC.md`) is sufficient.
+(`docs/about/TRACE_SPEC.md`) is sufficient.
 
 ## When NOT To Use
 
@@ -82,7 +82,7 @@ smoothly: "none — session ran clean".
 Items the session did not close; each links to where it lives now.
 
 ## Trace
-One trace block per `docs/process/TRACE_SPEC.md`, self-scored to the highest lane the
+One trace block per `docs/about/TRACE_SPEC.md`, self-scored to the highest lane the
 session touched. The durable evidence record — files read/changed, verify command
 + result, friction, outcome, N/A-by-decision marks. One consolidated trace for a
 multi-task session is enough.
@@ -118,6 +118,6 @@ delete the original recipe.)
 
 - `docs/about/HARNESS.md` § Growth Rule — the principle this mechanizes; § Playbook
   Lifecycle — the promotion target this checks.
-- `docs/process/TRACE_SPEC.md` § Trace Block — the trace this consolidates.
+- `docs/about/TRACE_SPEC.md` § Trace Block — the trace this consolidates.
 - `docs/process/WORKFLOW.md` § 3.6 / Always-On — the step this playbook owns.
-- `docs/process/ROLE_MAP.md` — Docs/Audit role + `retro` / `journal` engine binding.
+- `docs/about/ROLE_MAP.md` — Docs/Audit role + `retro` / `journal` engine binding.

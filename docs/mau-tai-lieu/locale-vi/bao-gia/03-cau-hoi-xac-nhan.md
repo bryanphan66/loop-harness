@@ -118,4 +118,4 @@ của các CLARIFICATION mức BLOCKER.]
 > vẫn cần xác nhận bằng văn bản.
 >
 > **Tham chiếu:** `docs/requirements/CLARIFICATIONS.md` (nguồn) · feature-register
-> `docs/mau-tai-lieu/locale-vi/feature-register.md` · token grammar `docs/process/TRACE_SPEC.md`.
+> `docs/mau-tai-lieu/locale-vi/feature-register.md` · token grammar `docs/about/TRACE_SPEC.md`.

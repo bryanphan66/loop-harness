@@ -11,7 +11,7 @@ audit trail; it never blocks on offline client action.
 
 - [ ] Every raw input from step 1.1 is filed under `docs/discovery/` (append-only) and listed in the intake brief's Source Map.
 - [ ] The intake brief fills every section of `docs/mau-tai-lieu/client-intake-brief.md` (VN client → `locale-vi/` fork).
-- [ ] The client's core business problem is stated in one paragraph (becomes the head of the token chain — `docs/process/TRACE_SPEC.md`).
+- [ ] The client's core business problem is stated in one paragraph (becomes the head of the token chain — `docs/about/TRACE_SPEC.md`).
 - [ ] Rough scope, budget band, and timeline expectation are captured (even if approximate).
 - [ ] Red flags / risks are listed (unclear scope, no budget, hostile timeline, tech mismatch).
 - [ ] **Conditional probe — compliance / data-residency / DPA:** asked and recorded, or `N/A by decision — <reason> (<date>)`.

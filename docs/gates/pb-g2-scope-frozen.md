@@ -22,7 +22,7 @@ later change is a change request (`CR-NN`), not a silent edit.
 ### Feature-register frozen (step 1.9)
 
 - [ ] `docs/scope-baseline/feature-register.{md,xlsx}` lists every business feature with REQ-ID(s), MoSCoW priority, in/out-of-scope mark, and assumptions.
-- [ ] **RTM backward-complete** (`docs/process/TRACE_SPEC.md`): every feature-register line traces to ≥1 REQ-ID and ≥1 use case; every REQ-ID to ≥1 GAP-NNN (or a "no-gap — new feature" note).
+- [ ] **RTM backward-complete** (`docs/about/TRACE_SPEC.md`): every feature-register line traces to ≥1 REQ-ID and ≥1 use case; every REQ-ID to ≥1 GAP-NNN (or a "no-gap — new feature" note).
 - [ ] Out-of-scope items are listed with a reason (defends against scope dispute).
 - [ ] A VN fork exists: `docs/scope-baseline/locale-vi/feature-register.md` (D4).
 - [ ] High-risk REQ-IDs each have ≥1 SC-NNN or a recorded skip-declaration (from step 1.8).

@@ -165,8 +165,8 @@ delete the original shape.)
 ## Related
 
 - `docs/process/WORKFLOW.md` — the authoritative 3-macro step map this composes.
-- `docs/process/TRACE_SPEC.md` — token grammar (`GAP→REQ→SC→TC`, `CR`).
-- `docs/process/ROLE_MAP.md` — role → agent + skill engine binding (SA vs Tech Lead, D5).
+- `docs/about/TRACE_SPEC.md` — token grammar (`GAP→REQ→SC→TC`, `CR`).
+- `docs/about/ROLE_MAP.md` — role → agent + skill engine binding (SA vs Tech Lead, D5).
 - `../UNDERSTANDING-loop-harness.md` § 10 (composition) — composition rules this honors.
 - `bilingual-delivery-template-pattern.md` — locale fork pattern (D4).
 - `ba-core-doc-bundle.md` — step 1.7 (the load-bearing BA spine).

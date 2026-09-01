@@ -198,7 +198,7 @@ not edit in place — annotate with a pointer to the CR.
 - Raw inputs cited: `docs/discovery/YYYY-MM-DD-<slug>.{ext}`.
 - Forward: SRS `docs/requirements/srs/<module>.md` (GAP → REQ-ID, 1.5).
 - Forward: feature-register `docs/scope-baseline/feature-register.md` (1.9).
-- Token chain: `docs/process/TRACE_SPEC.md`.
+- Token chain: `docs/about/TRACE_SPEC.md`.
 
 ---
 

@@ -64,4 +64,4 @@ What this touches — so a future reader knows what breaks if it is reversed.
 **Pointers**
 
 - Audit-trail rule: `AGENTS.md` § Task Loop step 6, `docs/process/WORKFLOW.md` § Always-On.
-- Trace vs decision: `docs/process/TRACE_SPEC.md` § Detailed Trace ≠ Decision Record.
+- Trace vs decision: `docs/about/TRACE_SPEC.md` § Detailed Trace ≠ Decision Record.

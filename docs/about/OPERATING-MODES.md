@@ -93,7 +93,7 @@ These are development directions, not yet built — do them under Frontier 1 fir
 └───────────────────────────────────────────────┘
 ```
 
-**Context engineering is not a missing 4th ring** — it lives *inside* the harness (memory + what reaches the model): `docs/process/CONTEXT_RULES.md`, `.claude/hooks/context-monitor.sh`, on-demand skills.
+**Context engineering is not a missing 4th ring** — it lives *inside* the harness (memory + what reaches the model): `docs/about/CONTEXT_RULES.md`, `.claude/hooks/context-monitor.sh`, on-demand skills.
 
 > **Ordering note (settled — `decisions/layer-nesting-harness-outermost.md`).** Two industry framings disagree about what wraps what. LangChain draws the loop *outermost* (it decides whether to re-run the machine). We use **harness outermost** because it orders layers by **authority / blast radius** — nothing escapes the sandbox, including the loop controller — and our real incidents have been authority incidents, not stop-rule incidents. Do not flip this back without reading the decision record.
 

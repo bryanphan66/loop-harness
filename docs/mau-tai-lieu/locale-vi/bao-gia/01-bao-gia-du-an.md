@@ -211,4 +211,4 @@ feature-register. Tổng số tính năng = số dòng FR ✅.]
 > bổ sung riêng qua quy trình change request (`CR-NN`).
 >
 > **Tham chiếu:** scope đóng băng `docs/mau-tai-lieu/locale-vi/feature-register.md` ·
-> SOW `docs/mau-tai-lieu/locale-vi/proposal-sow.md` · token grammar `docs/process/TRACE_SPEC.md`.
+> SOW `docs/mau-tai-lieu/locale-vi/proposal-sow.md` · token grammar `docs/about/TRACE_SPEC.md`.

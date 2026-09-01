@@ -82,4 +82,4 @@ CR-NN that moved a date, added a module, or deferred scope.
 - Committed dates source of truth → SOW / `docs/bao-gia/` milestone table (1.14).
 - Scope source → frozen feature-register (`docs/scope-baseline/feature-register.md`, 1.9).
 - Module breakdown source → `docs/stories/` (Build & Go-live slicing).
-- Token chain → `docs/process/TRACE_SPEC.md`.
+- Token chain → `docs/about/TRACE_SPEC.md`.

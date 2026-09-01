@@ -106,4 +106,4 @@ What harness changes were made or should be proposed because of this spec?
 - BA spine: `docs/requirements/`.
 - ERD-freeze decision: `docs/decisions/<slug>.md` (2.1, SA-owned).
 - Stack-selection decision: `docs/decisions/<slug>.md` (2.2, Tech-Lead-owned).
-- Token chain: `docs/process/TRACE_SPEC.md`.
+- Token chain: `docs/about/TRACE_SPEC.md`.

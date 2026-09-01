@@ -337,7 +337,7 @@ Independent of macro-stage, running across all three:
 
 ## Token Chain
 
-End-to-end traceability (full spec: `docs/process/TRACE_SPEC.md`). The canonical scheme
+End-to-end traceability (full spec: `docs/about/TRACE_SPEC.md`). The canonical scheme
 — **the only scheme; do NOT use `US-NNN.REQ-MMM`**:
 
 ```text
@@ -377,8 +377,8 @@ DoR gate reads the manifest rule.
 
 - **Per-step goal text:** `docs/process/STAGE_GOALS.md`
 - **Operating model:** `docs/about/HARNESS.md`
-- **Roles:** `docs/process/ROLE_MAP.md`
-- **Token grammar:** `docs/process/TRACE_SPEC.md`
+- **Roles:** `docs/about/ROLE_MAP.md`
+- **Token grammar:** `docs/about/TRACE_SPEC.md`
 - **Build manifest:** template `docs/mau-tai-lieu/build-manifest.md` · playbook `docs/playbooks/build-manifest-compilation.md`
 - **Non-CRUD delivery playbooks:** `docs/playbooks/async-job-queue.md` · `object-storage.md` · `media-pipeline.md` · `external-integration.md`
 - **SRS-lite (Lite lane):** `docs/mau-tai-lieu/srs-lite.md`

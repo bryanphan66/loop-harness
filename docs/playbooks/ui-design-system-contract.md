@@ -208,4 +208,4 @@ delete the original shape.)
 - `visual-and-behavioral-modeling.md` — sub-step A consumer (1.11).
 - `solo-dev-client-delivery.md` § 1.10 — caller.
 - `docs/decisions/<slug>-design-direction.md` — the persisted style decision.
-- `docs/process/ROLE_MAP.md` — Designer role + `ck-design-system` engine binding.
+- `docs/about/ROLE_MAP.md` — Designer role + `ck-design-system` engine binding.

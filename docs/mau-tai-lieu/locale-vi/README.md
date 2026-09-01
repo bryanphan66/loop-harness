@@ -89,7 +89,7 @@ copy. Chi tiết: `docs/about/HARNESS.md`.
 **Tham chiếu**
 
 - Bản đồ macro-stage + danh sách cổng: `docs/process/WORKFLOW.md`.
-- Token grammar + RTM completeness rule: `docs/process/TRACE_SPEC.md`.
+- Token grammar + RTM completeness rule: `docs/about/TRACE_SPEC.md`.
 - Mô hình vận hành + Independence Principle: `docs/about/HARNESS.md`.
-- Vai trò → engine: `docs/process/ROLE_MAP.md`.
+- Vai trò → engine: `docs/about/ROLE_MAP.md`.
 - Bản gốc EN của các surface chung: `docs/mau-tai-lieu/*.md`.

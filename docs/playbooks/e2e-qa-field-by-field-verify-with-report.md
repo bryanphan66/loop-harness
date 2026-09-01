@@ -154,8 +154,8 @@ incomplete seed (`seed-data-pattern.md`), not a render bug — fix the seed.
   screenshot side-by-side with its prototype export render, recorded
   pass/divergent — and re-captures any PUB product-shot taken before the APP
   screens it depicts were final.
-- `docs/process/TRACE_SPEC.md` — TC-NNN the report rows map to.
+- `docs/about/TRACE_SPEC.md` — TC-NNN the report rows map to.
 - `canonical-e2e-flow-playbook.md` — the fill/navigation counterpart (2.8).
 - `seed-data-pattern.md` — `not-found` rows often trace to incomplete seed.
 - `code-review-scoring.md` — the Tests dimension this evidence satisfies.
-- `docs/process/ROLE_MAP.md` — QC/QA role + `ck-qa` engine binding.
+- `docs/about/ROLE_MAP.md` — QC/QA role + `ck-qa` engine binding.

@@ -65,7 +65,7 @@ Skipped dimensions: compliance (no regulatory surface for this module).
 ```
 
 SC IDs use a **global zero-padded counter** within the project (`SC-001`,
-`SC-002`, …) per `docs/process/TRACE_SPEC.md`. The `REQ-traceback` column cites the
+`SC-002`, …) per `docs/about/TRACE_SPEC.md`. The `REQ-traceback` column cites the
 `MODULE.AREA.NN` REQ-ID the scenario decomposes. The composite `US-NNN.SC-MMM`
 form is **not used** (D3).
 
@@ -81,7 +81,7 @@ form is **not used** (D3).
 
 - **To RTM (1.7/2.12):** each SC-NNN lands in RTM Section 2 forward column against
   its REQ-ID. A high-risk REQ-ID with no SC-NNN and no recorded skip is an
-  **incomplete RTM** (per `docs/process/TRACE_SPEC.md`).
+  **incomplete RTM** (per `docs/about/TRACE_SPEC.md`).
 - **To feature register (1.9):** scenarios that reveal material risk (e.g. a
   concurrency or migration hazard) feed the register's risk/assumption notes and
   may reprice or re-phase the feature.
@@ -95,10 +95,10 @@ recurs across projects. Do not delete the original 12 dimensions.)
 
 ## Related
 
-- `docs/process/TRACE_SPEC.md` § Token Types — SC-NNN format + chain position.
+- `docs/about/TRACE_SPEC.md` § Token Types — SC-NNN format + chain position.
 - `docs/process/WORKFLOW.md` § 1.8 — the step this playbook owns.
 - `discovery-interview-playbook.md` / `ba-core-doc-bundle.md` — produce the
   high-risk REQ-IDs this playbook decomposes.
 - `canonical-e2e-flow-playbook.md` — Build-side consumer (TC-NNN closes the SC).
 - `code-review-scoring.md` — the Correctness dimension validates SC coverage.
-- `docs/process/ROLE_MAP.md` — BA role + `ck-scenario` engine binding.
+- `docs/about/ROLE_MAP.md` — BA role + `ck-scenario` engine binding.

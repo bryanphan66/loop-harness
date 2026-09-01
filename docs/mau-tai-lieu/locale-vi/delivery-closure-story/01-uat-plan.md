@@ -63,4 +63,4 @@ Khuyến nghị ≤ 40 test case cho mỗi đợt UAT. Nếu cần nhiều hơn,
 - Bản gốc tiếng Anh (chuẩn): `docs/mau-tai-lieu/delivery-closure-story/01-uat-plan.md`.
 - Ký nghiệm thu: `docs/mau-tai-lieu/locale-vi/delivery-closure-story/02-signoff-nghiem-thu.md`.
 - Cross-check RPM + status-flow: `docs/mau-tai-lieu/locale-vi/role-permission-matrix.md`, `status-flow.md`.
-- Token grammar (REQ-ID → TC-NNN): `docs/process/TRACE_SPEC.md`. Cổng ACCEPTANCE: `docs/process/WORKFLOW.md`.
+- Token grammar (REQ-ID → TC-NNN): `docs/about/TRACE_SPEC.md`. Cổng ACCEPTANCE: `docs/process/WORKFLOW.md`.

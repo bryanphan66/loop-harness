@@ -116,5 +116,5 @@ Append-only after first client review. Post-freeze changes need a CR-NN.
 
 - Playbook: `docs/playbooks/visual-and-behavioral-modeling.md`.
 - Cross-check: `docs/mau-tai-lieu/status-flow.md` (roles must match transition rows).
-- Token grammar: `docs/process/TRACE_SPEC.md`.
+- Token grammar: `docs/about/TRACE_SPEC.md`.
 - Localization: forks to `docs/mau-tai-lieu/locale-vi/role-permission-matrix.md` (D4).

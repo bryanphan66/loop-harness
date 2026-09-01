@@ -9,14 +9,14 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 ---
 
 ## A. Xương sống — 2 chế độ + vòng lặp
-> Owner: [`OPERATING-MODES.md`](../process/OPERATING-MODES.md) — ĐỌC ĐẦU TIÊN.
+> Owner: [`OPERATING-MODES.md`](./OPERATING-MODES.md) — ĐỌC ĐẦU TIÊN.
 
 | Keyword | Nghĩa 1 dòng |
 |---|---|
 | **Mode A — Build** | Chế độ dựng app: hữu hạn, 1 chiều (spec → app chạy được). Driver = `/stage-next`. |
 | **Mode B — Steady-state = the loop** | Chế độ nuôi app sau go-live (thời điểm app lên môi trường thật): vòng lặp vô hạn trên bảng issue (phiếu việc/vấn đề trên bảng theo dõi). Steady-state = trạng thái vận hành ổn định sau go-live. Nơi **chất lượng hội tụ**. |
 | **the loop** (vòng lặp) | **Đồ vật cụ thể** = chu trình vận hành Mode B. Trả lời "mỗi vòng LÀM GÌ": 6 **nhịp** discover (phát hiện việc) → dispatch (giao việc cho agent) → verify (xác minh) → recover (tự-sửa khi lỗi) → persist (lưu trạng thái) → decide-next (quyết việc kế). Dùng khi **vận hành** dự án live. |
-| **3 lớp bọc nhau** (framing) | `model+prompt ⊂ **loop** ⊂ **graph** ⊂ **harness**` — **harness NGOÀI CÙNG**, model là hộp NHỎ NHẤT. Mỗi lớp trả lời 1 câu: loop = *lặp lại* · graph = *địa hình* · harness = *thực tế/chạm được gì*. Thiếu lớp nào ra triệu chứng nấy: **không loop → không bao giờ dừng · không graph → không thấy VÌ SAO · không harness → chạm được mọi thứ**. Owner: [`OPERATING-MODES.md`](../process/OPERATING-MODES.md). Quyết định thứ tự: [`decisions/layer-nesting-harness-outermost.md`](../decisions/layer-nesting-harness-outermost.md). |
+| **3 lớp bọc nhau** (framing) | `model+prompt ⊂ **loop** ⊂ **graph** ⊂ **harness**` — **harness NGOÀI CÙNG**, model là hộp NHỎ NHẤT. Mỗi lớp trả lời 1 câu: loop = *lặp lại* · graph = *địa hình* · harness = *thực tế/chạm được gì*. Thiếu lớp nào ra triệu chứng nấy: **không loop → không bao giờ dừng · không graph → không thấy VÌ SAO · không harness → chạm được mọi thứ**. Owner: [`OPERATING-MODES.md`](./OPERATING-MODES.md). Quyết định thứ tự: [`decisions/layer-nesting-harness-outermost.md`](../decisions/layer-nesting-harness-outermost.md). |
 | **the loop ⟂ Loop Engineering** | KHÔNG cạnh tranh: *Loop Engineering* = **bộ môn** (1 trong 3 lớp); *the loop* = **đồ vật** (6 nhịp Mode B). ⚠️ Loop là lớp **TRONG CÙNG**, không phải trên cùng — sửa loop không sửa được lỗi thuộc harness (VD L15: worker treo vì quyền, không vì vòng lặp). |
 | **context engineering** | KHÔNG phải lớp thứ 4 — nằm **bên trong harness** (memory + cái gì tới được model): `CONTEXT_RULES.md`, `context-monitor.sh`, skill nạp theo nhu cầu. |
 | **go-live (graduation — tốt nghiệp)** | Điểm chuyển A→B: app deploy lên env thường trực đầu tiên. |
@@ -34,7 +34,7 @@ Mục tiêu: nhìn 1 file là hiểu **loop-harness gồm những khái niệm g
 | **Lane (làn quy trình) (Full / Lite)** | Chọn ở intake (tiếp nhận đầu vào): Full = việc khách trả tiền (BA (Business Analyst — phân tích nghiệp vụ) đầy đủ); Lite = tool nội bộ (SRS (Software Requirements Specification — đặc tả yêu cầu phần mềm)-lite 1 file). Macro 2–3 giống nhau. |
 | **walking skeleton** (bộ xương biết đi) | Bộ khung app tối thiểu chạy được (login + 1 CRUD (Create/Read/Update/Delete — thêm/đọc/sửa/xoá)) scaffold (khung dựng sẵn) ở 2.4 từ stack template (khung code mẫu). |
 | **BUILD MANIFEST** (bản kê thi công) | `docs/build-manifest.md`: các phase P0..PN, mỗi REQ-ID (mã yêu cầu) in-scope (trong phạm vi) nằm đúng 1 phase. |
-| **token chain / REQ-ID** (chuỗi truy vết yêu cầu / mã yêu cầu) | Chuỗi truy vết `GAP → REQ-ID → SC → TC`. Owner: [`TRACE_SPEC.md`](../process/TRACE_SPEC.md). |
+| **token chain / REQ-ID** (chuỗi truy vết yêu cầu / mã yêu cầu) | Chuỗi truy vết `GAP → REQ-ID → SC → TC`. Owner: [`TRACE_SPEC.md`](./TRACE_SPEC.md). |
 | **stack template** (khung code mẫu) | Bộ starter (khung khởi đầu) monorepo (1 repo chứa nhiều package) (pnpm + NestJS/Prisma/Postgres + Next.js + CI (Continuous Integration — tự động tích hợp) + e2e (end-to-end — kiểm thử đầu-cuối)) hình mẫu hasi-hub. |
 
 ## C. Vòng lặp issue (Mode B)

@@ -54,9 +54,9 @@ exactly what you need.
    client-paging gate list, the verify-gate no-bypass rule.
 3. `docs/process/WORKFLOW.md` — the step table row for your step: **Role · Engine ·
    Inputs · Output path · Gate · Manual?**. This row is authoritative.
-4. `docs/process/ROLE_MAP.md` — which role plays the step and which agent + skill engine
+4. `docs/about/ROLE_MAP.md` — which role plays the step and which agent + skill engine
    performs it (the **delegation target**).
-5. `docs/process/TRACE_SPEC.md` — the token grammar
+5. `docs/about/TRACE_SPEC.md` — the token grammar
    (`GAP-NNN → REQ-ID → SC-NNN → TC-NNN`, `CR-NN`) and the RTM completeness rule.
    Do not break the chain; mint/cite the tokens the step owns.
 6. `docs/process/STAGE_GOALS.md` — confirm the goal you were given matches the canonical
@@ -95,7 +95,7 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
 - **Document steps** (1.2, 1.4, 1.5, 1.5-lite, 1.6, 1.7, 1.14, 2.2, 2.3, …):
   render the template, fill from prior artifacts, write to the Output path in
   the WORKFLOW row. Mint the step's tokens (1.4→GAP-NNN, 1.5→REQ-ID
-  `MODULE.AREA.NN`, 1.8→SC-NNN) per `docs/process/TRACE_SPEC.md`.
+  `MODULE.AREA.NN`, 1.8→SC-NNN) per `docs/about/TRACE_SPEC.md`.
 - **Intake** (1.1): land raw files append-only under `docs/discovery/` + a
   Source Map. Never overwrite a prior raw drop.
 - **Design / prototype** (1.10–1.13): write tokens + diagrams. Step 1.12
@@ -154,7 +154,7 @@ You are the **control-plane orchestrator**, not the role itself. For your step:
   / a version string; rebuilt build-ARG env; real money/identity secrets fail-closed).
   Emit `MANUAL_CHECKPOINT` naming the target host — the prod deploy is a
   named-endpoint human decision (Rule 5), never auto-fire. **On go-live, flip
-  Mode A → Mode B** (`docs/process/OPERATING-MODES.md` § The graduation): in the SAME
+  Mode A → Mode B** (`docs/about/OPERATING-MODES.md` § The graduation): in the SAME
   close, edit `STAGE.md` so its Macro-stage becomes **Steady-state (Macro 3)**,
   drop the "current step" field, replace it with `Steady-state since <date>; board
   = <issues link>`, and record that the issue-pipeline loop (not `/stage-next`)

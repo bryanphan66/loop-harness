@@ -2,7 +2,7 @@
 
 *Gồm cả phần "cất tri thức mới ở đâu + tái dùng + mở rộng" (trước ở EXTENDING.md, đã gộp về đây).*
 
-Đây là bản **dẫn dắt tường minh** cho người mới (dev hoặc chính bạn khi quên). Đọc 1 mạch là nắm toàn cảnh: loop-harness LÀ GÌ, chạy THẾ NÀO, phần nào **đã chứng minh** vs **còn nợ**. Khác 2 file kia: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md) = từ điển tra cứu; [`OPERATING-MODES.md`](../process/OPERATING-MODES.md) = đặc tả chính xác 2 mode. File này = **câu chuyện + đánh giá thành thật**, trỏ về 2 file đó khi cần chi tiết.
+Đây là bản **dẫn dắt tường minh** cho người mới (dev hoặc chính bạn khi quên). Đọc 1 mạch là nắm toàn cảnh: loop-harness LÀ GÌ, chạy THẾ NÀO, phần nào **đã chứng minh** vs **còn nợ**. Khác 2 file kia: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md) = từ điển tra cứu; [`OPERATING-MODES.md`](./OPERATING-MODES.md) = đặc tả chính xác 2 mode. File này = **câu chuyện + đánh giá thành thật**, trỏ về 2 file đó khi cần chi tiết.
 
 > **Sự thật cần biết trước:** loop-harness được **bồi đắp sau mỗi dự án + đúc kết kinh nghiệm**, KHÔNG phải chuẩn thiết kế sạch từ đầu. Nên có phần rất vững (đã dogfood — tự dùng sản phẩm mình làm để kiểm), có phần còn nặng/vay mượn, có phần chưa build. File này gắn nhãn rõ để bạn biết tin phần nào tới đâu.
 
@@ -21,7 +21,7 @@ Một **harness** (khung vận hành cho AI agent) biến 1 spec (đặc tả y�
 
 Trước đây harness mô tả vòng đời bằng **3 cách chồng nhau** (3-macro, 2-mode, 4-bậc) → gây rối. **Từ nay lấy 2-mode (mode = chế độ) làm xương sống chính**; 2 cái kia hạ vai (xem §6).
 
-Tóm: **Mode A** = spec→app chạy được, đơn vị = 1 **PHASE**, lệnh `/stage-next`+`/build-phase`. **Mode B** = nuôi app sống, đơn vị = 1 **ISSUE**, vòng lặp trên bảng issue. Cắt tại **go-live**. → **Sơ đồ đầy đủ (drivers/trackers/gates) ở [`OPERATING-MODES.md`](../process/OPERATING-MODES.md)** — file này không vẽ lại.
+Tóm: **Mode A** = spec→app chạy được, đơn vị = 1 **PHASE**, lệnh `/stage-next`+`/build-phase`. **Mode B** = nuôi app sống, đơn vị = 1 **ISSUE**, vòng lặp trên bảng issue. Cắt tại **go-live**. → **Sơ đồ đầy đủ (drivers/trackers/gates) ở [`OPERATING-MODES.md`](./OPERATING-MODES.md)** — file này không vẽ lại.
 
 **Điểm dễ lẫn NHẤT — nhớ kỹ:** *"quy tắc tạo issue theo AC (Acceptance Criteria — tiêu chí nghiệm thu) từng module"* nằm ở **Mode B**, KHÔNG ở Mode A. Mode A chạy theo **phase** (pha/giai đoạn build), không theo issue (phiếu việc/vấn đề trên bảng theo dõi). Chỉ sau go-live (thời điểm app lên môi trường thật) mọi thay đổi mới thành issue.
 
@@ -35,7 +35,7 @@ Dòng chảy 1 chiều biến spec thành app. **Đây là chỗ "3-macro" cũ s
 ```
 spec → REQ-ID → BUILD MANIFEST → stack template → walking skeleton → /build-phase lặp
 ```
-1. **REQ-ID (mã yêu cầu) / token chain (chuỗi truy vết yêu cầu)** `PATCHED` — đánh số bền mỗi yêu cầu (`CM.CRUD.01`), truy vết `GAP→REQ-ID→SC→TC` (owner [`TRACE_SPEC.md`](../process/TRACE_SPEC.md)). *Phản biện: đúng cho việc-có-hợp-đồng (chứng minh với khách); với tool nội bộ là nghi thức thừa → dùng **Lane Lite** để bỏ bớt.*
+1. **REQ-ID (mã yêu cầu) / token chain (chuỗi truy vết yêu cầu)** `PATCHED` — đánh số bền mỗi yêu cầu (`CM.CRUD.01`), truy vết `GAP→REQ-ID→SC→TC` (owner [`TRACE_SPEC.md`](./TRACE_SPEC.md)). *Phản biện: đúng cho việc-có-hợp-đồng (chứng minh với khách); với tool nội bộ là nghi thức thừa → dùng **Lane Lite** để bỏ bớt.*
 2. **BUILD MANIFEST (bản kê thi công — danh sách pha)** `PROVEN` — `docs/build-manifest.md`, xếp mọi REQ-ID vào các phase P0..PN theo thứ tự thi công. Biến "đống spec" thành "hàng đợi phase".
 3. **stack template (khung code mẫu)** `PROVEN (design) / PATCHED (bug)` — `scaffolds/stack-pnpm-nest-next/`, bộ khung code mẫu hình hasi-hub. *Phản biện: 3 bug chỉ lộ khi dogfood proof-run → template chỉ đáng tin SAU khi bị ép chạy thật, không phải vì có mặt.*
 4. **walking skeleton (bộ xương biết đi — app tối thiểu chạy được đầu-cuối)** `PROVEN` — app tối thiểu **chạy thật đầu-cuối** (login + 1 CRUD + seed + CI xanh) dựng ở bước 2.4. Chứng minh đường ống thông TRƯỚC khi đắp thịt.
@@ -105,7 +105,7 @@ Bắt đầu ngay khi app go-live. Không còn "bước hiện tại"; có **hà
 
 ## 8. Dev mới bắt đầu thế nào
 1. Mở session (phiên làm việc): `cd ~/Desktop/Workspace/loop-harness && claude` (context tự nạp từ `CLAUDE.md`).
-2. Đọc theo thứ tự: file này → [`OPERATING-MODES.md`](../process/OPERATING-MODES.md) → [`WORKFLOW.md`](../process/WORKFLOW.md) → [`playbooks/README.md`](../playbooks/README.md).
+2. Đọc theo thứ tự: file này → [`OPERATING-MODES.md`](./OPERATING-MODES.md) → [`WORKFLOW.md`](../process/WORKFLOW.md) → [`playbooks/README.md`](../playbooks/README.md).
 3. Dựng dự án mới: `scripts/install-harness.sh --bootstrap --spec ./spec.md ./my-project` → chạy `/stage-next` lặp tới go-live → chuyển sang vòng lặp issue.
 4. Tra nhanh 1 keyword: [`KEYWORD-MAP.md`](./KEYWORD-MAP.md).
 

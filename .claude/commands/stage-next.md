@@ -76,8 +76,8 @@ Build & Go-live `2.1`–`2.13`, Post-Build `3.1`–`3.6` (`docs/process/WORKFLOW
    - Lane: <lane from STAGE.md>
    - <any extra context from user>
 
-   Read STAGE.md, AGENTS.md, docs/process/WORKFLOW.md (your step row), docs/process/ROLE_MAP.md,
-   docs/process/TRACE_SPEC.md, and your own agent definition first. Delegate to the
+   Read STAGE.md, AGENTS.md, docs/process/WORKFLOW.md (your step row), docs/about/ROLE_MAP.md,
+   docs/about/TRACE_SPEC.md, and your own agent definition first. Delegate to the
    row's Role + Engine; fall back to the global agent + playbook if the ck-skill
    is absent (Independence Principle). Stop at a MANUAL_CHECKPOINT (client-paging
    gate) or when the goal holds. Return the final Status block as your last

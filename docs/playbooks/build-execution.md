@@ -59,7 +59,7 @@ commits score higher.
 
 ## Commit Message Format
 
-Conventional commits. The body MUST cite ≥1 token per `docs/process/TRACE_SPEC.md` — a
+Conventional commits. The body MUST cite ≥1 token per `docs/about/TRACE_SPEC.md` — a
 REQ-ID (`MODULE.AREA.NN`), an SC-NNN, or a TC-NNN.
 
 ```text
@@ -441,7 +441,7 @@ agent reading this at the start of 2.6:
 
 - `docs/process/WORKFLOW.md` § 2.6 — the step this playbook owns; § Always-On — stage
   commits.
-- `docs/process/TRACE_SPEC.md` — the token grammar the commit-msg hook enforces (D3).
+- `docs/about/TRACE_SPEC.md` — the token grammar the commit-msg hook enforces (D3).
 - `code-review-scoring.md` — step 2.7 follows this playbook.
 - `visual-and-behavioral-modeling.md` — produces `screen-inventory.md` (1.11), the
   floorplan row a screen build confirms first.
@@ -465,7 +465,7 @@ agent reading this at the start of 2.6:
 - `design-system-3-tier.md` — the cross-stage 3-tier enforcement chain.
 - `seed-data-pattern.md` — step 2.5 precedes; provides demo data.
 - `payment-integration.md` — applies when money is in scope at 2.6.
-- `docs/process/ROLE_MAP.md` — Fullstack Dev role + `cook` engine binding.
+- `docs/about/ROLE_MAP.md` — Fullstack Dev role + `cook` engine binding.
 
 
 ## Phase Pre-flight — anchor every cited symbol / path / import / id-type to HEAD (2.6 phase-start)

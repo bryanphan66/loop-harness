@@ -24,7 +24,7 @@ for the current step at the lowest token cost.
 | `STAGE.md` | Where is this project at? Read first, always. |
 | `AGENTS.md` | Task loop + gate rules + verify-gate no-bypass. |
 | `docs/process/WORKFLOW.md` (current step row) | The step's Role · Engine · Output · Gate. |
-| `docs/process/TRACE_SPEC.md` (at the end) | Record the session trace; keep the token chain unbroken. |
+| `docs/about/TRACE_SPEC.md` (at the end) | Record the session trace; keep the token chain unbroken. |
 
 ## Macro-Stage 1 — PRE-BUILD
 
@@ -45,7 +45,7 @@ for the current step at the lowest token cost.
 | `docs/intake/*` (intake brief + discovery summary) | Skip | Must | Must |
 | `docs/requirements/*` for the touched module | Must | Must | Must |
 | Stage playbook (gap-analysis, scenario-taxonomy, discovery-interview) | Skip | Must | Must |
-| `docs/process/TRACE_SPEC.md` (REQ-ID grammar + RTM rule) | Should | Must | Must |
+| `docs/about/TRACE_SPEC.md` (REQ-ID grammar + RTM rule) | Should | Must | Must |
 | `docs/requirements/traceability/RTM.md` (existing chain) | Should | Must | Must |
 | `docs/gates/pb-g2-scope-frozen.md` (at 1.9) | Skip | Must at 1.9 | Must at 1.9 |
 
@@ -123,7 +123,7 @@ for the current step at the lowest token cost.
 | `docs/mau-tai-lieu/maintenance-proposal.md` | 3.4 |
 | `docs/requirements/change-requests/*` + `docs/build-manifest.md` (CR → new phase) | 3.5 any CR-NN |
 | `playbooks/session-retrospective.md` + session traces | 3.6 retro |
-| `docs/process/TRACE_SPEC.md` — every released REQ-ID in the handover; every `CR-NN` resolved | 3.1–3.6 |
+| `docs/about/TRACE_SPEC.md` — every released REQ-ID in the handover; every `CR-NN` resolved | 3.1–3.6 |
 
 ## Retrieval Triggers
 
@@ -137,8 +137,8 @@ Fire these regardless of step when the condition appears:
 | A client-paging gate is next (PB-G2/G3/G4, ACCEPTANCE, HANDOVER) | Load the matching `docs/gates/*` file; plan the `MANUAL_CHECKPOINT`. |
 | A conditional enterprise gate is in play | Mark it cleared **or** N/A by decision in `dod-build.md` — never silently drop (D2). |
 | Hitting a familiar tooling / environment symptom | Scan `docs/playbooks/README.md` for a recipe before re-deriving. |
-| Repeated confusion, stale doc, or missing proof | Record friction per `docs/process/TRACE_SPEC.md`. |
-| Preparing the final response | Re-read validation evidence + `git status --short` + `docs/process/TRACE_SPEC.md` trace block. |
+| Repeated confusion, stale doc, or missing proof | Record friction per `docs/about/TRACE_SPEC.md`. |
+| Preparing the final response | Re-read validation evidence + `git status --short` + `docs/about/TRACE_SPEC.md` trace block. |
 
 ## Token Budget Guidance
 
@@ -166,4 +166,4 @@ Before producing a step artifact:
 Before final response:
 
 - Validation evidence read; the Verify command run if the behavior carries one.
-- `docs/process/TRACE_SPEC.md` consulted for the session trace.
+- `docs/about/TRACE_SPEC.md` consulted for the session trace.

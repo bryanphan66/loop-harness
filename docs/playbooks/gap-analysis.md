@@ -106,7 +106,7 @@ classes:
 6. **Compliance** (regulation not met).
 
 Each gap gets a **GAP-NNN** token (`GAP-001`, `GAP-002`, … — global
-zero-padded counter per `docs/process/TRACE_SPEC.md`). The token traces forward when
+zero-padded counter per `docs/about/TRACE_SPEC.md`). The token traces forward when
 REQ-IDs are written at 1.5 and lands in the RTM backward column at 1.7.
 
 Severity: **High** (blocks To-Be vision OR regulatory) · **Medium** (blocks a goal
@@ -182,9 +182,9 @@ delete the original shape.)
 
 ## Related
 
-- `docs/process/TRACE_SPEC.md` § Token Types — GAP-NNN format + chain position.
+- `docs/about/TRACE_SPEC.md` § Token Types — GAP-NNN format + chain position.
 - `docs/process/WORKFLOW.md` § 1.4 — the step this playbook owns.
 - `discovery-interview-playbook.md` — produces the REQ candidates this consumes.
 - `ba-core-doc-bundle.md` — RTM backward column links REQ-ID → GAP-NNN.
 - `bilingual-delivery-template-pattern.md` — the `locale-vi/` fork pattern (D4).
-- `docs/process/ROLE_MAP.md` — BA role + `researcher` engine binding.
+- `docs/about/ROLE_MAP.md` — BA role + `researcher` engine binding.

@@ -130,4 +130,4 @@ thay đổi đi qua `CR-NN`.
 - Playbook: `docs/playbooks/visual-and-behavioral-modeling.md`.
 - Sơ đồ trạng thái (cross-check): `docs/mau-tai-lieu/locale-vi/status-flow.md`.
 - UAT cross-check: `docs/mau-tai-lieu/locale-vi/delivery-closure-story/01-uat-plan.md`.
-- Token grammar: `docs/process/TRACE_SPEC.md`. Cổng: `docs/process/WORKFLOW.md`.
+- Token grammar: `docs/about/TRACE_SPEC.md`. Cổng: `docs/process/WORKFLOW.md`.

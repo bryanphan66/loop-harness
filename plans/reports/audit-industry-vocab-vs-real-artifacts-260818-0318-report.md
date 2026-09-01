@@ -15,7 +15,7 @@ Phần lớn (9/12) **CÓ THẬT = có code cưỡng chế**, không mơ hồ. M
 
 | # | keyword ngành | verdict | bằng chứng |
 |---|---|---|---|
-| 1 | Spec-Driven Development (Mode A: spec->REQ-ID->manifest->phase) | CÓ THẬT | REQ-ID grammar `MODULE.AREA.NN` (`docs/process/TRACE_SPEC.md:16,21`), khoá bởi D3; compile manifest (`playbooks/build-manifest-compilation.md`, sizing <=10 file/phase); command `stage-next.md` + `build-phase.md` |
+| 1 | Spec-Driven Development (Mode A: spec->REQ-ID->manifest->phase) | CÓ THẬT | REQ-ID grammar `MODULE.AREA.NN` (`docs/about/TRACE_SPEC.md:16,21`), khoá bởi D3; compile manifest (`playbooks/build-manifest-compilation.md`, sizing <=10 file/phase); command `stage-next.md` + `build-phase.md` |
 | 2 | event-driven loop / steady-state (Mode B) | CÓ THẬT | `playbooks/steady-state-issue-pipeline.md` + `new-issue.mjs` (DoD 13-mục hằng trong code + `--check` fail-closed) + `issue-state.mjs`; trigger = 1 issue |
 | 3 | agent loop (`/build-phase`) | CÓ THẬT | `.claude/commands/build-phase.md`: 1 invocation = 1 phase, spawn stage-runner, verifier độc lập vòng 2, cap 3 vòng fix |
 | 4 | verification loop (verify-gate + verify-at-source + QC-vs-AC) | CÓ THẬT | `scripts/harness-verify-gate.sh` (git-hook không bypass, self-check FAIL CLOSED; Gate 2 chặn row fail/never-run/register rỗng); verify-at-source ở DoD item 11 + `ship-and-verify.sh` |
@@ -23,7 +23,7 @@ Phần lớn (9/12) **CÓ THẬT = có code cưỡng chế**, không mơ hồ. M
 | 6 | supervisor pattern (CONTROL->N bg) | CÓ THẬT (cơ chế Mode A; quy-ước Mode B) | dispatch `OPERATING-MODES.md:36` + `Task()` trong 2 command + `wait-workers.sh` + run-log kẹp. N-song-song không có script riêng; isolation = `bypassPermissions` (lỗ hổng tự khai) |
 | 7 | constitution (Locked Decisions D1-D6) | CÓ THẬT | `docs/about/HARNESS.md:190-202` liệt kê D1-D6 có version, cited xuyên docs; D3/D6 có code backing. Cưỡng chế = doc + gate, chưa full máy |
 | 8 | harness template (stack + steady-state kit) | CÓ THẬT | `templates/stack-pnpm-nest-next/` (monorepo thật + 3 check-*.mjs) + `templates/steady-state/scripts/*` + `templates/ops-board/` |
-| 9 | context engineering (CONTEXT_RULES + context-monitor) | CÓ THẬT | `docs/process/CONTEXT_RULES.md` + `.claude/hooks/context-monitor.sh` WIRED (UserPromptSubmit hook: tính %, band 40/60/80/95, ghi PENDING_NEXT_SESSION.md) |
+| 9 | context engineering (CONTEXT_RULES + context-monitor) | CÓ THẬT | `docs/about/CONTEXT_RULES.md` + `.claude/hooks/context-monitor.sh` WIRED (UserPromptSubmit hook: tính %, band 40/60/80/95, ghi PENDING_NEXT_SESSION.md) |
 | 10 | evals / observability / tracing (run-log) | **MƠ HỒ** | `run-log.mjs` chỉ logger/aggregator, code tự khai "day la buoc 1" — KHÔNG scoring vs expected (không phải evals), KHÔNG trace/run (`OPERATING-MODES.md:121` "no continuous trace per run") |
 | 11 | state machine / graph engineering (issue-state.mjs) | CÓ THẬT | `issue-state.mjs`: bảng TRANSITIONS 10-state + guard `isLegal` fail-closed + `--self-test` + `--force` chỉ cho người. Ép thật, chặn Backlog->Done. Graph layer rộng = cố ý không có (đã "priced") |
 | 12 | build-side vs product-side agent | **MƠ HỒ** | Chỉ nêu `KEYWORD-MAP.md:119` + note changelog "cần giữ tách". KHÔNG dùng làm ranh giới vận hành/gate ở đâu. Mention thuần |

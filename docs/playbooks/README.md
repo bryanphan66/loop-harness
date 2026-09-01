@@ -31,7 +31,7 @@ the rest ship `experimental` until then. Promotion happens via
 REQ-ID `MODULE.AREA.NN` (e.g. `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN` ·
 `CR-NN`. Chain: business problem → `GAP-NNN` → REQ-ID → use-case + RTM row →
 `SC-NNN` → feature-register line → SOW line → `TC-NNN` → UAT → release → handover.
-**`US-NNN.REQ-MMM` is NOT used.** Full grammar: `docs/process/TRACE_SPEC.md`.
+**`US-NNN.REQ-MMM` is NOT used.** Full grammar: `docs/about/TRACE_SPEC.md`.
 
 ## Use Order
 

@@ -14,7 +14,7 @@
 Do NOT use this for:
 
 - Changes to operating-contract docs — `AGENTS.md`, `docs/about/HARNESS.md`,
-  `docs/process/WORKFLOW.md`, `docs/process/TRACE_SPEC.md`, `docs/process/ROLE_MAP.md`. If you need to
+  `docs/process/WORKFLOW.md`, `docs/about/TRACE_SPEC.md`, `docs/about/ROLE_MAP.md`. If you need to
   change them, fork the harness.
 - New playbooks. Add new playbook files directly; markers are for amending
   existing ones.
@@ -39,7 +39,7 @@ Rules:
 |---|---|
 | `docs/playbooks/*.md` (except `README.md` and `template.md`) | yes |
 | `docs/mau-tai-lieu/**/*.md` | yes |
-| `docs/about/HARNESS.md`, `docs/process/WORKFLOW.md`, `docs/process/TRACE_SPEC.md`, `docs/process/ROLE_MAP.md`, `AGENTS.md` | no — fork instead |
+| `docs/about/HARNESS.md`, `docs/process/WORKFLOW.md`, `docs/about/TRACE_SPEC.md`, `docs/about/ROLE_MAP.md`, `AGENTS.md` | no — fork instead |
 | `docs/decisions/*.md` | no — write a new superseding decision |
 | `docs/playbooks/README.md` | no — register playbooks by editing the index directly |
 

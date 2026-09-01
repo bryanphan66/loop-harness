@@ -114,5 +114,5 @@ not applicable (never delete them silently).
 
 - Whole-project map (modules + timeline + %): `docs/ROADMAP.md`.
 - Step tables + gate definitions: `docs/process/WORKFLOW.md`.
-- Token chain: `docs/process/TRACE_SPEC.md`.
-- Role bindings: `docs/process/ROLE_MAP.md`.
+- Token chain: `docs/about/TRACE_SPEC.md`.
+- Role bindings: `docs/about/ROLE_MAP.md`.

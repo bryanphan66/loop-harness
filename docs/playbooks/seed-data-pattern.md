@@ -104,4 +104,4 @@ delete the original rules.)
 - `docs/process/WORKFLOW.md` § 2.5 — the step this playbook owns.
 - `canonical-e2e-flow-playbook.md` — consumes seed IDs (2.8).
 - `build-execution.md` — wires the seed script into the dev bootstrap (2.6).
-- `docs/process/ROLE_MAP.md` — DevSecOps role + `ck-seed` engine binding.
+- `docs/about/ROLE_MAP.md` — DevSecOps role + `ck-seed` engine binding.
