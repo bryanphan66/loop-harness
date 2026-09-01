@@ -1,7 +1,62 @@
 # Harness Changelog
 
 Version log of the harness operating model itself (docs, playbooks, gates,
-templates). Per-project state never lives here. Current version: **v7.4**.
+templates). Per-project state never lives here. Current version: **v8.0**.
+
+## v8.0 — 2026-09-01 — the Macro-2 delete-first refactor: a machine-readable pipeline spine, REQ-ID as the one anchor, and the repo flattened to BE the harness
+
+A long dogfood + review session (Phase-2 build run to completion, then a deep
+audit) exposed that the *documented* issue model and the *actual* one had
+diverged. Corrected on the record, plus a structural flatten so the repo stops
+nesting the product one level deep.
+
+**Issue model corrected (the big one).**
+- `feature-register` is a **DERIVED scope view** frozen at PB-G2 — **NOT** the
+  source of truth. The living requirement detail is `docs/requirements/srs/` (the
+  SRS), the visual detail is the frozen prototype. The register only lists WHAT is
+  in scope, not the detail.
+- **REQ-ID is the sole cross-artifact anchor.** The parallel `F-NNN` "durable
+  token" is **retired** (it duplicated REQ-ID and was never in the D3 grammar).
+- **The `feature-issues-sync.mjs` register→issue "SoT sync" was a lie** — 0/120
+  Phase-2 issues ever carried its marker; issues are authored by an agent from the
+  SRS via `new-issue.mjs`. Script deleted; `feature-issue-ac-demo-standard.md` +
+  this changelog corrected.
+
+**New spine + tools (in `docs/process/` and `scaffolds/.../scripts/`).**
+- `docs/process/macro-2.pipeline.yaml` — the **machine-readable Macro-2 spec**:
+  per step `driver · inputs · gates · playbooks · output · exit_when`. One file
+  answers "at step X, which check/recipe/doc applies". Ends the scatter across
+  STAGE_GOALS/WORKFLOW/gates/lint-registry; those now point INTO it. Encodes the
+  folds 2.5→2.4, 2.7→2.10, 2.11→2.13; security = one verify pass at 2.9.
+- `rtm-status.mjs` — REQ-ID coverage matrix (SRS = the universe) × register /
+  issue / test / prototype-freeze. `--gate` fails on missing required cols;
+  answers "is this module complete / where are we". Verified live: 816 REQ-ID.
+- `req-issue-scaffold.mjs` — REQ-ID-anchored issue scaffold; `--check` refuses a
+  REQ-ID absent from the SRS (anti-fabrication), else pulls the SRS excerpt +
+  register scope + a traceable Links block for the agent to write AC from. The
+  honest script/agent boundary the old sync doc lied about.
+- Gate set canonicalized (elearning's 15 → the template; dropped the superseded
+  `check-hardcoded-ui-strings`; `check-ui-typography` + `check-huong-dan-shots`
+  now fail-soft when their target files are absent).
+- Bug/UAT/CR routing defined (`steady-state-issue-pipeline.md`): bug = issue only;
+  small free CR = like a bug; large billable CR = CR-NN full flow + register.
+
+**Structural flatten + clarity.**
+- The redundant `harness/` subdir is **gone — the repo root IS the harness**.
+  `plans/` deduped. Product-vs-workshop is now `SKELETON_PATHS` (what install
+  ships), not a directory.
+- Docs regrouped: `docs/process/` (how it runs) + `docs/about/` (about the
+  harness itself). Root `templates/` renamed to **`scaffolds/`** so code-scaffolds
+  no longer collide in name with `docs/templates/` (blank doc forms).
+- `docs/README.md` is a plain "what are you trying to do → which file" map, now
+  fronted by the PROVEN/PATCHED/ASPIRATIONAL maturity scorecard so a reader knows
+  what to trust before relying on it.
+
+**Honest scope note.** A hard look for dead weight found almost none: no orphan
+files, closure-stories are distinct, locale-vi + domain playbooks are all
+dogfood-used, the "duplication" is mostly intentional self-sufficiency (AGENTS↔
+HARNESS) or history (this changelog). The harness is dense, not junky — genuinely
+slimming further means an OWNER decision to drop a capability, not a cleanup.
 
 ## v7.4 — 2026-08-17 — layer nesting corrected: HARNESS is the outermost ring, and the graph gap now has a price
 
