@@ -2,11 +2,11 @@
 # install-harness.sh — one-command bootstrap of the loop-harness skeleton
 # into a NEW (or existing) project directory.
 #
-# What it does (see AGENTS.md + docs/HARNESS.md for the operating model):
+# What it does (see AGENTS.md + docs/about/HARNESS.md for the operating model):
 #   - Copies the harness skeleton: AGENTS.md + STAGE.md template + docs/ +
 #     .claude/ + .githooks/ + scripts/ (only the skeleton paths — never the
 #     source repo's own plans/, .git/, or design scratch).
-#   - Embeds the stack template (templates/stack-pnpm-nest-next/) into
+#   - Embeds the stack template (scaffolds/stack-pnpm-nest-next/) into
 #     <target>/.harness/stack-template/ — source only, no node_modules/dist/
 #     .turbo/.next/pnpm-lock.yaml — so WORKFLOW step 2.4 always has a reachable,
 #     proven scaffold to run instead of a project hand-deriving an equivalent.
@@ -319,7 +319,7 @@ write_source_file() {
 # .harness/ is entirely harness-owned — nothing project-authored is ever
 # expected there — so every (re)install wipes and recopies it wholesale.
 # ---------------------------------------------------------------------------
-STACK_TEMPLATE_RELDIR="templates/stack-pnpm-nest-next"
+STACK_TEMPLATE_RELDIR="scaffolds/stack-pnpm-nest-next"
 STACK_TEMPLATE_TARGET_RELDIR=".harness/stack-template"
 STACK_TEMPLATE_EMBEDDED=0
 STACK_TEMPLATE_VERSION="unversioned"
@@ -482,8 +482,8 @@ materialize_remote_source() {
   # The skeleton lives at the repo root (flattened 2026-09-01).
   local top
   top="$(find "$HARNESS_TMP" -mindepth 1 -maxdepth 1 -type d ! -name '.*' | head -n1)"
-  [ -n "$top" ] && [ -f "$top/AGENTS.md" ] && [ -f "$top/docs/HARNESS.md" ] \
-    || fail "extracted tarball missing AGENTS.md or docs/HARNESS.md — unexpected archive layout."
+  [ -n "$top" ] && [ -f "$top/AGENTS.md" ] && [ -f "$top/docs/about/HARNESS.md" ] \
+    || fail "extracted tarball missing AGENTS.md or docs/about/HARNESS.md — unexpected archive layout."
 
   # Flip to local mode pointing at the extracted tree; all later copy logic
   # (collect_skeleton_files / copy_file / write_source_file) then just works.
@@ -652,7 +652,7 @@ SOURCE_BASE_URL="${SOURCE_BASE_URL%/}"
 HARNESS_REPO="${HARNESS_REPO:-}"
 HARNESS_REF="${HARNESS_REF:-main}"
 
-if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../AGENTS.md" ] && [ -f "$SCRIPT_DIR/../docs/HARNESS.md" ]; then
+if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../AGENTS.md" ] && [ -f "$SCRIPT_DIR/../docs/about/HARNESS.md" ]; then
   SOURCE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
   SOURCE_MODE="local"
 fi
@@ -928,7 +928,7 @@ if [ "$BOOTSTRAP" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
       fi
       sed -E \
         -e 's|^- \*\*Macro-stage:\*\*.*$|- **Macro-stage:** Pre-Build|' \
-        -e 's|^- \*\*Lane:\*\*.*$|- **Lane:** Full (default — revisit at intake 1.2; see docs/WORKFLOW.md § Lanes)|' \
+        -e 's|^- \*\*Lane:\*\*.*$|- **Lane:** Full (default — revisit at intake 1.2; see docs/process/WORKFLOW.md § Lanes)|' \
         -e "s|^- \*\*Harness source:\*\*.*\$|- **Harness source:** $harness_source_note|" \
         -e 's|^- \*\*Current step:\*\*.*$|- **Current step:** 1.1 — Lead capture (PB-G1 not yet decided)|' \
         -e "s|^- \*\*Last completed:\*\*.*\$|- **Last completed:** bootstrap baseline on $today (harness skeleton installed)|" \
@@ -1034,8 +1034,8 @@ Next step — open Claude Code in this directory and paste the first goal:
   the PB-G1 intake go/no-go decision (proceed | park | decline) INTERNALLY — do
   NOT page the client. Update STAGE.md Snapshot to Current = Pre-Build / 1.3
   (discovery) and add the 1.2 row to History in the same stage-boundary commit.
-  Read STAGE.md, AGENTS.md, docs/WORKFLOW.md, docs/ROLE_MAP.md, and
-  docs/TRACE_SPEC.md first. Stop after 10 turns.
+  Read STAGE.md, AGENTS.md, docs/process/WORKFLOW.md, docs/process/ROLE_MAP.md, and
+  docs/process/TRACE_SPEC.md first. Stop after 10 turns.
 
 What you bootstrapped:
   - The harness skeleton + STAGE.md root tracker (Snapshot pre-filled for
@@ -1055,7 +1055,7 @@ What you bootstrapped:
     rationale in docs/decisions/<slug>.md. See docs/playbooks/design-system-3-tier.md.
   - Run \`cat STAGE.md\` any time to see which macro-stage/step this repo is at.
 
-3-macro map (docs/WORKFLOW.md): Pre-Build → Build & Go-live → Post-Build —
+3-macro map (docs/process/WORKFLOW.md): Pre-Build → Build & Go-live → Post-Build —
 all built fully. Lane: Full (paid client) or Lite (internal/small) — declare at
 intake (1.2). Run loop: /stage-next per step; at Build 2.6 switch to
 /build-phase (one manifest phase per invocation) until the manifest is done.

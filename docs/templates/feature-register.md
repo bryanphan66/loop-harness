@@ -18,7 +18,7 @@ Status: draft | reviewed-by-client | frozen · Last updated: YYYY-MM-DD
 >
 > Every line carries a **REQ-ID** (`MODULE.AREA.NN`), the **GAP-NNN** it answers
 > (or "no-gap — new feature"), and the **use-case** that realises it. Freezing
-> this makes the RTM **backward-complete** (`docs/TRACE_SPEC.md` § RTM Rule).
+> this makes the RTM **backward-complete** (`docs/process/TRACE_SPEC.md` § RTM Rule).
 
 ## How To Review
 
@@ -115,5 +115,5 @@ Append-only after the first client review. Post-freeze changes need a CR-NN.
   `docs/requirements/srs/<module>.md` (REQ-ID), use-cases, scenarios (SC-NNN).
 - RTM: `docs/requirements/traceability/RTM.md`.
 - Forward: SOW § 4 (`proposal-sow.md`) + VN `docs/bao-gia/` — every line priced.
-- Token chain + RTM rule: `docs/TRACE_SPEC.md`.
+- Token chain + RTM rule: `docs/process/TRACE_SPEC.md`.
 - Localization: forks to `docs/templates/locale-vi/feature-register.md` (D4).

@@ -10,7 +10,7 @@
 **Macro-stage / step:** Build & Go-live · 2.6 (after 2.5 seed, before 2.7 review).
 
 > Branching / commit / hook recipes below are authoritative. Executed per
-> manifest phase via `/build-phase` (`docs/WORKFLOW.md` § Macro-Stage 2).
+> manifest phase via `/build-phase` (`docs/process/WORKFLOW.md` § Macro-Stage 2).
 
 ## Engine
 
@@ -55,11 +55,11 @@ commits score higher.
 > **Stage-boundary commits (control plane):** each step that produces a repo
 > artifact = one bundled commit at the step boundary that ALSO updates `STAGE.md`
 > + `docs/ROADMAP.md`. Never split that into a follow-up commit (see
-> `docs/WORKFLOW.md` § Always-On Layer).
+> `docs/process/WORKFLOW.md` § Always-On Layer).
 
 ## Commit Message Format
 
-Conventional commits. The body MUST cite ≥1 token per `docs/TRACE_SPEC.md` — a
+Conventional commits. The body MUST cite ≥1 token per `docs/process/TRACE_SPEC.md` — a
 REQ-ID (`MODULE.AREA.NN`), an SC-NNN, or a TC-NNN.
 
 ```text
@@ -439,9 +439,9 @@ agent reading this at the start of 2.6:
 
 ## Related
 
-- `docs/WORKFLOW.md` § 2.6 — the step this playbook owns; § Always-On — stage
+- `docs/process/WORKFLOW.md` § 2.6 — the step this playbook owns; § Always-On — stage
   commits.
-- `docs/TRACE_SPEC.md` — the token grammar the commit-msg hook enforces (D3).
+- `docs/process/TRACE_SPEC.md` — the token grammar the commit-msg hook enforces (D3).
 - `code-review-scoring.md` — step 2.7 follows this playbook.
 - `visual-and-behavioral-modeling.md` — produces `screen-inventory.md` (1.11), the
   floorplan row a screen build confirms first.
@@ -455,7 +455,7 @@ agent reading this at the start of 2.6:
   must pass: machine-checkable Playwright assertions (element completeness +
   interaction behaviour) + a human side-by-side glance before the phase closes
   (2.6 leg, 2.7 floor rule, 2.10 DoD).
-- `docs/HARNESS.md` § Control-Plane Failure Classes — **FC6** (verify at the real
+- `docs/about/HARNESS.md` § Control-Plane Failure Classes — **FC6** (verify at the real
   source, never a wrapper exit) + **FC7** (human review must be real — surface
   the side-by-side, no rubber-stamp) bind this playbook's commit/push +
   fidelity-gate legs.
@@ -465,7 +465,7 @@ agent reading this at the start of 2.6:
 - `design-system-3-tier.md` — the cross-stage 3-tier enforcement chain.
 - `seed-data-pattern.md` — step 2.5 precedes; provides demo data.
 - `payment-integration.md` — applies when money is in scope at 2.6.
-- `docs/ROLE_MAP.md` — Fullstack Dev role + `cook` engine binding.
+- `docs/process/ROLE_MAP.md` — Fullstack Dev role + `cook` engine binding.
 
 
 ## Phase Pre-flight — anchor every cited symbol / path / import / id-type to HEAD (2.6 phase-start)

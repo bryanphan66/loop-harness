@@ -6,20 +6,20 @@ Output path: <project-root>/STAGE.md
 Bilingual: INTERNAL — English only (no locale-vi fork) per D4.
 Model: the 3-macro model (Pre-Build / Build & Go-live / Post-Build) with the
   canonical gates PB-G1..PB-G4, DoR, ERD FROZEN, SECURITY SIGN-OFF, DoD,
-  ACCEPTANCE, HANDOVER (docs/WORKFLOW.md § Canonical Gate List).
+  ACCEPTANCE, HANDOVER (docs/process/WORKFLOW.md § Canonical Gate List).
 Shape-only scaffold. Replace <placeholders>.
 -->
 
 # Project Stage
 
-> Single-glance answer to "which `docs/WORKFLOW.md` step is this project at?".
+> Single-glance answer to "which `docs/process/WORKFLOW.md` step is this project at?".
 > Read this **first** every Task Loop. Updated in **every** stage-boundary
 > commit (the same commit as the artifact + `docs/ROADMAP.md`).
 
 ## Snapshot
 
 - **Macro-stage:** Pre-Build | Build & Go-live | Post-Build
-- **Lane:** Full | Lite — declared at intake (1.2); see `docs/WORKFLOW.md` § Lanes
+- **Lane:** Full | Lite — declared at intake (1.2); see `docs/process/WORKFLOW.md` § Lanes
 - **Harness source:** <path of the harness clone or `owner/repo@ref` — filled by install-harness.sh; step 2.4 scaffolds the stack template from here>
 - **Current step:** <e.g. 1.9 — Feature register + scope baseline>
 - **Last completed:** <e.g. 1.8 — Scenario edge-case> on YYYY-MM-DD (commit <short-sha>)
@@ -113,6 +113,6 @@ not applicable (never delete them silently).
 ## Pointers
 
 - Whole-project map (modules + timeline + %): `docs/ROADMAP.md`.
-- Step tables + gate definitions: `docs/WORKFLOW.md`.
-- Token chain: `docs/TRACE_SPEC.md`.
-- Role bindings: `docs/ROLE_MAP.md`.
+- Step tables + gate definitions: `docs/process/WORKFLOW.md`.
+- Token chain: `docs/process/TRACE_SPEC.md`.
+- Role bindings: `docs/process/ROLE_MAP.md`.

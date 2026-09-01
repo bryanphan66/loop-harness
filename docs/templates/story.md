@@ -59,7 +59,7 @@ Hold true during the build step regardless of who implements.
 
 ## Validation
 
-Each REQ-ID → ≥1 TC-NNN before ACCEPTANCE (`docs/TRACE_SPEC.md` § RTM forward).
+Each REQ-ID → ≥1 TC-NNN before ACCEPTANCE (`docs/process/TRACE_SPEC.md` § RTM forward).
 
 | Layer | Expected proof | TC-NNN |
 | --- | --- | --- |

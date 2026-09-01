@@ -169,11 +169,11 @@ the 2.9 security review.
 
 ## Related
 
-- `docs/WORKFLOW.md` § 2.6 / 2.9 — code + security gates.
+- `docs/process/WORKFLOW.md` § 2.6 / 2.9 — code + security gates.
 - `docs/decisions/<slug>-stack-selection.md` § External Providers — picks the
   provider (2.2) before this runs.
 - `code-review-scoring.md` — Security dimension auto-blocks on missing signature
   verify.
 - `canonical-e2e-flow-playbook.md` — E2E tests for payment journeys.
 - `ck-security` (engine) — STRIDE+OWASP review for the money surface (2.9).
-- `docs/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles + `ck-payment-integration`.
+- `docs/process/ROLE_MAP.md` — Fullstack Dev + DevSecOps roles + `ck-payment-integration`.

@@ -76,7 +76,7 @@ Các file ở đây chỉ tham chiếu `ck-*` skill trong mục **Engine / Tham 
 phải yêu cầu cứng. **Independence Principle:** harness vẫn chạy trên bare agent + git
 + bash; `ck-*` là accelerator, không phải dependency. `install-harness.sh`
 preflight-check `~/.claude/skills` + `~/.claude/agents` và CẢNH BÁO nếu thiếu — không
-copy. Chi tiết: `docs/HARNESS.md`.
+copy. Chi tiết: `docs/about/HARNESS.md`.
 
 ## Cách dùng
 
@@ -88,8 +88,8 @@ copy. Chi tiết: `docs/HARNESS.md`.
 
 **Tham chiếu**
 
-- Bản đồ macro-stage + danh sách cổng: `docs/WORKFLOW.md`.
-- Token grammar + RTM completeness rule: `docs/TRACE_SPEC.md`.
-- Mô hình vận hành + Independence Principle: `docs/HARNESS.md`.
-- Vai trò → engine: `docs/ROLE_MAP.md`.
+- Bản đồ macro-stage + danh sách cổng: `docs/process/WORKFLOW.md`.
+- Token grammar + RTM completeness rule: `docs/process/TRACE_SPEC.md`.
+- Mô hình vận hành + Independence Principle: `docs/about/HARNESS.md`.
+- Vai trò → engine: `docs/process/ROLE_MAP.md`.
 - Bản gốc EN của các surface chung: `docs/templates/*.md`.

@@ -3,7 +3,7 @@ Template: delivery-closure-story/01-uat-plan.md
 Macro-stage: 2 Build & Go-live · Step 2.12 UAT / client acceptance
 Role: BA + Client · Engine: ck-uat · Gate: ACCEPTANCE (client, countersigned)
 Bilingual: EN canonical base — VN fork at locale-vi/delivery-closure-story/01-uat-plan.md
-Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/TRACE_SPEC.md)
+Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/process/TRACE_SPEC.md)
 -->
 
 # UAT Plan — <release / module id>
@@ -38,7 +38,7 @@ each test case can cite step numbers. Mirror the frozen prototype flow.
 Each test cites its `SC-NNN` (and the REQ-ID it proves) in the Path
 column. Failures must link to a follow-up row in `overview.md`
 § Open Follow-Ups. Every `TC-NNN` here mirrors a row in
-`docs/TEST_MATRIX.md` § Verification Register.
+`docs/about/TEST_MATRIX.md` § Verification Register.
 
 ## Cap
 

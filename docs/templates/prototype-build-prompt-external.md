@@ -3,7 +3,7 @@ TEMPLATE: prototype-build-prompt-external.md — Step 1.12 prompt convention for
 Used by: Designer at step 1.12 when the engine is an external tool (Claude Design / Open Design /
   Google Stitch / Pencil.dev). (For the in-repo "Claude Code + taste skill" path use
   prototype-build-prompt.md instead.) Copied into the bootstrapped project.
-Authority: docs/WORKFLOW.md 1.12 · docs/STAGE_GOALS.md §1.12 (Prompt convention) · ADR prototype-external-design-tool-not-generated.
+Authority: docs/process/WORKFLOW.md 1.12 · docs/process/STAGE_GOALS.md §1.12 (Prompt convention) · ADR prototype-external-design-tool-not-generated.
 Bilingual: short prompts are pasted into the tool by the operator — write them in the operator's language.
 
 WHY THIS EXISTS
@@ -61,6 +61,6 @@ Mỗi file tự rà design-system-compliance + báo changelog khi xong.
 
 ## Cross-References
 
-- Prompt convention rule: `docs/STAGE_GOALS.md` § Step 1.12 · `docs/WORKFLOW.md` row 1.12.
+- Prompt convention rule: `docs/process/STAGE_GOALS.md` § Step 1.12 · `docs/process/WORKFLOW.md` row 1.12.
 - Versioned build-prompt files + per-project ready prompts: `docs/visuals/prototype/README.md` § Build Prompts.
 - In-repo taste-skill path (different engine): `docs/templates/prototype-build-prompt.md`.

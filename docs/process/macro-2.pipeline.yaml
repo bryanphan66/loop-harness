@@ -12,9 +12,19 @@
 #   - the RTM / observability dashboard reads `steps[]` to show "where are we".
 #   - docs (STAGE_GOALS, WORKFLOW) point INTO this; they no longer re-declare it.
 #
+# HOW TO READ (what file do I use at each step?)
+#   Every step below answers "which standard / recipe / check applies here":
+#     gates:     -> the CHECK(s). A name = a script in ../gates/lint-gates-registry.md
+#                   (mechanical) OR a checklist file in ../gates/<name>.md.
+#     playbooks: -> the RECIPE(s). Each name is a file ../playbooks/<name>.md
+#                   telling you HOW to do this step.
+#     inputs/output -> which documents flow in and out (doc forms live in
+#                   ../templates/, e.g. build-manifest.md, feature-register.md).
+#   So: pick a step -> read its `playbooks` for HOW, its `gates` for the bar to pass.
+#
 # CONVENTIONS
-#   - `gates` names a script in lint-gates-registry.md (mechanical) OR a gate
-#     doc in docs/gates/ (checklist). `tier` says whether it actually blocks.
+#   - `gates` names a script in ../gates/lint-gates-registry.md (mechanical) OR a
+#     gate doc in ../gates/ (checklist). `tier` says whether it actually blocks.
 #   - `enforcement`: mechanical (script exits non-zero) | orchestrator (ctl /
 #     verifier agent judges) | human (a person signs).  Do NOT call a step
 #     "mechanical" unless a script really blocks it — see G2 note below.

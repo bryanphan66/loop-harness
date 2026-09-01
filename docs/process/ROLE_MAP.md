@@ -2,11 +2,11 @@
 
 Which SDLC role plays each step, and which **agent(s)** + **skill engine(s)**
 perform it. The `ck-*` skills are the **live engine** the harness invokes — they
-are never vendored into a project (see `docs/HARNESS.md` § Independence
+are never vendored into a project (see `docs/about/HARNESS.md` § Independence
 Principle). On a bare agent + git + bash, the global agents alone can play every
 role; the skills only accelerate.
 
-**Authority:** this file. **Orchestration:** `docs/WORKFLOW.md`
+**Authority:** this file. **Orchestration:** `docs/process/WORKFLOW.md`
 binds each role to numbered steps; `stage-runner` delegates one step at a time.
 
 ## Role Catalog
@@ -30,7 +30,7 @@ binds each role to numbered steps; `stage-runner` delegates one step at a time.
 > the Tech Lead reviewer (2.7) also consult Tier-1 `docs/design-system/design-rules.md`
 > — the dev classifies any grid/form screen before coding it, and the reviewer
 > enforces the design-system-compliance floor rule (see `AGENTS.md` § UI / Design
-> System Rule and `docs/WORKFLOW.md` rows 2.6/2.7).
+> System Rule and `docs/process/WORKFLOW.md` rows 2.6/2.7).
 
 ## SA and Tech Lead Are Separate (D5)
 
@@ -52,7 +52,7 @@ The "minimalism" red-team proposed merging them; the user kept them separate.
 ## How stage-runner Delegates To Each Role
 
 `stage-runner` is the control-plane orchestrator. For each step in
-`docs/WORKFLOW.md`:
+`docs/process/WORKFLOW.md`:
 
 1. Read `STAGE.md` → identify the next step ID and its Role + Engine columns.
 2. Load only the step's goal + the relevant playbook (isolated context — the
@@ -60,7 +60,7 @@ The "minimalism" red-team proposed merging them; the user kept them separate.
 3. Invoke the role's engine. If the `ck-*` skill is present (preflight passed),
    use it; otherwise fall back to the global agent + the playbook's core logic
    (Independence Principle).
-4. Write the step's artifact to the Output path in `docs/WORKFLOW.md`.
+4. Write the step's artifact to the Output path in `docs/process/WORKFLOW.md`.
 5. Enforce the Gate. For client-paging gates (PB-G2, PB-G3, PB-G4, ACCEPTANCE,
    HANDOVER), emit a `MANUAL_CHECKPOINT` and return
    `MANUAL_CHECKPOINT_PENDING`. For conditional enterprise gates, mark **N/A by

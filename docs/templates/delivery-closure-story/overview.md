@@ -4,7 +4,7 @@ Macro-stage: 2 Build & Go-live · Steps 2.12 UAT → 2.13 Sign-off / release
 Role: BA + Release Manager + Client · Engine: ck-uat → ck-signoff
 Gate: ACCEPTANCE (client, countersigned) — see docs/gates/dod-build.md + WORKFLOW §2
 Bilingual: EN canonical base — VN fork at locale-vi/delivery-closure-story/
-Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/TRACE_SPEC.md)
+Tokens: REQ-ID MODULE.AREA.NN · SC-NNN · TC-NNN (docs/process/TRACE_SPEC.md)
 -->
 
 # Delivery Closure — <project / release id>

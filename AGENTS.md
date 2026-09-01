@@ -6,7 +6,7 @@ on the **loop-harness** operating model — a bootstrapped project, not the
 harness itself.
 
 Check `STAGE.md` first (Current step + **Lane**: Full | Lite). The 3-macro flow
-in `docs/WORKFLOW.md` governs the work; the product contract lives in
+in `docs/process/WORKFLOW.md` governs the work; the product contract lives in
 `docs/requirements/` (SRS + REQ-IDs + RTM, or `srs-lite.md` in the Lite lane)
 and `docs/discovery/` (raw input); the build order lives in
 `docs/build-manifest.md` once step 2.3 compiles it.
@@ -18,13 +18,13 @@ Read in this order:
 1. `STAGE.md` (repo root) — the single state tracker. Answers "where is this
    repo / project at?" in one glance before anything else.
 2. `README.md` — project status.
-3. `docs/HARNESS.md` — the human-agent operating model (3-layer architecture +
+3. `docs/about/HARNESS.md` — the human-agent operating model (3-layer architecture +
    Independence Principle + Playbook Lifecycle).
-4. `docs/WORKFLOW.md` — the 3-macro-stage map (Pre-Build / Build & Go-live /
+4. `docs/process/WORKFLOW.md` — the 3-macro-stage map (Pre-Build / Build & Go-live /
    Post-Build), per-step tables, canonical gates, token chain.
-5. `docs/ROLE_MAP.md` — which SDLC role plays each step and which agent + skill
+5. `docs/process/ROLE_MAP.md` — which SDLC role plays each step and which agent + skill
    engine performs it.
-6. `docs/TRACE_SPEC.md` — the token grammar (`GAP-NNN → REQ-ID → SC-NNN →
+6. `docs/process/TRACE_SPEC.md` — the token grammar (`GAP-NNN → REQ-ID → SC-NNN →
    TC-NNN`, `CR-NN`) and RTM completeness rule. Referenced by the verify-gate.
 7. The user-provided spec or raw input, when one exists.
 8. `docs/requirements/` — the BA spine (SRS + REQ-IDs + RTM + use-cases).
@@ -44,8 +44,8 @@ The harness must run on a **bare agent + git + bash**. The `ck-*` skills are the
 **live engine** the harness *invokes* to produce artifacts faster, but they are
 **accelerators, not dependencies**:
 
-- `AGENTS.md`, `STAGE.md`, `docs/WORKFLOW.md`, `docs/HARNESS.md`,
-  `docs/TRACE_SPEC.md`, and `scripts/install-harness.sh` MUST NOT reference any
+- `AGENTS.md`, `STAGE.md`, `docs/process/WORKFLOW.md`, `docs/about/HARNESS.md`,
+  `docs/process/TRACE_SPEC.md`, and `scripts/install-harness.sh` MUST NOT reference any
   `ck-*` skill as a required step.
 - `install-harness.sh` **preflight-checks** that `~/.claude/skills` and
   `~/.claude/agents` exist and **WARNS if missing** — it never copies/vendors
@@ -59,7 +59,7 @@ can run, treat it as a defect — refactor the file or open a backlog entry.
 
 ## ck-Skills As Engine
 
-The 3-layer model (full detail in `docs/HARNESS.md`):
+The 3-layer model (full detail in `docs/about/HARNESS.md`):
 
 | Layer | Role | Components |
 |---|---|---|
@@ -68,7 +68,7 @@ The 3-layer model (full detail in `docs/HARNESS.md`):
 | **Role players** | *execute* each SDLC role's work | global agents (planner, researcher, fullstack-developer, code-reviewer, tester, debugger, ui-ux-designer, docs-manager, project-manager, git-manager, code-simplifier, journal-writer, brainstormer) orchestrated by `stage-runner` |
 
 Role → engine binding is summarized below and specified fully in
-`docs/ROLE_MAP.md`.
+`docs/process/ROLE_MAP.md`.
 
 | Role | Played by (agent · skill engine) |
 |---|---|
@@ -140,13 +140,13 @@ For every task:
    tokens, the Tier-3 inventory `src/components/README.md`, and the floorplan
    classification in `docs/visuals/diagrams/screen-inventory.md` — see § UI /
    Design System Rule.
-3. Check the token chain (`docs/TRACE_SPEC.md`): every feature traces
+3. Check the token chain (`docs/process/TRACE_SPEC.md`): every feature traces
    `GAP-NNN → REQ-ID → use-case + RTM row → SC-NNN → feature-register line →
    SOW line → TC-NNN`. Do not break the chain.
 4. Before fighting any tooling / environment problem, scan
    `docs/playbooks/README.md` for a matching recipe and apply it before
    re-deriving a fix.
-5. Walk the macro-stage step in `docs/WORKFLOW.md`. Honor its gate. Conditional
+5. Walk the macro-stage step in `docs/process/WORKFLOW.md`. Honor its gate. Conditional
    enterprise gates (data-migration, NFR/load, DR/RTO-RPO, compliance/WCAG,
    observability/SLO) must be explicitly marked **N/A by decision** when not
    needed — never silently dropped.
@@ -159,10 +159,10 @@ For every task:
    - Did an architecture / behavior / authz / data-ownership / API-shape change
      happen? Add `docs/decisions/<slug>.md` (slug, not number).
    - Did we exercise an `experimental` playbook usable without modification?
-     Promote it to `verified` (see `docs/HARNESS.md` § Playbook Lifecycle).
+     Promote it to `verified` (see `docs/about/HARNESS.md` § Playbook Lifecycle).
    - Is this a multi-task session (3+ commits)? Run the session-retrospective
      playbook → `plans/reports/retro-<date>-<slug>.md`.
-7. Record a **session trace** per `docs/TRACE_SPEC.md` before reporting done.
+7. Record a **session trace** per `docs/process/TRACE_SPEC.md` before reporting done.
 
 ## Stage Orchestration
 
@@ -265,13 +265,13 @@ A task is done only when:
 - The requested change is completed or the blocker is documented.
 - The BA spine, scope baseline, RTM, stories, and verification register remain
   current.
-- The token chain is unbroken (`docs/TRACE_SPEC.md`).
+- The token chain is unbroken (`docs/process/TRACE_SPEC.md`).
 - Validation commands ran when they exist; the **Pre-Close Verification Gate**
   is satisfied (`pass`, or a recorded reason — `MANUAL:` checkpoint the human
   signed off).
 - Any conditional enterprise gate touched is either passed or explicitly
   marked **N/A by decision**.
-- A **session trace** is recorded per `docs/TRACE_SPEC.md`.
+- A **session trace** is recorded per `docs/process/TRACE_SPEC.md`.
 - The final response says what changed and what was not attempted.
 
 ## Addendum (2026-07-22) — shared-branch safety + background-session hygiene

@@ -107,10 +107,10 @@ Last commit: ${last_commit}
 
 ## Recommended first prompt for the new session
 
-Read this file, STAGE.md, AGENTS.md, and docs/WORKFLOW.md. Resume from the
+Read this file, STAGE.md, AGENTS.md, and docs/process/WORKFLOW.md. Resume from the
 step shown above. If an active /goal was running when the prior session ran
 out of context, re-issue \`/stage-next\` (it auto-detects the next step from
-STAGE.md), or paste the matching goal block from docs/STAGE_GOALS.md.
+STAGE.md), or paste the matching goal block from docs/process/STAGE_GOALS.md.
 
 ## Open MANUAL_CHECKPOINTs
 
@@ -144,7 +144,7 @@ Seed written to: .claude/PENDING_NEXT_SESSION.md
 
 Paste this into the new session:
 
-Read .claude/PENDING_NEXT_SESSION.md, STAGE.md, and docs/WORKFLOW.md. Resume from where session ${short_sess} stopped — run /stage-next per the current step."
+Read .claude/PENDING_NEXT_SESSION.md, STAGE.md, and docs/process/WORKFLOW.md. Resume from where session ${short_sess} stopped — run /stage-next per the current step."
     [[ -x "$notifier" ]] && CLAUDE_PROJECT_DIR="$cwd" "$notifier" --message "$text" >/dev/null 2>&1 || true
 
     # Inject a warning into the model's view via stdout (UserPromptSubmit

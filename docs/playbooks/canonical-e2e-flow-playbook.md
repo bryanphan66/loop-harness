@@ -178,8 +178,8 @@ delete the original 4 types.)
 
 ## Related
 
-- `docs/WORKFLOW.md` § 2.8 — the step this playbook owns.
-- `docs/TRACE_SPEC.md` — TC-NNN format + the REQ→SC→TC loop.
+- `docs/process/WORKFLOW.md` § 2.8 — the step this playbook owns.
+- `docs/process/TRACE_SPEC.md` — TC-NNN format + the REQ→SC→TC loop.
 - `scenario-taxonomy-playbook.md` — the SC-NNN these tests prove.
 - `seed-data-pattern.md` — provides the seed IDs the skeletons reference.
 - `e2e-qa-field-by-field-verify-with-report.md` — field-by-field verify + QA
@@ -187,4 +187,4 @@ delete the original 4 types.)
 - `code-review-scoring.md` — the "no generic error-swallow" floor rule (2.7)
   that the negative-path tests here prove at the e2e level.
 - `docs/gates/dod-build.md` — the DoD E2E line reads § Mandatory Coverage Rules.
-- `docs/ROLE_MAP.md` — QC/QA role + `ck-e2e-flow` engine binding.
+- `docs/process/ROLE_MAP.md` — QC/QA role + `ck-e2e-flow` engine binding.

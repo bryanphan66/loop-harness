@@ -36,10 +36,10 @@ Evidence: `plans/reports/autoscript-uat-fix-round1-summary.md` U1 + landing-imag
 - `build-manifest-compilation.md`: export bundle added as frozen input #6.
 
 ### Version note
-- New `docs/HARNESS_CHANGELOG.md` — v1 (import) / v2 (proof-run F1..F18) / v3 (this round, per-BS mapping). Referenced from `HARNESS.md` § Growth Rule. Current version: v3.
+- New `docs/about/HARNESS_CHANGELOG.md` — v1 (import) / v2 (proof-run F1..F18) / v3 (this round, per-BS mapping). Referenced from `HARNESS.md` § Growth Rule. Current version: v3.
 
 ## Files changed (17)
-- New: `harness/docs/gates/visual-fidelity.md`, `harness/docs/HARNESS_CHANGELOG.md`
+- New: `harness/docs/gates/visual-fidelity.md`, `harness/docs/about/HARNESS_CHANGELOG.md`
 - Modified: `build-execution.md`, `canonical-e2e-flow-playbook.md`, `code-review-scoring.md`, `build-manifest-compilation.md`, `e2e-qa-field-by-field-verify-with-report.md`, `playbooks/README.md`, `gates/{README,dod-build,dor-build}.md`, `STAGE_GOALS.md` (2.3/2.6/2.7/2.8/2.10), `WORKFLOW.md` (2.6–2.10 rows, floor-note, Canonical Gate List), `templates/build-manifest.md`, `HARNESS.md`, `.claude/commands/{build-phase,gate-check}.md`
 
 ## Verification

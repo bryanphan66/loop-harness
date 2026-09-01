@@ -6,7 +6,7 @@ NOT the workshop's own dev-session config (that is the repo-root `.claude/`).
 ## commands/ — slash commands the operator/agent runs
 | File | Command | What it does |
 |---|---|---|
-| `stage-next.md` | `/stage-next` | Run the next `docs/WORKFLOW.md` step via the `stage-runner` subagent, enforce its gate, update `STAGE.md`, land one stage-boundary commit. |
+| `stage-next.md` | `/stage-next` | Run the next `docs/process/WORKFLOW.md` step via the `stage-runner` subagent, enforce its gate, update `STAGE.md`, land one stage-boundary commit. |
 | `build-phase.md` | `/build-phase` | Build step 2.6 — implement ONE `build-manifest.md` phase (code → validate → e2e smoke → verification-register → commit → phase-acceptance). Repeat until the manifest is done. |
 | `gate-check.md` | `/gate-check` | Verify any gate on demand. |
 

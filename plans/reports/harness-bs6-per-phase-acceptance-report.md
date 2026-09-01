@@ -52,8 +52,8 @@
 | `docs/templates/build-manifest.md` | header: cadence knob + Preview command; Progress table: cột Verify-by + Accepted; AC nâng thành 3 hạng mục BẮT BUỘC (functional + negative-path + visual-fidelity / `n/a — no screens`); phase block field Verify-by; coverage checklist 2 dòng mới |
 | `.claude/commands/build-phase.md` | step 2 precondition (refuse khi phase trước chưa accepted); step 5 mới ACCEPTANCE VERIFICATION (a-d); step 6 report; Rules thêm "verifier ≠ implementer"; packet nhắc preview |
 | `.claude/agents/stage-runner.md` | 2.6: không tự certify acceptance / không tự fill Accepted cell; để preview bootable; nếu được invoke LÀM verifier thì theo verdict block, không đụng code |
-| `docs/STAGE_GOALS.md` § 2.6 | Gate line + goal text: acceptance verification sau commit; Manual? = cadence-driven (page operator) |
-| `docs/WORKFLOW.md` | TL;DR; hàng 2.6 (engine + gate + manual cell); Gate rebalance note rewrite (per-phase acceptance + 2.7/2.8/2.10 = aggregation); Canonical Gate List thêm **Phase Acceptance** |
+| `docs/process/STAGE_GOALS.md` § 2.6 | Gate line + goal text: acceptance verification sau commit; Manual? = cadence-driven (page operator) |
+| `docs/process/WORKFLOW.md` | TL;DR; hàng 2.6 (engine + gate + manual cell); Gate rebalance note rewrite (per-phase acceptance + 2.7/2.8/2.10 = aggregation); Canonical Gate List thêm **Phase Acceptance** |
 | `docs/playbooks/build-execution.md` | § Incremental Preview (mới) + § Per-Phase Acceptance Verification (mới) + Related link |
 | `docs/playbooks/build-manifest-compilation.md` | step 5 AC 3 hạng mục + Verify-by; step 6 mới (set knobs, derive Verify-by, re-derive khi operator retune); gate step; Related |
 | `docs/gates/dor-build.md` | dòng mới: mọi phase có AC 3 hạng mục + Verify-by; header khai cadence + preview — DoR yêu cầu trước khi build start |
@@ -61,7 +61,7 @@
 | `docs/gates/README.md` | index row + đoạn mô tả (walked by `/build-phase`, không phải `/gate-check`) |
 | `docs/templates/STAGE.md` | cell gate 2.6 |
 | `AGENTS.md` | bullet 2.6 invoke |
-| `docs/HARNESS_CHANGELOG.md` | **v4** entry — thiết kế + trade-off + token rationale + cite auto-script |
+| `docs/about/HARNESS_CHANGELOG.md` | **v4** entry — thiết kế + trade-off + token rationale + cite auto-script |
 
 ## Cách operator chỉnh nhịp human checkpoint
 

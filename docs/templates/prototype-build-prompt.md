@@ -3,7 +3,7 @@ TEMPLATE: prototype-build-prompt.md — Step 1.12 board-mode build prompt (TRIAL
 Used by: Designer at step 1.12 when the chosen engine is "Claude Code + taste skill" (the
   external-tool path does NOT need this file). Copied into the bootstrapped project; fill <<...>>.
 Engine: Claude Code in-repo. Output: prototype/board.html + prototype/screens/*.html.
-Authority: docs/WORKFLOW.md 1.12 · docs/STAGE_GOALS.md §1.12 · ADR prototype-external-design-tool-not-generated (Amendment TRIAL).
+Authority: docs/process/WORKFLOW.md 1.12 · docs/process/STAGE_GOALS.md §1.12 · ADR prototype-external-design-tool-not-generated (Amendment TRIAL).
 Bilingual: prompt body VI (user runs it in Claude Code); user-facing screen copy VI-first.
 Project note: a filled, project-specific copy lives at docs/visuals/prototype/build-prompt-claude-code.md.
 

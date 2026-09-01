@@ -146,4 +146,4 @@ Nếu bảo trì kết thúc:
 - Log sự cố: `docs/incidents/` (repo dự án).
 - Change Request log: `docs/templates/locale-vi/change-request-log.md`.
 - Bàn giao dự án: `docs/templates/locale-vi/project-closure-story/` (đề xuất này gửi kèm).
-- Macro-stage Post-Build: `docs/WORKFLOW.md`.
+- Macro-stage Post-Build: `docs/process/WORKFLOW.md`.

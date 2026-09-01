@@ -5,7 +5,7 @@
 **Lifecycle:** experimental · **First use:** 2026-07-11 (Nhất Nghệ eLearning) · **Verified by:** none
 
 > Owns the **two hosted status Artifacts** a run keeps: the **internal ops-board**
-> (team) and the **client-facing roadmap** (buyer). Authority: `docs/HARNESS.md`
+> (team) and the **client-facing roadmap** (buyer). Authority: `docs/about/HARNESS.md`
 > § Status Artifact → Two surfaces + Locked Decision **D4**. This is the *how*;
 > HARNESS.md is the *why/what*. Composes with `bilingual-delivery-template-pattern.md`
 > (D4 forks) — it never duplicates it.

@@ -7,8 +7,8 @@ Goal: verify a harness gate is satisfied BEFORE a later step proceeds, and if it
 is not, print precisely what is missing. This is the guardrail that stops build
 code starting before **PB-G4** and stops out-of-order step execution.
 
-Gates are defined in `docs/WORKFLOW.md` § Canonical Gate List. Token chain rules
-are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
+Gates are defined in `docs/process/WORKFLOW.md` § Canonical Gate List. Token chain rules
+are in `docs/process/TRACE_SPEC.md` (RTM completeness). The verify-gate command
 (`scripts/harness-verify-gate.sh`) is the mechanical proof source where present.
 
 ## Arguments
@@ -22,9 +22,9 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
 
 ## Steps
 
-1. Read `STAGE.md` (Current step, **Lane**, blockers) and `docs/WORKFLOW.md`
+1. Read `STAGE.md` (Current step, **Lane**, blockers) and `docs/process/WORKFLOW.md`
    (the Canonical Gate List + the step tables). In the **Lite lane**
-   (`docs/WORKFLOW.md` § Lanes): PB-G2/PB-G3 clear on a recorded owner ack, and
+   (`docs/process/WORKFLOW.md` § Lanes): PB-G2/PB-G3 clear on a recorded owner ack, and
    the 2.x hard line is PB-G3 frozen **+ `1.14/1.15 — N/A by decision (Lite
    lane)` recorded in STAGE.md** instead of PB-G4.
 
@@ -45,13 +45,13 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
      - `3.2`+ → needs **HANDOVER** GREEN.
    - With no argument, gate the Current step the same way.
 
-3. Assert the gate's clearing condition (from `docs/WORKFLOW.md`). Check
+3. Assert the gate's clearing condition (from `docs/process/WORKFLOW.md`). Check
    mechanically where possible — prefer evidence over assumption:
 
    | Gate | GREEN when (evidence to look for) |
    |---|---|
    | **PB-G1** | intake brief records a go/no-go decision (`docs/intake/*-intake-brief.md` has proceed/park/decline). Internal — does not page client. |
-   | **PB-G2** | every BLOCKER in `docs/requirements/CLARIFICATIONS.md` answered + `docs/scope-baseline/feature-register.{md,xlsx}` marked frozen + RTM **backward** complete (every feature-register line → ≥1 REQ-ID + ≥1 use case, per `docs/TRACE_SPEC.md`). Client sign recorded. |
+   | **PB-G2** | every BLOCKER in `docs/requirements/CLARIFICATIONS.md` answered + `docs/scope-baseline/feature-register.{md,xlsx}` marked frozen + RTM **backward** complete (every feature-register line → ≥1 REQ-ID + ≥1 use case, per `docs/process/TRACE_SPEC.md`). Client sign recorded. |
    | **PB-G3** | `docs/visuals/prototype/feedback-final.md` records a written freeze; no open scope-drift items. |
    | **PB-G4** | signed contract + deposit recorded; `docs/ROADMAP.md` skeleton exists. **No build code may exist before this.** |
    | **DoR** | requirements baselined + scope signed (PB-G4 / Lite equivalent) + ERD frozen + design approved + acceptance criteria + NFR present + **build-manifest complete** — assert the full DoR checklist incl. the manifest-completeness rule from `docs/gates/dor-build.md` (SoT). |
@@ -64,7 +64,7 @@ are in `docs/TRACE_SPEC.md` (RTM completeness). The verify-gate command
 
 4. For each unmet condition, list it as a concrete missing item with the file or
    token that proves it (e.g. "PB-G2 NOT GREEN: `IF.AUTH.03` has no
-   feature-register line — RTM backward incomplete (`docs/TRACE_SPEC.md`)").
+   feature-register line — RTM backward incomplete (`docs/process/TRACE_SPEC.md`)").
 
 5. Run the verify-gate command if it exists, to confirm the verification
    register has no `fail` / `never-run` rows:

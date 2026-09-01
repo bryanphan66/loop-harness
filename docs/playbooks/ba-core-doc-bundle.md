@@ -90,7 +90,7 @@ docs/requirements/
     └── RTM.md                      # 5. the completeness matrix (the gate)
 ```
 
-Paths are **fixed** — the verify-gate and `docs/WORKFLOW.md` step 1.7 read these
+Paths are **fixed** — the verify-gate and `docs/process/WORKFLOW.md` step 1.7 read these
 exact locations. Do not rename or relocate.
 
 ---
@@ -267,7 +267,7 @@ RTM** → the verify-gate blocks the stage-close commit.
   column, even if pending. (Forward rows are *placeholders* at 1.7.)
 - [ ] Every high-risk REQ-ID (flagged for 1.8) has a stubbed SC-NNN cell.
 
-> **The mechanical rule** (from `docs/TRACE_SPEC.md` § RTM Completeness): *a
+> **The mechanical rule** (from `docs/process/TRACE_SPEC.md` § RTM Completeness): *a
 > feature-register line with no REQ-ID, a REQ-ID with no TC-NNN at ACCEPTANCE, or
 > a high-risk REQ-ID with no SC-NNN and no skip note is an incomplete RTM.* The
 > 1.7 gate enforces only the **backward + consistency** halves; the forward half
@@ -315,10 +315,10 @@ recurring orphan pattern the completeness gate missed. Do not delete the origina
 
 ## Related
 
-- `docs/WORKFLOW.md` § 1.7 — the step this playbook owns.
-- `docs/TRACE_SPEC.md` § RTM Completeness Rule — the mechanical gate this enforces.
+- `docs/process/WORKFLOW.md` § 1.7 — the step this playbook owns.
+- `docs/process/TRACE_SPEC.md` § RTM Completeness Rule — the mechanical gate this enforces.
 - `gap-analysis.md` — produces GAP-NNN (RTM backward link).
 - `scenario-taxonomy-playbook.md` — consumes high-risk REQ-IDs (mints SC-NNN).
 - `bilingual-delivery-template-pattern.md` — the GLOSSARY VN fork pattern (D4).
 - `solo-dev-client-delivery.md` § 1.7 — the meta-playbook that calls this.
-- `docs/ROLE_MAP.md` — BA role binding for each artifact's engine.
+- `docs/process/ROLE_MAP.md` — BA role binding for each artifact's engine.

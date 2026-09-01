@@ -195,5 +195,5 @@ Wishing the project well.
 
 - Discovery interview: `docs/playbooks/discovery-interview-playbook.md` (5 personas × 3 modes).
 - Next (BA spine): gap analysis `docs/templates/gap-analysis.md` (mints GAP-NNN).
-- Token chain: `docs/TRACE_SPEC.md`.
+- Token chain: `docs/process/TRACE_SPEC.md`.
 - Localization: forks to `docs/templates/locale-vi/client-intake-brief.md` (D4).

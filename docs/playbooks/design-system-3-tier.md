@@ -148,5 +148,5 @@ delete the original shape.)
 - `docs/decisions/three-tier-design-system-floorplan-enforcement.md` — the decision.
 - `docs/playbooks/ui-design-system-contract.md` — Tier-2 token contract (1.10).
 - `docs/playbooks/code-review-scoring.md` — the floor-rule lives at 2.7.
-- `docs/WORKFLOW.md` § 1.10–1.12 + 2.6–2.10 — the steps this spans.
-- `docs/ROLE_MAP.md` — Designer + `ck-ux-design` / `ck-design-system` binding.
+- `docs/process/WORKFLOW.md` § 1.10–1.12 + 2.6–2.10 — the steps this spans.
+- `docs/process/ROLE_MAP.md` — Designer + `ck-ux-design` / `ck-design-system` binding.

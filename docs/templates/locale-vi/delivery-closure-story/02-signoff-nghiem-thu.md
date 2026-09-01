@@ -65,4 +65,4 @@ không có điều kiện. Mỗi điều kiện đúc `CR-NN` để theo dõi.
 - Bản gốc tiếng Anh (chuẩn): `docs/templates/delivery-closure-story/02-signoff.md`.
 - Kế hoạch UAT (nguồn bằng chứng): `docs/templates/locale-vi/delivery-closure-story/01-uat-plan.md`.
 - Thông báo khách sau ký: `docs/templates/locale-vi/delivery-closure-story/03-client-update.md`.
-- Token grammar: `docs/TRACE_SPEC.md`. Cổng ACCEPTANCE: `docs/WORKFLOW.md`.
+- Token grammar: `docs/process/TRACE_SPEC.md`. Cổng ACCEPTANCE: `docs/process/WORKFLOW.md`.

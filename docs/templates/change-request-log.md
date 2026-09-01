@@ -191,7 +191,7 @@ Next update: within <N> hours
 **Pointers**
 
 - SOW § 9 Change Request Policy: `docs/templates/proposal-sow.md`.
-- Re-entry into the chain: `docs/TRACE_SPEC.md` § Change-request branch.
+- Re-entry into the chain: `docs/process/TRACE_SPEC.md` § Change-request branch.
 - Roadmap impact: `docs/ROADMAP.md` § Change Log Impact.
 - Maintenance SLA windows: `docs/templates/maintenance-proposal.md` § 5.
 - Localization: forks to `docs/templates/locale-vi/change-request-log.md` (D4).

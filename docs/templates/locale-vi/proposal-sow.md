@@ -186,4 +186,4 @@ Chữ ký + đặt cọc tại đây = qua cổng `PB-G4`. Sau cổng này build
 - Bàn giao (M5): `docs/templates/locale-vi/project-closure-story/`.
 - Change requests: `docs/templates/locale-vi/change-request-log.md`.
 - Bảo trì: `docs/templates/locale-vi/maintenance-proposal.md`.
-- Bản đồ macro-stage + cổng: `docs/WORKFLOW.md`. Token grammar: `docs/TRACE_SPEC.md`.
+- Bản đồ macro-stage + cổng: `docs/process/WORKFLOW.md`. Token grammar: `docs/process/TRACE_SPEC.md`.

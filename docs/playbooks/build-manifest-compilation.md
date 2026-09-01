@@ -131,10 +131,10 @@ A missing/unfrozen input is a 2.3 blocker — do not compile from moving specs.
 ## Related
 
 - `docs/templates/build-manifest.md` — the artifact shape.
-- `docs/WORKFLOW.md` § Macro-Stage 2 — the 2.3 row + Build Manifest note.
+- `docs/process/WORKFLOW.md` § Macro-Stage 2 — the 2.3 row + Build Manifest note.
 - `.claude/commands/build-phase.md` — the loop that executes the manifest.
 - `build-execution.md` — per-phase discipline (commits, hooks, fidelity).
 - `docs/gates/dor-build.md` — the gate the manifest must satisfy.
 - `docs/gates/phase-acceptance.md` — the per-phase gate the acceptance checks
   + `Verify-by` + cadence knob feed.
-- `docs/TRACE_SPEC.md` — REQ-ID grammar; the coverage rule is a trace rule.
+- `docs/process/TRACE_SPEC.md` — REQ-ID grammar; the coverage rule is a trace rule.

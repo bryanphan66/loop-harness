@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # stage-deliver.sh — PostToolUse(Bash) hook. After any Bash call, if the latest
-# git commit is a stage-boundary commit (per docs/WORKFLOW.md), push the new /
+# git commit is a stage-boundary commit (per docs/process/WORKFLOW.md), push the new /
 # changed docs/ artifacts in that commit to the human via the channel-abstracted
 # notifier (.claude/scripts/notifier-send.sh — Telegram default, swappable).
 #
@@ -9,7 +9,7 @@
 # "N.M" token. Build code commits (2.6) fire per-phase and are SKIPPED to avoid
 # spam — their delivery is the QA evidence push (qa-deliver.sh), not the diff.
 #
-# Audience labels follow the client-paging gate map in docs/WORKFLOW.md:
+# Audience labels follow the client-paging gate map in docs/process/WORKFLOW.md:
 #   client-paging steps (PB-G2 1.9, PB-G3 1.13, PB-G4 1.15, ACCEPTANCE 2.12,
 #   HANDOVER 3.1) -> "CLIENT review (forward to customer)"; all others -> self.
 
@@ -46,7 +46,7 @@ else
 fi
 
 # Drop tokens that are not real WORKFLOW step IDs (e.g. a bare "2.0" from a
-# version string like "v2.0"). Only the IDs in docs/WORKFLOW.md route here.
+# version string like "v2.0"). Only the IDs in docs/process/WORKFLOW.md route here.
 case "$step" in
   1.1|1.2|1.3|1.4|1.5|1.6|1.7|1.8|1.9|1.10|1.11|1.12|1.13|1.14|1.15) ;;
   2.1|2.1b|2.2|2.3|2.4|2.5|2.6|2.7|2.8|2.9|2.10|2.11|2.12|2.13) ;;
@@ -65,7 +65,7 @@ case "$step" in
   *)                      audience="self review" ;;
 esac
 
-# Friendly step name (from docs/WORKFLOW.md step tables).
+# Friendly step name (from docs/process/WORKFLOW.md step tables).
 case "$step" in
   1.1)  step_name="Lead capture + intake raw files" ;;
   1.2)  step_name="Intake brief (go/no-go)" ;;
@@ -141,9 +141,9 @@ Files: ${#files[@]}"
     "${files[@]}" >/dev/null 2>&1 || true
 fi
 
-# Push the next step's gate text (from docs/WORKFLOW.md) so the human knows
+# Push the next step's gate text (from docs/process/WORKFLOW.md) so the human knows
 # what clears next. Best-effort — silently skip if the map file is absent.
-goals_file="$sess_cwd/docs/STAGE_GOALS.md"
+goals_file="$sess_cwd/docs/process/STAGE_GOALS.md"
 [[ -f "$goals_file" ]] || exit 0
 
 # Next-step pointer within the same macro-stage map.

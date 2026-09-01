@@ -2,7 +2,7 @@
 
 **Goal:** reusable harness at `videcode-harness/harness/` that, when run on a project, produces a real app at hasi-hub quality (pnpm monorepo, NestJS+Prisma+Postgres API, Next.js web, CI green, docker compose up, seeded, e2e). Proof = one sample project driven through Macro 2 end-to-end.
 
-**Source of truth studied:** embedded harness in `~/Desktop/Workspace/auto-script` (STAGE.md, AGENTS.md, docs/WORKFLOW.md, STAGE_GOALS.md, playbooks/, gates/, .claude/, scripts/) + hasi-hub structural benchmark (see `plans/reports/hasi-hub-benchmark-260705.md`).
+**Source of truth studied:** embedded harness in `~/Desktop/Workspace/auto-script` (STAGE.md, AGENTS.md, docs/process/WORKFLOW.md, STAGE_GOALS.md, playbooks/, gates/, .claude/, scripts/) + hasi-hub structural benchmark (see `plans/reports/hasi-hub-benchmark-260705.md`).
 
 ## Diagnosis — why Macro 2 never produced an app
 

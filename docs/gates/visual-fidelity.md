@@ -52,7 +52,7 @@ the export", or **an LLM comparing two screenshots**. An LLM image-compare is
 unreliable and biased toward "same" — it is not a tooth. The machine tooth is the
 assertions; the human tooth is the glance. Prose ("port from export") gets
 skimmed; an executable assertion cannot be, and a surfaced side-by-side cannot be
-rubber-stamped blind (`docs/HARNESS.md` § Control-Plane Failure Classes — FC7).
+rubber-stamped blind (`docs/about/HARNESS.md` § Control-Plane Failure Classes — FC7).
 
 **Why this gate exists (failure evidence):** re-implementing a frozen
 Claude-Design export by *reading* it into fresh Tailwind passed floorplan

@@ -22,12 +22,12 @@
 
 ## Engine
 
-Per D1 (Independence Principle, `docs/HARNESS.md`): name the `ck-*` skill that is
+Per D1 (Independence Principle, `docs/about/HARNESS.md`): name the `ck-*` skill that is
 the **fast path** for this playbook, and the **bare-agent fallback** that produces
 the same artifact shape. The skill is an accelerator, NEVER a hard requirement.
 
 - **Fast path:** `<ck-skill>` — one line on what it does.
-- **Role:** `<SDLC role from docs/ROLE_MAP.md>`. **Bare-agent fallback:** `<global
+- **Role:** `<SDLC role from docs/process/ROLE_MAP.md>`. **Bare-agent fallback:** `<global
   agent>` runs the core logic below.
 
 ## When To Run
@@ -40,7 +40,7 @@ For a process playbook: numbered steps or sections, each with inputs/outputs.
 For a framework: contract skeleton + token taxonomy + verification gate.
 For a tooling fix: Symptoms → Root Cause → Fix with copy-pasteable commands.
 
-Use the canonical tokens (D3, `docs/TRACE_SPEC.md`): REQ-ID `MODULE.AREA.NN`,
+Use the canonical tokens (D3, `docs/process/TRACE_SPEC.md`): REQ-ID `MODULE.AREA.NN`,
 `SC-NNN`, `TC-NNN`, `GAP-NNN`, `CR-NN`. **Never** `US-NNN.REQ-MMM`.
 
 ## Per-Tier Application (if applicable)
@@ -62,7 +62,7 @@ delete the original shape.)
 
 ## Related
 
-- `docs/WORKFLOW.md` § N.M — the step this playbook owns.
-- `docs/TRACE_SPEC.md` — tokens cited here.
-- `docs/ROLE_MAP.md` — role + engine binding.
+- `docs/process/WORKFLOW.md` § N.M — the step this playbook owns.
+- `docs/process/TRACE_SPEC.md` — tokens cited here.
+- `docs/process/ROLE_MAP.md` — role + engine binding.
 - Adjacent playbooks / decisions.

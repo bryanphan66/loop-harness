@@ -2,7 +2,7 @@
 
 Shape-only scaffolds for the artifacts the harness expects across the **3 macro
 stages** (Pre-Build / Build & Go-live / Post-Build). Copy or stub into the
-project repo when the corresponding `docs/WORKFLOW.md` step is reached.
+project repo when the corresponding `docs/process/WORKFLOW.md` step is reached.
 
 Each template starts with an HTML header comment citing **which step + gate** it
 serves, its **role + engine**, its **output path**, and its **bilingual** status.
@@ -12,7 +12,7 @@ and code fences stay English even inside a VN fork.
 
 **Token grammar (D3 — the only scheme):** `REQ-ID = MODULE.AREA.NN` (e.g.
 `IF.AUTH.01`) · `SC-NNN` · `TC-NNN` · `GAP-NNN` · `CR-NN`. Do **not** use
-`US-NNN.REQ-MMM`. Full chain: `docs/TRACE_SPEC.md`.
+`US-NNN.REQ-MMM`. Full chain: `docs/process/TRACE_SPEC.md`.
 
 ## Index
 
@@ -22,7 +22,7 @@ and code fences stay English even inside a VN fork.
 | --- | --- | --- | --- | --- |
 | [client-intake-brief.md](client-intake-brief.md) | 1.2 | PB-G1 (internal capture) | **yes** | Vendor-internal go/no-go. Red/green flags, complexity, conditional probes, decline reply. |
 | [gap-analysis.md](gap-analysis.md) | 1.4 | feeds PB-G2 | **yes** | As-Is/To-Be + 6 gap categories + MoSCoW. Mints `GAP-NNN` → `REQ-ID`. |
-| [srs-lite.md](srs-lite.md) | 1.5-lite (Lite lane) | PB-G2 owner ack (1.9-lite) | no (internal) | One-file requirements spine: modules + `REQ-ID` table + high-risk flags + feature table + NFR one-liners. Replaces 1.3–1.9 in the Lite lane (`docs/WORKFLOW.md` § Lanes). |
+| [srs-lite.md](srs-lite.md) | 1.5-lite (Lite lane) | PB-G2 owner ack (1.9-lite) | no (internal) | One-file requirements spine: modules + `REQ-ID` table + high-risk flags + feature table + NFR one-liners. Replaces 1.3–1.9 in the Lite lane (`docs/process/WORKFLOW.md` § Lanes). |
 | [feature-register.md](feature-register.md) | 1.9 | **PB-G2 (CLIENT)** scope frozen | **yes** | Scope baseline. Columns: scope-group, module/use-case, feature, `in-MVP`/`defer`/`needs-consult`/`out`, `REQ-ID`, `GAP` ref. RTM backward-complete on freeze. |
 | [role-permission-matrix.md](role-permission-matrix.md) | 1.11 | RPM coverage; re-checked at ACCEPTANCE | **yes** | Roles × resources × CRUD grid. Every non-`N` cell cites a `REQ-ID`. |
 | [status-flow.md](status-flow.md) | 1.11 | status-flow coverage; re-checked at ACCEPTANCE | **yes** | Per-entity Mermaid state machine + transition table. Every transition cites a `REQ-ID`. |
@@ -102,8 +102,8 @@ and the user-guide. **Internal technical** artifacts stay English: `spec-intake`
 
 ## Cross-References
 
-- 3-macro step tables + gates: `docs/WORKFLOW.md`.
-- Token grammar + RTM rule: `docs/TRACE_SPEC.md`.
-- Role → agent + engine binding: `docs/ROLE_MAP.md`.
+- 3-macro step tables + gates: `docs/process/WORKFLOW.md`.
+- Token grammar + RTM rule: `docs/process/TRACE_SPEC.md`.
+- Role → agent + engine binding: `docs/process/ROLE_MAP.md`.
 - Docs crosswalk (which template backs which expected doc): `docs/README.md`.
 - Per-project stage tracker lands at the project **repo root** as `STAGE.md`.

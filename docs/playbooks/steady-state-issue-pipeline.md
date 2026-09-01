@@ -13,7 +13,7 @@
 How the harness runs a project **after go-live**. This operationalizes `WORKFLOW.md` Macro 3 steps **3.3 steady-state** + **3.5 change-control**. Model + when-to-switch: `../OPERATING-MODES.md`.
 
 ## Install (once, at graduation to Mode B)
-From `templates/steady-state/`, copy into the project:
+From `scaffolds/steady-state/`, copy into the project:
 - `scripts/issue-state.mjs` — set an issue's State (resolves the org Issue Field by name, re-sends other field values so nothing is wiped, `gh` only). **Enforces the legal transitions below** — the 10 states are a barrier, not paint on the floor.
 - `scripts/qc-checklist.mjs` — generate a QC checklist from an issue's Acceptance Criteria (happy path + 6 slices), post it as a comment (idempotent).
 - `.github/ISSUE_TEMPLATE/bug-report.md` — the bug form (repro / expected / actual / severity / evidence + env).
@@ -121,7 +121,7 @@ Three recover points, one per place the loop actually broke (see `lessons-log.md
 - **R2 — gate (flaky pre-push).** The flake bites at **`git push`** (the pre-push gate runs the full suite), not at merge (merge is server-side). **Retry the push <=2x** on the flaky signature only (real failures like `rejected` never retry), then fail-closed. Script: `push-retry.sh`.
 - **R3 — deploy (verify-at-source mismatch).** After merge, if the running container SHA != the shipped commit, or health != ok: **re-trigger the deploy 1x**; still wrong -> **open a follow-up issue + flag** (prod -> auto-rollback per the deploy standard). Script: `ship-and-verify.sh`.
 
-### Script contracts (in `templates/steady-state/scripts/`, config-driven; dogfooded on elearning-platform)
+### Script contracts (in `scaffolds/steady-state/scripts/`, config-driven; dogfooded on elearning-platform)
 - **`push-retry.sh [<git push args>]`** — `git push`, retried <=2x ONLY on the flaky-integration signature (redis/BullMQ/timeout); a deterministic failure (rejected/network) exits immediately; fail-closed after the cap. Used at push time (e.g. in the coder's dispatch).
 - **`ship-and-verify.sh <issue> [<commit>]`** — after merge: poll the deploy run -> **verify-at-source** (SSH the running web container's git SHA == `<commit>`) -> on mismatch re-trigger deploy once -> on 2nd mismatch `gh issue create` a "deploy-drift" follow-up `Refs #<issue>` and exit non-zero. Repo from `gh repo view`; deploy target/branch via env (`DEPLOY_SSH`/`DEPLOY_BRANCH`/`DEPLOY_WORKFLOW`).
 

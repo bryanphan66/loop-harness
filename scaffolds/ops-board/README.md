@@ -2,7 +2,7 @@
 
 **Lifecycle:** experimental · **First use:** TBD · **Verified by:** none (renders correctly in both themes; **never yet run on real data**)
 
-The internal ops-board that `docs/HARNESS.md` § Status Artifact and
+The internal ops-board that `docs/about/HARNESS.md` § Status Artifact and
 `playbooks/status-surfaces-ops-and-client.md` already specify — this is the
 first *drawn* version of it. One self-contained HTML file, no build step, no
 dependency, no external request.
