@@ -21,9 +21,10 @@ playbook owns its step's recipe.
 ## Lifecycle
 
 Each playbook carries a grep-able `**Lifecycle:**` line (`experimental` /
-`verified` / `deprecated`) per `docs/HARNESS.md` § Playbook Lifecycle. All
-playbooks here ship `experimental` (not yet exercised on a real step). Promotion to
-`verified` happens via `session-retrospective.md`.
+`verified` / `deprecated`) per `docs/HARNESS.md` § Playbook Lifecycle. A playbook
+is `verified` once it has been exercised on a real step (8 are, as of 2026-09);
+the rest ship `experimental` until then. Promotion happens via
+`session-retrospective.md`.
 
 ## Tokens (D3 — the only scheme)
 

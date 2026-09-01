@@ -1,0 +1,222 @@
+# Macro-2 (Build & Go-live) — machine-readable pipeline spec.
+#
+# WHY THIS FILE EXISTS
+#   Before this, "what is Macro-2" was scattered across STAGE_GOALS.md (goal
+#   prose), WORKFLOW.md (a table), gates/ (checklists), playbooks/ (how-to) and
+#   lint-gates-registry.md (scripts). No single place said "step -> gate ->
+#   playbook -> output". This file is that single place: the SOT for the Macro-2
+#   PROCESS SHAPE. Prose docs explain; this declares.
+#
+# HOW IT IS USED
+#   - /stage-next reads `steps[].driver` + `goal_ref` to run the right step.
+#   - the RTM / observability dashboard reads `steps[]` to show "where are we".
+#   - docs (STAGE_GOALS, WORKFLOW) point INTO this; they no longer re-declare it.
+#
+# CONVENTIONS
+#   - `gates` names a script in lint-gates-registry.md (mechanical) OR a gate
+#     doc in docs/gates/ (checklist). `tier` says whether it actually blocks.
+#   - `enforcement`: mechanical (script exits non-zero) | orchestrator (ctl /
+#     verifier agent judges) | human (a person signs).  Do NOT call a step
+#     "mechanical" unless a script really blocks it — see G2 note below.
+#   - `manual: true` = pages a human (MANUAL_CHECKPOINT), never auto-advances.
+#
+# 2026-09-01 refactor: merged 2.5->2.4, 2.7->2.10, 2.11->2.13; security folded to
+#   a single VERIFY pass (2.9) over 2.2/2.6 mitigations, not a 3rd from-scratch
+#   STRIDE. REQ-ID is the sole cross-artifact anchor (F-NNN retired).
+
+meta:
+  macro: 2
+  name: "Build & Go-live"
+  driver_default: "/stage-next"       # per-step override in steps[].driver
+  anchor_token: "REQ-ID"              # the ONLY cross-artifact trace token (D3)
+  # G2 — the standing hole: every `mechanical` gate below runs only as a LOCAL
+  # git hook (pre-commit/pre-push via harness-verify-gate.sh). gh-merge and
+  # web-edit BYPASS them; ci.yml does not run on pull_request. Until a
+  # server-side required-check exists, "mechanical" == "advisory on merge".
+  known_gaps:
+    - "G2: gates are local-hook only; gh-merge bypasses. No server-side enforcement yet."
+    - "Prototype freeze PB-G3.2/G3.3 (phase 2/3) pending -> fidelity gate has no frozen export to diff for those phases."
+
+# Where issue content actually comes from (was mis-documented as a register->issue
+# sync script that does not exist). REQ-ID is the join key across all three.
+issue_sourcing:
+  anchor: "REQ-ID"
+  scope_from: "docs/scope-baseline/feature-register.*  (a DERIVED scope view, frozen at PB-G2 — NOT the detail SOT)"
+  detail_from: "docs/requirements/srs/*  (functional detail + AC — the living requirement SOT)"
+  visual_from: "docs/visuals/prototype/*  (layout / control counts — the visual SOT; must be frozen to gate)"
+  authored_by: "agent -> scripts/new-issue.mjs (fixed 5-header + DoD-13 frame). A REQ-ID-anchored generator (planned) will pull scope+detail+visual by REQ-ID."
+  anti_fabrication:
+    - "every REQ-ID in an issue must exist in the SRS (mechanical check, planned)"
+    - "issue '## Liên kết' must cite the source file per field; refs must resolve (planned)"
+    - "'correct-content' = human sign-off at the freeze gates; the machine only proves 'has evidence'"
+
+steps:
+  - id: "2.1"
+    name: "Freeze ERD"
+    role: SA
+    driver: "/stage-next"
+    goal_ref: "STAGE_GOALS.md#2.1"
+    inputs: ["SRS data-model", "use-cases", "screen-inventory"]
+    output: ["docs/system-architecture.md (ERD)", "docs/decisions/<slug>.md"]
+    gates:
+      - name: "ERD frozen"
+        enforcement: orchestrator   # NOT mechanical — no script; an agent/owner judges
+    playbooks: []
+    exit_when: "entities + normalization + audit/tenant fields reviewed; ERD marked FROZEN"
+
+  - id: "2.1b"
+    name: "Data migration & cutover (brownfield only)"
+    role: [SA, DevSecOps]
+    condition: "brownfield (replacing a legacy system). greenfield/Lite -> N/A by decision (record one line)."
+    inputs: ["legacy schema", "ERD"]
+    output: ["migration plan", "dry-run cutover report"]
+    gates:
+      - name: "ETL + dry-run + rollback-of-data + RTO/RPO"
+        enforcement: orchestrator
+    playbooks: ["external-integration"]
+    exit_when: "dry-run cutover passes with rollback proven, or recorded N/A"
+
+  - id: "2.2"
+    name: "Technical design + stack + threat-model baseline"
+    role: "Tech Lead"
+    inputs: ["NFR", "ERD"]
+    output: ["docs/decisions/<slug>.md (stack)", "API contract", "STRIDE threat-model"]
+    gates:
+      - name: "stack justified vs NFR; API contract complete; threat-model authored"
+        enforcement: orchestrator
+    playbooks: []
+    exit_when: "stack ADR done; API contract complete; STRIDE threat-model recorded (this is the security BASELINE that 2.9 verifies, not re-does)"
+    note: "default stack = the shipped walking-skeleton template; deviations need the ADR to say why."
+
+  - id: "2.3"
+    name: "Implementation plan + BUILD MANIFEST + DoR"
+    role: ["Tech Lead", "PM"]
+    inputs: ["TDR", "scope baseline (feature-register)", "ERD", "screen-inventory", "SRS"]
+    output: ["plans/<ts>-<slug>/", "docs/build-manifest.md"]
+    gates:
+      - name: "check-manifest-coverage"
+        enforcement: mechanical      # REQ-ID <-> phase, no drop/dup, has P0
+      - name: "DoR (docs/gates/dor-build.md)"
+        enforcement: orchestrator
+    playbooks: ["build-manifest-compilation"]
+    exit_when: "every in-scope REQ-ID appears in exactly one manifest phase; DoR clear"
+    dual_role_warning: >
+      2.3 serves TWO models: (a) compile a linear build-manifest for phased build,
+      and (b) act as the re-entry point for change-control (a CR mints a NEW phase).
+      Phase-2 in practice ran the ISSUE model (Mode-B style) and was excluded from
+      the manifest on purpose (prototype freeze pending). Keep these two roles
+      DISTINCT; do not let a project silently run both at once.
+
+  - id: "2.4"
+    name: "Walking skeleton + seed (manifest P0)"   # merged: old 2.5 folded in
+    role: [DevSecOps, Dev]
+    inputs: ["stack decision", "manifest P0", "ERD", "RBAC"]
+    output: ["scaffolded monorepo + pipeline + compose", "seed scripts"]
+    gates:
+      - name: "install && build green; compose boots; health OK; secret-scan clean"
+        enforcement: mechanical      # real commands with real pass/fail (secret-scan via gitleaks)
+      - name: "seeded-admin login works; FK-valid; P0 marked done"
+        enforcement: orchestrator
+    playbooks: ["seed-data-pattern"]
+    exit_when: "skeleton boots + seeded admin logs in against real DB; P0 done"
+    merged_from: "old 2.5 (seed) — same P0 milestone, no separate stage boundary"
+
+  - id: "2.6"
+    name: "Build feature by phase — /build-phase loop P1..PN"
+    role: "Fullstack Dev"
+    driver: "/build-phase"           # the one real self-chaining driver in Macro-2
+    inputs: ["build-manifest", "ERD", "SRS module file(s)", "screen-inventory rows", "prototype export files", "tokens"]
+    output: ["code commits", "verification-register rows", "manifest progress (Accepted cell)"]
+    gates:
+      - name: "check-prototype-fidelity"
+        enforcement: mechanical
+      - name: "check-universal-fidelity-imports + check-new-screen-fidelity-required"
+        enforcement: mechanical
+        note: "candidate to merge into one fidelity CLI"
+      - name: "check-prisma-fk-indexes"
+        enforcement: mechanical
+      - name: "check-admin-screen-width-caps"
+        enforcement: mechanical
+      - name: "check-ui-typography + check-no-hardcoded-hex"
+        enforcement: mechanical
+      - name: "check-shared-dialog"
+        enforcement: mechanical
+      - name: "check-ac-coverage (coverage-floor: each in-scope REQ-ID referenced by >=1 test)"
+        enforcement: mechanical
+      - name: "check-authz-test-present / check-money-concurrency-test-present"
+        enforcement: mechanical
+        strength: "presence-only — proves a test file exists, NOT behaviour; behaviour is proven by the green test suite. Do not over-trust."
+      - name: "phase-acceptance (docs/gates/phase-acceptance.md)"
+        enforcement: orchestrator    # independent verifier agent vs running preview; mostly prose legs
+    playbooks: ["build-execution", "prototype-export-adoption"]
+    exit_when: "per phase: compiles/runs; validate:quick green; phase e2e smoke; fidelity assertions green; commit cites >=1 REQ-ID; phase Accepted by independent verifier"
+    note: "the core of Macro-2 and the most real gate cluster."
+
+  - id: "2.8"
+    name: "E2E from BA docs + user manual"
+    role: "QC/QA"
+    inputs: ["acceptance criteria", "SRS", "user-guide shots"]
+    output: ["E2E tests", "TC-NNN rows", "user manual (HDSD)"]
+    gates:
+      - name: "every REQ-ID has >=1 E2E pass + TC row (phase smokes count when they map a REQ-ID)"
+        enforcement: orchestrator
+      - name: "negative-path e2e for every failable op (real cause surfaces); every auth method login->200 + cookie hygiene"
+        enforcement: orchestrator
+    playbooks: ["canonical-e2e-flow-playbook", "user-guide-hdsd-standard"]
+    exit_when: "REQ-ID E2E coverage complete + mandatory negative/auth rules pass"
+
+  - id: "2.9"
+    name: "Security — VERIFY (not re-do)"
+    role: "DevSecOps"
+    inputs: ["code", "2.2 threat-model", "2.6 Leg-6 authz/secret floor"]
+    output: ["security report"]
+    gates:
+      - name: "SECURITY SIGN-OFF: 0 Critical/High open"
+        enforcement: orchestrator
+    playbooks: []
+    exit_when: "each 2.2 threat-model mitigation confirmed present; 2.6 authz floor confirmed; red-team on NEW surface only; 0 Crit/High"
+    note: "consolidated: security appears at 2.2 (model) + 2.6 (floor) + here. This step VERIFIES those, it does not run STRIDE from scratch again."
+
+  - id: "2.10"
+    name: "Manifest-complete review + QA + DoD"   # merged: old 2.7 (6-dim review) folded in
+    role: ["Tech Lead", "QC/QA"]
+    inputs: ["full diff since P0", "running build", "prototype exports"]
+    output: ["review record", "QA evidence", "filled docs/gates/visual-fidelity.md", "filled docs/gates/dod-build.md"]
+    gates:
+      - name: "code review score >=7, no dimension 0 (floor rules already auto-checked per-phase at 2.6 — here = aggregation + cross-phase sweep)"
+        enforcement: orchestrator
+      - name: "harness-verify-gate TEST_MATRIX (no fail / never-run)"
+        enforcement: mechanical
+      - name: "DoD GATE (docs/gates/dod-build.md): review + E2E + security + QA + user-manual + visual-fidelity per key screen"
+        enforcement: orchestrator
+    playbooks: ["code-review-scoring", "e2e-qa-field-by-field-verify-with-report", "pre-demo-self-qa-checklist"]
+    exit_when: "review passes + DoD gate green per screen"
+    merged_from: "old 2.7 (6-dim review) — same floor rules as DoD; one manifest-complete review instead of review+midpoint+DoD"
+
+  - id: "2.12"
+    name: "UAT + sign-off (one client session)"
+    role: [BA, "Release Mgr", Client]
+    manual: true
+    inputs: ["running build", "prototype"]
+    output: ["docs/uat/*", "signed sign-off"]
+    gates:
+      - name: "ACCEPTANCE (CLIENT): critical journeys pass + matches prototype + sign-off signed"
+        enforcement: human
+    playbooks: []
+    exit_when: "client (or owner in Lite) signs off"
+
+  - id: "2.13"
+    name: "Go-live readiness + Release"   # merged: old 2.11 readiness folded in
+    role: "Release Manager"
+    manual: true                          # prod deploy = named-endpoint human decision
+    inputs: ["accepted build", "infra"]
+    output: ["release note (every released REQ)", "tag", "readiness checklist"]
+    gates:
+      - name: "readiness green; rollback rehearsed; DR restore-drill + NFR/load (CONDITIONAL N/A by decision)"
+        enforcement: orchestrator
+      - name: "verify-at-source: health .status==ok + build-specific content marker + running SHA == released commit"
+        enforcement: mechanical        # ctl/ship-and-verify.sh, fail-closed; NOT CI-green/HTTP-200/version-string
+    playbooks: ["go-live-deploy-verify"]
+    exit_when: "released artifact verified at source == released commit; rollback = one IMAGE_TAG line"
+    merged_from: "old 2.11 (go-live readiness) — prod-boot was rehearsed at 2.11 then real at 2.13; one release contract"
+    graduation: "flip STAGE.md Mode A -> Mode B here. NEEDS a script (currently hand-edit — the step that once fossilised elearning at 'step 1.13')."

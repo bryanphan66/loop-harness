@@ -2,38 +2,57 @@
 
 **Lifecycle:** verified · **First use:** elearning 2026-07 · **Verified by:** elearning UAT delivery
 
-> The end-to-end chain from a frozen feature to a client-testable issue with
-> acceptance criteria and demo media. Defines the SoT sync, the issue body format,
-> and the one-spec-per-AC media pipeline. Owns the tracker+demo slice of 2.x/3.x.
+> The end-to-end chain from a scoped feature to a client-testable issue with
+> acceptance criteria and demo media. Defines the issue body format and the
+> one-spec-per-AC media pipeline. Owns the tracker+demo slice of 2.x/3.x.
 
 **Macro-stage / step:** Build & Go-live (2.x) + Handover (3.1). **Gate it serves:**
 DoD (traceable issues + UAT evidence). Shape: **structural framework**.
 
+> **Source model (corrected 2026-09-01 — read before the sections below).** The
+> requirement contract is `docs/requirements/srs/*` (functional detail + AC) plus
+> the frozen prototype (`docs/visuals/prototype/*`, visual detail). The
+> feature-register (`docs/scope-baseline/`) is a DERIVED scope view frozen at
+> PB-G2 — it lists WHAT features are in scope, not their detail. The single
+> cross-artifact trace anchor is the **REQ-ID** (D3 grammar, `TRACE_SPEC.md`).
+> Issues are authored by an agent from the SRS + prototype via
+> `scripts/new-issue.mjs` (fixed 5-header + DoD-13 frame). A REQ-ID-anchored
+> generator that pulls scope+detail+visual is planned (see `macro-2.pipeline.yaml`
+> § issue_sourcing). There is **no** `feature-issues-sync.mjs` register->issue
+> sync script — earlier drafts described one that was never built.
+
 ## Engine
 
-- **Fast path:** `ck-scout` (register parse) + a sync script (`feature-issues-sync.mjs`
-  shape) + `web-testing` (Playwright recordings) + `media-processing` (ffmpeg frame).
-- **Bare-agent fallback:** the global agent parses the register, syncs issues, and
-  records one spec per AC.
+- **Author path (real):** agent reads SRS module file(s) + frozen prototype for a
+  REQ-ID, fills the variable fields into `scripts/new-issue.mjs` (which writes the
+  fixed frame) + `web-testing` (Playwright recordings) + `media-processing`
+  (ffmpeg frame).
 
 ## When To Run
 
 Standing up the feature tracker (GitHub issues) + client UAT board (PM tool) + the
 per-AC demo media. **Skip when:** there is no external tracker or no demo requirement.
 
-## 1. Feature-register = Source of Truth
+## 1. Feature-register = the frozen SCOPE view (not the detail SOT)
 
-Each feature row is stable, machine-readable data:
-`id` (F-NNN, **durable** — never reused/renumbered), `reqids` (REQ-ID grammar,
-e.g. `CM.CRUD.01-03`), `goal` (user story), `ac[]` (acceptance criteria),
-`scope_in` / `scope_out`, `deps`. Everything downstream derives from here.
+Each feature row is machine-readable scope data:
+`reqids` (REQ-ID grammar, e.g. `CM.CRUD.01-03` — the trace anchor), `goal` (user
+story, may be a one-liner), `ac[]` (may be empty for later-phase rows),
+`scope_in` / `scope_out`, `deps`, plus an internal row id. The row's **detail**
+(full AC, business rules, control counts) lives in the SRS + prototype the
+`reqids` point to — NOT in the register. Rows are keyed and traced by **REQ-ID**;
+the internal row id is a spreadsheet key, never a trace token. (A prior `F-NNN`
+"durable token" scheme is retired — it duplicated REQ-ID and is not in D3.)
 
-## 2. GitHub Issues = SoT for features (idempotent sync)
+## 2. GitHub Issues (authored, REQ-ID-anchored)
 
-A sync script (shape of `scripts/feature-issues-sync.mjs`) reconciles register -> issues:
+An agent authors each issue from the SRS + frozen prototype for its REQ-ID(s) via
+`scripts/new-issue.mjs`, which writes the fixed frame. (The planned REQ-ID
+generator will pull scope+detail+visual automatically — `macro-2.pipeline.yaml`.)
 
-- **Durable join via a hidden marker** `<!-- feat-id: F-NNN -->` in the body — a
-  feature can be renamed or change module and still match its existing issue.
+- **Trace anchor: REQ-ID.** The issue's `## Liên kết` section must cite the source
+  file per field (SRS path + register scope line + prototype), so every field is
+  traceable back to its source.
 - **Body template:**
   ```
   **Mục tiêu (User story):** {goal}
