@@ -8,14 +8,17 @@
  *
  *   REQ-ID | register(scope) | issue | test | prototype(phase-freeze)
  *
- * ✓ = present, ✗ = missing, ? = source not available this run (e.g. gh offline).
+ * ✓ = present, ✗ = missing, ~ = register matched ONLY by a module catch-all (MD-dot-star
+ * / CL-dot-star) so the area has no real scope row — treated as not-covered, ? = offline.
  * The SRS column is implicit (every row exists because the SRS defines it).
  *
- * Two modes:
+ * Two modes + filters:
  *   node scripts/rtm-status.mjs                 # print the matrix (Markdown)
- *   node scripts/rtm-status.mjs --gate          # exit 1 if a required column has ✗
+ *   node scripts/rtm-status.mjs --gate          # exit 1 if a required column has ✗ or ~
  *   node scripts/rtm-status.mjs --json          # machine output for a dashboard
  *   node scripts/rtm-status.mjs --selftest      # built-in checks
+ *   node scripts/rtm-status.mjs --module MD     # only REQ-IDs under MD.
+ *   node scripts/rtm-status.mjs --issues-file <dump.json>  # read a gh issue-list dump (avoid gh-live timeout)
  *
  * Config (gate-config.json → rtm.*), all optional with sane defaults:
  *   srsDir       docs/requirements/srs
@@ -40,11 +43,18 @@ const REGISTER = resolve(ROOT, cfg.registerJson ?? 'docs/scope-baseline/feature-
 const TEST_DIRS = (cfg.testDirs ?? ['apps', 'packages']).map((d) => resolve(ROOT, d));
 const REQUIRED_COLS = cfg.requiredCols ?? ['register', 'test'];
 const FROZEN_PHASES = new Set(cfg.frozenPhases ?? ['Phase 1']);
-const ISSUES_FILE = cfg.issuesFile ? resolve(ROOT, cfg.issuesFile) : null;
-
 const REQ_ID = /\b[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\b/g;
 const args = process.argv.slice(2);
 const has = (f) => args.includes(f);
+// `--flag value` or `--flag=value`
+const argVal = (f) => {
+  const i = args.findIndex((a) => a === f || a.startsWith(f + '='));
+  if (i < 0) return null;
+  return args[i].includes('=') ? args[i].slice(args[i].indexOf('=') + 1) : (args[i + 1] ?? null);
+};
+const MODULE_FILTER = argVal('--module');          // e.g. --module MD  → only REQ-IDs under MD.
+const ISSUES_FILE = (argVal('--issues-file') || cfg.issuesFile)
+  ? resolve(ROOT, argVal('--issues-file') || cfg.issuesFile) : null;   // read a gh dump instead of gh-live
 
 // ---- REQ-ID universe from SRS -------------------------------------------------
 function srsReqIds() {
@@ -55,11 +65,16 @@ function srsReqIds() {
   return ids;
 }
 
-// ---- register coverage (wildcard/range aware) --------------------------------
-// register `reqids` entries can be exact (MD.CUST.01), a range (MD.CUST.01-10),
-// or a wildcard (MD.* / MD.CUST.*). A SRS REQ-ID is "in register" if ANY entry
-// matches it. Ranges/wildcards are treated as prefix matches on the MODULE.AREA
-// stem (coarse but honest — the register is a scope index, not a per-REQ list).
+// ---- register coverage (explicit vs module catch-all) ------------------------
+// A register `reqids` entry is one of:
+//   exact       MD.CUST.01      → names one REQ
+//   range       MD.CUST.01-10   → a numbered span in an area
+//   area glob   MD.CUST.*       → names a sub-area (acceptable per-area scope row)
+//   module glob MD.*            → module catch-all — too coarse: it silently makes
+//                                 EVERY area look covered even when no per-area row exists.
+// Only exact/range/area-glob count as REAL coverage ('✓'). A REQ-ID matched ONLY by a
+// module catch-all is '~' (wildcard-only) — not green, so missing per-area scope rows
+// stop hiding behind a single MD.* / CL.* line.
 function registerMatchers() {
   if (!existsSync(REGISTER)) return [];
   let data;
@@ -73,11 +88,11 @@ function registerMatchers() {
     }
   })(data);
   return entries.map((e) => {
-    const exact = e.match(/^[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+$/);
-    if (exact) return (id) => id === e;
-    // wildcard or range → prefix on the part before '.*', '.NN-MM', or trailing '.*'
+    if (/^[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+$/.test(e)) return { kind: 'explicit', test: (id) => id === e };
     const stem = e.replace(/\.\*+$/, '').replace(/\.\d+(-\d+)?$/, '').replace(/\*/g, '');
-    return (id) => id.startsWith(stem);
+    // stem still has a '.' → MODULE.AREA (area-level, explicit enough); no '.' → MODULE-only catch-all
+    const kind = stem.includes('.') ? 'explicit' : 'wildcard';
+    return { kind, test: (id) => id.startsWith(stem) };
   });
 }
 
@@ -130,33 +145,49 @@ function phaseOfReqId() {
 // ---- build the matrix ---------------------------------------------------------
 function build() {
   if (!existsSync(SRS_DIR)) return null;
-  const reqIds = [...srsReqIds()].sort();
+  let reqIds = [...srsReqIds()].sort();
+  if (MODULE_FILTER) {
+    const mf = MODULE_FILTER.replace(/\.+$/, '');
+    reqIds = reqIds.filter((id) => id === mf || id.startsWith(mf + '.'));
+  }
   const regMatch = registerMatchers();
   const issues = issueReqIds();      // Set | null
   const tests = testReqIds();
   const phaseMap = phaseOfReqId();
   const rows = reqIds.map((id) => {
-    const inReg = regMatch.some((m) => m(id));
+    const explicit = regMatch.some((m) => m.kind === 'explicit' && m.test(id));
+    const wildcard = regMatch.some((m) => m.kind === 'wildcard' && m.test(id));
+    const register = explicit ? '✓' : (wildcard ? '~' : '✗');
     const inIssue = issues === null ? '?' : (issues.has(id) ? '✓' : '✗');
     const inTest = tests.has(id) ? '✓' : '✗';
-    const stem = id.replace(/\.\d+$/, '');
-    const phase = phaseMap.get(stem) ?? null;
+    const stem = id.replace(/\.\d+$/, '');            // MODULE.AREA
+    const phase = phaseMap.get(stem) ?? phaseMap.get(id.split('.')[0]) ?? null;  // fall back to MODULE-level (catch-all rows)
     const proto = phase == null ? '?' : (FROZEN_PHASES.has(phase) ? '✓' : '⚠');
-    return { id, register: inReg ? '✓' : '✗', issue: inIssue, test: inTest, prototype: proto, phase };
+    return { id, register, issue: inIssue, test: inTest, prototype: proto, phase };
   });
   return { rows, hasIssues: issues !== null };
 }
 
+// '~' (register matched only by a module catch-all) counts as NOT covered — it is the
+// silent-green case we want the gate to flag, not pass.
 function fails(rows) {
-  return rows.filter((r) => REQUIRED_COLS.some((c) => r[c] === '✗'));
+  return rows.filter((r) => REQUIRED_COLS.some((c) => r[c] === '✗' || r[c] === '~'));
 }
 
 // ---- selftest -----------------------------------------------------------------
 if (has('--selftest')) {
-  const m = registerMatchers.length; // presence
-  const stem = 'MD.CUST.*'.replace(/\.\*+$/, '').replace(/\.\d+(-\d+)?$/, '').replace(/\*/g, '');
-  const ok = stem === 'MD.CUST' && 'MD.CUST.01'.startsWith(stem) && !'MD.TAG.01'.startsWith(stem);
-  console.log(ok ? '✓ [rtm-selftest] wildcard/prefix matching OK' : '✗ [rtm-selftest] FAILED');
+  const kindOf = (e) => {
+    if (/^[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+$/.test(e)) return 'explicit';
+    const stem = e.replace(/\.\*+$/, '').replace(/\.\d+(-\d+)?$/, '').replace(/\*/g, '');
+    return stem.includes('.') ? 'explicit' : 'wildcard';
+  };
+  const ok =
+    kindOf('MD.CUST.01') === 'explicit' &&
+    kindOf('MD.CUST.01-10') === 'explicit' &&
+    kindOf('MD.CUST.*') === 'explicit' &&      // area-level glob = explicit enough
+    kindOf('CL.*') === 'wildcard' &&           // module catch-all = wildcard-only
+    'MD.CUST.01'.startsWith('MD.CUST') && !'MD.TAG.01'.startsWith('MD.CUST');
+  console.log(ok ? '✓ [rtm-selftest] register classify (explicit vs module-catch-all) + prefix OK' : '✗ [rtm-selftest] FAILED');
   process.exit(ok ? 0 : 1);
 }
 
@@ -170,7 +201,8 @@ if (has('--json')) {
 } else {
   const pct = (c) => rows.length ? Math.round(100 * rows.filter((r) => r[c] === '✓').length / rows.length) : 0;
   console.log(`# RTM status — ${rows.length} REQ-ID (nguồn: SRS)\n`);
-  console.log(`register ${pct('register')}%  ·  test ${pct('test')}%  ·  issue ${hasIssues ? pct('issue') + '%' : 'n/a (gh offline)'}  ·  prototype-frozen ${pct('prototype')}%\n`);
+  console.log(`register ${pct('register')}%  ·  test ${pct('test')}%  ·  issue ${hasIssues ? pct('issue') + '%' : 'n/a (gh offline — dùng --issues-file <dump>)'}  ·  prototype-frozen ${pct('prototype')}%`);
+  console.log('_✓=có · ✗=thiếu · ~=chỉ khớp module catch-all (chưa có scope-row riêng cho area) · ?=nguồn offline_\n');
   console.log('| REQ-ID | register | issue | test | prototype | phase |');
   console.log('|---|---|---|---|---|---|');
   for (const r of rows) console.log(`| ${r.id} | ${r.register} | ${r.issue} | ${r.test} | ${r.prototype} | ${r.phase ?? '?'} |`);

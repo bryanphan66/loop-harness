@@ -81,9 +81,30 @@ function moduleOf(section) {
   return (section || '').replace(/^[^A-Za-zÀ-ỹ]*/, '').trim() || '(chưa rõ Module)';
 }
 
+// ---- retired-REQ guard: "appears in SRS" is not enough — a REQ-ID can still be
+// RETIRED (e.g. `REVISED (CR-032): MD.PROD.01/02 are retired`). Anti-fab must refuse
+// scaffolding a killed requirement, else the agent re-mints a dead feature.
+const RETIRE_RE = /\b(retired|deprecated|removed from scope|no longer (in )?scope|withdrawn)\b|khai tử|(đã )?bỏ khỏi scope/i;
+function lineRetires(id, ln) {
+  return new RegExp(id.replace(/[.]/g, '\\.') + '(?!\\d)').test(ln) && RETIRE_RE.test(ln);
+}
+function retirementNote(id) {
+  for (const p of walk(SRS_DIR, (x) => x.endsWith('.md'))) {
+    const text = readSafe(p);
+    if (!text.includes(id)) continue;
+    for (const ln of text.split('\n')) if (lineRetires(id, ln)) return { file: relative(ROOT, p), line: ln.trim().slice(0, 160) };
+  }
+  return null;
+}
+
 if (args.includes('--selftest')) {
-  const ok = typeof srsExcerpt === 'function' && typeof registerRow === 'function';
-  console.log(ok ? '✓ [scaffold-selftest] OK' : '✗ FAILED');
+  const okFns = typeof srsExcerpt === 'function' && typeof registerRow === 'function';
+  const okRetire =
+    lineRetires('MD.PROD.01', '**REVISED 2026-08-20 (CR-032): MD.PROD.01/02 are retired**') &&
+    !lineRetires('MD.PROD.01', 'MD.PROD.01 — SYS shall create a product') &&
+    !lineRetires('MD.PROD.01', 'MD.PROD.011 is retired');   // no false match on .011
+  const ok = okFns && okRetire;
+  console.log(ok ? '✓ [scaffold-selftest] fns + retired-guard OK' : '✗ FAILED');
   process.exit(ok ? 0 : 1);
 }
 
@@ -92,6 +113,8 @@ const checkId = argOf('--check');
 if (checkId) {
   const hits = srsExcerpt(checkId);
   if (!hits.length) { console.error(`✗ [scaffold] REQ-ID '${checkId}' KHÔNG có trong SRS (${relative(ROOT, SRS_DIR)}) — không được tạo issue với mã này (chống bịa)`); process.exit(1); }
+  const ret = retirementNote(checkId);
+  if (ret) { console.error(`✗ [scaffold] REQ-ID '${checkId}' đã RETIRED (${ret.file}: "${ret.line}") — không tạo issue cho mã đã khai tử (chống bịa)`); process.exit(1); }
   console.log(`✓ [scaffold] '${checkId}' có trong SRS: ${hits.map((h) => h.file).join(', ')}`);
   process.exit(0);
 }
@@ -102,6 +125,8 @@ if (!existsSync(SRS_DIR)) { console.error(`✗ không thấy SRS dir ${relative(
 
 const excerpts = srsExcerpt(id);
 if (!excerpts.length) { console.error(`✗ REQ-ID '${id}' KHÔNG có trong SRS — chống bịa, dừng.`); process.exit(1); }
+const retired = retirementNote(id);
+if (retired) { console.error(`✗ REQ-ID '${id}' đã RETIRED (${retired.file}: "${retired.line}") — không scaffold mã đã khai tử.`); process.exit(1); }
 const row = registerRow(id);
 
 const scaffold = {
