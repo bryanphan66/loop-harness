@@ -155,7 +155,7 @@ const stateName = positionals[1];
 const die = (msg) => { console.error(`[loi] ${msg}`); process.exit(1); };
 
 if (!issueNumber || !/^\d+$/.test(issueNumber)) {
-  die('thieu/ sai <issue-number>. Dung: node scripts/issue-state.mjs <issue-number> "<state name>" [--repo owner/name] [--dry-run]');
+  die('thieu/ sai <issue-number>. Dung: node scripts/issue-state.mjs <issue-number> "<state name>" [--repo owner/name] [--dry-run] [--advance] [--force "<ly do>"]');
 }
 if (!stateName) {
   die('thieu "<state name>". Dung: node scripts/issue-state.mjs <issue-number> "<state name>"');

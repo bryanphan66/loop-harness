@@ -32,7 +32,7 @@ Every bug/change = **one GitHub Issue** (source of truth). It moves through 10 s
 | PM | triage Backlog -> Ready for Dev (AC + Module + Priority present). |
 | Control session | dispatch one async coder per issue (own worktree); after code, merge, run `ship-and-verify.sh` (auto-sets Deploying + Ready for Test). **Bracket every dispatch with `run-log.mjs start` / `end`** — that log is the only evidence a harness change helped. |
 | Coder (bg) | **first action: `node scripts/issue-state.mjs <N> "In Dev" --advance`** (binds In Dev to the coder actually starting — no operator memory needed); then code to AC, run the verify gate, attach QC checklist (`qc-checklist.mjs`), open a **draft PR** to the integration branch. |
-| QC (human) | test on staging via the issue's checklist; pass -> Ready for UAT, fail -> keep + file bug. |
+| QC (hybrid) | **agent-QC does the OBJECTIVE half** — assert on staging (API/DB/RBAC 403/email via Mailpit/business-rule/status-code) + **tick DoD-13**, and **flag visual/UX for human** (never fake-tick "looks right"). Control sets `QC Testing` at QC-dispatch (bind state to the action, don't rely on the worker). pass-objective -> Ready for UAT (human does the visual/final check at UAT); AC-fail -> In Dev (golden rule); out-of-AC bug -> sub-issue (Refs parent); teardown test data. **Verify = 2 INDEPENDENT passes, 2nd ADVERSARIAL (prompt to REFUTE)** — a single pass missed ~50% false-PASS in dogfood 260902; only advance when both agree. |
 | Customer | UAT -> Done. |
 
 Set state: `node scripts/issue-state.mjs <N> "<state>"`.
@@ -47,7 +47,8 @@ was still unset / Backlog). State is now **bound to the action that defines it**
 | ... -> **In Dev** | coder starts | first line of the coder dispatch prompt runs `issue-state.mjs <N> "In Dev" --advance` (walks unset/Backlog/Ready-for-Dev -> In Dev in one idempotent call) |
 | In Dev -> **Deploying** | merge + deploy | `ship-and-verify.sh` sets it before polling the deploy |
 | Deploying -> **Ready for Test** | verify-at-source PASS | `ship-and-verify.sh` sets it only after the running artifact carries the shipped commit (fail-closed: no verify, no advance) |
-| Ready for Test -> QC -> UAT -> Done | **human** | left manual on purpose — QC/UAT are human gates; `--advance` refuses to auto-jump past In Dev |
+| Ready for Test -> **QC Testing** | QC starts | control sets it at QC-dispatch (agent-QC hybrid or human) — bind state to action |
+| QC Testing -> **Ready for UAT** | objective QC pass | agent-QC advances after 2-pass adversarial verify + DoD tick; **UAT + Done stay human** (visual/final on staging). `--advance` still refuses to auto-jump past In Dev |
 
 Issues entering via Plane-sync / manual `gh` land at `(chua co)` (unset); `--advance`
 handles that start. Issues created via `new-issue.mjs` start at `Backlog` automatically.

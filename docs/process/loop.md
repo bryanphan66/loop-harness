@@ -22,7 +22,7 @@
 Backlog → Ready for Dev → In Dev → Deploying → Ready for Test
         → QC Testing → Ready for UAT → UAT Testing → Done        (+ Cancelled)
 ```
-`issue-state.mjs` **ÉP** cạnh chuyển (nhảy cóc Backlog→Done bị chặn; `--force "<lý do>"` chỉ cho người). QC = human (Trung), loop DỪNG ở Ready for Test.
+`issue-state.mjs` **ÉP** cạnh chuyển (nhảy cóc Backlog→Done bị chặn; `--force "<lý do>"` chỉ cho người; **`--advance` tự đi các bước hợp lệ tới đích, tối đa In Dev**). QC = **hybrid**: agent-QC lo phần KHÁCH QUAN (assert API/DB/RBAC + tick DoD) + **flag thị giác cho human**, đẩy tới Ready for UAT; **UAT + Done vẫn HUMAN** (thị giác/cuối). **Verify PHẢI 2 lượt, lượt 2 ADVERSARIAL (REFUTE)** — 1 lượt sót ~50% false-PASS (dogfood 260902). Control set state TẠI dispatch/QC-dispatch (bind vào hành động, đừng để worker tự nhớ).
 
 ## Luật đã đổ máu (mỗi cái từng gây bug thật)
 
