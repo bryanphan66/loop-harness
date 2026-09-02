@@ -2,6 +2,18 @@
 
 Cây thư mục THẬT + vai trò từng phần, để biết **sửa/đọc file nào cho việc gì** và **cái gì được cài vào dự án vs cái gì chỉ để phát triển harness**. Tra khái niệm → [`KEYWORD-MAP.md`](./KEYWORD-MAP.md); hiểu tổng thể → [`UNDERSTANDING-loop-harness.md`](./UNDERSTANDING-loop-harness.md).
 
+## Kiến thức Hasi + elearning nằm đâu (tra nhanh)
+
+Không gom vào 1 doc (dễ lỗi thời); mỗi loại ở kho riêng:
+
+| Cần gì | Mở kho |
+|---|---|
+| Cách LÀM 1 việc (recipe) | `docs/playbooks/` |
+| Bài học "đổ máu" khi dựng harness | `plans/lessons-log.md` |
+| Gotcha vận hành (loop / deploy / QC / dispatch) | auto-memory `MEMORY.md` |
+| Deliverable từng mốc (nghiệm thu, audit, benchmark) | `plans/reports/` |
+| Cách Trung muốn làm việc (style, review, deploy, coach) | `~/.claude/rules/` |
+
 ## Cây repo (PHẲNG — root LÀ sản phẩm, từ 2026-09-01)
 
 Trước đây sản phẩm nằm lồng trong `harness/`; đã **làm phẳng** ra root (bỏ 1 lớp `harness/harness` thừa + dedup `plans/`). Giờ **repo root CHÍNH LÀ harness**; ranh giới sản-phẩm-vs-xưởng không còn theo thư mục mà theo **`SKELETON_PATHS` trong `scripts/install-harness.sh`** (danh sách cái gì được bê đi cài).
