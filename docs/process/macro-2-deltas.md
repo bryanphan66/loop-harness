@@ -51,6 +51,8 @@ thứ vốn là lỗi SRS.
 
 | MD-11 | autocontent, trước 2.1 | so danh sách bước WORKFLOW.md với macro-2.md | `/stage-next` lấy thứ tự bước từ `WORKFLOW.md` của dự án, mà file đó chưa biết refactor gộp bước 2026-09-01. Bước 2.0 không bao giờ chạy; 2.5/2.7/2.11 chạy vào chỗ trống | đồng bộ khối Macro 2 trong WORKFLOW.md | **đã sửa** |
 
+| MD-12 | autocontent, đo chỉ số gốc trước khi chạy | `rtm-status` báo register 0% trong khi dự án có feature-register | lệch **một ký tự** tên file: script đọc `feature-register.source.json`, dự án có `feature-register-source.json`. Chỉ số gốc sai 60 điểm phần trăm | script nhận cả hai cách đặt tên | **đã sửa** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -585,3 +587,38 @@ có `.tsx` nào) và chưa khai `uiRegions` trong `gate-config.json`.
 `gate-config.json` thêm khối `uiRegions` với `public` / `portal` / `libraryDir` /
 `registryFile` / `allowlist`, mặc định trỏ đúng cây `apps/web/src/app/(public)`,
 `(app)`, `(admin)`.
+
+## MD-12 - chỉ số gốc sai 60 điểm phần trăm vì lệch một ký tự tên file
+
+**Lòi ra thế nào.** Đo 4 chỉ số gốc trước khi chạy Macro 2. `rtm-status` báo:
+
+```
+629 REQ-ID · register 0% · test 0% · issue 0% · prototype-frozen 0%
+```
+
+`register 0%` vô lý: autocontent đã đóng băng feature-register từ PB-G2. Đi tìm.
+
+**Nguyên nhân.** Script đọc `docs/scope-baseline/feature-register.source.json`
+(dấu **chấm**), dự án có `docs/scope-baseline/feature-register-source.json` (dấu
+**gạch ngang**). Lệch đúng một ký tự.
+
+**Số thật sau khi trỏ đúng:**
+
+```
+629 REQ-ID · register 60% · test 0% · issue 0% · prototype-frozen 56%
+```
+
+**Vì sao đây là chuyện lớn.** Nếu chạy Macro 2 mà không đo trước, mốc gốc ghi lại
+sẽ là **0%**. Cuối lượt đo lại được 60% thì **60 điểm phần trăm đó là giả** - nó
+vốn đã có từ Macro 1, không phải do Macro 2 làm ra. Cả phép đo "60% -> 99%" mà lượt
+chạy này sinh ra để chứng minh sẽ sai ngay từ số đầu tiên.
+
+Đây chính là lý do phải đo mốc gốc **trước** khi chạy, chứ không đo sau rồi suy ngược.
+
+**Đã sửa.** `rtm-status.mjs` nhận cả hai cách đặt tên (thử `.source.json` trước, rồi
+`-source.json`), vẫn ưu tiên `cfg.registerJson` nếu dự án khai. Không đổi tên artifact
+của Macro 1 - đó là vùng đã đóng băng, và đổi tên file là việc rủi ro hơn nhận hai tên.
+
+**Chưa rõ, để lại:** `prototype-frozen 56%` nghĩa là 44% REQ-ID chưa map được sang
+phase đã freeze. Có thể đúng (Phase 1 không phủ hết scope) hoặc lại là một lệch map
+nữa. Chưa đủ dữ kiện để kết luận; ghi lại để 2.3 khi dựng build-manifest thì đối chiếu.
