@@ -8,7 +8,8 @@
 ## Cách dùng
 
 **Ghim version trước khi chạy.** Đặt tag git `macro-2-v0.1` lúc bắt đầu một lượt chạy
-thật. Không ghim thì cuối lượt không ai biết kết quả do bản nào tạo ra, và con số của
+thật. **Đã ghim 2026-09-05** tại `4c473ac`, trước lượt chạy đầu trên autocontent -
+`git show macro-2-v0.1` liệt kê đúng những gì bản này gồm và những gì chưa từng chạy thử. Không ghim thì cuối lượt không ai biết kết quả do bản nào tạo ra, và con số của
 lượt trước thành không so sánh được.
 
 **Ghi ngay, sửa sau.** Thấy vướng thì thêm một dòng vào bảng dưới, mất 1 phút, không
