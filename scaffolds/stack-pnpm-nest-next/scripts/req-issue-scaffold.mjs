@@ -23,12 +23,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gateRoot, loadGateConfig, walk, readSafe } from './gate-lib.mjs';
+import { gateRoot, loadGateConfig, walk, readSafe, resolveRegisterJson } from './gate-lib.mjs';
 
 const ROOT = gateRoot(dirname(fileURLToPath(import.meta.url)));
 const cfg = loadGateConfig(ROOT).rtm ?? {};
 const SRS_DIR = resolve(ROOT, cfg.srsDir ?? 'docs/requirements/srs');
-const REGISTER = resolve(ROOT, cfg.registerJson ?? 'docs/scope-baseline/feature-register.source.json');
+const REGISTER = resolveRegisterJson(ROOT, cfg);
 const REQ_ID_G = /\b[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\b/g;
 
 const args = process.argv.slice(2);

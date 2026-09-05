@@ -34,24 +34,13 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { gateRoot, loadGateConfig, walk, readSafe } from './gate-lib.mjs';
+import { gateRoot, loadGateConfig, walk, readSafe, resolveRegisterJson } from './gate-lib.mjs';
 
 const ROOT = gateRoot(dirname(fileURLToPath(import.meta.url)));
 const cfg = loadGateConfig(ROOT).rtm ?? {};
 const SRS_DIR = resolve(ROOT, cfg.srsDir ?? 'docs/requirements/srs');
-// Hai cách đặt tên cùng tồn tại ngoài thực tế: `feature-register.source.json` và
-// `feature-register-source.json`. Lệch một ký tự, và hậu quả không hề nhỏ - trên
-// autocontent nó khiến register đọc ra 0% trong khi thật là 60%, prototype-frozen
-// 0% trong khi thật là 56%. Một chỉ số gốc sai 60 điểm phần trăm thì mọi so sánh
-// sau đó đều vô nghĩa. Nhận cả hai (macro-2-deltas.md MD-12).
-const REGISTER = (() => {
-  if (cfg.registerJson) return resolve(ROOT, cfg.registerJson);
-  for (const name of ['feature-register.source.json', 'feature-register-source.json']) {
-    const p = resolve(ROOT, 'docs/scope-baseline', name);
-    if (existsSync(p)) return p;
-  }
-  return resolve(ROOT, 'docs/scope-baseline/feature-register.source.json');
-})();
+// Nhận cả hai cách đặt tên register - xem resolveRegisterJson trong gate-lib.mjs.
+const REGISTER = resolveRegisterJson(ROOT, cfg);
 const TEST_DIRS = (cfg.testDirs ?? ['apps', 'packages']).map((d) => resolve(ROOT, d));
 const REQUIRED_COLS = cfg.requiredCols ?? ['register', 'test'];
 const FROZEN_PHASES = new Set(cfg.frozenPhases ?? ['Phase 1']);
