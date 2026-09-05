@@ -902,3 +902,39 @@ MD-08 nhưng chỉ cắm vào hai trong ba file. Đã bù dòng 2.0 vào `WORKFL
 **Luật rút ra:** thêm một script dự án phải chạy -> thêm vào `SKELETON_PATHS` **cùng
 commit**. Gộp/xoá/thêm một bước -> soát **cả ba** file (`macro-2.md`, `STAGE_GOALS.md`,
 `WORKFLOW.md`) và `grep "Current = "`, không chỉ soát một bảng.
+
+## MD-21 - kiến thức về cách bung việc kẹt ở file vai trò, dự án không thấy
+
+Operator hỏi: subagent, phiên nền, `claude -p` headless - ctl có sẵn rồi, sao không
+research cho harness để khỏi vướng. Đi soi thì đúng: kiến thức **có**, nhưng nằm sai chỗ.
+
+```
+loop-harness/CLAUDE.md            có mục "Dispatch - cú pháp ĐÚNG (đã test)"
+loop-harness/docs/about/*.md      6 file nhắc --bg / bypassPermissions, dạng chẩn đoán
+autocontent/docs/about/           KHÔNG TỒN TẠI
+```
+
+`CLAUDE.md` là **file vai trò của ghế điều phối**, không phải tài liệu quy trình -
+`install-harness.sh` không mang nó xuống dự án. `docs/about/` thì autocontent không có
+vì nó cài từ nhánh harness khác (`.harness-provenance`: `/home/nghia/vibecode-harness`).
+Kết quả: chạy Macro 2 trong autocontent là chạy **không có** kiến thức đó, và mỗi lần
+đụng tới lại phải suy ra từ đầu - đúng lượt này tôi đã lo nhầm rằng 2.6 cần
+`settings.local.json`.
+
+**Kiểm chứng lại trên CLI 2.1.261 chứ không tin trí nhớ:**
+
+| khẳng định cũ | kiểm | kết quả |
+|---|---|---|
+| `-p` xung đột `--bg` | chạy thật `claude -p --bg "…"` | **ĐÚNG** - CLI chặn: *"--print never starts the interactive session that `claude agents` attaches to, so the job would be unattachable"* |
+| 2.6 cần `bypassPermissions` | đọc `.claude/commands/build-phase.md` | **SAI** - nó bung **subagent trong phiên** (`subagent_type: stage-runner`), không cần quyền gì thêm |
+| chỉ có `bypassPermissions` cho worker nền | `claude --help` | **SAI** - có `--allowed-tools` / `--disallowed-tools`, tức là cấp đúng thứ cần. Đây chính là lỗ hổng `HARNESS_CHANGELOG.md` tự thừa nhận còn mở |
+| cách ly song song phải tự dựng | `claude --help` | **SAI** - có `-w/--worktree` và `--tmux` sẵn |
+
+Viết thành `docs/playbooks/dispatch-modes.md` (102 dòng): 4 chế độ + bảng chọn nhanh +
+bảng triệu chứng -> nguyên nhân. Cắm vào cột Playbook của **2.6** trong `macro-2.md`
+(không thì thành playbook mồ côi, đúng thứ luật chống phình cấm) và thêm mục ngắn ở
+`macro-2.md`. `CLAUDE.md` giữ lại phần vận hành ghế điều phối, trỏ sang playbook.
+
+**Luật rút ra:** kiến thức nào dự án cần lúc chạy thì phải nằm trong `docs/` mà
+`install-harness.sh` mang xuống. Để trong `CLAUDE.md` là để cho **ghế điều phối** đọc,
+không phải cho dự án - hai chỗ khác nhau, đừng nhầm.
