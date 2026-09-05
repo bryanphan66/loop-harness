@@ -59,6 +59,8 @@ thứ vốn là lỗi SRS.
 
 | MD-15 | so scaffold với elearning trước khi chạy | đối chiếu cây thư mục hai bên | scaffold có 3 Dockerfile nhưng **không có `.dockerignore`**; thiếu 4 script mà elearning đã dùng thật | thêm `.dockerignore` ngay; 4 script chờ đúng bước | **đã sửa một phần** |
 
+| MD-16 | operator soát sau MD-15 | *"đã bảo dựa vào elearning để học hỏi thì đương nhiên chọn Kamal"* + `STAGE_GOALS` vẫn còn Macro 1/3 | tôi cắt Macro 1/3 khỏi `WORKFLOW.md` và `macro-2.md` nhưng **quên `STAGE_GOALS.md`** - để lại đúng bẫy MD-10/MD-11; và bỏ Kamal vì cho là "elearning tự chọn" trong khi nó là chuẩn đã qua thử lửa | cắt STAGE_GOALS còn Macro 2 + mang chuẩn Kamal vào scaffold | **đã sửa** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -750,3 +752,36 @@ chưa ai gọi tới** - đúng cái luật bất biến vừa dựng để cấ
 **Không mang sang:** `dev.sh` + `docker-compose.dev.yml` (tiện dụng khi chạy nhiều dự án
 một máy, không phải gate), `.kamal` (elearning chọn Kamal; scaffold để 2.4 tự quyết nơi
 triển khai), `config/`, `demo/` (nghiệp vụ riêng elearning).
+
+## MD-16 - hai chỗ tôi làm chưa tới, operator bắt được
+
+**1. `STAGE_GOALS.md` vẫn còn cả ba macro.**
+
+Cắt Macro 1/3 khỏi `macro-1.md`, `macro-3.md`, `WORKFLOW.md` (MD-10) nhưng quên
+`STAGE_GOALS.md`. Kết quả: `WORKFLOW.md` còn 1 macro, `STAGE_GOALS.md` còn 3 -
+**đúng cái bẫy MD-10 và MD-11 vừa dựng luật để cấm**, do chính tôi để lại.
+
+Đã cắt: **922 -> 468 dòng**, còn 15 block Step 2.x, 0 block Macro 1/3.
+
+**2. Bỏ Kamal là sai.**
+
+MD-15 tôi ghi *"`.kamal` - elearning chọn Kamal; scaffold để 2.4 tự quyết nơi triển
+khai"*. Operator bác: đã lấy elearning làm chuẩn để học thì Kamal chính là cái phải
+học - nó **đã chạy live staging thật**, không phải lựa chọn trên giấy.
+
+Đã mang vào scaffold:
+- `config/deploy.yml` (87 dòng) - cắt từ elearning, thay giá trị riêng bằng
+  `__PROJECT_SLUG__` và `TODO`. Giữ nguyên phần đáng giá: proxy SSL + healthcheck,
+  registry cache `mode=max`, `env.clear.COMMIT_SHA` nhúng commit (2.13 đọc lại để
+  kiểm at-source), accessories postgres + redis khớp `docker-compose.yml` của scaffold.
+- `.kamal/secrets-common` (18 dòng) - kèm nguyên bài học: với `-d <destination>` Kamal
+  đọc `secrets-common` và **bỏ qua** `.kamal/secrets` phẳng; đặt nhầm ra
+  *"Secret 'KAMAL_REGISTRY_PASSWORD' not found"*. elearning mất một vòng để tìm ra.
+- `macro-2.md` thêm mục "Triển khai: Kamal", cột Mẫu tài liệu của 2.4 thêm
+  `config/deploy.yml`.
+
+**Vẫn không mang workflow deploy** (611 dòng): nó phụ thuộc destination, registry và
+quy ước tag của từng dự án. Ghi rõ trong `macro-2.md` là chép từ
+`elearning-platform/.github/workflows/deploy.yml` ở 2.4, đừng dựng lại từ đầu. Đây
+không phải né việc - đây là ranh giới giữa **chuẩn** (mô tả deploy thế nào, mang vào)
+và **pipeline cụ thể** (deploy đi đâu, để dự án quyết ở 2.4).
