@@ -57,6 +57,8 @@ thứ vốn là lỗi SRS.
 
 | MD-14 | autocontent, ngay trước khi chạy | soát `STAGE_GOALS.md` sau khi đồng bộ WORKFLOW | **nguồn sự thật thứ ba** cũng lệch: chỉ 2/12 bước có goal text (2.12, 2.13), còn lại là một dòng kết bằng `*[next increment]*`; vẫn theo danh sách bước CŨ (có 2.5/2.7/2.11, không có 2.0) | viết goal text cho các bước sắp chạy | **mở** |
 
+| MD-15 | so scaffold với elearning trước khi chạy | đối chiếu cây thư mục hai bên | scaffold có 3 Dockerfile nhưng **không có `.dockerignore`**; thiếu 4 script mà elearning đã dùng thật | thêm `.dockerignore` ngay; 4 script chờ đúng bước | **đã sửa một phần** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -712,3 +714,39 @@ nghiệm; viết goal cho bước chưa chạy là đoán, và đoán xong thì 
 là chắp vá. Viết tới đâu chạy tới đó.
 
 **Chưa sửa** - cần phán đoán nghiệp vụ, không tự quyết.
+
+## MD-15 - scaffold thiếu vài thứ elearning đã có và đã dùng thật
+
+Operator hỏi: cấu trúc sườn scaffold có nên tham khảo elearning không, vì bên đó khởi
+tạo khá ổn. Đối chiếu cây thư mục hai bên.
+
+**Phần lớn "elearning có mà scaffold không" là đồ của harness, không phải của scaffold:**
+`.claude`, `.githooks`, `AGENTS.md`, `CLAUDE.md`, `docs/`, `plans/`, `STAGE.md` -
+`install-harness.sh` mang xuống. `harness-verify-gate.sh`, `install-harness.sh`,
+`new-issue.mjs`, `issue-state.mjs`, `qc-checklist.mjs`, `push-retry.sh`,
+`ship-and-verify.sh` - đến từ skeleton + bộ steady-state (MD-06). Không phải lỗ.
+
+**Lỗ thật, đã sửa ngay:**
+
+`.dockerignore` **không có** trong scaffold, trong khi scaffold có đủ **3 Dockerfile**
+(`apps/web`, `apps/api`, `apps/worker`) - y hệt elearning. Thiếu nó thì mỗi lần đóng gói
+image gửi cả `node_modules`, `.next`, `.git` sang daemon: chậm và phình image. Đã thêm,
+lấy từ elearning (dự án đang live staging) và mở rộng thêm `dist`, `.turbo`, `coverage`,
+`playwright-report`, `test-results`, giữ `.env.example`.
+
+**Lỗ thật, chờ đúng bước - cố ý không thêm bây giờ:**
+
+| Script | elearning dùng ở | Chờ tới |
+|---|---|---|
+| `restore-drill.sh` | diễn tập khôi phục | **2.13** - gate nhắc DR + RTO/RPO, runbook `backup-restore-drill.md` đã có nhưng không có script |
+| `gen-user-guide-index.mjs` | mục lục HDSD | **2.8** - bước sinh user manual |
+| `compute-beta-version.mjs` + `test-compute-version.mjs` | đánh version bản beta | **2.13** - release |
+| `fetch-prototype-media.sh` | kéo media từ prototype | **2.6** - fidelity |
+
+Lý do chờ: bốn cái này gắn với một bước cụ thể. Thêm bây giờ là **nhét vào scaffold thứ
+chưa ai gọi tới** - đúng cái luật bất biến vừa dựng để cấm, và đúng cách 24 file mồ côi
+đã tích tụ. Khi chạy tới bước đó mà thấy cần thì mang sang, kèm một dòng delta.
+
+**Không mang sang:** `dev.sh` + `docker-compose.dev.yml` (tiện dụng khi chạy nhiều dự án
+một máy, không phải gate), `.kamal` (elearning chọn Kamal; scaffold để 2.4 tự quyết nơi
+triển khai), `config/`, `demo/` (nghiệp vụ riêng elearning).
