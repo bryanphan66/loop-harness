@@ -1558,3 +1558,48 @@ Và một luật nữa cho gate: **cổng đọc dữ liệu ngoài phải phân
 trống" với "đọc không ra"**. Ở đây hai ca đó gộp làm một nên cái sai của tôi không lộ - gate
 chỉ nói "chưa đặt" cho cả hai. Đã tách thành `apiFail` và `unset` riêng, và chính việc tách
 đó làm lỗi lộ ra khi operator hỏi lại.
+
+---
+
+## MD-44 - pipeline 10 nấc, goal-text chỉ đẩy tới nấc thứ ba
+
+Operator hỏi: worker chạy issue có đổi trạng thái không, ví dụ `Backlog -> Ready for Dev ->
+In Dev -> Ready for Test`. Đi đo, và câu hỏi lộ ra một lỗ hổng lớn hơn chính nó.
+
+Trường `States` của tổ chức có **10 nấc**:
+
+```
+Backlog · Ready for Dev · In Dev · Ready for Test · QC Testing
+Ready for UAT · UAT Testing · Deploying · Done · Cancelled
+```
+
+**Goal-text của tôi nhắc đúng hai:** `In Dev` và `Done`. Và **không bước nào sau 2.6 nhắc
+tới trạng thái issue** - grep 2.8, 2.9, 2.10, 2.12, 2.13 đều ra 0.
+
+Nghĩa là pipeline dừng ở `In Dev` rồi đứng yên tới hết dự án. Bảy nấc giữa - đúng những nấc
+ghi lại **ai đã kiểm cái gì** - không ai chạm tới.
+
+### Điều làm phát hiện này đáng giá hơn một bản vá
+
+Mười nấc đó **chính là Macro 2 nhìn từ phía một REQ-ID**: `Ready for Test` là lúc 2.6 đóng
+phase, `QC Testing` là 2.10, `UAT Testing` là 2.12, `Deploying` là 2.13. Hai thứ tôi vẫn coi
+là riêng biệt - "quy trình bước" và "pipeline issue" - hoá ra là **một thứ, viết hai lần ở
+hai chỗ**. Nối chúng lại thì `issue%` không còn là một chỉ số phụ mà là bản đồ tiến độ theo
+từng yêu cầu, và Macro 3 nhận bàn giao đúng thứ nó cần.
+
+### Đã vá
+
+- `ISSUE_STATES` (mảng có thứ tự) vào `gate-lib`, kèm `Cancelled` là lối ra ngoài thứ tự.
+- `check-issue-coverage.mjs --expect "<nấc>"`: mọi issue trong phạm vi phải tới nấc đó
+  hoặc xa hơn. Thử ba chiều: đòi nấc xa -> ĐỎ đúng 4 issue đang `Backlog`; đòi nấc gần ->
+  XANH; đòi nấc không tồn tại -> báo lỗi kèm danh sách hợp lệ.
+- Goal-text: 2.6 thêm `Ready for Test` (cấm nhảy thẳng `Done`), 2.10 thêm `QC Testing` ->
+  `Ready for UAT`, 2.12 thêm `UAT Testing`, 2.13 thêm `Deploying` -> `Done` và bắt
+  `--expect "Done"` xanh **trước khi** flip sang Mode B.
+
+### Một rủi ro ghi lại, chưa vá
+
+Script harness sao xuống dự án bị prettier của dự án format lại, nên so byte **luôn lệch** -
+9/11 script hiện lệch định dạng dù hành vi khớp (đã kiểm bằng cách chạy cả hai bản trên cùng
+dữ liệu, đầu ra giống hệt). Drift thật sẽ lẫn vào nhiễu này. Cách vá: cho script harness vào
+`.prettierignore` của dự án. **Chưa làm** - ghi để không quên.
