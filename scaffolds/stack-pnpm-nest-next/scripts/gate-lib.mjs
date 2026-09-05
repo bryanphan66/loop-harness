@@ -136,7 +136,12 @@ export function reqIdsByPhase(root, manifestPath) {
   const absorb = (t, p) => {
     if (!p || !t) return;
     for (const id of t.match(RE) ?? []) add(id, p);
-    const own = t.split(/\b(?:dedup|minus|cross-referenc|already homed|see also|see )/i)[0];
+    // Cắt trước mọi mệnh đề nói NGƯỢC lại quyền sở hữu. Tách P1.4 khỏi P1.1 bằng
+    // câu "IF.JOBS.05 đã chuyển sang P1.4" từng làm P1.1 báo 5/5 thay vì 4/4 -
+    // chỉ NHẮC một mã trong lời giải thích mà thành nhận nó.
+    const own = t.split(
+      /\b(?:dedup|minus|cross-referenc|already homed|see also|see |chuyển sang|đã sang|moved to|now in|thuộc P\d)/i,
+    )[0];
     for (const m of own.matchAll(/\bin\s+`([^`]*\/)?([a-z0-9-]+\.md)`/g)) {
       const file = `${m[1] ?? ''}${m[2]}`;
       const abs = resolve(root, file.includes('/') ? file : `docs/requirements/srs/${file}`);
@@ -163,7 +168,10 @@ export function reqIdsByPhase(root, manifestPath) {
       continue;
     }
     if (inBlock) {
-      if (/^\s*-\s\*\*/.test(line) || /^#{2,4}\s/.test(line)) inBlock = null;
+      // Khối kết thúc ở: bullet in đậm kế tiếp, tiêu đề, hoặc DÒNG TRỐNG. Dòng
+      // trống là ranh giới rẻ và ổn định - nhãn trải nhiều dòng không có dòng
+      // trống bên trong, còn văn giải thích thì luôn nằm sau một dòng trống.
+      if (/^\s*-\s\*\*/.test(line) || /^#{2,4}\s/.test(line) || !line.trim()) inBlock = null;
       else { text += `\n${line}`; continue; }
     }
     if (!inBlock && text) { absorb(text, blockPhase); text = ''; }

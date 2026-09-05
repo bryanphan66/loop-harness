@@ -1320,3 +1320,39 @@ kế tiếp - không cần thấy dấu đóng. Kiểm: `P20` từ **0 -> 17 REQ
 mẫu dài**. Nhận diện bằng thứ ngắn và ổn định (đầu dòng, đầu khối), rồi mới gom nội dung.
 Mẫu càng dài càng nhiều cách viết làm nó trượt, và mỗi lần trượt là một phase biến mất
 không kèn không trống.
+
+---
+
+## MD-39 - khối khai REQ-ID nuốt cả lời giải thích, nhắc một mã thành nhận nó
+
+Tách P1.4 ra khỏi P1.1, agent viết trong khối P1.1 câu *"`IF.JOBS.05` đã chuyển sang
+P1.4"*. Cổng đọc xong báo **P1.1 có 5 REQ-ID thay vì 4** - chỉ **nhắc** một mã trong lời
+giải thích mà thành nhận sở hữu nó.
+
+Nguyên nhân: khối khai chỉ dừng ở bullet in đậm kế tiếp hoặc tiêu đề, nên mọi dòng văn
+viết dưới nhãn đều bị gom vào rồi quét token.
+
+Agent lách bằng cách viết *"ba id vòng đời job nay ở P1.4"* - không dùng mã đầy đủ. Lách
+được, nhưng người viết sau sẽ lặp lại, vì **không ai đoán được rằng viết tên một mã trong
+câu giải thích lại làm phase nhận nó**.
+
+Đã sửa hai lớp:
+
+1. **Khối dừng ở DÒNG TRỐNG** (ngoài bullet kế tiếp và tiêu đề). Dòng trống là ranh giới
+   rẻ và ổn định: nhãn trải nhiều dòng không có dòng trống bên trong (xem MD-38), còn văn
+   giải thích thì luôn nằm sau một dòng trống.
+2. **Cắt trước mệnh đề nói ngược quyền sở hữu**: thêm `chuyển sang|đã sang|moved to|now
+   in|thuộc P\d` vào danh sách đã có (`dedup|minus|cross-referenc|already homed|see`).
+
+Kiểm trên manifest giả có đủ ba cái bẫy (câu "đã chuyển sang", đoạn văn tự do nhắc mã,
+phase con): `P1.1 -> 2 mã của nó`, `P1.4 -> 2 mã của nó`, `P1 -> gộp đủ 4`. Không rò.
+
+**Đây là dòng `gate-sai` thứ sáu, và cả sáu cùng một gốc:** cổng đọc **tài liệu người
+viết** bằng cách khớp mẫu. Người viết có nhiều cách diễn đạt cùng một ý, còn mẫu thì chỉ
+biết một. Ba lần trượt đã gặp - có chữ chen giữa (MD-35), xuống dòng (MD-38), và nhắc mã
+trong lời giải thích (MD-39).
+
+**Luật đúc kết:** khi cổng phải đọc văn người viết, hãy (a) nhận diện bằng thứ ngắn và ổn
+định, (b) **khoanh vùng rõ ràng đâu là khai, đâu là giải thích**, (c) cắt trước mọi mệnh đề
+phủ định. Và luôn tự hỏi: *người viết tiếp theo có đoán được luật này không?* Nếu không thì
+luật sai, không phải người viết sai.
