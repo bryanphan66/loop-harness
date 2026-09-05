@@ -55,6 +55,8 @@ thứ vốn là lỗi SRS.
 
 | MD-13 | autocontent, kiểm cơ chế cưỡng chế | so hook `.claude` với git hook | `.githooks/pre-commit` gọi `harness-verify-gate.sh`, nhưng `core.hooksPath` nằm trong `.git/config` - **không đi theo repo**. Clone mới là gate tắt câm, không gì báo | không sửa sạch được; ghi lại + kiểm ở 2.0 | **mở, không sửa được sạch** |
 
+| MD-14 | autocontent, ngay trước khi chạy | soát `STAGE_GOALS.md` sau khi đồng bộ WORKFLOW | **nguồn sự thật thứ ba** cũng lệch: chỉ 2/12 bước có goal text (2.12, 2.13), còn lại là một dòng kết bằng `*[next increment]*`; vẫn theo danh sách bước CŨ (có 2.5/2.7/2.11, không có 2.0) | viết goal text cho các bước sắp chạy | **mở** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -679,3 +681,34 @@ Kết quả gate: **33 -> 2 tham chiếu treo, 0 file mồ côi.** Hai cái còn
 không có là đúng.
 
 **Cấm thêm cột.** Nâng cấp phải rơi vào 1 trong 4 ô, hoặc thành delta chờ.
+
+## MD-14 - `STAGE_GOALS.md` là nguồn sự thật thứ ba, cũng lệch
+
+MD-11 sửa lệch giữa `WORKFLOW.md` và `macro-2.md`. Soát tiếp thì `STAGE_GOALS.md`
+cũng lệch, theo đúng kiểu đó.
+
+```
+block "### Step 2.x" đầy đủ:  2  (chỉ 2.12 và 2.13)
+2.1 -> 2.11:                  một dòng, kết bằng *[next increment]*
+danh sách bước:               CŨ - còn 2.5 / 2.7 / 2.11, KHÔNG có 2.0
+```
+
+Chính file đó tự khai: *"The full `/goal` text for 2.1-2.11 is built in the next
+macro-stage increment"*.
+
+**Vì sao quan trọng.** `/stage-next` ghi: *"Prefer the `## Step <id>` block in
+`docs/STAGE_GOALS.md` if it exists. Otherwise extract the step's row intent from
+`docs/WORKFLOW.md`"*. Với 2.0 đến 2.10 thì không có block, nên nó rơi xuống đọc **một
+ô bảng**. Agent nhận một dòng thay vì một mục tiêu.
+
+Đây là lần thứ ba cùng một hình dạng: MD-10 (PB-G3/G4), MD-11 (danh sách bước),
+MD-14 (goal text). **Ba file cùng mô tả một quy trình thì sẽ lệch** - luật 4 ô và gate
+hai chiều chặn được chiều "gọi tên thứ không có", nhưng không chặn được chiều "ba file
+cùng nói một chuyện".
+
+**Đề nghị, chống phình:** viết goal text cho **2.0, 2.1, 2.2, 2.3** thôi - đúng những
+bước sắp chạy. Không viết 2.4-2.10 trước. Lý do: lượt chạy này sinh ra để rút kinh
+nghiệm; viết goal cho bước chưa chạy là đoán, và đoán xong thì phải sửa lại, đó chính
+là chắp vá. Viết tới đâu chạy tới đó.
+
+**Chưa sửa** - cần phán đoán nghiệp vụ, không tự quyết.
