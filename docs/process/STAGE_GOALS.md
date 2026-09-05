@@ -55,6 +55,21 @@ condition cannot loop forever.
 > Same goals in both lanes. In the Lite lane, `docs/ROADMAP.md` is born at 2.3
 > (with the plan) instead of 1.15.
 
+## Ngân sách lượt - đọc trước khi tin con số "Stop after N turns"
+
+Các mốc `Stop after N turns` dưới đây đặt cho dự án cỡ **~100-150 REQ-ID**. Đo trên một
+dự án **401 REQ-ID** thì bước 2.3 quy định 15 lượt (+3 lượt viết script) và **thực tế vượt**
+- phần lớn lượt dùng để đọc dò 21 file SRS trước khi viết được dòng đầu tiên.
+
+**Quy tắc nhân:** trên **200 REQ-ID** thì nhân ngân sách của các bước đọc-nhiều
+(**2.1, 2.2, 2.3**) lên **×1.5**, trên **400** thì **×2**. Các bước còn lại giữ nguyên -
+chúng đọc artifact đã cô đọng, không đọc SRS thô.
+
+**Vượt ngân sách không phải lỗi, GIẤU mới là lỗi.** Vượt thì ghi một dòng
+`docs/macro2-friction-log.md` loại `thieu-cong-cu` kèm số lượt thật, để lần sau hiệu chỉnh
+bằng số chứ không bằng cảm giác. Tuyệt đối **không cắt bớt việc** cho vừa ngân sách - hạ
+mức kiểm thì phải ghi rõ đã hạ (xem 2.1, 2.2).
+
 ### Step 2.0 — Kiểm sẵn sàng trước khi xây
 
 - **Inputs:** tier-2 design tokens của dự án · thư viện UI đã chọn (`registry.json` của nó) · Component Coverage Matrix trong `design-guidelines.md` · `WORKFLOW.md` + `macro-2.md` của dự án.
@@ -130,6 +145,16 @@ Goal:
 equivalent) covering every entity the SRS(-lite) and screen inventory imply:
 entities with fields + types, relations with cardinality, normalization
 reviewed, **audit fields** (created/updated timestamps + actor) and
+**Đo phủ REQ-ID -> thực thể, chế độ báo cáo.** Chạy
+`node scripts/check-reqid-artifact-coverage.mjs --artifact entity --advisory` và **ghi con
+số vào ghi chép của bước**. Nó KHÔNG chặn: đo lần đầu trên một dự án thật ra 22% ở mức
+area, vì ERD chưa từng ghi trích dẫn REQ-ID. Bắt đủ 100% ngay tại đây là bắt viết ~130
+dòng trích dẫn trong một bước 15 lượt - cổng sẽ đỏ mãi rồi bị bỏ qua. Nợ này **trả dần
+theo phase ở 2.6**, nơi cùng script chạy ở chế độ chặn với `--phase P<n>`.
+
+Nói thẳng trong ADR con số đo được, đừng viết "đã đối chiếu đầy đủ" khi mới đối chiếu ở
+mức module.
+
 **tenant/organization scoping** decided per entity (single-tenant is a valid
 recorded decision), soft-delete policy, and status enums matching each
 status-flow diagram. Every in-scope REQ-ID maps to ≥1 entity or carries an
@@ -185,6 +210,10 @@ email-blast), the stack decision **surfaces the opt-in tier-2 primitives** — R
 queue (`apps/api/src/common/queue/`), object-storage adapter
 (`apps/api/src/common/storage/`), worker app (`apps/worker/`) — and names the
 matching playbook per capability; a CRUD-only project leaves tier-2 off (YAGNI).
+**Đo phủ REQ-ID -> endpoint, chế độ báo cáo.** Chạy
+`node scripts/check-reqid-artifact-coverage.mjs --artifact api --advisory`, ghi con số vào
+ghi chép của bước. Cùng lý do như 2.1: đo lần đầu ra 17% ở mức area. Nợ trả dần ở 2.6.
+
 STAGE.md Current = 2.3. Stop after 15 turns.
 
 ### Step 2.3 — Implementation plan + BUILD MANIFEST + DoR
@@ -382,7 +411,15 @@ while phases remain.
 2. **Runner nhận việc:** `node .harness/steady-state/scripts/issue-state.mjs <n> "In Dev"`. Không có bước này thì
    không ai nhìn được ai đang làm gì, và hai runner có thể ôm cùng một REQ-ID.
 3. **Verifier PASS:** `node .harness/steady-state/scripts/issue-state.mjs <n> "Done"`.
-4. **Đóng phase:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing` phải
+4. **Đóng phase:** hai cổng phải **xanh**:
+   - `node scripts/check-reqid-artifact-coverage.mjs --artifact entity --phase P<n>`
+   - `node scripts/check-reqid-artifact-coverage.mjs --artifact api --phase P<n>`
+
+   Đây là chỗ trả nợ truy vết mà 2.1/2.2 chỉ báo cáo: mở phase nào thì viết trích dẫn
+   REQ-ID cho phase đó vào ERD và API contract. Tới lúc phase cuối đóng, phủ tự đủ 100%
+   mà không ai phải viết 130 dòng một lượt.
+
+5. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing` phải
    **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
    không issue nào còn nằm ở trạng thái mở đầu.
 

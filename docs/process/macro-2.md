@@ -56,12 +56,12 @@ không phải delta.
 | Bước | Làm gì (1 câu) | Playbook (cách làm) | Gate (cổng) | Mẫu tài liệu | Script / lệnh | Xong khi |
 |---|---|---|---|---|---|---|
 | **2.0** | Kiểm sẵn sàng: tier-2 hợp thư viện UI + tài liệu không gọi tên ma + **ánh xạ component -> thư viện** | — | `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* **@một-lần**| `component-mapping-<thư-viện>.md`, `dangling-refs-allow.md` | `check-tier2-ui-compat.mjs`, `check-dangling-refs.mjs` | phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, 0 cú pháp đời cũ, 0 tham chiếu treo, **mọi dòng ma trận component đã phân loại trực tiếp/ghép/thiếu và mỗi cái thiếu đã có PR lên thư viện gốc** |
-| **2.1** | Đóng băng ERD (sơ đồ dữ liệu) | — (ck-tech-design) | ERD-frozen *(người phán)* **@một-lần**| `decision.md` | — | ERD chốt, entity ↔ REQ-ID đủ |
+| **2.1** | Đóng băng ERD (sơ đồ dữ liệu) | — (ck-tech-design) | ERD-frozen *(người phán)* **@một-lần**| `decision.md` | `check-reqid-artifact-coverage.mjs --artifact entity --advisory` | ERD chốt, entity ↔ REQ-ID đủ |
 | **2.1b** | Di trú dữ liệu (chỉ brownfield) | `external-integration` | ETL + dry-run *(người)* **@một-lần**| — | — | dry-run cutover pass, hoặc N/A |
-| **2.2** | Chọn stack + threat-model | `async-job-queue`, `object-storage`, `media-pipeline` *(khi stack có hàng đợi / lưu tệp / xử lý media)* | stack-justified *(người)* **@một-lần**| `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
+| **2.2** | Chọn stack + threat-model | `async-job-queue`, `object-storage`, `media-pipeline` *(khi stack có hàng đợi / lưu tệp / xử lý media)* | stack-justified *(người)* **@một-lần**| `decision.md`, `code-standards.md` | `check-reqid-artifact-coverage.mjs --artifact api --advisory` | ADR stack xong, threat-model ghi (nền cho 2.9) |
 | **2.3** | Bản kê thi công + DoR + soạn issue | `build-manifest-compilation`, `feature-issue-ac-demo-standard`, `github-issue-standard` | `check-manifest-coverage` ⚙️ + `dor-build` **@một-lần**| `build-manifest.md`, `spec-intake.md`, `change-request-log.md` | `check-manifest-coverage.mjs` , `setup-issue-board.mjs`| mọi REQ-ID in-scope vào đúng 1 phase, DoR xanh |
 | **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ + `ui-region-boundary` ⚙️ **@một-lần**| `deployment-guide.md`, `config/deploy.yml` *(Kamal)* | `scaffold.sh`, `secret-scan.sh`, `pnpm lint:gates` *(đã gồm `check-ui-region-boundary.mjs`)*, seed | app boot + admin login được, P0 done, **vùng public/portal đã khai trong `gate-config.json`** |
-| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `dispatch-modes`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase** + `issue-coverage` ⚙️| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` , `.harness/steady-state/scripts/new-issue.mjs`, `.harness/steady-state/scripts/issue-state.mjs`, `check-issue-coverage.mjs`| mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
+| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `dispatch-modes`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase** + `issue-coverage` ⚙️| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` , `.harness/steady-state/scripts/new-issue.mjs`, `.harness/steady-state/scripts/issue-state.mjs`, `check-issue-coverage.mjs` , `check-reqid-artifact-coverage.mjs --phase P<n>` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
 | **2.8** | E2E từ AC + hướng dẫn dùng | `canonical-e2e-flow-playbook`, `user-guide-hdsd-standard` | `check-ac-coverage` ⚙️ **@một-lần**| `validation-report.md` | `check-ac-coverage.mjs` | mọi REQ-ID có ≥1 E2E pass + đường-lỗi + login test |
 | **2.9** | Bảo mật — VERIFY (không làm lại) | — (ck-security) | security-sign-off *(người)* **@một-lần**| — | — | 0 Critical/High; đối chiếu threat-model 2.2 + floor 2.6 |
 | **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field-verify-with-report`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` **@một-lần**| `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
@@ -162,6 +162,25 @@ phase đầu phải dựng bảng cho 20 phase sau - sai vai.
 **Vì sao issue mở theo phase chứ không dựng hết ở 2.3:** dựng 400 issue ở 2.3 là 400 issue
 chết nằm chờ hàng tuần; phạm vi còn đổi thì sửa hàng loạt. Mở theo phase thì issue sống đúng
 lúc có người làm, và khớp cách Mode B (Macro 3) vận hành sau go-live.
+
+## Tiêu chí quy mô máy: đo trước, chặn sau
+
+Bước 2.1 đòi *mọi REQ-ID map >=1 thực thể*, 2.2 đòi *API contract phủ mọi REQ-ID có API*.
+Cả hai là tiêu chí quy mô máy (401 mã, 601 mục) giao cho **gate người phán** trong 15 lượt,
+và **không có script**. Trên dự án thật agent chỉ còn hai lối: nhận vống, hoặc hạ mức kiểm
+rồi ghi lại là đã hạ.
+
+Đo lần đầu bằng máy: **ERD phủ 22%**, **API contract phủ 17%** (mức `area`). Không phải hai
+tài liệu sai 78%, mà là chúng **chưa từng ghi trích dẫn REQ-ID**. Bắt đủ 100% ngay tại
+2.1/2.2 là bắt viết ~130 dòng trích dẫn trong một bước 15 lượt - cổng sẽ đỏ mãi rồi bị bỏ
+qua, đúng bệnh "gate đỏ mãi là gate mù".
+
+**Cách làm:** đo ở 2.1/2.2 (`--advisory`, ghi số vào ghi chép), **chặn ở 2.6 theo từng
+phase** (`--phase P<n>`). Mở phase nào thì viết trích dẫn cho phase đó. Phase cuối đóng
+xong là phủ tự đủ 100%, không ai phải viết một lượt.
+
+Kiểm chứng: `P1.1` chạy chế độ chặn -> **xanh, 4/4 REQ-ID có thực thể**. Nợ chia nhỏ thì
+trả được.
 
 ## Bù, đừng tua lại
 
