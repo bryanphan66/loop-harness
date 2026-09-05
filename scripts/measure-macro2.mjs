@@ -32,6 +32,20 @@ const flag = (name, dflt = null) => {
   const i = args.indexOf(name);
   return i === -1 || !args[i + 1] || args[i + 1].startsWith("--") ? dflt : args[i + 1];
 };
+if (args.includes("--help") || args.includes("-h")) {
+  // Chay that khi nguoi ta chi muon xem cach dung = ghi mot dong rac vinh vien
+  // vao mot so append-only. Da xay ra that trong lan chay dau.
+  console.log(`đo lại 4 chỉ số của một lượt chạy Macro 2 và ghi một dòng vào docs/macro2-run-log.md
+
+  node scripts/measure-macro2.mjs --step <bước>        đo và ghi sổ
+  node scripts/measure-macro2.mjs --step 2.3 --dry     in ra, KHÔNG ghi sổ
+  node scripts/measure-macro2.mjs --step 2.3 --note "…" thêm ghi chú vào dòng
+
+Sổ là append-only: một lần chạy nhầm để lại một dòng không xoá được, nên
+--dry trước khi ghi thật nếu chưa chắc.`);
+  process.exit(0);
+}
+
 const STEP = flag("--step", "?");
 const NOTE = flag("--note", "");
 const DRY = args.includes("--dry");
@@ -84,6 +98,12 @@ function verdict(res) {
   const line = res.out.split("\n").map((l) => l.trim()).filter(Boolean).pop() ?? "";
   const short = line.replace(/^[✓✗\-\s]*/, "").slice(0, 72);
   if (/skipped|chưa có|no .* yet|not .* yet/i.test(res.out)) return `bỏ qua: ${short}`;
+  // Mot gate thoat 0 sau khi kiem KHONG muc nao la "xanh rong", khong phai dat.
+  // Da xay ra that: check-manifest-coverage doc nham file, tim thay 0 REQ-ID,
+  // so sanh 0 muc, bao xanh - va so nay chep thang vao so lam bang chung.
+  if (res.code === 0 && /\b0\s+(?:in-scope\s+)?[A-Za-z-]+\(s\)/.test(line)) {
+    return `XANH RỖNG (kiểm 0 mục, không chứng minh gì): ${short}`;
+  }
   return `${res.code === 0 ? "xanh" : "ĐỎ"}${short ? `: ${short}` : ""}`;
 }
 const manifest = verdict(run("check-manifest-coverage.mjs"));

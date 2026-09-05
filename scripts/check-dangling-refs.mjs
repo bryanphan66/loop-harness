@@ -255,7 +255,35 @@ for (const x of findings) {
   if (!grouped.has(k)) grouped.set(k, { ...x, files: [] });
   grouped.get(k).files.push(x.file);
 }
-const rows = [...grouped.values(), ...orphans].sort((a, b) => a.kind.localeCompare(b.kind) || a.ref.localeCompare(b.ref));
+const allRows = [...grouped.values(), ...orphans].sort((a, b) => a.kind.localeCompare(b.kind) || a.ref.localeCompare(b.ref));
+
+/*
+ * Ngoai le co khai bao, khong phai giai trinh bang van.
+ *
+ * Truoc day gate nay do vinh vien: mot du an that co 15 tham chieu treo hop le
+ * (engine cua macro khac, output chua sinh, thu da ruled N/A tu truoc). Agent
+ * viet van giai thich tung dong roi di tiep. Hau qua: lan sau xuat hien mot
+ * tham chieu treo MOI, no la dong thu 16 trong mot danh sach do 15 dong va
+ * khong ai nhan ra. Mot gate do mai la mot gate mu.
+ *
+ * Nay: khai tung ngoai le kem LY DO trong docs/gates/dangling-refs-allow.md
+ * (moi dong bang: | `<ref>` | ly do |). Da khai het thi gate XANH; con mot
+ * dong chua khai thi DO. Ngoai le khai roi ma khong con treo nua se bi bao la
+ * ngoai le thua - de danh sach khong phinh mai.
+ */
+const ALLOW_FILE = join(root, "docs/gates/dangling-refs-allow.md");
+const allowed = new Map();
+if (existsSync(ALLOW_FILE)) {
+  for (const line of readFileSync(ALLOW_FILE, "utf8").split("\n")) {
+    if (!line.trim().startsWith("|")) continue;
+    const cells = line.split("|").map((c) => c.trim()).filter(Boolean);
+    const m = cells[0]?.match(/`([^`]+)`/);
+    if (m && cells[1]) allowed.set(m[1], cells[1]);
+  }
+}
+const rows = allRows.filter((r) => !allowed.has(r.ref));
+const excused = allRows.filter((r) => allowed.has(r.ref));
+const staleAllows = [...allowed.keys()].filter((k) => !allRows.some((r) => r.ref === k));
 
 const result = {
   gate: "dangling-refs",
@@ -264,7 +292,9 @@ const result = {
   twoWay: argv.includes("--two-way"),
   processFiles: processFiles.map((f) => relative(root, f)),
   dangling: rows.length,
-  orphans: orphans.length,
+  orphans: orphans.filter((o) => !allowed.has(o.ref)).length,
+  excused: excused.length,
+  staleAllows,
   rows,
   warnings,
   pass: rows.length === 0,
@@ -283,6 +313,8 @@ if (asJson) {
   }
   const wrows = [...new Map(warnings.map((w) => [`${w.kind}|${w.ref}`, w])).values()];
   for (const w of wrows) console.log(`  CANH BAO ${w.kind} \`${w.ref}\` - ${w.note} (o ${w.file})`);
+  if (excused.length) console.log(`  ${excused.length} tham chieu treo DA KHAI ngoai le (docs/gates/dangling-refs-allow.md)`);
+  for (const k of staleAllows) console.log(`  CANH BAO ngoai le thua: \`${k}\` khai roi nhung khong con treo - xoa khoi allow file`);
   console.log(result.pass ? "[dangling-refs] XANH" : `[dangling-refs] DO - ${rows.length - orphans.length} tham chieu treo + ${orphans.length} file mo coi`);
 }
 
