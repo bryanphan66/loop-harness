@@ -223,3 +223,28 @@ export function inScopeReqIds(root, cfg = {}) {
   }
   return out;
 }
+
+/**
+ * Thứ tự 10 trạng thái của pipeline issue (org field `States`).
+ *
+ * Đây KHÔNG phải danh sách trang trí: nó là bản sao theo từng REQ-ID của chính
+ * các bước Macro 2. `Ready for Test` ứng với lúc đóng phase con ở 2.6,
+ * `QC Testing` với 2.10, `UAT Testing` với 2.12, `Deploying` với 2.13. Một issue
+ * đứng yên ở `In Dev` trong khi bước đã sang 2.10 nghĩa là hồ sơ nói dối.
+ *
+ * Đo lần đầu trên dự án thật: goal-text chỉ đẩy tới `In Dev` rồi thôi - 7 trạng
+ * thái sau không bước nào chạm tới.
+ */
+export const ISSUE_STATES = [
+  'Backlog',
+  'Ready for Dev',
+  'In Dev',
+  'Ready for Test',
+  'QC Testing',
+  'Ready for UAT',
+  'UAT Testing',
+  'Deploying',
+  'Done',
+];
+/** `Cancelled` nằm ngoài thứ tự - nó là lối ra, không phải một nấc. */
+export const ISSUE_STATE_TERMINAL = 'Cancelled';

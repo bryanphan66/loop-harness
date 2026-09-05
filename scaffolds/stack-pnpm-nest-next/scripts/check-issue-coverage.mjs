@@ -14,13 +14,18 @@
  *
  *   node scripts/check-issue-coverage.mjs --phase P1
  *   node scripts/check-issue-coverage.mjs --phase P1 --closing   # thêm: hết trạng thái mở đầu
+ *   node scripts/check-issue-coverage.mjs --expect "Ready for Test"  # mọi issue đã tới nấc này
+ *
+ * `--expect` là cách các bước SAU 2.6 kiểm hồ sơ khớp thực tế: 2.10 đòi
+ * `QC Testing`, 2.12 đòi `UAT Testing`, 2.13 đòi `Deploying`. Không có nó thì
+ * pipeline dừng ở `In Dev` và đứng yên tới hết dự án - đo lần đầu đúng như vậy.
  *   node scripts/check-issue-coverage.mjs --phase P1 --repo owner/name
  */
 import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { gateRoot, loadGateConfig, reqIdsByPhase, inScopeReqIds } from './gate-lib.mjs';
+import { gateRoot, loadGateConfig, reqIdsByPhase, inScopeReqIds, ISSUE_STATES, ISSUE_STATE_TERMINAL } from './gate-lib.mjs';
 
 const ROOT = gateRoot(dirname(fileURLToPath(import.meta.url)));
 const cfg = loadGateConfig(ROOT);
@@ -101,8 +106,15 @@ if (noMilestone.length) {
 }
 
 // --- trạng thái, chỉ khi đóng phase --------------------------------------------
-if (CLOSING && phaseIssues.length) {
+const EXPECT = flag('--expect');
+if (EXPECT && !ISSUE_STATES.includes(EXPECT)) {
+  console.error(`issue-coverage: '--expect ${EXPECT}' không phải trạng thái hợp lệ. Danh sách: ${ISSUE_STATES.join(' -> ')}`);
+  process.exit(1);
+}
+
+if ((CLOSING || EXPECT) && phaseIssues.length) {
   const stuck = [];
+  const seen = new Map();  // issue -> trạng thái đọc được
   const unset = [];        // đọc được nhưng trường States TRỐNG = chưa ai đặt
   let apiFail = 0;         // gọi API hỏng = vấn đề môi trường/quyền
   for (const it of phaseIssues) {
@@ -119,13 +131,26 @@ if (CLOSING && phaseIssues.length) {
     if (r.status !== 0) { apiFail++; continue; }
     const st = (r.stdout ?? '').trim();
     if (!st) { unset.push(`#${it.number}`); continue; }
-    if (START_STATES.includes(st)) stuck.push(`#${it.number}=${st}`);
+    seen.set(it.number, st);
+    if (CLOSING && START_STATES.includes(st)) stuck.push(`#${it.number}=${st}`);
   }
   if (apiFail) {
     errors.push(`gọi API không lấy được trạng thái của ${apiFail} issue — cổng KHÔNG được xanh khi không nhìn thấy đầu vào. Kiểm quyền \`gh\` và trường org "States".`);
   }
   if (unset.length) {
     errors.push(`${unset.length} issue CHƯA ĐƯỢC ĐẶT trạng thái: ${unset.slice(0, 10).join(', ')} — chạy \`node .harness/steady-state/scripts/issue-state.mjs <n> "<state>"\`. Đây là việc chưa làm, không phải lỗi quyền.`);
+  }
+  if (EXPECT) {
+    const want = ISSUE_STATES.indexOf(EXPECT);
+    const behind = [];
+    for (const [num, st] of seen) {
+      if (st === ISSUE_STATE_TERMINAL) continue;          // đã huỷ, có lý do riêng
+      const at = ISSUE_STATES.indexOf(st);
+      if (at === -1 || at < want) behind.push(`#${num}=${st || '(trống)'}`);
+    }
+    if (behind.length) {
+      errors.push(`${behind.length} issue chưa tới "${EXPECT}": ${behind.slice(0, 10).join(', ')} — hồ sơ đang nói khác thực tế, đẩy bằng issue-state.mjs`);
+    }
   }
   if (stuck.length) {
     errors.push(`${stuck.length} issue còn ở trạng thái mở đầu khi đóng ${PHASE}: ${stuck.slice(0, 10).join(', ')} — đẩy bằng .harness/steady-state/scripts/issue-state.mjs`);

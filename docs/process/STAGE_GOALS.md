@@ -410,7 +410,11 @@ while phases remain.
    issue của phase đang mở, không mở trước cho phase sau.
 2. **Runner nhận việc:** `node .harness/steady-state/scripts/issue-state.mjs <n> "In Dev"`. Không có bước này thì
    không ai nhìn được ai đang làm gì, và hai runner có thể ôm cùng một REQ-ID.
-3. **Verifier PASS:** `node .harness/steady-state/scripts/issue-state.mjs <n> "Done"`.
+3. **Code xong, chờ verifier:** `node .harness/steady-state/scripts/issue-state.mjs <n> "Ready for Test"`.
+   **KHÔNG nhảy thẳng sang `Done`.** Pipeline có 10 nấc và chúng là bản sao theo từng
+   REQ-ID của chính các bước Macro 2: `Ready for Test` là 2.6 đóng phase, `QC Testing` là
+   2.10, `UAT Testing` là 2.12, `Deploying` là 2.13. Nhảy nấc nghĩa là hồ sơ nói dối về
+   việc đã ai kiểm cái gì.
 4. **Bật `prototypeFidelity.required` khi phase đầu tiên có màn hình.** Đặt `true` trong
    `scripts/gate-config.json`. Trước đó gate tự bỏ qua vì chưa có gì để đối chiếu; sau đó
    thiếu `fidelity-map.json` (hoặc map rỗng route) là **ĐỎ** - vì lúc ấy thiếu map nghĩa là
@@ -425,8 +429,8 @@ while phases remain.
    REQ-ID cho phase đó vào ERD và API contract. Tới lúc phase cuối đóng, phủ tự đủ 100%
    mà không ai phải viết 130 dòng một lượt.
 
-6. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing` phải
-   **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
+6. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing --expect "Ready for Test"`
+   phải **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
    không issue nào còn nằm ở trạng thái mở đầu.
 
 Cổng đó **không bao giờ xanh rỗng**: phase có REQ-ID mà tìm ra 0 issue là ĐỎ, và không đọc
@@ -527,6 +531,11 @@ build and browser-QA in separate steps. **Khai đợt phát hành trước khi c
 `docs/gates/dod-build.md` § Phạm vi đo). Không khai thì gate đo cả register - trên một dự
 án nhiều đợt, đó là đo nhầm thước và cổng sẽ đỏ tới tận đợt cuối.
 
+**Đẩy trạng thái issue theo đúng việc đang làm.** Verifier độc lập bắt đầu chạy ->
+`.harness/steady-state/scripts/issue-state.mjs <n> "QC Testing"`; QA pass -> `"Ready for UAT"`. Trước khi
+đóng bước, `node scripts/check-issue-coverage.mjs --expect "Ready for UAT"` phải xanh.
+Không đẩy thì issue đứng ở `In Dev` tới hết dự án và Macro 3 nhận bàn giao một bảng sai.
+
 STAGE.md Current = 2.12. Stop after
 15 turns.
 
@@ -564,6 +573,9 @@ Emit MANUAL_CHECKPOINT inviting the client (Lite: owner) to run the UAT session;
 record results per journey. The ACCEPTANCE gate clears only when the client's
 written sign-off is recorded and the RTM is **forward-complete** (every in-scope
 REQ-ID → ≥1 passing TC-NNN). Do not advance STAGE.md before the written
+**Trạng thái issue:** khách bắt đầu nghiệm thu -> `.harness/steady-state/scripts/issue-state.mjs <n>
+"UAT Testing"`. `--expect "UAT Testing"` phải xanh trước khi ghi sign-off.
+
 sign-off. STAGE.md Current = 2.13 only after sign-off. Stop after 10 turns.
 
 ### Step 2.13 — Release
@@ -592,6 +604,11 @@ Checklist** before declaring the release done:
 4. the deploy is fired against a **named endpoint with human go-ahead** — emit
    `MANUAL_CHECKPOINT` naming the target host; never auto-fire a prod deploy
    (Rule 5).
+
+**Đẩy trạng thái issue lần cuối.** Bắt đầu deploy -> `.harness/steady-state/scripts/issue-state.mjs <n>
+"Deploying"`; verify-at-source xong -> `"Done"`. `node scripts/check-issue-coverage.mjs
+--expect "Done"` phải xanh **trước khi** flip sang Mode B - Macro 3 chạy bằng
+issue-pipeline, nhận một bảng còn issue ở `In Dev` là nhận nợ không ai biết.
 
 **Then flip Mode A → Mode B (graduation — `docs/about/OPERATING-MODES.md` § The
 graduation).** Go-live is the graduation point; in the SAME close edit `STAGE.md`:
