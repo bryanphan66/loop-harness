@@ -35,10 +35,12 @@ thứ vốn là lỗi SRS.
 
 | MD-02 | autocontent, trước 2.1 | luật do operator đưa 2026-09-05 | macro-2 không định nghĩa ranh giới UI custom vs UI component, và không có đường đẩy ngược component tái dùng lên thư viện gốc | luật 3 vùng + bước đẩy ngược: **đã sửa**. Gate lint theo vùng: hoãn tới 2.4 | **đã sửa một phần** |
 
-| MD-03 | autocontent, lúc cài macro 2 | so tên playbook macro-2 gọi với file thật | `macro-2.md` cột 2.10 gọi `e2e-qa-field-by-field`, file thật tên `e2e-qa-field-by-field-verify-with-report.md` - tham chiếu treo, agent tìm không ra | sửa tên | **đã sửa** |
-| MD-04 | autocontent, lúc cài macro 2 | 4 link tương đối gãy sau khi copy spine sang dự án | spine giả định layout `docs/process/`; dự án layout phẳng thì `STAGE_GOALS.md`, `WORKFLOW.md`, `TRACE_SPEC.md` gãy. Installer không rewrite đường dẫn | chỉnh tay lúc cài + cần cách chống tái phát | **mở** |
+| MD-03 | autocontent, lúc cài macro 2 | so tên playbook macro-2 gọi với file thật | `macro-2.md` cột 2.10 gọi `e2e-qa-field-by-field`, file thật tên `e2e-qa-field-by-field-verify-with-report.md` - tham chiếu treo, agent tìm không ra | sửa tên + dựng gate `dangling-refs` chặn tái phát | **đã sửa** |
+| MD-04 | autocontent, lúc cài macro 2 | 4 link tương đối gãy sau khi copy spine sang dự án | spine giả định layout `docs/process/`; dự án layout phẳng thì `STAGE_GOALS.md`, `WORKFLOW.md`, `TRACE_SPEC.md` gãy. Installer không rewrite đường dẫn | chỉnh tay lúc cài + gate `dangling-refs` bắt link gãy | **đã sửa** |
 
-| MD-05 | autocontent, sau khi cài macro 2 | truy nguồn gốc MD-01: ai sinh ra tier-2 kiểu v3 | bước **1.10 của Macro 1** gọi 2 engine không tồn tại (`ck-brand-guidelines`, `ck-design-system`); engine còn lại `ui-styling` dạy cả v4 lẫn v3, không chốt bản nào | cần kiểm cơ học engine tồn tại + chốt bản Tailwind ở 1.10 | **mở** (vùng Macro 1, chưa được sửa) |
+| MD-05 | autocontent, sau khi cài macro 2 | truy nguồn gốc MD-01: ai sinh ra tier-2 kiểu v3 | bước **1.10 của Macro 1** gọi 2 engine không tồn tại (`ck-brand-guidelines`, `ck-design-system`); engine còn lại `ui-styling` dạy cả v4 lẫn v3, không chốt bản nào | gate `dangling-refs` đếm được: **17 engine treo**. Sửa 1.10 thì chờ phép | **đã đo, chưa sửa** (vùng Macro 1) |
+
+| MD-06 | autocontent, chạy gate dangling-refs | `ship-and-verify.sh` treo sau khi cài macro 2 | bước 2.13 gọi `ship-and-verify.sh`, script này nằm ở `scaffolds/steady-state/`, mà cài macro 2 chỉ nhúng `scaffolds/stack-pnpm-nest-next` | quyết: nhúng thêm steady-state, hay dời script sang stack template | **mở** |
 
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
@@ -223,3 +225,45 @@ có cả hai. Agent đọc skill này có thể ra v3 hoặc v4 tuỳ nó bắt 
 - chốt bản Tailwind ngay trong bước 1.10, hoặc sửa `ui-styling` bỏ phần v3
 - tìm lại `ck-design-system` (khả năng ở máy Nghĩa, cùng chỗ `vibecode-harness`),
   hoặc bỏ hẳn nó khỏi bảng nếu không còn dùng
+
+## Gate `dangling-refs` - đóng MD-03 và MD-04, đo được MD-05
+
+`scripts/check-dangling-refs.mjs`. Hỏi một câu: mọi thứ **bảng quy trình** gọi tên
+có tồn tại thật không. Soi cột Playbook / Gate / Mẫu tài liệu / Script / Engine,
+cộng link tương đối trong chính file đó.
+
+**Phạm vi hẹp là có ý.** Bản đầu quét mọi backtick trong mọi file markdown và ra
+**418** kết quả - phần lớn là báo cáo cũ trong `plans/` và tên artifact mà *dự án*
+sinh ra (`VISION_SCOPE.md`, `tokens.css`, `vi.json`), harness không có là đúng.
+Gate ồn thì không ai đọc. Thu về đúng chỗ đẻ ra MD-03/04/05 còn **23**.
+
+Bốn lỗi của chính gate, tìm ra bằng cách chạy thật rồi soi từng dòng:
+- đường dẫn `docs/...` trong tài liệu là tính từ **gốc repo**, không phải từ vị trí
+  file. Chỉ thử một gốc thì báo oan 20 link.
+- `.harness/` và `.claude/` là thư mục ẩn nhưng **chính là nơi chứa script + lệnh**
+  harness gọi tên. Bỏ qua chúng thì báo oan 6 script.
+- glob (`check-*.mjs`), slash-command (`/build-phase`), placeholder (`<slug>`),
+  hằng (`IMAGE_TAG`) không phải đường dẫn.
+- "treo" phải nghĩa là **không có ở đâu cả**. File có thật nhưng nằm sai thư mục
+  chỉ là cảnh báo, không chặn.
+
+**Chạy trong dự án, không phải trong harness.** Trong harness, mọi đường dẫn output
+của dự án đều treo và đó là đúng. Chỉ khi chạy ở repo dự án, nơi harness asset và
+artifact dự án cùng tồn tại, con số mới có nghĩa.
+
+### Kết quả chạy trên autocontent
+
+23 tham chiếu treo:
+
+| Loại | Số | Đáng chú ý |
+|---|---|---|
+| engine | **17** | `ck-tech-design`, `ck-ux-design`, `ck-uat`, `ck-qa`, `ck-signoff`, `ck-seed`, `ck-e2e-flow`, `ck-handover`, `ck-hypercare`, `ck-prod-readiness`, `ck-rri`, `ck-intake-file`, `ck-bien-ban`, `ck-brand-guidelines`, `ck-design-system`, `ck-scope-confirmation`, `ck-client-prep-checklist` |
+| gate | 2 | `audit_placeholders.py`, `extract_scope_boundary.py` |
+| link | 3 | `docs/bao-gia/02-dieu-khoan-bao-hanh.md`, `scripts/export-client-bundle.sh` |
+| script | 1 | `ship-and-verify.sh` -> MD-06 |
+
+Chỉ **9** skill `ck-*` tồn tại thật: `ck-autoresearch`, `ck-code-review`, `ck-debug`,
+`ck-graphify`, `ck-loop`, `ck-plan`, `ck-predict`, `ck-scenario`, `ck-security`.
+
+**Chặn ngay trước mắt:** bước **2.1** (đóng băng ERD) - chỗ autocontent đang đứng -
+gọi `ck-tech-design`, không tồn tại. Bước 2.2 cũng vậy.
