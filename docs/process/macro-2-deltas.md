@@ -1151,12 +1151,53 @@ Nặng vì `issue%` là một trong hai cột được dựng ra để chứng m
 vì chuỗi neo `REQ-ID -> issue -> test -> UAT` đứt một mắt thì Macro 3 (chạy bằng
 issue-pipeline) không có gì để nhận bàn giao.
 
-**Chưa vá** - còn một quyết định phải hỏi operator: giao cho **2.3** (dựng issue cho cả
-scope một lượt) hay **2.6** (mở issue theo từng phase). Khuyến nghị: **2.6 theo phase** -
-401 issue dựng ở 2.3 là 401 issue chết nằm chờ hàng tuần, phạm vi còn đổi thì sửa hàng
-loạt; mở theo phase thì issue sống đúng lúc có người làm và khớp cách Mode B vận hành.
+**ĐÃ VÁ** - operator chốt: dựng bảng ở 2.3, mở issue theo phase ở 2.6. Xem MD-34.
 
-Kèm theo khi vá: ô Script của bước đó phải có `req-issue-scaffold.mjs`, cổng
-`phase-acceptance` thêm điều kiện máy kiểm được (mọi REQ-ID của phase có >=1 issue), và
-sửa §"Nguồn nội dung issue" trong `macro-2.md` - nó đang nhắc `new-issue.mjs`, **file
-không có trong kit**.
+Một chỗ tôi nói sai và sửa lại: `new-issue.mjs` **có** trong kit, nằm ở
+`scaffolds/steady-state/scripts/` chứ không ở stack-template. Tôi chỉ tìm một thư mục.
+
+---
+
+## MD-34 - chuỗi issue: ba mắt xích, không mắt nào có chủ
+
+Operator hỏi liên tiếp ba câu, mỗi câu lột thêm một tầng:
+
+1. *"sao không thấy tạo issue trên repo"* -> MD-33: không bước nào giao việc tạo issue.
+2. *"2.6 có cập nhật trạng thái issue sau khi worker làm không"* -> goal-text 2.6 nhắc
+   "issue" **0 lần**; `issue-state.mjs` chỉ nằm trong kit steady-state (Macro 3), không bước
+   nào của Macro 2 gọi.
+3. *"tạo phase và module trên GitHub ở step nào"* -> **không step nào**. Repo thật: 0
+   milestone, 0 nhãn `Module:`, 0 nhãn `plane`, chỉ có 9 nhãn mặc định của GitHub.
+
+Mắt thứ ba là mắt chặn: chuẩn issue quy định Phase = **milestone**, Module = **nhãn cấp
+repo**. Thiếu chúng thì `gh issue create --milestone --label` ĐỎ, nên kể cả sửa xong lỗi
+đường dẫn register (MD-32) thì lệnh tạo issue vẫn hỏng. Bản chạy thử chưa chạm tới đó vì
+gãy sớm hơn.
+
+**Đã vá, ba mắt xích thành một chuỗi:**
+
+| bước | việc | công cụ |
+|---|---|---|
+| 2.3 | dựng milestone `Phase 0..N` + nhãn `Module:` + `plane` | `setup-issue-board.mjs` mới, **mặc định chạy thử**, `--apply` mới tạo, chạy lại được |
+| 2.6 mở phase | issue cho REQ-ID của phase, state `Ready for Dev` | `new-issue.mjs` |
+| 2.6 nhận việc | state `In Dev` | `issue-state.mjs` |
+| 2.6 đóng phase | cổng máy kiểm | `check-issue-coverage.mjs --closing` mới |
+
+Cổng mới **fail-closed đúng bài học MD-22**: phase có REQ-ID mà 0 issue là ĐỎ (đọc hỏng,
+không phải "phase không cần issue"); không đọc được trường org `States` cũng ĐỎ.
+
+Kiểm chứng trên autocontent: `setup-issue-board` chạy thử đọc đúng **21 phase + 20 module**
+(đã bỏ emoji khỏi tên nhãn); `check-issue-coverage --phase P1` báo **20/20 REQ-ID chưa có
+issue** - khớp con số 20 mà chính manifest ghi cho P1.
+
+**Chia việc theo lúc dữ liệu có sẵn:** 2.3 là lúc duy nhất biết đủ P0..PN và M1..MN nên nó
+dựng bảng; 2.6 là lúc duy nhất biết ai đang làm gì nên nó mở issue và đẩy trạng thái. Bắt
+2.6 dựng bảng thì phase đầu phải dựng hộ 20 phase sau - sai vai.
+
+**Và một luật viết vào `macro-2.md`: "Bù, đừng tua lại."** Phát hiện bước trước thiếu sản
+phẩm thì chạy bù đúng phần thiếu ở bước hiện tại, ghi AD nói rõ bù cho bước nào, rồi sửa
+goal-text. **Không đặt lại con trỏ bước** - tua về 2.3 là dựng lại `build-manifest.md` đã
+đóng và cổng DoR đã thông, phá thứ đang đứng vững để lấy một sản phẩm phụ.
+
+Phần đọc manifest và đọc register in-scope đã dồn vào `gate-lib.mjs`
+(`reqIdsByPhase`, `inScopeReqIds`) thay vì chép sang script mới - đúng luật MD-32.
