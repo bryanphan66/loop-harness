@@ -1,0 +1,27 @@
+# Ngữ cảnh cho 3 Dockerfile (apps/web, apps/api, apps/worker).
+# Thiếu file này thì mỗi lần đóng gói gửi cả node_modules, .next và .git sang daemon -
+# chậm và phình image. Bản này lấy từ elearning-platform, dự án đang live staging.
+node_modules
+**/node_modules
+out
+**/out
+.next
+**/.next
+dist
+**/dist
+.turbo
+**/.turbo
+coverage
+**/coverage
+playwright-report
+test-results
+.git
+.github
+plans
+docs
+*.log
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store
