@@ -47,7 +47,7 @@ thứ vốn là lỗi SRS.
 | MD-08 | autocontent, trước 2.1 | hỏi "gắn thư viện UI vào thì có đủ component không" mà không ai đo được | macro-2 không có bước nào đối chiếu ma trận component của dự án với thư viện UI. Không đo thì tới 2.6 mới vỡ ra thiếu, lúc đó đã có màn code theo cách khác | thêm ánh xạ vào bước 2.0 + mẫu bảng | **đã sửa** |
 
 | MD-09 | autocontent, chuẩn bị ingest board trên Mac | chạy `ingest-archive.sh` trên macOS | script harness viết trên Linux, dùng `find -printf` và `stat -c%s`, cả hai không có trên macOS. Không ai kiểm tính khả chuyển | vá 2 script + cần luật: script harness phải chạy được trên Linux lẫn macOS | **đã sửa ở dự án, harness còn nợ luật** |
-| MD-10 | autocontent, so gate doc với harness | đối chiếu `docs/gates/` hai bên | **PB-G3 và PB-G4 đảo nghĩa giữa harness và dự án** - không phải lỗi tên, mà đảo thứ tự tiền/thiết kế | chốt một thứ tự, sửa bên còn lại | **mở** |
+| MD-10 | autocontent, so gate doc với harness | đối chiếu `docs/gates/` hai bên | **PB-G3 và PB-G4 đảo nghĩa giữa harness và dự án** - không phải lỗi tên, mà đảo thứ tự tiền/thiết kế | cắt Macro 1 + Macro 3 khỏi loop-harness, để bản của dự án là bản duy nhất | **đã sửa** |
 
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
@@ -379,7 +379,7 @@ Không phải lỗi đặt tên. **Đảo thứ tự nghiệp vụ.**
 
 | | PB-G3 | PB-G4 |
 |---|---|---|
-| **loop-harness** `macro-1.md` | 1.13 chốt prototype (khách duyệt) | 1.15 hợp đồng + đặt cọc |
+| **loop-harness** `macro-1.md` *(đã xoá 2026-09-05)* | 1.13 chốt prototype (khách duyệt) | 1.15 hợp đồng + đặt cọc |
 | **autocontent** `WORKFLOW.md` | 1.14 contract + deposit *(money hard line)* | 1.15 review loop -> freeze *(EXIT)* |
 
 harness ghi thẳng: *"prototype chốt TRƯỚC báo giá"*.
@@ -397,3 +397,40 @@ khi khách trả tiền không.
 
 **Cần operator chốt một thứ tự.** Đây là quyết định kinh doanh, không phải kỹ thuật -
 không tự quyết được.
+
+### MD-10 - đã sửa (2026-09-05): cắt Macro 1 và Macro 3 khỏi loop-harness
+
+Operator chốt: loop-harness chỉ là bộ **tượng trưng** cho Macro 2; bộ chạy thật của
+autocontent bootstrap từ `vibecode-harness`. Giữ hai định nghĩa Macro 1 song song là
+mời người đọc chọn nhầm ở đúng chỗ nặng nhất - thứ tự tiền và thiết kế.
+
+Đã làm:
+- xoá `docs/process/macro-1.md`, `docs/process/macro-3.md`
+- `docs/process/WORKFLOW.md` viết lại thành **macro-2 only**: 386 -> 268 dòng. Bỏ mục
+  Macro-Stage 1, Macro-Stage 3, mục Lanes (lane chỉ quyết định Macro 1 nặng nhẹ, Macro 2
+  chạy như nhau); Canonical Gate List bỏ hàng PB-G1..G4 và HANDOVER; Token Chain cắt
+  phần thượng nguồn, bắt đầu từ REQ-ID mà Macro 1 của dự án giao xuống
+- thêm mục **"Ranh giới - đọc trước"** nói thẳng: điều kiện VÀO (PB-G3/G4) và RA
+  (handover, hypercare) do workflow của dự án định nghĩa; loop-harness chịu trách
+  nhiệm từ 2.0 đến 2.13
+- `README.md` và `loop.md` bỏ link tới hai file đã xoá
+
+**Cách giải quyết mâu thuẫn: bỏ một bên, không hoà giải.** Bản của dự án thắng vì đó
+là bản đang chạy thật. Nếu sau này cần một định nghĩa Macro 1 dùng chung thì viết mới,
+đừng hồi sinh bản cũ.
+
+**Lưu ý cho người đọc MD-05:** cắt Macro 1 khỏi loop-harness **không** đụng tới 22
+engine `ck-*` treo - chúng nằm trong `autocontent/docs/WORKFLOW.md`, bootstrap từ
+vibecode-harness ở commit `ba08c40`, đã có đủ 22 từ lúc clone `562f95c`. Hai việc khác
+nhau, đừng nhầm là một.
+
+**Hệ quả cho MD-05, đo lại sau khi cắt:** gate `dangling-refs` chạy trên loop-harness
+rơi từ **20 engine treo xuống 7**. Bảy cái còn lại là engine THẬT SỰ của Macro 2:
+
+`ck-tech-design` · `ck-seed` · `ck-e2e-flow` · `ck-qa` · `ck-signoff` · `ck-uat` · `ck-prod-readiness`
+
+Mười cái kia (`ck-intake-file`, `ck-ux-design`, `ck-brand-guidelines`,
+`ck-design-system`, `ck-scope-package`, `ck-rri`, `ck-handover`, `ck-hypercare`,
+`ck-bien-ban`, `ck-client-prep-checklist`) thuộc Macro 1/3 và **không chặn lượt chạy
+này**. MD-05 vì vậy hẹp hơn nhiều so với lúc ghi: cần lấp 7, không phải 17. Trong đó
+`ck-tech-design` là cái duy nhất chặn cứng, vì 2.1 và 2.2 đều gọi nó.

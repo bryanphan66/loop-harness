@@ -1,158 +1,63 @@
-# Workflow
+# Workflow — Macro 2 (Build & Go-live)
 
-The **step map** for solo-dev (agent-driven) product work. The operating spine is
-the **two modes** (`OPERATING-MODES.md`): **Mode A — Build** = macro-stages
-**(1) Pre-Build** + **(2) Build & Go-live**, driven by `/stage-next`; **Mode B —
-the loop** = macro-stage **(3) Post-Build**'s continuous parts (3.3/3.5), driven
-by the issue-pipeline, NOT `/stage-next`. The three "macro-stages" below are just
-this file's **grouping of the numbered steps inside those modes** — not a third
-model. Every step has a goal block in `docs/process/STAGE_GOALS.md` and can be run by
-`/stage-next` (and, for 2.6, the `/build-phase` loop).
+**File này chỉ nói về Macro 2.** Macro 1 (Pre-Build) và Macro 3 (Post-Build) đã
+được cắt khỏi loop-harness ngày 2026-09-05.
 
-**Authority:** this file. Per-step goal text: `docs/process/STAGE_GOALS.md`. Current
-stage: read `STAGE.md` at repo root — updated at every stage-boundary commit.
+## Ranh giới — đọc trước
 
-Each step table column: **# · Step · Role · Engine · Inputs · Output path · Gate
-· Manual?**. *Engine* names the `ck-*` skill or global agent that performs the
-step (the live engine — never vendored; see `docs/about/HARNESS.md` § Independence
-Principle). *Manual?* = does the step page the client/owner for offline action.
+loop-harness sở hữu **đúng một thứ: Macro 2**. Macro 1 và Macro 3 thuộc về bộ
+harness mà từng dự án mang theo (`<dự án>/docs/WORKFLOW.md`), không thuộc file này.
 
----
+Lý do cắt: trước 2026-09-05 tồn tại **hai định nghĩa Macro 1 khác nhau** - một
+trong loop-harness, một trong bộ harness mà autocontent bootstrap từ
+`vibecode-harness`. Hai bản mâu thuẫn ở chỗ nặng nhất có thể: **thứ tự tiền và
+thiết kế**. loop-harness ghi *"prototype chốt TRƯỚC báo giá"* (PB-G3 = chốt
+prototype, PB-G4 = hợp đồng + cọc); autocontent ghi ngược lại (PB-G3 = contract +
+deposit, và *"loop 1.15 chỉ chạy sau PB-G3 - không lặp thiết kế sâu khi chưa trả
+tiền"*). Giữ cả hai là mời người đọc chọn nhầm. Chi tiết: `macro-2-deltas.md` MD-10.
 
-## Lanes
+Nên trong file này:
+- **Điều kiện VÀO Macro 2** (`PB-G3`, `PB-G4` đã bắn) do workflow của dự án định nghĩa
+- **Điều kiện RA** (`HANDOVER`, hypercare, steady-state) cũng vậy
+- Ở giữa, từ **2.0 đến 2.13**, là phần loop-harness chịu trách nhiệm
 
-Every project declares a **Lane** in `STAGE.md` Snapshot at intake. The lane
-decides how heavy Macro 1 runs; Macro 2 and 3 are identical in both lanes.
+## Cách đọc
 
-| | **Full** (paid client) | **Lite** (internal / small) |
-|---|---|---|
-| Who | external paying client | your own product, internal tool, small trusted engagement |
-| Macro-1 steps | 1.1–1.15 as tabled below | merged/reduced route below |
-| Client-paging gates | PB-G1..G4 as tabled | collapse to **owner acks** (still recorded in writing) |
-| Quote/contract (1.14/1.15) | required | **N/A-by-decision auto** — recorded, then straight to 2.1 |
+Mỗi bước có goal block trong `docs/process/STAGE_GOALS.md` và chạy được bằng
+`/stage-next` (riêng 2.6 dùng vòng `/build-phase`). Bảng thi hành một-nhìn-là-rõ
+nằm ở `macro-2.md`.
 
-**Lite route (replaces the Macro-1 table rows it names; all other invariants
-hold):**
+**Authority:** file này cho bản đồ bước, gate và vai. `macro-2.md` cho cách làm
+từng bước. `STAGE_GOALS.md` cho mục tiêu-text từng bước. Trạng thái hiện tại:
+`STAGE.md` ở gốc repo dự án.
 
-1. **1.1+1.2 merged intake** — raw inputs land append-only in `docs/discovery/`
-   + ONE combined intake brief with the go/no-go decision (PB-G1, internal).
-2. **1.5-lite SRS-lite** — `docs/requirements/srs-lite.md` from
-   `docs/mau-tai-lieu/srs-lite.md`: module list + one REQ-ID table
-   (`MODULE.AREA.NN`, full grammar) + NFR one-liners. Scenarios (1.8) run **only
-   for high-risk reqs** (money / auth / async / destructive); everything else is
-   skipped with one recorded line. 1.3/1.4/1.6/1.7 fold into this step: open
-   questions go in an "Open questions" section, no separate gap-analysis or RTM
-   files (**GAP-NNN optional in Lite — the token chain may start at REQ-ID**).
-3. **1.9-lite feature list** — the feature table inside srs-lite (or a short
-   `docs/scope-baseline/feature-register.md`) frozen by **owner ack** = PB-G2.
-4. **1.10-lite design tokens** — Tier-2 tokens + **Tier-1 pin only** (record the
-   `docs/design-system/VERSION` pin); skip brand book + Component Coverage
-   Matrix. Screen inventory + floorplan classification (1.11) stays
-   **mandatory** for every grid/form screen.
-5. **1.12 prototype, ONE round** — then **1.13 freeze by owner ack** = PB-G3.
-   **Internal-product substitution:** a Lite internal product (no external
-   client to show) may substitute the classified screen inventory (1.11) + a
-   written per-screen states contract (sample-data + empty/error states
-   described per screen) for the visual prototype — record
-   `1.12 — N/A by decision (written screen specs substitute)` at the PB-G3
-   freeze. Floorplan classification + the design-system gate still apply.
-6. **1.14 / 1.15 skipped — N/A-by-decision auto** (record one line in STAGE.md
-   Snapshot). Proceed to **2.1**.
+Cột của bảng bước: **# · Step · Role · Engine · Inputs · Output path · Gate ·
+Manual?**. *Engine* là skill `ck-*` hoặc agent toàn cục thực thi bước đó (engine
+sống, không bao giờ vendor - `docs/about/HARNESS.md` § Independence Principle).
+*Manual?* = bước đó có phải gọi người/khách xử lý ngoài hệ thống không.
 
-**Lite keeps, non-negotiable:** REQ-ID grammar, screen-inventory floorplan
-classification, the token chain (REQ-ID → TC-NNN minimum), stage-boundary
-commits, the verify-gate, N/A-by-decision recording.
+> **Lane** (Full / Lite) do dự án khai trong `STAGE.md`. Lane chỉ quyết định
+> Macro 1 chạy nặng hay nhẹ - **Macro 2 chạy như nhau ở cả hai lane**, nên file
+> này không bàn tới lane nữa.
 
 ---
 
 ## TL;DR Flow
 
 ```text
-MACRO 1 — PRE-BUILD  (Full lane: no build code until PB-G4; Lite: until PB-G3-lite)
-  A. PM Intake        1.1 capture → 1.2 intake brief ........ PB-G1 (internal)
-  B. BA Core Docs     1.3 discovery → 1.9 feature register .. PB-G2 (CLIENT: scope frozen)
-  C. Design Prototype 1.10 brand → 1.13 freeze ............... PB-G3 (CLIENT: prototype frozen)
-  D. Freeze+Quote     1.14 bao-gia → 1.15 contract+deposit ... PB-G4 (CLIENT: hard line)
-        │  invariant: PROTOTYPE-THEN-QUOTE — PB-G3 before 1.14
-        │  (Lite lane: A+B merged, D skipped N/A-by-decision)
-        ▼
+VÀO: PB-G3 + PB-G4 của dự án đã bắn (thứ tự do workflow của dự án định nghĩa)
+     ▼
 MACRO 2 — BUILD & GO-LIVE
-  2.1 ERD freeze (SA) → 2.2 stack/threat-model (Tech Lead)
+  2.0 kiểm sẵn sàng: tier-2 hợp thư viện UI · tài liệu không gọi tên ma · ánh xạ component
+  → 2.1 ERD freeze (SA) → 2.2 stack/threat-model (Tech Lead)
   → 2.3 plan + BUILD MANIFEST + DoR → 2.4 walking skeleton + env/CI (P0)
   → 2.5 seed → 2.6 /build-phase loop P1..PN (per-phase ACCEPTANCE verify)
   → 2.7 review (manifest-complete) → 2.8 E2E → 2.9 security sign-off
   → 2.10 QA (DoD) → 2.11 go-live readiness
   → 2.12 UAT + sign-off (ACCEPTANCE, CLIENT) → 2.13 release
-        ▼
-MACRO 3 — POST-BUILD   (steady-state: switches to the issue-pipeline, not /stage-next — see OPERATING-MODES.md)
-  3.1 handover (HANDOVER, CLIENT) → 3.2 hypercare → 3.3 steady-state
-  → 3.4 maintenance proposal → 3.5 change-control (always-on) → 3.6 retro
-  ↳ 3.3 + 3.5 are CONTINUOUS = the issue-pipeline (Mode B), not linear stage steps
+     ▼
+RA: bàn giao + hypercare + steady-state - thuộc workflow của dự án
 ```
-
----
-
-## Macro-Stage 1 — PRE-BUILD
-
-**Goal:** raw lead → frozen scope baseline + frozen full-function prototype
-(+ signed contract in the Full lane). **No build code** before the freeze gates
-clear.
-
-**Exit invariant (PROTOTYPE-THEN-QUOTE, Full lane):** freeze prototype (PB-G3)
-**before** the bao-gia (1.14), so the quote anchors to a frozen visual contract
-— the #1 defense against scope dispute.
-
-**DEFAULT LANE = Lite (slim). Run the heavy Full lane ONLY for a large external
-paid client where a scope-dispute is a real commercial risk.** Pre-Build's job is
-to freeze scope + a prototype, not to mint a document museum — a bloated Macro 1
-(232 REQ-IDs, 200+ scenarios, a v1→v3 prototype grind) is the #1 way to sa lầy
-before any code exists. Slim principles (apply in both lanes; the Lite route below
-is the mechanism):
-- **REQ-ID per feature-AREA, not per micro-behaviour.** Aim for tens, not hundreds.
-- **Scenarios (1.8) only for high-risk reqs** (money / auth / async / destructive) — skip the rest with one recorded line.
-- **Traceability folds into the feature register** — no separate RTM file in Lite; GAP-NNN optional (token chain may start at REQ-ID).
-- **Prototype = ONE round then freeze** (1.12→1.13). No v1→v2→v3 grind unless the client explicitly re-scopes.
-- **No separate Vision / Glossary / BPMN files unless a specific req needs one** — keep them as sections, or skip and record the skip.
-The invariants that STAY non-negotiable even in Lite: REQ-ID grammar, screen-inventory floorplan classification, the freeze gates (PB-G2/G3), stage-boundary commits, the verify-gate, N/A-by-decision recording.
-
-### BLOCK A — PM Intake
-
-| # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
-|---|---|---|---|---|---|---|---|
-| 1.1 | Lead capture + intake raw files | PM | `ck-intake-file` · `project-manager` | client email/chat/docs | `docs/discovery/YYYY-MM-DD-<slug>.{ext}` (append-only) + Source Map (`docs/discovery/README.md § Source Map`) | — (required even when self-initiated) | no |
-| 1.2 | Intake brief go/no-go **+ Lane declaration** | PM | `project-manager` | discovery raw | `docs/intake/…-intake-brief.md` (`locale-vi/`) | **PB-G1** intake go/no-go — *internal capture, does NOT page client*; Lane recorded in STAGE.md | no |
-
-### BLOCK B — BA Core Docs *(load-bearing spine; Lite lane: replaced by 1.5-lite + 1.9-lite)*
-
-| # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
-|---|---|---|---|---|---|---|---|
-| 1.3 | Discovery interview (5 persona × 3 mode) | BA | `ck-rri` + discovery-interview-playbook | intake brief + raw | `docs/intake/…-discovery-summary.md` | persona coverage / time-box | no |
-| 1.4 | Gap analysis As-Is/To-Be MoSCoW | BA | `researcher` · gap-analysis-playbook | discovery summary | `docs/requirements/gap-analysis.md` (mints **GAP-NNN**) (`locale-vi/`) | review round → freeze (max 2 rounds) | no |
-| 1.5 | SRS IEEE-830 per module + REQ-ID | BA | `ck-xre EXTRACT` | gap analysis + raw | `docs/requirements/srs/<module>.md` + `nfr/` + `permissions/` + `data-model.md` + README | every req has **REQ-ID** `MODULE.AREA.NN` | no |
-| 1.6 | Validate SRS + resolve BLOCKERs | BA | `ck-xre VALIDATE→RESOLVE-PATCH` | SRS | `docs/requirements/CLARIFICATIONS.md` (BLOCKER/IMPORTANT/NICE) | *(rolled into PB-G2)* | no |
-| 1.7 | Vision / use-cases / glossary / BPMN / RTM | BA | `researcher` + `docs-manager`; `tech-graph` (BPMN) | SRS + clarifications | `VISION_SCOPE.md`, `use-cases/USE_CASES.md`, `GLOSSARY.md` (bilingual), `BPMN_DIAGRAMS.md`, `traceability/RTM.md` | **RTM completeness**: every feature → ≥1 REQ-ID + ≥1 use case | no |
-| 1.8 | Scenario edge-case (high-risk reqs only) | BA | `ck-scenario` (12 dims) | high-risk REQ-IDs | `docs/requirements/scenarios/*.md` (mints **SC-NNN**) | each high-risk req decomposed or skip recorded | no |
-| 1.9 | Feature register + scope baseline | BA + PM | `ck-scope-package` | RTM + SRS + scenarios | `docs/scope-baseline/feature-register.{md,xlsx}` + scope matrix (`locale-vi/`) | **PB-G2 (CLIENT) — scope frozen** = BLOCKERs answered (1.6) + feature-register frozen | **yes** |
-
-### BLOCK C — Design Prototype *(Lite lane: 1.10-lite, 1.12 one round)*
-
-| # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
-|---|---|---|---|---|---|---|---|
-| 1.10 | **3-tier design system** — Tier-1 pin + Tier-2 tokens + Tier-3 inventory | Designer | `ck-brand-guidelines` → `ck-design-system` · `ui-styling` | scope baseline + SRS | `docs/design/brand-guidelines.md` + tokens + `design-guidelines.md` (§0 pins the `docs/design-system/design-rules.md` version) + `src/components/README.md` | **Component Coverage Matrix + Tier-1 version pinned** | no |
-| 1.11 | Screen map / flows / RPM / status-flow / ERD draft | Designer | `ck-ux-design` + visual-and-behavioral-modeling | feature register + use-cases | `docs/visuals/diagrams/*` (RPM, status-flow, business-workflow + process-flagged user-flows in `locale-vi/`) + `docs/visuals/diagrams/screen-inventory.md` | RPM + status-flow coverage; **every grid/form screen → exactly one §4 floorplan (or CUSTOM per §4.7)** — all lanes | no |
-| 1.12 | **Prototype all functions** | Designer | external design tool (Claude Design / Open Design / Google Stitch / Pencil.dev) · or (TRIAL) Claude Code + taste skill → `board.html` | screen map + tokens; repo attached to tool, prompt = short pointer to `build-prompt-v<N>-*.md` | `docs/visuals/prototype/` + share URL · or `prototype/board.html` | each screen ≥1 sample-data + ≥1 empty/error; conforms to its floorplan + design-system-compliance gate passes | **yes** |
-| 1.13 | Review loop (revise → re-validate → re-review) + **FREEZE** | Designer + PM | facilitation; **`CR-NN`** when feedback changes a feature | prototype + process annex + client feedback | `docs/visuals/prototype/feedback-*.md` + `feedback-final.md` | **PB-G3 (CLIENT) — prototype frozen** in writing; process-complex features confirmed vs their flow diagram; >2 rounds = scope problem (Lite: 1 round, owner ack) | **yes** |
-
-### BLOCK D — Freeze + Quote + Contract *(Full lane only — Lite marks both N/A-by-decision and jumps to 2.1)*
-
-| # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
-|---|---|---|---|---|---|---|---|
-| 1.14 | Bao-gia + technical overview + contract draft | PM | `project-manager` | frozen feature register + prototype | `docs/bao-gia/{01..05}.md` + PDF + contract draft (`locale-vi/`) | every price line ↔ 1 feature-register row | no |
-| 1.15 | **Sign contract + deposit (EXIT Pre-Build)** | PM + Release Mgr | `project-manager` · `git-manager` | signed bao-gia | signed contract + deposit; `docs/ROADMAP.md` skeleton | **PB-G4 (CLIENT, hardest) — contract + deposit: NO build code before this** | **yes** |
-
-> **Conditional intake probes (mark N/A by decision if not applicable):** during
-> discovery also ask **compliance / data-residency / DPA** and **brownfield
-> (replacing a legacy system → migration needed?)**.
 
 ---
 
@@ -261,31 +166,12 @@ release note → production release. *(payment milestones attach here in Full)*
 
 ---
 
-## Macro-Stage 3 — POST-BUILD
-
-**Entry:** production deployed + sign-off signed. **Exit:** signed handover +
-hypercare window closed within SLA (0 Critical open) → move to maintenance/SLA.
-Change-control runs continuously, re-entering the pipeline at 2.3 / 2.6.
-
-| # | Step | Role | Engine | Inputs | Output path | Gate | Manual? |
-|---|---|---|---|---|---|---|---|
-| 3.1 | Handover package | Support/SRE + PM | `ck-handover` | release + docs | `docs/handover/*` (`locale-vi/`) | **HANDOVER (CLIENT)**: receive docs/credentials/training/source-IP; every credential access-verified; **rotate secrets at handover** (Lite: internal handover note; gate = owner ack) | **yes** |
-| 3.2 | Hypercare + SLA window | Support/SRE | `ck-hypercare` + runbook | production | hypercare log | window closed, P1/P2 within SLA, 0 Critical open | no |
-| 3.3 | Maintenance / monitoring / backup steady-state | DevSecOps | `ck-hypercare`, `ck-security` (periodic) | production | ops records | uptime within SLA, backup verified, patches applied | no |
-| 3.4 | Maintenance proposal (recurring revenue) | PM | `maintenance-proposal.md` (`locale-vi/`) | hypercare results | `docs/handover/maintenance-proposal.md` | tier proposed; client decides (Lite: N/A-by-decision allowed) | no |
-| 3.5 | **Change control (always-on, ASYNC)** | BA + PM | `ck-xre CHANGE-REQUEST` | client request | `docs/requirements/change-requests/` (mints **CR-NN**) (`locale-vi/`) | impact + re-estimate + approval **before** code; *push notifier, does NOT block session* | **yes** |
-| 3.6 | Retro + journal + agent memory | Docs/Audit | `retro` + `journal` | session history | `plans/reports/retro-<date>-<slug>.md` + changelog | lessons captured; memory persisted | no |
-
 ---
 
 ## Canonical Gate List
 
 | Gate | Macro | Type | Clears when |
 |---|---|---|---|
-| **PB-G1** | Pre-Build | internal capture (no client page) | intake go/no-go decided (proceed / park / decline) + Lane declared |
-| **PB-G2** | Pre-Build | **CLIENT** (Lite: owner ack) | scope frozen — BLOCKERs answered + feature-register (or Lite feature list) frozen |
-| **PB-G3** | Pre-Build | **CLIENT** (Lite: owner ack) | prototype frozen in writing |
-| **PB-G4** | Pre-Build | **CLIENT** (hardest; Lite: N/A-by-decision auto) | contract signed + deposit received — *no build code before this (Full lane)* |
 | **DoR** | Build | internal | baselined + ERD frozen + design approved + acceptance criteria + NFR + **build-manifest complete** (manifest-completeness + full clearing conditions → `docs/gates/dor-build.md`, SoT) |
 | **ERD FROZEN** | Build | internal | entities / normalization / audit+tenant fields reviewed |
 | **WALKING SKELETON** | Build | internal | scaffolded app installs, builds, boots via compose, health OK, seeded admin login works, CI(-equivalent local) green |
@@ -295,30 +181,29 @@ Change-control runs continuously, re-entering the pipeline at 2.3 / 2.6.
 | **Visual Fidelity** | Build | internal (floor-rule auto-block) | every key UI screen's Playwright fidelity assertions (element completeness + interaction behaviour) are green + a human side-by-side glance is recorded (built screenshot vs prototype image), or the screen carries a recorded rebuild decision — per-phase acceptance leg (2.6) + 2.7 floor rule + 2.10 evidence pass + a DoD line; adopt-export-as-code, NOT LLM image-compare (`docs/gates/visual-fidelity.md`) |
 | **Phase Acceptance** | Build | internal (per-phase auto-block) | per 2.6 phase: independent agent-verifier PASS on the phase's acceptance checks (functional + visual-fidelity + negative-path) against the running preview, recorded in the manifest `Accepted` cell + a TC-NNN row; human checkpoint OK when the phase's `Verify-by` is `both` — the next phase MUST NOT start before both (`docs/gates/phase-acceptance.md`) |
 | **ACCEPTANCE** | Build | **CLIENT** (Lite: owner ack) | critical journeys pass + matches prototype + sign-off signed |
-| **HANDOVER** | Post-Build | **CLIENT** (Lite: owner ack) | docs/credentials/training/source-IP received + verified + secrets rotated |
 
 **Conditional enterprise gates** — each must be explicitly marked **N/A by
 decision** when not applicable, never silently dropped: data-migration/cutover
 (2.1b), NFR/load test (2.11), DR + RTO/RPO (2.11), compliance/privacy/WCAG,
-observability/SLO (2.4 — usually always-on). **Lite lane auto-N/A:** 1.14, 1.15,
-optionally 3.4 — still recorded. The single tracked **toggle table (SoT)** where
+observability/SLO (2.4 — usually always-on). The single tracked **toggle table (SoT)** where
 each is cleared-or-N/A lives in `docs/gates/dod-build.md` § Conditional Enterprise
 Gate Toggles.
 
-> **Client-paging gates** (page the human via `MANUAL_CHECKPOINT`): PB-G2,
-> PB-G3, PB-G4, ACCEPTANCE, HANDOVER. PB-G1 is internal — it does **not** page.
-> In the **Lite lane** these page the **owner** instead of a client; a one-line
-> written ack clears them.
+> **Client-paging gate inside Macro 2:** ACCEPTANCE (2.12). The Pre-Build gates
+> (PB-G1..G4) and HANDOVER belong to the project's own workflow, not to this
+> file — see § Ranh giới.
+
+---
 
 ---
 
 ## Always-On Layer
 
-Independent of macro-stage, running across all three:
+Chạy song song với mọi bước của Macro 2:
 
 - **Change-control (async)** — any post-freeze client/owner request → CR-NN log;
   impact + re-estimate + approval **before** code; push-notifies the human,
-  never blocks the session (step 3.5; re-enters at 2.3 / 2.6 — the manifest
+  never blocks the session (lane change-control của dự án; re-enters at 2.3 / 2.6 — the manifest
   gains a new phase, never an in-place scope stretch).
 - **Audit trail** — every architecture/behavior choice → `docs/decisions/<slug>.md`
   (stable slug, never a number); every released REQ-ID → ≥1 TC-NNN; every
@@ -335,25 +220,19 @@ Independent of macro-stage, running across all three:
 
 ---
 
+---
+
 ## Token Chain
 
 End-to-end traceability (full spec: `docs/about/TRACE_SPEC.md`). The canonical scheme
 — **the only scheme; do NOT use `US-NNN.REQ-MMM`**:
 
+Macro 2 nhận chuỗi này từ Macro 1 của dự án (REQ-ID và feature-register đã có
+sẵn khi vào 2.1) và nối tiếp từ `build-manifest phase` trở đi:
+
 ```text
-business problem            (1.2 intake brief)
-    ↓ analysed by gap analysis (1.4; Lite lane: optional — chain may start at REQ-ID)
-GAP-NNN                     (docs/requirements/gap-analysis.md)
-    ↓ becomes requirement
-REQ-ID = MODULE.AREA.NN     (1.5 SRS / 1.5-lite srs-lite, e.g. IF.AUTH.01)
-    ↓ realised + traced
-use case + RTM row          (1.7; Lite: the srs-lite table row)
-    ↓ decomposed (high-risk reqs)
-SC-NNN                      (1.8 scenarios)
-    ↓ confirmed in scope
-feature-register line       (1.9 / 1.9-lite)
-    ↓ priced (Full lane)
-SOW / bao-gia line          (1.14)
+REQ-ID = MODULE.AREA.NN     (do Macro 1 của dự án sinh, vd IF.AUTH.01)
+feature-register line       (do Macro 1 của dự án đóng băng ở PB-G2)
     ↓ compiled to build order
 build-manifest phase        (2.3 — every in-scope REQ-ID in exactly one phase)
     ↓ proven (Build)
@@ -362,8 +241,9 @@ TC-NNN                      (2.6 phase smoke / 2.8 E2E + verification register)
 UAT (2.12) → release-note (2.13) → handover (3.1)
 ```
 
-**Change requests** mint `CR-NN` (3.5) and, when approved, mint new REQ-IDs that
-re-enter the chain at 1.5 (mid-build: at 2.3 as a new manifest phase).
+**Change requests** mint `CR-NN` và, khi được duyệt, sinh REQ-ID mới. Giữa lúc
+build thì chúng vào lại ở **2.3 dưới dạng một phase mới của manifest**, không bao
+giờ nong scope của phase đang chạy.
 
 **RTM completeness rule:** every feature-register line traces back to ≥1 REQ-ID
 and ≥1 use case, and forward to ≥1 TC-NNN before ACCEPTANCE. **Manifest
@@ -373,14 +253,16 @@ DoR gate reads the manifest rule.
 
 ---
 
+---
+
 ## Quick Links
 
-- **Per-step goal text:** `docs/process/STAGE_GOALS.md`
-- **Operating model:** `docs/about/HARNESS.md`
-- **Roles:** `docs/about/ROLE_MAP.md`
-- **Token grammar:** `docs/about/TRACE_SPEC.md`
-- **Build manifest:** template `docs/mau-tai-lieu/build-manifest.md` · playbook `docs/playbooks/build-manifest-compilation.md`
-- **Non-CRUD delivery playbooks:** `docs/playbooks/async-job-queue.md` · `object-storage.md` · `media-pipeline.md` · `external-integration.md`
-- **SRS-lite (Lite lane):** `docs/mau-tai-lieu/srs-lite.md`
-- **Docs crosswalk:** `docs/README.md`
-- **Per-project stage tracker:** `docs/mau-tai-lieu/STAGE.md`
+- **Bảng thi hành từng bước:** `macro-2.md`
+- **Mục tiêu-text từng bước:** `STAGE_GOALS.md`
+- **Thay đổi harness phát hiện từ dự án thật:** `macro-2-deltas.md`
+- **Mô hình vận hành 2 mode:** `../about/OPERATING-MODES.md`
+- **Vai:** `../about/ROLE_MAP.md`
+- **Ngữ pháp token:** `../about/TRACE_SPEC.md`
+- **Build manifest:** mẫu `../mau-tai-lieu/build-manifest.md` · playbook `../playbooks/build-manifest-compilation.md`
+- **Playbook giao hàng không-CRUD:** `../playbooks/async-job-queue.md` · `object-storage.md` · `media-pipeline.md` · `external-integration.md`
+- **Danh sách gate cơ học:** `../gates/lint-gates-registry.md`

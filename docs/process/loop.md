@@ -43,4 +43,4 @@ Backlog → Ready for Dev → In Dev → Deploying → Ready for Test
 - **R1** auto re-dispatch khi BLOCKED = `ASPIRATIONAL` (chưa build — đừng tưởng đã có).
 
 ## Đọc thêm
-- Đặc tả 2-mode: [`../about/OPERATING-MODES.md`](../about/OPERATING-MODES.md) · Vào loop từ: [`macro-3.md`](./macro-3.md) (bàn giao → hypercare → loop).
+- Đặc tả 2-mode: [`../about/OPERATING-MODES.md`](../about/OPERATING-MODES.md) · Vào loop sau khi dự án bàn giao xong (bàn giao -> hypercare -> loop); phần đó thuộc workflow của dự án, không thuộc loop-harness.
