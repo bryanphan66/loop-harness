@@ -1225,3 +1225,40 @@ hai cách viết trên một manifest giả: cả hai đều đọc ra đúng RE
 Chỉ siết chặt khi cái đọc là **đầu ra của máy**. Và khi hai script cùng trả lời một câu hỏi
 thì phải dùng chung một hàm - đây là lần thứ ba bài học đó xuất hiện (MD-12, MD-32, giờ là
 MD-35), nên `reqIdsByPhase` nằm ở `gate-lib` chứ không chép.
+
+---
+
+## MD-36 - milestone bị đặt sai nghĩa: gói việc kỹ thuật chiếm chỗ mốc phát hành
+
+Operator đưa roadmap kinh doanh: **Phase 1..5**, mỗi phase một khoảng thời gian
+(*"Phase 1: Release MVP Vietnam 01/09-31/09"*, *"Phase 2: SEO/ADS/RBAC, Rollout Global
+01/10-15/10"*...). Rồi hỏi thẳng: sao lại 21 phase, và *"cái này nên gọi là phase 1 thôi"*.
+
+Operator đúng. MD-34 tôi cho `setup-issue-board.mjs` dựng **21 milestone tên
+`Phase 0..Phase 20`** - đó là **phase THI CÔNG** (1 module = 1 gói việc, tiêu chí là ranh
+giới module + dev-day). Nó chiếm mất cái tên mà mốc phát hành đang dùng.
+
+**Va tên không phải giả định - nó đã sống sẵn trong repo:** `ROADMAP.md` viết *"TikTok
+video deferred phase 2"* và *"it stays a Phase-2 line in the feature register"* theo nghĩa
+**đợt phát hành**, trong khi milestone `Phase 2` tôi vừa tạo lại là *"Platform NFRs & UI
+standards"* - gói việc thứ hai. Nhìn milestone "Phase 2" không ai biết là nghĩa nào.
+
+**Đã sửa - mỗi thứ về đúng chỗ:**
+
+| thứ | biểu diễn | vì sao |
+|---|---|---|
+| phase phát hành `Phase 1..N` | **milestone** + hạn chót | milestone GitHub có due date và thanh tiến độ - đúng thứ một mốc phát hành cần, và là thứ người ngoài đội hỏi |
+| phase thi công `P0..PN` | nhãn `Build: P<n>` | chỉ là thứ tự làm nội bộ, không có hạn chót riêng |
+| module | nhãn `Module: <Tên>` | không đổi |
+
+Một issue mang **cả hai**: nhãn nói nó thuộc gói việc nào, milestone nói nó ra mắt đợt nào.
+`check-issue-coverage.mjs` nay kiểm nhãn `Build: P<n>`, và kiểm thêm rằng mọi issue **có một
+milestone phát hành** - thiếu milestone nghĩa là chưa ai quyết tính năng đó lên sóng lúc nào.
+
+`setup-issue-board.mjs` đọc mốc phát hành từ `docs/ROADMAP.md` § Release roadmap và **dừng**
+nếu không có - milestone là quyết định kinh doanh, không được suy ra từ gói việc kỹ thuật.
+Mẫu `docs/mau-tai-lieu/ROADMAP.md` thêm section đó.
+
+**Bài học rộng hơn:** harness mượn từ "phase" cho khái niệm của nó mà không hỏi dự án đã
+dùng từ đó chưa. Một từ có sẵn nghĩa trong ngôn ngữ của dự án thì công cụ **không được**
+chiếm. Chỗ khác cần soát cùng lý do: "module", "milestone", "release".

@@ -219,11 +219,24 @@ manifest is the executable source, the plan is the why). The DoR checklist
 (`docs/gates/dor-build.md`) is filled and green. In the Lite lane
 `docs/ROADMAP.md` is born here from the template.
 
-**Dựng bảng issue của repo trước khi rời bước.** Chuẩn issue
-(`docs/playbooks/github-issue-standard.md`) quy định **Phase = milestone** `Phase N` và
-**Module = nhãn cấp repo** `Module: <Tên>`. Thiếu chúng thì `gh issue create --milestone
---label` ĐỎ, nên bước 2.6 không mở nổi issue nào. Đây là lúc **duy nhất** biết đủ hai danh
-sách: P0..PN vừa sinh trong `build-manifest.md`, M1..MN trong `docs/ROADMAP.md`.
+**Dựng bảng issue của repo trước khi rời bước.** Thiếu nhãn và milestone thì
+`gh issue create --milestone --label` ĐỎ, nên bước 2.6 không mở nổi issue nào.
+
+**Milestone là PHASE PHÁT HÀNH, không phải phase thi công.** Hai thứ này khác nhau và đã
+va tên trong một dự án thật: `ROADMAP.md` dùng *"deferred phase 2"* theo nghĩa đợt phát
+hành, trong khi bảng thi công cũng có "Phase 2" nghĩa là gói việc thứ hai - nhìn milestone
+"Phase 2" không ai biết là nghĩa nào. Milestone GitHub có **hạn chót** và thanh tiến độ,
+đúng thứ một mốc phát hành cần; phase thi công chỉ là thứ tự làm nội bộ nên nó là **nhãn**.
+
+| thứ | biểu diễn | nguồn |
+|---|---|---|
+| phase phát hành `Phase 1..N` | **milestone** + due date | `docs/ROADMAP.md` § Release roadmap |
+| phase thi công `P0..PN` | nhãn `Build: P<n>` | bảng phase trong `build-manifest.md` |
+| module | nhãn `Module: <Tên>` | bảng M1..MN trong `docs/ROADMAP.md` |
+
+`docs/ROADMAP.md` **phải có § Release roadmap** dạng `| Phase 1 | Tên đợt | 01/09-31/09 |`
+trước khi chạy. Không có thì script dừng và nói rõ - milestone là mốc kinh doanh, không
+được suy ra từ gói việc kỹ thuật.
 
 Chạy `node scripts/setup-issue-board.mjs` (mặc định **chỉ in ra**), đọc danh sách, rồi
 `--apply`. Chạy lại được, thứ đã có thì bỏ qua. Tạo nhãn và milestone là **hành động ra
