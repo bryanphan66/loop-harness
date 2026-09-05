@@ -1201,3 +1201,27 @@ goal-text. **Không đặt lại con trỏ bước** - tua về 2.3 là dựng l
 
 Phần đọc manifest và đọc register in-scope đã dồn vào `gate-lib.mjs`
 (`reqIdsByPhase`, `inScopeReqIds`) thay vì chép sang script mới - đúng luật MD-32.
+
+---
+
+## MD-35 - gate ĐỎ GIẢ: regex đòi đúng một cách viết
+
+`check-manifest-coverage.mjs` (và `reqIdsByPhase` trong `gate-lib`) nhận diện dòng khai
+REQ-ID của phase bằng `/\*\*REQ-IDs?(?:\s+covered)?:\*\*/` - **đòi đúng chuỗi**. Manifest
+viết `**REQ-IDs covered (7):**` - kèm số lượng, cách viết hoàn toàn tự nhiên - thì regex
+trượt, cả khối bị bỏ qua, và gate báo **20 REQ-ID của P1 "covered by NO phase"**.
+
+Trong khi `req-id-phase-coverage.mjs` (script khác, cùng dự án) vẫn PASS - **hai script
+không chung quy ước**, nên hai câu trả lời trái ngược cho cùng một câu hỏi.
+
+**Đỏ giả nguy hơn xanh giả ở chỗ nó bảo người ta đi sai đường.** Agent gặp gate đỏ sẽ sửa
+*tài liệu* cho vừa regex - và đúng là nó đã làm vậy: chuyển `(7)` ra ngoài dấu đóng đậm.
+Tài liệu bị bẻ cong theo công cụ, thay vì công cụ đọc được tài liệu người viết.
+
+Đã nới thành `/\*\*REQ-IDs?\b[^*]*:\*\*/` - nhận mọi chữ giữa `REQ-ID(s)` và `:**`. Thử cả
+hai cách viết trên một manifest giả: cả hai đều đọc ra đúng REQ-ID.
+
+**Luật rút ra:** gate đọc **tài liệu người viết** phải nhận nhiều cách viết của cùng một ý.
+Chỉ siết chặt khi cái đọc là **đầu ra của máy**. Và khi hai script cùng trả lời một câu hỏi
+thì phải dùng chung một hàm - đây là lần thứ ba bài học đó xuất hiện (MD-12, MD-32, giờ là
+MD-35), nên `reqIdsByPhase` nằm ở `gate-lib` chứ không chép.
