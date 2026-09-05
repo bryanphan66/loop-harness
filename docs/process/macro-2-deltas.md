@@ -1413,3 +1413,60 @@ artifact đã cô đọng.
 Và: **vượt ngân sách không phải lỗi, GIẤU mới là lỗi** - vượt thì ghi số thật vào sổ ma sát
 để lần sau hiệu chỉnh bằng số, không bằng cảm giác. Tuyệt đối không cắt bớt việc cho vừa
 ngân sách; hạ mức kiểm thì phải ghi rõ đã hạ.
+
+---
+
+## MD-41 - chạy khô nửa sau: một script go-live nhận cờ làm số issue, một gate tự miễn
+
+Chạy khô công cụ của **2.8 -> 2.13** trên artifact đang có, **không đóng bước, không đụng
+`STAGE.md`**. Mục đích: kiểm *công cụ*, không kiểm *quy trình* - vì 2.6 mới xong 1/21 phase
+nên chạy các bước đó như tiến trình thật sẽ đỏ đúng và ép người ta ghi đè.
+
+Nửa sau chỉ có **ba script cơ học** (`check-ac-coverage`, `harness-verify-gate`,
+`ship-and-verify`); 2.9 và 2.12 là cổng người. Bắt được hai lỗi.
+
+### 1. `ship-and-verify.sh --help` chạy thật rồi treo
+
+```bash
+ISSUE="${1:?usage: ship-and-verify.sh <issue-number> [<commit-sha>]}"
+```
+
+`--help` **không bị coi là cờ** - nó thành *số issue*, script chạy tiếp, gọi `gh`/`curl`/ssh
+rồi treo. Đây là script **go-live**, và phần thân nó có nhánh *"bắn lại deploy MỘT lần"*.
+Một người gõ `--help` để xem cách dùng **không được phép chạm vào đường deploy**.
+
+Cùng lỗi MD-23 (`measure-macro2.mjs --help` chạy thật, ghi dòng rác vào sổ), nhưng hậu quả
+nặng hơn nhiều. Soát cả hai kit: **chỉ hai script nhận tham số vị trí** - `ship-and-verify.sh`
+và `scaffold.sh` - và **cả hai đều không chặn cờ**. Đã thêm nhánh `-h|--help` in cách dùng
+và **từ chối mọi tham số bắt đầu bằng `-`** trước khi đọc tham số vị trí.
+
+**Luật:** script nhận tham số vị trí phải chặn cờ TRƯỚC. Càng nguy hiểm càng phải chặn -
+thứ tự đúng là *cái gì đụng tới prod thì kiểm tham số chặt nhất*, không phải lỏng nhất.
+
+### 2. Gate trung thực-prototype tự miễn ở đúng bước cần nó nhất
+
+`check-prototype-fidelity.mjs` bỏ qua khi (a) không có `fidelity-map.json`, hoặc (b) có file
+nhưng rỗng route. Ở bước 2.0-2.4 điều đó đúng - chưa có gì để đối chiếu. Nhưng ở **2.10**,
+nơi cổng `visual-fidelity` cần nó, thiếu map nghĩa là **chưa ai làm việc đối chiếu**, mà
+cổng vẫn đi qua. Xanh giả nằm sẵn ở bước gần go-live nhất.
+
+Đã thêm `prototypeFidelity.required` vào `gate-config.json`: dự án khai một lần rằng mình
+có prototype đóng băng, và từ đó **cả hai đường bỏ qua đều thành ĐỎ**. Bật ở **2.6 khi phase
+đầu tiên có màn hình** - trước đó bật là chặn nhầm.
+
+Thử hai chiều: `required=true -> exit 1`, `required=false -> exit 0`.
+
+Một lỗi của tôi trong lúc vá, ghi lại vì nó là hình dạng hay gặp: nhánh mới trả
+`{ errors, out }` trong khi hàm dùng `{ code, out, err }` - crash `err is not iterable`.
+**Chèn nhánh vào hàm có sẵn thì phải đọc hình dạng giá trị trả về của nó trước**, đừng đoán.
+
+### Không bắt được gì ở đâu
+
+`check-ac-coverage` đỏ **đúng** (17 REQ-ID chưa có test - trạng thái thật giữa phase).
+`check-huong-dan-shots`, `check-canonical-redirect-manifest`, `check-new-screen-fidelity`
+bỏ qua có lý do rõ ràng. `qc-checklist.mjs` tôi tưởng crash, hoá ra tôi gọi sai đường dẫn -
+nó nằm ở kit steady-state.
+
+**Giới hạn của chạy khô, nói thẳng:** nó không kiểm được cổng người (2.9 bảo mật, 2.12
+nghiệm thu), không kiểm được `harness-verify-gate.sh` ở chế độ đóng bước, và không kiểm
+được 2.13 thật vì cần máy chủ. Muốn chốt nửa sau phải chạy trọn trên một dự án nhỏ.

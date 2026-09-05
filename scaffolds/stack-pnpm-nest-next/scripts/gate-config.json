@@ -6,7 +6,9 @@
   },
   "prototypeFidelity": {
     "_doc": "check-prototype-fidelity.mjs — where the route→prototype structural map lives (routes, requiredComponents, requiredSections). Default scripts/fidelity-map.json. STRICT for mapped routes, fail-soft for the rest.",
-    "mapFile": "scripts/fidelity-map.json"
+    "mapFile": "scripts/fidelity-map.json",
+    "required": false,
+    "_doc_required": "Dự án CÓ prototype đã đóng băng thì đặt true ở bước 2.0. Khi true, thiếu scripts/fidelity-map.json là ĐỎ chứ không phải 'bỏ qua' - vì lúc đó thiếu map nghĩa là CHƯA LÀM, không phải được miễn. Để false thì gate bỏ qua như cũ (dự án không map từ prototype)."
   },
   "manifestCoverage": {
     "_doc": "check-manifest-coverage.mjs — where the frozen scope baseline + build plan live.",

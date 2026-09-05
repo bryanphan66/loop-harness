@@ -10,6 +10,16 @@
 set -euo pipefail
 
 TEMPLATE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+case "${1:-}" in
+  -h|--help)
+    echo "scaffold.sh <target-dir> <project-slug>"
+    echo "  Dựng bộ khung vào <target-dir>. Dựng TẠI CHỖ (target = gốc repo có sẵn)"
+    echo "  được nhận diện tự động: giữ .gitignore/README/AGENTS của dự án, không"
+    echo "  quét vào .harness/, không git add -A."
+    exit 0 ;;
+  -*) echo "scaffold.sh: không nhận cờ '$1'." >&2; exit 2 ;;
+esac
+
 TARGET_DIR="${1:-}"
 SLUG="${2:-}"
 

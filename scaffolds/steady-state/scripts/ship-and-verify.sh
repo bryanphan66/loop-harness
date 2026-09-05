@@ -17,6 +17,27 @@
 #     deploy.containerGrep grep -oE pattern that yields the running artifact's 40-hex git sha
 set -uo pipefail
 
+usage() {
+  cat <<'USAGE'
+ship-and-verify.sh <issue-number> [<commit-sha>]
+
+Sau khi merge, kiểm bản deploy ĐÃ THẬT SỰ tới đích ở NGUỒN (artifact đang chạy mang
+đúng commit vừa ship). Lệch thì bắn lại deploy MỘT lần; vẫn lệch thì mở issue
+deploy-drift và fail-closed. Không tin CI xanh hay HTTP 200.
+
+Cấu hình qua `git config deploy.*` - xem phần đầu file.
+USAGE
+}
+
+# Chặn cờ TRƯỚC khi đọc tham số vị trí. Không có bước này thì `--help` bị nhận là
+# SỐ ISSUE và script chạy thật: nó gọi gh/curl/ssh rồi treo, và phần thân của nó
+# có nhánh "bắn lại deploy MỘT lần". Một người gõ --help để xem cách dùng không
+# được phép chạm vào đường deploy. (Cùng lỗi với measure-macro2.mjs, MD-23.)
+case "${1:-}" in
+  -h|--help) usage; exit 0 ;;
+  -*) echo "ship-and-verify: không nhận cờ '$1'." >&2; usage >&2; exit 2 ;;
+esac
+
 ISSUE="${1:?usage: ship-and-verify.sh <issue-number> [<commit-sha>]}"
 REPO="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
 DEFBR="$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null || echo main)"

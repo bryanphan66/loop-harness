@@ -200,6 +200,13 @@ export function runGate(root) {
   const mapPath = resolve(root, cfg.mapFile ?? 'scripts/fidelity-map.json');
 
   if (!existsSync(mapPath)) {
+    // Dự án khai `prototypeFidelity.required: true` (có prototype đã đóng băng)
+    // thì THIẾU map là ĐỎ, không phải bỏ qua: ở bước 2.10 thiếu map nghĩa là
+    // chưa ai làm việc đối chiếu, mà gate lại đi qua - đúng hình dạng xanh giả.
+    if (cfg.required) {
+      err.push('✗ [prototype-fidelity] dự án khai có prototype đóng băng nhưng KHÔNG có scripts/fidelity-map.json — chưa làm, không phải được miễn');
+      return { code: 1, out, err };
+    }
     out.push('✓ [prototype-fidelity] no scripts/fidelity-map.json yet — skipped');
     return { code: 0, out, err };
   }
@@ -220,6 +227,12 @@ export function runGate(root) {
     : DEFAULT_SHARED_ROOTS;
 
   if (routes.length === 0) {
+    // Cùng lý do như nhánh thiếu file: map RỖNG cũng là chưa làm, không phải
+    // được miễn. Hai đường bỏ qua thì phải chặn cả hai, không thì vá nửa vời.
+    if (cfg.required) {
+      err.push('✗ [prototype-fidelity] dự án khai có prototype đóng băng nhưng fidelity-map KHÔNG có route nào — chưa làm, không phải được miễn');
+      return { code: 1, out, err };
+    }
     out.push('✓ [prototype-fidelity] fidelity-map has no routes yet — skipped');
     return { code: 0, out, err };
   }
