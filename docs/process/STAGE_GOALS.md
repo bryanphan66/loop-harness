@@ -466,6 +466,20 @@ while phases remain.
    *"runner nhận việc -> In Dev"* không có ai để chạy. Chặn ở cửa vào thì lỗi thành
    **không mở được phase**, thay vì **phát hiện khi đã muộn**.
 
+   **Và đối chiếu mục nghiệm thu của phase với SRS, TRƯỚC khi ai code.** Bản kê thi công là
+   tài liệu dẫn xuất; mục nghiệm thu của nó có thể mâu thuẫn thẳng với mệnh đề *Acceptance*
+   của chính REQ-ID mà không ai thấy. Ca thật: mục kiểm của một phase đòi job treo phải
+   "chuyển sang trạng thái kết thúc thật" trong khi SRS **cấm** đúng điều đó, và đòi huỷ
+   một job đã kết thúc phải "báo lỗi" trong khi SRS nói đó là không-làm-gì. **Một test viết
+   đúng theo lời văn ấy sẽ xanh trong khi khẳng định đúng thứ SRS cấm.**
+
+   Không cổng nào bắt được (`check-manifest-coverage` đếm REQ-ID có mặt,
+   `check-ac-coverage` hỏi có test nhắc tên mã) - đây là việc đọc hai văn bản cạnh nhau.
+   Làm ở **cửa vào**: mở khối khai báo SRS của từng REQ-ID trong phase
+   (`req-issue-scaffold.mjs --reqid <MÃ>`), đọc mệnh đề *Acceptance*, so với mục nghiệm thu
+   của phase. Mâu thuẫn thì **sửa bản kê**, không sửa SRS, và ghi lại lời văn cũ để lần sau
+   không ai "sửa" ngược về.
+
 1. **Mở phase:** `node .harness/steady-state/scripts/new-issue.mjs` sinh issue cho các REQ-ID của phase, gắn nhãn
    `Module: <Tên>` + milestone `Phase N` (bảng đã dựng ở 2.3), state `Ready for Dev`. Chỉ
    issue của phase đang mở, không mở trước cho phase sau.

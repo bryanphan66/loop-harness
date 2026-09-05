@@ -2212,3 +2212,50 @@ trong hai ngày, câu trả lời là có, và bản sao kia là bản sai: regi
 bản `docs/about/` mới (MD-53). Một artifact có hai bản mà không có gì buộc chúng khớp thì
 bản ít được nhìn tới sẽ luôn là bản sai.
 
+## MD-62 - tôi đọc dấu tick thay vì đọc bằng chứng, trong lúc đang viết delta về đúng chuyện đó
+
+Tôi mở `docs/build-manifest.md`, thấy `| P1.4 | ... | [x] |`, và báo với chủ dự án rằng
+**"P1.4 xong, cả P1 đã đủ bốn nhóm"**. Rồi nhắn phiên chạy bảo bắt đầu verifier.
+
+Phiên chạy chặn lại. Dấu tick đó là **sửa đổi chưa commit**: `git status` có 35 file dirty,
+agent build vẫn đang chạy 35 phút, và trong bản ĐÃ COMMIT thì P1.4 chưa tick. Không có
+commit nào của P1.4 cả.
+
+Bắt đầu verifier lúc đó là sai hai lần: kiểm một mẻ code chưa qua cổng của chính nó, và
+thả agent thứ hai vào đúng cây làm việc mà agent kia đang ghi - lượt chạy này đã mất một
+commit vì đúng kiểu chồng lấn đó (`1f107ed`).
+
+**Đây là dạng NGUỒN GIẢ (MD-52) ở một chỗ mới, và tôi là người mắc.** Suốt đêm tôi viết
+MD-54 (phép kiểm mang tên yêu cầu mà không làm việc của nó), MD-59 (comment khai đã nối mà
+chưa nối), MD-61 (bản sao ít ai nhìn là bản sai) - rồi làm đúng thế: **đọc lời khai của một
+tài liệu, không đọc thứ mà lời khai đó nói về.**
+
+Luật, viết ra vì rõ ràng biết luật không đủ để khỏi mắc:
+
+> **Ô đã tick trong một file chưa commit không phải bằng chứng, nó là một câu đang được
+> viết.** Đọc trạng thái phase thì đọc bản đã commit (`git show HEAD:<file>`), và nhìn
+> `git status` trước khi tin. Cùng luật với "verify-at-source" của deploy: cái đang chạy
+> mới tính, không phải cái ai đó nói là đang chạy.
+
+**Ca thứ tư của cùng gia đình, do phiên chạy tự tìm ra và tự khai - đáng ghi vì nó là loại
+nguy hiểm nhất.** `build-manifest.md` § P1.4 mục kiểm 1 và 4 **mâu thuẫn thẳng với SRS**:
+mục 1 đòi job treo phải "chuyển sang trạng thái kết thúc thật" trong khi `IF.JOBS.05` CẤM
+điều đó; mục 4 đòi huỷ một job đã kết thúc phải "báo lỗi kèm nguyên nhân" trong khi
+`IF.JOBS.06` nói đó là không-làm-gì, không phải lỗi. Cả hai viết từ bản tóm tắt của một
+agent trước, lúc scaffold còn hỏng.
+
+**Một test viết đúng theo lời văn đó sẽ XANH trong khi khẳng định đúng thứ SRS cấm.** Không
+cổng nào bắt được: `check-manifest-coverage` chỉ đếm REQ-ID có mặt, `check-ac-coverage` chỉ
+hỏi có test nào nhắc tên mã.
+
+**Vá ở CỬA VÀO, không phải cửa ra.** MD-47 đã học bài này một lần: cổng chỉ kiểm lúc đóng
+phase thì lỗi bị phát hiện khi đã muộn. Mục nghiệm thu của phase trong bản kê phải được đối
+chiếu với mệnh đề *Acceptance* của chính REQ-ID trong SRS **trước khi ai code**, không phải
+lúc verifier chạy. Đã thêm vào mục 0 của 2.6.
+
+**Và sửa lại một ca tôi kể sai đêm qua.** Tôi viết AC 5 của issue `#22` là "chép hành vi 409
+của code". Phiên chạy đọc kỹ hơn: SRS **không hề phán** về mã trạng thái - nó chỉ giới hạn
+việc chạy lại vào trạng thái kho lỗi. Nên "chỉ job trong kho lỗi mới chạy lại được" là suy
+ra được, còn `409` là chi tiết cài đặt. Bài học hẹp hơn tôi viết: **AC khẳng định một điều
+SRS không nói, bằng ngôn ngữ mượn của bản cài đặt.**
+
