@@ -55,6 +55,19 @@ condition cannot loop forever.
 > Same goals in both lanes. In the Lite lane, `docs/ROADMAP.md` is born at 2.3
 > (with the plan) instead of 1.15.
 
+## Thứ tự nguồn sự thật
+
+Khi hai tài liệu nói khác nhau, thứ tự này cố định, cái đứng trên thắng:
+
+**SRS** (chi tiết + tiêu chí chấp nhận) > **prototype đã freeze** (hình dạng màn hình) >
+**feature-register** (chỉ trả lời có-làm-không) > ERD/API contract (dẫn xuất) >
+build-manifest (thứ tự thi công) > issue/AC (bản sao để làm việc) > **code + test (KHÔNG
+BAO GIỜ là nguồn)**.
+
+- **Code lệch SRS -> sửa CODE.** Không sửa SRS, không sửa AC cho khớp code.
+- **SRS lệch prototype -> mở CR, dừng lại báo.** Cả hai đều có người ký, agent không tự chọn.
+- Bảng đầy đủ kèm lý do: `macro-2.md` § Thứ tự nguồn sự thật.
+
 ## Ngân sách lượt - đọc trước khi tin con số "Stop after N turns"
 
 Các mốc `Stop after N turns` dưới đây đặt cho dự án cỡ **~100-150 REQ-ID**. Đo trên một

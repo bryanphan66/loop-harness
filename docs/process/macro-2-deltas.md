@@ -1700,3 +1700,45 @@ nhãn đó. Kiểm: `--check #27` và `#32` đều báo `label plane/Module/Buil
 
 **Luật:** thêm một quy ước mới (nhãn, trường, tên) thì phải sửa **công cụ tạo ra nó** trong
 cùng lần, không để lại một bước gắn tay. Bước tay không có cổng nào giữ.
+
+---
+
+## MD-49 - luật "SRS là nguồn" có ghi, nhưng không có thứ tự và không cổng nào giữ
+
+Operator hỏi: các SOT của Macro 2 - SRS, prototype, feature-register - harness còn nhớ cái
+nào cai quản cái gì không, và **sao đến giờ vẫn có tư tưởng code thắng SRS**.
+
+Đi kiểm. `macro-2.md` **có** ghi, ở hai gạch đầu dòng:
+
+```
+Scope (feature nào)  <- feature-register  (KHÔNG phải SOT)
+Chi tiết + AC        <- docs/requirements/srs/  (SOT thật)
+```
+
+Đúng, nhưng **thiếu ba thứ**, và cả ba đều là lý do lỗ hổng lọt được:
+
+1. **Không có thứ tự ưu tiên.** Grep "ưu tiên / xung đột / precedence" trong `macro-2.md` và
+   `TRACE_SPEC.md` ra **rỗng**. Không chỗ nào nói SRS lệch prototype thì sao, hay code lệch
+   SRS thì sao.
+2. **Chữ "SOT" bị dùng cho quá nhiều thứ** trong cùng bộ tài liệu: loop-harness là SOT của
+   harness, `dor-build.md` là SoT của DoR, manifest reno-ui là "nguồn sự thật", SRS là "SOT
+   thật". Đọc xong không biết cái nào phân xử cái nào.
+3. **Không cổng nào đọc luật đó.** Nó là văn xuôi trong một mục về nguồn nội dung issue.
+
+Kết quả thực tế: 10 issue của P1.1/P1.2 viết **sau** khi code. Không ai vi phạm một luật
+tường minh nào cả - vì luật chưa từng được viết đủ rõ để vi phạm.
+
+**Đã viết thành bảng bảy dòng** trong `macro-2.md`, tóm tắt một đoạn ở đầu `STAGE_GOALS.md`.
+Ba luật đi kèm:
+
+- **Code không bao giờ thắng.** Code lệch SRS thì sửa CODE - không sửa SRS, không sửa AC cho
+  khớp code, không "ghi nhận thực tế hiện tại". Một dòng SRS bị bẻ theo code là một yêu cầu
+  của khách biến mất mà không ai ký.
+- **SRS lệch prototype = CR**, không phải chỗ agent tự chọn. Cả hai đều đã đóng băng và đều
+  có người ký.
+- **Register không phân xử chi tiết** - nó chỉ trả lời "có làm không".
+
+**Cổng giữ luật:** cổng cửa vào của 2.6 (MD-47). Issue phải tồn tại **trước** khi runner
+code; lúc chưa có code thì không có gì để chép, tiêu chí buộc lấy từ SRS. Đây là chỗ duy
+nhất luật này kiểm được bằng máy - phần còn lại là thứ tự làm việc, không phải thứ so sánh
+được bằng script.
