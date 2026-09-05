@@ -1654,3 +1654,32 @@ stack trace Node thô.
 Người dùng `--dry-run` là người **cẩn thận nhất** - không được để họ nhận một stack trace.
 Đã sửa: giả lập thì chỉ **in đường đi** rồi thoát. Thử: `Ready for Dev -> In Dev, 1 buoc,
 khong goi API`.
+
+---
+
+## MD-47 - cổng đặt ở cửa ra nên chỉ bắt được cái đã muộn
+
+Operator hỏi: P1.2 đang chạy rồi mà sao chưa thấy issue nào - *"sao lủng hoài vậy"*.
+
+Kiểm: repo vẫn 7 issue, **6/6 REQ-ID của P1.2 chưa có issue**. Và đây là **lần thứ hai cùng
+một chuyện**: P1.1 cũng code trước rồi mới mở issue.
+
+**Nguyên nhân gốc không phải phiên chạy quên, mà là chỗ tôi đặt cổng.**
+`check-issue-coverage` chỉ chạy lúc **đóng** phase (`--closing`). Quy trình dặn *"mở phase
+-> sinh issue"* bằng **văn**, còn máy thì chỉ kiểm ở **cuối**. Nên runner code trước, tạo
+issue sau - hoặc quên hẳn - và không gì bắt được cho tới lúc đóng.
+
+Nhìn lại cả ngày thì **mọi lỗ hổng đều cùng hình dạng đó**: bảng bước hứa việc mà goal-text
+không giao (MD-33), goal-text giao mà cổng không kiểm (MD-44), cổng kiểm mà kiểm ở cuối
+(chỗ này). Ba tầng, cùng một bệnh: **khoảng cách giữa lời dặn và phép kiểm.**
+
+**Đã vá:** thêm **cổng cửa vào** ở 2.6 - `check-issue-coverage.mjs --phase P<n>` phải xanh
+**TRƯỚC** khi giao việc cho runner. Lỗi thành *"không mở được phase"* thay vì *"phát hiện
+khi đã muộn"*.
+
+Kiểm ngay trên P1.2 đang chạy: cổng báo `6/6 REQ-ID của P1.2 chưa có issue nào` - đúng thứ
+operator vừa hỏi, và nếu có cổng này từ đầu thì P1.2 đã không mở được.
+
+**Luật:** việc nào quy trình bắt làm **trước** một hành động thì phải có cổng chạy **trước**
+hành động đó. Cổng cuối để bắt cái **hỏng trong lúc làm**, không dùng để bắt cái **chưa
+làm** - tới lúc đó sửa đã đắt.

@@ -144,6 +144,7 @@ việc, dù bảng 2.3 đặt tên bước là *"soạn issue"* và `issue%` đ�
 | lúc nào | làm gì | bằng gì |
 |---|---|---|
 | **2.3** dựng bảng | milestone = **phase phát hành** (`Phase 1..N`, có hạn chót) + nhãn `Build: P<n>` (phase thi công) + nhãn `Module: <Tên>` + `plane` | `setup-issue-board.mjs` (mặc định chạy thử, `--apply` mới tạo) |
+| **2.6** TRƯỚC khi giao runner | `check-issue-coverage.mjs --phase P<n>` phải xanh - **cổng cửa vào** |
 | **2.6** mở phase | issue cho REQ-ID của phase, gắn `Build: P<n>` + `Module:` + milestone đợt phát hành, state `Ready for Dev` | `.harness/steady-state/scripts/new-issue.mjs` |
 | **2.6** runner nhận việc | state `In Dev` - đây là mắt xích cho theo dõi **live** | `.harness/steady-state/scripts/issue-state.mjs <n> "In Dev"` |
 | **2.6** verifier PASS | state `Done` | `.harness/steady-state/scripts/issue-state.mjs <n> "Done"` |
@@ -214,6 +215,23 @@ Script có TRANSITION GUARD chặn nhảy cóc và self-test đi kèm; tài li�
 ngược lại. Tôi từng xếp `Deploying` gần `Done` theo nghĩa "go-live" và làm cổng đòi một nấc
 không tới được - lượt chạy bị chặn cho tới khi đọc bảng bên đó. Nhảy nấc là nói dối về việc **ai
 đã kiểm cái gì**, nên cổng chặn.
+
+## Cổng ở cửa vào, không chỉ ở cửa ra
+
+Mọi lỗ hổng lượt chạy đầu đều cùng một hình dạng: **quy trình dặn bằng văn, máy chỉ kiểm ở
+cuối.** Nên khoảng trống chỉ lộ ra khi đã muộn - hoặc khi có người hỏi.
+
+Ví dụ thật: goal-text 2.6 nói *"mở phase -> sinh issue"*, nhưng cổng issue chỉ chạy lúc
+**đóng** phase. Kết quả ở P1.1: runner code xong rồi mới mở issue, nên mốc *"nhận việc ->
+In Dev"* không có ai để chạy, và cả 7 issue nằm ở `Backlog` trong khi code đã có.
+
+**Luật:** việc nào quy trình bắt làm **trước** một hành động thì phải có cổng chạy **trước**
+hành động đó. Cổng cuối chỉ để bắt cái hỏng trong lúc làm, không dùng để bắt cái **chưa
+làm** - lúc đó sửa đã đắt.
+
+Ở 2.6: `check-issue-coverage.mjs --phase P<n>` **trước** khi giao runner (issue phải tồn
+tại, đúng nhãn, đúng milestone), và `--closing --expect "In Dev"` **sau** khi runner xong.
+Hai lần, hai mục đích.
 
 ## Bù, đừng tua lại
 

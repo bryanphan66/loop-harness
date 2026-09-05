@@ -405,6 +405,16 @@ while phases remain.
 **Hai script issue nằm ở kit steady-state** (`.harness/steady-state/scripts/`), không ở
 `scripts/` - chúng là công cụ của Mode B, và Macro 2 dùng chung chứ không chép bản thứ hai.
 
+0. **CỔNG CỬA VÀO - chạy TRƯỚC khi giao việc cho runner.**
+   `node scripts/check-issue-coverage.mjs --phase P<n>` phải **xanh**: mọi REQ-ID của phase
+   đã có issue, gắn đúng nhãn `Build: P<n>` và milestone đợt phát hành.
+
+   **Vì sao ở cửa vào, không phải cửa ra:** cổng chỉ kiểm lúc đóng phase thì runner có thể
+   code trước rồi mới tạo issue - hoặc quên hẳn - và không gì bắt được cho tới cuối. Trên
+   lượt chạy thật, đúng chuyện đó xảy ra ở P1.1: code xong rồi mới mở issue, nên mốc
+   *"runner nhận việc -> In Dev"* không có ai để chạy. Chặn ở cửa vào thì lỗi thành
+   **không mở được phase**, thay vì **phát hiện khi đã muộn**.
+
 1. **Mở phase:** `node .harness/steady-state/scripts/new-issue.mjs` sinh issue cho các REQ-ID của phase, gắn nhãn
    `Module: <Tên>` + milestone `Phase N` (bảng đã dựng ở 2.3), state `Ready for Dev`. Chỉ
    issue của phase đang mở, không mở trước cho phase sau.
