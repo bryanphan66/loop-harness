@@ -40,7 +40,7 @@ thứ vốn là lỗi SRS.
 
 | MD-05 | autocontent, sau khi cài macro 2 | truy nguồn gốc MD-01: ai sinh ra tier-2 kiểu v3 | bước **1.10 của Macro 1** gọi 2 engine không tồn tại (`ck-brand-guidelines`, `ck-design-system`); engine còn lại `ui-styling` dạy cả v4 lẫn v3, không chốt bản nào | đo lại: Macro 2 còn **0 engine treo**; 10 cái còn lại thuộc Macro 1/3, ngoài phạm vi | **đã giải quyết** |
 
-| MD-06 | autocontent, chạy gate dangling-refs | `ship-and-verify.sh` treo sau khi cài macro 2 | bước 2.13 gọi `ship-and-verify.sh`, script này nằm ở `scaffolds/steady-state/`, mà cài macro 2 chỉ nhúng `scaffolds/stack-pnpm-nest-next` | quyết: nhúng thêm steady-state, hay dời script sang stack template | **mở** |
+| MD-06 | autocontent, chạy gate dangling-refs | thiếu **5** script steady-state (ghi ban đầu tưởng 1) | bước 2.13 gọi `ship-and-verify.sh`, script này nằm ở `scaffolds/steady-state/`, mà cài macro 2 chỉ nhúng `scaffolds/stack-pnpm-nest-next` | installer thêm `copy_steady_state_kit()`, nhúng `.harness/steady-state/` | **đã sửa** |
 
 | MD-07 | autocontent, trước 2.1 | thử đọc prototype qua MCP Claude Design rồi qua clone local | macro-2 ghi "Giao diện <- prototype đã freeze" nhưng không nói đọc kiểu gì. Board 2,171,246 ký tự; agent mở cả file là vỡ context rồi bịa | luật đọc theo frame + `extract-frame.mjs` + chốt board chỉ đọc | **đã sửa** |
 
