@@ -1511,3 +1511,30 @@ chế độ theo đợt thì đã merge một cổng luôn xanh ở chế độ 
 **Luật:** giá trị rỗng của một tuỳ chọn phải nghĩa là "không dùng tuỳ chọn này", không bao
 giờ là "dùng với tập rỗng". Và cổng nào lọc được thì phải thử ba chiều: không lọc, lọc
 đúng, lọc sai.
+
+---
+
+## MD-43 - issue được tạo nhưng trạng thái chưa bao giờ được đẩy
+
+Operator hỏi: 7 issue kia chỉ tạo ra thôi chứ không làm luôn à. Kiểm trường `States` của
+tổ chức: **cả 7 đều TRỐNG**. Cái chip `Backlog` nhìn thấy trên GitHub là **nhãn**, không
+phải trường trạng thái - hai thứ khác nhau, và nhìn bằng mắt thì giống hệt.
+
+Nguyên nhân trình tự: lượt chạy viết code P1.1 **trước**, mở issue **sau** (vì lỗ hổng
+"không bước nào giao việc tạo issue" mãi mới lộ ra). Goal-text 2.6 nói *"runner nhận việc
+-> In Dev"*, nhưng lúc runner chạy thì issue chưa tồn tại. Không ai sai; **thứ tự bị đảo
+một lần và không có gì kéo nó về**.
+
+Cổng `check-issue-coverage --closing` **bắt được** - đỏ với *"không đọc được trạng thái"*,
+đúng tinh thần fail-closed. Nhưng thông điệp **gộp hai nguyên nhân khác hẳn nhau**:
+
+- gọi API hỏng -> chuyện **quyền/mạng**
+- trường trống -> **chưa ai đặt**, tức việc chưa làm
+
+Người đọc câu cũ sẽ đi kiểm quyền `gh` trong khi thật ra chỉ cần chạy `issue-state.mjs`.
+Đã tách thành hai lỗi riêng, mỗi cái nói đúng việc phải làm.
+
+**Bài học chung, thứ ba trong ngày về cùng chủ đề:** một thông điệp lỗi gộp nhiều nguyên
+nhân thì cũng vô dụng như một cổng luôn xanh - nó không nói cho người ta biết phải làm gì.
+Trước đó: MD-22 (gate không nói được là nó đọc hỏng), MD-35 (gate đỏ nhưng lý do sai khiến
+người ta sửa nhầm tài liệu).
