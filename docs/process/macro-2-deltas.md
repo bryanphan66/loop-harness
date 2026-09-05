@@ -42,6 +42,8 @@ thứ vốn là lỗi SRS.
 
 | MD-06 | autocontent, chạy gate dangling-refs | `ship-and-verify.sh` treo sau khi cài macro 2 | bước 2.13 gọi `ship-and-verify.sh`, script này nằm ở `scaffolds/steady-state/`, mà cài macro 2 chỉ nhúng `scaffolds/stack-pnpm-nest-next` | quyết: nhúng thêm steady-state, hay dời script sang stack template | **mở** |
 
+| MD-07 | autocontent, trước 2.1 | thử đọc prototype qua MCP Claude Design rồi qua clone local | macro-2 ghi "Giao diện <- prototype đã freeze" nhưng không nói đọc kiểu gì. Board 2,171,246 ký tự; agent mở cả file là vỡ context rồi bịa | luật đọc theo frame + `extract-frame.mjs` + chốt board chỉ đọc | **đã sửa** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -267,3 +269,39 @@ Chỉ **9** skill `ck-*` tồn tại thật: `ck-autoresearch`, `ck-code-review`
 
 **Chặn ngay trước mắt:** bước **2.1** (đóng băng ERD) - chỗ autocontent đang đứng -
 gọi `ck-tech-design`, không tồn tại. Bước 2.2 cũng vậy.
+
+## MD-07 - macro-2 không nói cách đọc prototype
+
+**Lòi ra thế nào.** Thử đọc board `AutoContent Prototype` hai đường.
+
+Qua MCP Claude Design: kết nối được (`canEdit: true`), liệt kê được 90+ file, nhưng
+`get_file` có **ngưỡng cứng 256 KiB**. Board 2.24 MB nên trả về `truncated: true`,
+đúng 262,144 byte = **11.7%**, cắt giữa chuỗi base64. Bóc hết ảnh ra thì markup vẫn
+**1,431,017 ký tự**, gấp 5.5 lần ngưỡng. Không lần đọc nào lấy trọn được.
+
+Qua clone local: đọc đủ. 2,242,107 byte, đóng `</html>`, 3 zone / 121 frame / 52 màn.
+
+**Clone có trung thực với board không - đã kiểm, không đoán.** So byte-với-byte
+262,144 byte đầu: lệch ở byte 153,207. Nguyên nhân là board có thêm một
+`data-comment-anchor="f23fdba937-a"` mà clone không có - dấu neo Claude Design gắn
+khi ai đó để lại bình luận. Bỏ đúng thuộc tính đó ra thì **257,677 ký tự đầu giống
+hệt nhau**. Clone trung thực; drift duy nhất là metadata bình luận, không phải nội
+dung thiết kế.
+
+**Vấn đề thật.** `macro-2.md` ghi "Giao diện <- prototype đã freeze" mà không nói đọc
+kiểu gì. Agent ở 2.6 đọc câu đó rồi mở `index.html` là nuốt 2.17 triệu ký tự - vỡ
+ngân sách context (subagent ~200K token). Vỡ context thì agent bịa. Cùng họ với
+MD-03/04/05: harness gọi tên một thứ, không nói cách tới nó, và không có gì báo.
+
+**Đã sửa.**
+- `scripts/extract-frame.mjs`: `--list` in mục lục 121 frame; `sNN` lấy một frame;
+  `NN` lấy mọi state của một màn; `--trace` chỉ lấy route + floorplan + REQ-ID + UC
+  + CR; ảnh base64 mặc định thay bằng chỗ giữ chỗ.
+  Một frame **7.5K-17K ký tự** so với 2.17M cả file - chênh hơn 100 lần.
+- `macro-2.md` mục "Nguồn nội dung issue": thêm luật đọc theo frame, và chốt
+  **board trên Claude Design là chỉ đọc** (board sửa được nên không được làm mốc
+  so fidelity; mốc là clone trong repo).
+
+Test thật: `--list` ra đúng 121 frame / 3 zone; `s08a --trace` trả về
+`APP · 08 · /app · Overview Page · ... · RPT.DASH.01/.02 · UC-21 · §4.4 card dashboard`;
+`18 --trace` trả về đúng 4 state của màn Campaign timeline.
