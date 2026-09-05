@@ -38,7 +38,7 @@ thứ vốn là lỗi SRS.
 | MD-03 | autocontent, lúc cài macro 2 | so tên playbook macro-2 gọi với file thật | `macro-2.md` cột 2.10 gọi `e2e-qa-field-by-field`, file thật tên `e2e-qa-field-by-field-verify-with-report.md` - tham chiếu treo, agent tìm không ra | sửa tên + dựng gate `dangling-refs` chặn tái phát | **đã sửa** |
 | MD-04 | autocontent, lúc cài macro 2 | 4 link tương đối gãy sau khi copy spine sang dự án | spine giả định layout `docs/process/`; dự án layout phẳng thì `STAGE_GOALS.md`, `WORKFLOW.md`, `TRACE_SPEC.md` gãy. Installer không rewrite đường dẫn | chỉnh tay lúc cài + gate `dangling-refs` bắt link gãy | **đã sửa** |
 
-| MD-05 | autocontent, sau khi cài macro 2 | truy nguồn gốc MD-01: ai sinh ra tier-2 kiểu v3 | bước **1.10 của Macro 1** gọi 2 engine không tồn tại (`ck-brand-guidelines`, `ck-design-system`); engine còn lại `ui-styling` dạy cả v4 lẫn v3, không chốt bản nào | gate `dangling-refs` đếm được: **17 engine treo**. Sửa 1.10 thì chờ phép | **đã đo, chưa sửa** (vùng Macro 1) |
+| MD-05 | autocontent, sau khi cài macro 2 | truy nguồn gốc MD-01: ai sinh ra tier-2 kiểu v3 | bước **1.10 của Macro 1** gọi 2 engine không tồn tại (`ck-brand-guidelines`, `ck-design-system`); engine còn lại `ui-styling` dạy cả v4 lẫn v3, không chốt bản nào | đo lại: Macro 2 còn **0 engine treo**; 10 cái còn lại thuộc Macro 1/3, ngoài phạm vi | **đã giải quyết** |
 
 | MD-06 | autocontent, chạy gate dangling-refs | `ship-and-verify.sh` treo sau khi cài macro 2 | bước 2.13 gọi `ship-and-verify.sh`, script này nằm ở `scaffolds/steady-state/`, mà cài macro 2 chỉ nhúng `scaffolds/stack-pnpm-nest-next` | quyết: nhúng thêm steady-state, hay dời script sang stack template | **mở** |
 
@@ -48,6 +48,8 @@ thứ vốn là lỗi SRS.
 
 | MD-09 | autocontent, chuẩn bị ingest board trên Mac | chạy `ingest-archive.sh` trên macOS | script harness viết trên Linux, dùng `find -printf` và `stat -c%s`, cả hai không có trên macOS. Không ai kiểm tính khả chuyển | vá 2 script + cần luật: script harness phải chạy được trên Linux lẫn macOS | **đã sửa ở dự án, harness còn nợ luật** |
 | MD-10 | autocontent, so gate doc với harness | đối chiếu `docs/gates/` hai bên | **PB-G3 và PB-G4 đảo nghĩa giữa harness và dự án** - không phải lỗi tên, mà đảo thứ tự tiền/thiết kế | cắt Macro 1 + Macro 3 khỏi loop-harness, để bản của dự án là bản duy nhất | **đã sửa** |
+
+| MD-11 | autocontent, trước 2.1 | so danh sách bước WORKFLOW.md với macro-2.md | `/stage-next` lấy thứ tự bước từ `WORKFLOW.md` của dự án, mà file đó chưa biết refactor gộp bước 2026-09-01. Bước 2.0 không bao giờ chạy; 2.5/2.7/2.11 chạy vào chỗ trống | đồng bộ khối Macro 2 trong WORKFLOW.md | **đã sửa** |
 
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
@@ -434,3 +436,84 @@ Mười cái kia (`ck-intake-file`, `ck-ux-design`, `ck-brand-guidelines`,
 `ck-bien-ban`, `ck-client-prep-checklist`) thuộc Macro 1/3 và **không chặn lượt chạy
 này**. MD-05 vì vậy hẹp hơn nhiều so với lúc ghi: cần lấp 7, không phải 17. Trong đó
 `ck-tech-design` là cái duy nhất chặn cứng, vì 2.1 và 2.2 đều gọi nó.
+
+## MD-05 - đã giải quyết (2026-09-05), và bài học không phải cái ta tưởng
+
+Ghi ban đầu là "17 engine treo, `ck-tech-design` chặn cứng bước 2.1". Sai ở chỗ chưa
+đọc kỹ chính cột Engine.
+
+**Ba lần thu hẹp:**
+
+| | Còn lại | Vì sao |
+|---|---|---|
+| ghi ban đầu | 17 | đếm thô mọi `ck-*` không có trong bộ skill |
+| sau khi cắt Macro 1/3 khỏi loop-harness | 7 | 10 cái kia thuộc Macro 1/3, **không chặn lượt này** |
+| sau khi đọc cột Engine | **0** | tên gộp, không phải skill thiếu |
+
+**`ck-tech-design` không phải skill.** Cột Engine ghi thẳng chỉ dẫn trong ngoặc:
+
+```
+2.1   ck-tech-design (databases) + tech-graph
+2.2   ck-tech-design + ck-predict
+```
+
+`ck:databases` ("Design schemas... database design, indexes, migrations", có
+`db-design.md` riêng), `ck:tech-graph` ("production-quality SVG+PNG technical
+diagrams - architecture, data flow"), `ck:predict` ("5 expert personas debate
+proposed changes... architectural, security, performance") - **cả ba đều có trên
+máy**. Người viết WORKFLOW đã lường trước; `ck-tech-design` chỉ là nhãn gộp.
+
+Bốn engine còn lại cũng không chặn: 2.8 và 2.10 có playbook + script cơ học gánh;
+2.12 là gate **khách ký**, người phán chứ không phải skill; 2.5 và 2.11 **đã bị gộp
+mất**, không còn là bước.
+
+**Bài học, và nó rộng hơn MD-05:** *một bước không nhất thiết cần skill.* Nó cần
+**một trong ba**: script cơ học (kiểm được bằng máy), playbook (chỉ cách làm), hoặc
+skill (chỉ khi cần năng lực agent không tự có). Skill là loại đắt nhất và ít cần
+nhất. WORKFLOW gọi 22 engine mà chỉ 9 tồn tại, vậy mà gần như không bước nào bị chặn
+thật - vì playbook và gate đã gánh. **Nhồi skill vào mọi bước chính là cách harness
+phình lên mà chất lượng không tăng.**
+
+Nguyên tắc đã ghi vào `autocontent/docs/WORKFLOW.md` dưới bảng Macro 2: ghi skill
+thật khi bước cần năng lực chuyên biệt; ghi `—` khi playbook + gate đã đủ hoặc khi
+người là người phán. Không bịa tên cho đủ cột.
+
+**Còn lại, ngoài phạm vi:** 10 engine Macro 1/3 (`ck-intake-file`, `ck-ux-design`,
+`ck-brand-guidelines`, `ck-design-system`, `ck-scope-confirmation`, `ck-rri`,
+`ck-handover`, `ck-hypercare`, `ck-bien-ban`, `ck-client-prep-checklist`). Macro 1 đã
+ra sản phẩm - SRS, prototype p1 v6, tier-2 token, feature-register đều nằm trong repo.
+Skill là cái *làm ra* chúng; artifact tồn tại độc lập. Không có đường quay lại Macro 1
+trong lượt này: CR giữa build vào lại ở **2.3** dưới dạng phase mới của manifest.
+**Đừng mở lại mục này.**
+
+## MD-11 - WORKFLOW.md của dự án lệch danh sách bước với macro-2.md
+
+**Lòi ra thế nào.** Đang kiểm MD-05 thì thấy `/stage-next` ghi ở dòng 33:
+*"advance per the `docs/WORKFLOW.md` order"* - tức thứ tự bước lấy từ file của **dự
+án**, không phải từ spine của harness. So hai bên:
+
+```
+WORKFLOW.md   ... 2.4  2.5  2.6  2.7  2.8 ... 2.11 2.12 2.13   (14 bước)
+macro-2.md    2.0  2.4       2.6       2.8 ...      2.12 2.13   (12 bước)
+```
+
+`macro-2.md` ghi *"Refactor 2026-09-01: gộp 2.5→2.4, 2.7→2.10, 2.11→2.13"*, nhưng
+`WORKFLOW.md` của dự án chưa biết chuyện đó.
+
+**Vì sao nghiêm trọng.** Hai hậu quả, cả hai đều im lặng:
+1. **Bước 2.0 không bao giờ chạy.** Hai gate `tier2-ui-compat` + `dangling-refs` và
+   bảng ánh xạ 79 component vừa dựng xong sẽ bị bỏ qua sạch - cài vào một bước mà bộ
+   điều phối không đọc tới.
+2. **2.5, 2.7, 2.11 chạy vào chỗ trống** - WORKFLOW bảo chạy, spine không có dòng nào,
+   agent không có hướng dẫn.
+
+Đây là loại lỗi tệ nhất trong cả sổ này: **không phải thiếu thứ gì, mà là hai nguồn
+sự thật cùng tồn tại và không ai đối chiếu.** Cùng họ với MD-10 (PB-G3/G4 đảo nghĩa).
+
+**Đã sửa** (`autocontent@1b47053`): đồng bộ khối Macro 2 trong `WORKFLOW.md` - thêm
+2.0, gộp 2.5/2.7/2.11, dọn số hiệu cũ ở TL;DR và danh sách gate điều kiện, viết lại
+cột Engine bỏ tên gộp. Danh sách bước hai bên nay khớp hoàn toàn.
+
+**Luật rút ra cho harness:** khi spine đổi danh sách bước, **phải re-propagate xuống
+`WORKFLOW.md` của mọi dự án đang chạy** - đó là file `/stage-next` đọc. Sửa spine mà
+không đồng bộ xuống thì thay đổi không có hiệu lực, và tệ hơn là không có gì báo.
