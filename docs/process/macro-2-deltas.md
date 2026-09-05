@@ -1603,3 +1603,54 @@ Script harness sao xuống dự án bị prettier của dự án format lại, n
 9/11 script hiện lệch định dạng dù hành vi khớp (đã kiểm bằng cách chạy cả hai bản trên cùng
 dữ liệu, đầu ra giống hệt). Drift thật sẽ lẫn vào nhiễu này. Cách vá: cho script harness vào
 `.prettierignore` của dự án. **Chưa làm** - ghi để không quên.
+
+---
+
+## MD-45 - tôi xếp sai thứ tự trạng thái, suýt sửa một bảng đang đúng
+
+Phiên chạy báo chặn: cổng đòi `--expect "Ready for Test"` nhưng nấc đó **không tới được
+bằng đường hợp lệ**, vì `TRANSITIONS` trong `issue-state.mjs` xếp `Deploying` ngay sau
+`In Dev`. Nó đề nghị đổi bảng đó cho khớp tài liệu, và **từ chối tự sửa** vì file thuộc kit
+harness - sửa là tạo bản lệch.
+
+Đọc bảng thì **script đúng, tài liệu của tôi sai**:
+
+```
+Backlog -> Ready for Dev -> In Dev -> Deploying -> Ready for Test
+        -> QC Testing -> Ready for UAT -> UAT Testing -> Done
+```
+
+`Deploying` ở đây **không phải go-live**. Nó là *"đưa lên môi trường để test"* - self-test
+của script ghi thẳng: `['In Dev', 'Ready for Test', false] // chua deploy thi chua test
+duoc`. Và `--advance` cố ý **chỉ đi tới `In Dev`**; từ `Deploying` trở đi phải do người
+hoặc `ship-and-verify.sh` đặt, để giữ cổng QC/UAT là người.
+
+Tôi xếp `Deploying` gần `Done` theo nghĩa quen thuộc của từ đó, **không đọc bảng**. Hậu quả:
+`ISSUE_STATES` sai thứ tự, bảng ánh xạ trong `macro-2.md` sai, và goal-text 2.6 đòi một nấc
+không tới được - **lượt chạy bị chặn**.
+
+Đã sửa ba chỗ của tôi, **không đụng script**. Goal-text 2.6 nay dừng ở `In Dev` (xa nhất
+`--advance` tới được hợp lệ). Thử lại: `--expect "In Dev"` XANH, `--expect "Ready for Test"`
+ĐỎ đúng lý do.
+
+### Hai điều đáng giữ
+
+**Phiên chạy từ chối sửa file harness là đúng, và nó cứu tôi.** Nếu nó tự sửa cho khớp tài
+liệu thì một bảng có TRANSITION GUARD + self-test đã bị bẻ theo một tài liệu sai, và lỗi sẽ
+chỉ lộ ra ở 2.13 khi có người hỏi vì sao issue nhảy thẳng từ UAT sang go-live.
+
+**Đây là lỗi thứ ba cùng một hình dạng trong ngày:** khoá JSON `issue_field_name`, hình dạng
+trả về `{code,out,err}`, và giờ là thứ tự `TRANSITIONS`. Cả ba đều là *tôi suy từ tên gọi
+thay vì đọc thứ đang có*. Luật đã ghi hai lần rồi vẫn tái phạm, nên ghi thêm một lần nữa,
+cụ thể hơn: **khi tài liệu và code nói khác nhau, code có test là nguồn; sửa tài liệu.**
+
+## MD-46 - `--advance --dry-run` chết giữa chừng
+
+Cùng lượt, phiên chạy bắt thêm: `issue-state.mjs --advance --dry-run` tính đường đi một lần
+rồi chạy từng chặng bằng tiến trình con. Ở chế độ giả lập trạng thái **không đổi**, nên chặng
+thứ hai đọc lại vẫn thấy trạng thái cũ và chết vì "nhảy cóc" (`Backlog -> In Dev`), văng
+stack trace Node thô.
+
+Người dùng `--dry-run` là người **cẩn thận nhất** - không được để họ nhận một stack trace.
+Đã sửa: giả lập thì chỉ **in đường đi** rồi thoát. Thử: `Ready for Dev -> In Dev, 1 buoc,
+khong goi API`.

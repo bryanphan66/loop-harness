@@ -232,18 +232,28 @@ export function inScopeReqIds(root, cfg = {}) {
  * `QC Testing` với 2.10, `UAT Testing` với 2.12, `Deploying` với 2.13. Một issue
  * đứng yên ở `In Dev` trong khi bước đã sang 2.10 nghĩa là hồ sơ nói dối.
  *
- * Đo lần đầu trên dự án thật: goal-text chỉ đẩy tới `In Dev` rồi thôi - 7 trạng
- * thái sau không bước nào chạm tới.
+ * THỨ TỰ NÀY LÀ BẢN SAO CỦA `TRANSITIONS` TRONG issue-state.mjs, không phải do
+ * đoán. Bản đầu tôi xếp `Deploying` gần `Done` theo nghĩa "go-live" - SAI. Trong
+ * pipeline này `Deploying` nằm GIỮA `In Dev` và `Ready for Test`: phải triển khai
+ * lên môi trường test rồi mới test được ("chua deploy thi chua test duoc", chính
+ * lời self-test của script). Đặt sai chỗ khiến cổng đòi một nấc không tới được
+ * bằng đường hợp lệ, và lượt chạy bị chặn.
+ *
+ * Sửa ở đây thì phải sửa cùng lúc `TRANSITIONS` bên kia - hoặc đừng sửa gì cả và
+ * đọc bảng bên đó trước. Bảng bên đó có TRANSITION GUARD + self-test, nó là nguồn.
+ *
+ * Đo lần đầu trên dự án thật: goal-text chỉ đẩy tới `In Dev` rồi thôi - các nấc
+ * sau không bước nào chạm tới.
  */
 export const ISSUE_STATES = [
   'Backlog',
   'Ready for Dev',
   'In Dev',
+  'Deploying',        // <- triển khai lên MÔI TRƯỜNG TEST, không phải go-live
   'Ready for Test',
   'QC Testing',
   'Ready for UAT',
   'UAT Testing',
-  'Deploying',
   'Done',
 ];
 /** `Cancelled` nằm ngoài thứ tự - nó là lối ra, không phải một nấc. */
