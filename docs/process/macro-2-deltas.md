@@ -33,6 +33,8 @@ thứ vốn là lỗi SRS.
 |---|---|---|---|---|---|
 | MD-01 | autocontent, trước 2.1 | dựng môi trường, đọc `reno-ui/docs/tailwind-v4-requirement.md` | macro-2 không có bước nào kiểm tier-2 token có chạy được với thư viện UI của dự án không | thêm bước kiểm tương thích trước 2.4 | mở |
 
+| MD-02 | autocontent, trước 2.1 | luật do operator đưa 2026-09-05 | macro-2 không định nghĩa ranh giới UI custom vs UI component, và không có đường đẩy ngược component tái dùng lên thư viện gốc | thêm luật 3 vùng + gate lint theo vùng + bước đẩy ngược | mở |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -69,3 +71,41 @@ danh sách tên token thư viện đọc với tên token tier 2 đang có, báo
 
 **Chưa quyết.** Đặt là bước 2.0 hay nhét vào DoR của 2.3. Chờ hết phase 1 của
 autocontent rồi chốt, để xem còn delta nào cùng nhóm không.
+
+## MD-02 - macro-2 không định nghĩa ranh giới UI custom vs UI component
+
+**Luật operator đưa (2026-09-05).** Một dự án có 2 loại UI, ranh giới theo VÙNG chứ
+không theo cảm tính từng màn:
+
+| Vùng | Luật | Nguồn |
+|---|---|---|
+| **Public page** | custom 100% | copy thẳng từ prototype Claude Design |
+| **Portal / admin** | khoảng 99% dùng component thư viện | reno-ui |
+| **1% custom trong portal** | nếu thấy có khả năng dùng lại ở dự án sau thì **đẩy ngược lên reno-ui**, không để lại trong dự án | reno-ui là SOT |
+
+**Phân loại.** SRS không sai, prototype không sai. macro-2 không có dòng nào về ranh
+giới này, cũng không có bước nào cho việc đẩy ngược. -> lỗi harness.
+
+**Vì sao nghiêm trọng.** Không có ranh giới rõ theo vùng thì mỗi phase agent tự quyết
+"cái này custom cho nhanh", và tới phase 3-4 thì portal đã đầy component inline. Đây
+đúng là loại rò rỉ kéo các lượt chạy trước xuống khoảng 60%. Lint `no-raw-color` của
+reno-ui chặn được màu cứng nhưng KHÔNG chặn được việc tự viết component mới.
+
+Chiều ngược lại cũng hỏng: custom tái dùng được mà để lại trong dự án thì dự án sau
+viết lại từ đầu, và bản nâng cấp reno-ui không mang nó theo.
+
+**Đề xuất sửa harness.**
+
+1. Ghi luật 3 vùng vào `macro-2.md` (mục "Nguồn nội dung issue", cạnh dòng "Giao diện
+   <- prototype đã freeze").
+2. **Gate lint theo vùng, không lint toàn repo một kiểu.** Dự án phải khai đường dẫn
+   nào là public, nào là portal. Vùng portal: cấm định nghĩa component UI mới ngoài
+   `components/ui/` do thư viện sinh. Vùng public: chỉ áp `no-raw-color` ở mức cảnh
+   báo, không chặn.
+3. Thêm việc **đẩy ngược** vào vòng lặp 2.6: mỗi lần đóng phase, rà custom vừa viết
+   trong portal, cái nào tái dùng được thì mở PR sang reno-ui trước, rồi dự án
+   `shadcn add` xuống. KHÔNG sửa file trong `components/ui/` tại chỗ - lần sync bản
+   mới sẽ ghi đè mất.
+
+**Chưa quyết.** Ai phán "cái này tái dùng được" - agent tự quyết hay người. Đề nghị:
+agent đề xuất, người duyệt ở mốc đóng phase, vì đây là quyết định ảnh hưởng dự án khác.
