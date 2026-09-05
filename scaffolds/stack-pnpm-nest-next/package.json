@@ -26,7 +26,8 @@
     "db:seed": "pnpm --filter ./apps/api db:seed",
     "prepare": "husky || true",
     "ui:sync": "node scripts/ui-sync.mjs",
-    "ui:check": "node scripts/ui-sync.mjs --check"
+    "ui:check": "node scripts/ui-sync.mjs --check",
+    "validate:quick": "pnpm run lint && pnpm run typecheck && pnpm run test"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",

@@ -33,25 +33,25 @@
  *   node scripts/check-ui-region-boundary.mjs           # exit 1 nếu vi phạm A hoặc B
  *   node scripts/check-ui-region-boundary.mjs --json
  */
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, relative, resolve, basename } from "node:path";
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative, resolve, basename } from 'node:path';
 
 const ROOT = process.cwd();
-const asJson = process.argv.includes("--json");
+const asJson = process.argv.includes('--json');
 
-const CONFIG_PATH = join(ROOT, "scripts/gate-config.json");
-const cfg = existsSync(CONFIG_PATH) ? JSON.parse(readFileSync(CONFIG_PATH, "utf8")) : {};
+const CONFIG_PATH = join(ROOT, 'scripts/gate-config.json');
+const cfg = existsSync(CONFIG_PATH) ? JSON.parse(readFileSync(CONFIG_PATH, 'utf8')) : {};
 const regions = cfg.uiRegions ?? null;
 
 /** Primitive mà thư viện chắc chắn đã có — tự vẽ là đi vòng qua thư viện. */
-const LIBRARY_PRIMITIVES = ["button", "input", "select", "textarea", "dialog"];
+const LIBRARY_PRIMITIVES = ['button', 'input', 'select', 'textarea', 'dialog'];
 
-const SKIP_DIRS = new Set(["node_modules", "dist", ".next", ".turbo", "coverage", "e2e", "e2e-ui"]);
+const SKIP_DIRS = new Set(['node_modules', 'dist', '.next', '.turbo', 'coverage', 'e2e', 'e2e-ui']);
 
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
   for (const name of readdirSync(dir)) {
-    if (name.startsWith(".") || SKIP_DIRS.has(name)) continue;
+    if (name.startsWith('.') || SKIP_DIRS.has(name)) continue;
     const full = join(dir, name);
     const st = statSync(full);
     if (st.isDirectory()) walk(full, out);
@@ -63,14 +63,14 @@ function walk(dir, out = []) {
 /** Glob rất hẹp: chỉ cần `dir/**` và đường dẫn trần. Không kéo thêm phụ thuộc. */
 function matches(relPath, patterns) {
   return (patterns ?? []).some((p) => {
-    const base = p.replace(/\/\*\*?$/, "").replace(/\/$/, "");
-    return relPath === base || relPath.startsWith(base + "/");
+    const base = p.replace(/\/\*\*?$/, '').replace(/\/$/, '');
+    return relPath === base || relPath.startsWith(base + '/');
   });
 }
 
 /** Bỏ comment để khỏi bắt nhầm ví dụ trong chú thích. */
 const stripComments = (s) =>
-  s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
 
 const errors = [];
 const warnings = [];
@@ -78,20 +78,20 @@ const notes = [];
 
 if (!regions) {
   notes.push(
-    "gate-config.json chưa khai `uiRegions` — gate không kiểm được gì. Khai public/portal/libraryDir rồi chạy lại.",
+    'gate-config.json chưa khai `uiRegions` — gate không kiểm được gì. Khai public/portal/libraryDir rồi chạy lại.',
   );
 } else {
-  const libDir = regions.libraryDir ?? "apps/web/src/components/ui";
+  const libDir = regions.libraryDir ?? 'apps/web/src/components/ui';
   const allow = new Set(regions.allowlist ?? []);
   const scanRoots = [...(regions.public ?? []), ...(regions.portal ?? []), libDir]
-    .map((p) => p.replace(/\/\*\*?$/, ""))
+    .map((p) => p.replace(/\/\*\*?$/, ''))
     .filter((p, i, a) => a.indexOf(p) === i);
 
   const files = scanRoots.flatMap((r) => walk(resolve(ROOT, r))).map((f) => relative(ROOT, f));
 
   if (files.length === 0) {
     notes.push(
-      `chưa có file .tsx nào trong ${scanRoots.join(", ")} — dự án chưa scaffold (bước 2.4). Gate sẽ có hiệu lực khi có code.`,
+      `chưa có file .tsx nào trong ${scanRoots.join(', ')} — dự án chưa scaffold (bước 2.4). Gate sẽ có hiệu lực khi có code.`,
     );
   }
 
@@ -99,7 +99,7 @@ if (!regions) {
   const registryNames = new Set();
   const regPath = regions.registryFile ? resolve(ROOT, regions.registryFile) : null;
   if (regPath && existsSync(regPath)) {
-    const reg = JSON.parse(readFileSync(regPath, "utf8"));
+    const reg = JSON.parse(readFileSync(regPath, 'utf8'));
     for (const item of reg.items ?? []) registryNames.add(item.name);
   }
 
@@ -107,11 +107,19 @@ if (!regions) {
     const rel = f;
     if (!matches(rel, [libDir])) continue;
     if (/\.(test|spec)\.(tsx|jsx)$/.test(rel)) continue; // file test không phải đồ thư viện
-    const stem = basename(rel).replace(/\.(tsx|jsx)$/, "");
+    const libBase = libDir.replace(/\/\*\*?$/, '').replace(/\/$/, '');
+    const withinLib = relative(libBase, rel);
+    // Một mục registry:ui có thể cài thành file phẳng ("button.tsx") HOẶC thư
+    // mục nhiều file ("chart/index.tsx" + "chart/chart-legend.tsx" ...). Ở
+    // trường hợp thư mục, tên đối chiếu là TÊN THƯ MỤC (mục registry), không
+    // phải basename của từng file con — nếu không mọi file nội bộ (index,
+    // *-context, *-toolbar...) đều bị báo nhầm là "tự viết".
+    const segments = withinLib.split('/');
+    const stem = segments.length > 1 ? segments[0] : basename(rel).replace(/\.(tsx|jsx)$/, '');
     if (registryNames.size === 0) continue; // không có registry để đối chiếu
     if (!registryNames.has(stem) && !allow.has(rel)) {
       errors.push({
-        rule: "B-thu-vien",
+        rule: 'B-thu-vien',
         file: rel,
         note: `"${stem}" không phải mục của registry. File tự viết trong thư mục thư viện sẽ bị lần sync sau ghi đè mất — nâng ở repo thư viện gốc rồi kéo xuống.`,
       });
@@ -122,18 +130,18 @@ if (!regions) {
   for (const f of files) {
     if (!matches(f, regions.portal)) continue;
     if (matches(f, [libDir])) continue;
-    const raw = readFileSync(resolve(ROOT, f), "utf8");
+    const raw = readFileSync(resolve(ROOT, f), 'utf8');
     const src = stripComments(raw);
-    const lines = raw.split("\n");
+    const lines = raw.split('\n');
     for (const tag of LIBRARY_PRIMITIVES) {
-      const re = new RegExp(`<${tag}[\\s/>]`, "g");
+      const re = new RegExp(`<${tag}[\\s/>]`, 'g');
       if (!re.test(src)) continue;
       lines.forEach((line, i) => {
         if (!new RegExp(`<${tag}[\\s/>]`).test(line)) return;
-        if (line.includes("ui-ok:")) return;
+        if (line.includes('ui-ok:')) return;
         if (allow.has(f)) return;
         errors.push({
-          rule: "A-portal",
+          rule: 'A-portal',
           file: `${f}:${i + 1}`,
           note: `vùng portal tự vẽ <${tag}>. Dùng component thư viện; thật sự cần thì thêm comment "ui-ok: <lý do>" cùng dòng.`,
         });
@@ -145,20 +153,20 @@ if (!regions) {
   const HEX = /#[0-9a-fA-F]{3,8}\b/;
   for (const f of files) {
     if (!matches(f, regions.public)) continue;
-    const lines = readFileSync(resolve(ROOT, f), "utf8").split("\n");
+    const lines = readFileSync(resolve(ROOT, f), 'utf8').split('\n');
     lines.forEach((line, i) => {
       if (!HEX.test(stripComments(line))) return;
       warnings.push({
-        rule: "C-public",
+        rule: 'C-public',
         file: `${f}:${i + 1}`,
-        note: "màu cứng ở vùng public — chấp nhận được (custom 100%), chỉ nhắc để biết.",
+        note: 'màu cứng ở vùng public — chấp nhận được (custom 100%), chỉ nhắc để biết.',
       });
     });
   }
 }
 
 const result = {
-  gate: "ui-region-boundary",
+  gate: 'ui-region-boundary',
   configured: Boolean(regions),
   errors,
   warnings: warnings.length,
@@ -169,7 +177,7 @@ const result = {
 if (asJson) {
   console.log(JSON.stringify({ ...result, warningList: warnings }, null, 2));
 } else {
-  console.log("[ui-region-boundary]");
+  console.log('[ui-region-boundary]');
   for (const n of notes) console.log(`  GHI CHU: ${n}`);
   for (const e of errors) {
     console.log(`  LOI  [${e.rule}] ${e.file}`);
@@ -180,7 +188,11 @@ if (asJson) {
     for (const w of warnings.slice(0, 5)) console.log(`       ${w.file}`);
     if (warnings.length > 5) console.log(`       ... và ${warnings.length - 5} chỗ nữa`);
   }
-  console.log(result.pass ? "[ui-region-boundary] XANH" : `[ui-region-boundary] DO — ${errors.length} vi phạm`);
+  console.log(
+    result.pass
+      ? '[ui-region-boundary] XANH'
+      : `[ui-region-boundary] DO — ${errors.length} vi phạm`,
+  );
 }
 
 process.exit(result.pass ? 0 : 1);
