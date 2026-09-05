@@ -2062,3 +2062,46 @@ qua. Một quy trình có 14 bước mà mới chạy 7 thì nửa còn lại l�
 cách duy nhất bắt lỗi ở đó trước ngày go-live là **đọc nó như thể đang chạy nó**: rút mọi
 lệnh ra xem có thật không (MD-56), rút mọi nước đi ra xem có hợp lệ không (đây).
 
+## MD-58 - lượt chạy đêm không người trực: máy ngủ, và agent chết câm
+
+Lượt chạy để tự lái qua đêm. Sáng ra dựng lại mốc thời gian thì mất khoảng **4 tiếng** vào
+hai chuyện chẳng liên quan gì tới Macro 2 - nhưng cả hai đều là chuyện của harness, vì
+harness là thứ nói người ta chạy đêm được.
+
+**Một - máy ngủ giữa chừng.** Trong log phiên chạy có đúng dòng này, hai lần:
+
+```
+API Error: Your computer went to sleep mid-response.
+```
+
+`pmset -g` cho thấy `sleep 1` - máy đặt ngủ sau **một phút** không dùng. Có hai tiến trình
+`caffeinate` nhưng là loại `-t 300`, giữ 5 phút mỗi thao tác, do công cụ tự bật. Không cái
+nào giữ suốt phiên. Nên hễ phiên im lặng chờ một lệnh nền - ví dụ một mẻ 14 lượt gọi API
+GitHub - là máy ngủ, và phản hồi mất luôn.
+
+**Luật: lượt chạy không người trực phải tự giữ máy thức, trong suốt thời lượng của nó.**
+`caffeinate -dimsu -t <giây>` chạy nền, bật TRƯỚC khi dispatch, không phải sau khi mất bài.
+Đây không phải mẹo vặt của macOS: bất kỳ nền tảng nào cũng có cái tương đương, và không có
+nó thì "chạy qua đêm" là một lời hứa không có cơ sở.
+
+**Hai - agent gặp lệnh treo thì chết câm.** `apps/api/package.json` có `test:e2e` thiếu cờ
+`--forceExit`, nên jest chạy xong 14 test vẫn treo vĩnh viễn vì còn handle mở. **Hai agent
+build P1.3 chết đứng liên tiếp ở đúng bước đó** (watchdog 600s), và **không agent nào chẩn
+được gì** - chúng chết trước khi kịp báo. Phiên chính phải tự chạy jest trực tiếp mới thấy
+`Force exiting Jest`, tức là rò handle.
+
+Hai luật rút ra, và cái thứ hai quan trọng hơn:
+
+- **Lệnh mà agent không người trực chạy thì không được phép treo.** Script test phải có
+  `--forceExit` hoặc timeout. Treo vô hạn + watchdog = agent chết không để lại lời nào.
+- **Agent chết ở watchdog thì ĐỪNG thả agent thứ hai vào cùng chỗ.** Luật cũ đã có -
+  *"không lặp lại cùng cách sau khi BLOCKED"* - nhưng nó viết cho trường hợp agent BÁO
+  BLOCKED. Chết câm thì không có báo cáo nào để đọc, nên luật không kích hoạt, và người
+  điều phối thả tiếp con thứ hai vào đúng cái bẫy. **Bổ sung: agent chết ở watchdog thì
+  điều phối viên phải TỰ CHẠY lệnh cuối cùng nó chạm tới, trước khi thả con tiếp theo.**
+  Một lượt chạy tay 5 giây tìm ra thứ mà hai agent và 2,5 tiếng không tìm ra.
+
+**Cái đắt không phải hai lỗi này.** Cả hai đều vặt, sửa mỗi cái một dòng. Cái đắt là chúng
+**không để lại dấu vết** - máy ngủ thì log chỉ có một dòng API error, agent chết watchdog
+thì không có gì cả. Một lượt chạy đêm mất 4 tiếng mà sáng ra nhìn vào không hiểu vì sao.
+

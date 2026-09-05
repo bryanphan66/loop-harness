@@ -9,6 +9,39 @@
 **Macro-stage / step:** always-on cả ba macro; dùng nhiều nhất ở **2.6** (`/build-phase`)
 và **2.9/2.10** (QA). **Gate it serves:** none - đây là cách làm, không phải cổng.
 
+## Trước khi dispatch một lượt chạy KHÔNG NGƯỜI TRỰC - hai thứ, làm trước, không phải sau
+
+**1. Giữ máy thức suốt thời lượng chạy.**
+
+```bash
+nohup caffeinate -dimsu -t 21600 >/dev/null 2>&1 &   # 6 tiếng
+```
+
+Đo trên một lượt chạy đêm thật: `pmset -g` cho `sleep 1` - máy ngủ sau **một phút** không
+dùng. Có `caffeinate` nhưng là loại `-t 300` do công cụ tự bật theo từng thao tác, không
+cái nào giữ suốt phiên. Hễ phiên im lặng chờ một lệnh nền (một mẻ 14 lượt gọi API GitHub)
+là máy ngủ, và log chỉ để lại đúng một dòng:
+
+```
+API Error: Your computer went to sleep mid-response.
+```
+
+Xuất hiện **hai lần trong một đêm**. Không có dòng này thì sáng ra nhìn vào khoảng trống hai
+tiếng và không hiểu vì sao. Bật `caffeinate` TRƯỚC khi dispatch, không phải sau khi mất bài.
+
+**2. Lệnh mà worker sẽ chạy không được phép treo.**
+
+Script test phải có `--forceExit` (jest) hoặc timeout. Treo vô hạn cộng với watchdog bằng
+**agent chết câm**: đo được trên cùng đêm đó, `test:e2e` thiếu `--forceExit` làm **hai agent
+build chết đứng liên tiếp** ở đúng một bước (watchdog 600s, mất ~2,5 tiếng), và **không con
+nào chẩn được gì** vì chúng chết trước khi kịp báo.
+
+> **Agent chết ở watchdog thì ĐỪNG thả con thứ hai vào cùng chỗ.** Luật "không lặp lại cùng
+> cách sau khi BLOCKED" viết cho trường hợp agent BÁO blocked; chết câm thì không có báo cáo
+> nào để đọc nên luật không kích hoạt. Điều phối viên phải **tự chạy lệnh cuối cùng nó chạm
+> tới** trước khi thả con tiếp theo. Một lượt chạy tay 5 giây tìm ra thứ mà hai agent và 2,5
+> tiếng không tìm ra.
+
 ## Chọn nhanh
 
 | Cần gì | Dùng | Vì sao |
