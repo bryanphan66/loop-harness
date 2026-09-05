@@ -32,7 +32,14 @@
 ## Nguồn nội dung issue (neo REQ-ID)
 - **Scope** (feature nào) ← `feature-register` *(view scope đông băng PB-G2, KHÔNG phải SOT)*.
 - **Chi tiết + AC** ← `docs/requirements/srs/` *(SOT thật, sống)*.
-- **Giao diện** ← prototype đã freeze.
+- **Giao diện** ← prototype đã freeze. **Đọc theo TỪNG FRAME, không mở cả file.**
+  Board là một file HTML rất lớn (autocontent: 2,171,246 ký tự, 121 frame, ảnh
+  base64 chiếm 34%). Mở cả file là vỡ ngân sách context, mà vỡ context thì agent bịa.
+  Dùng `extract-frame.mjs`: `--list` để xem mục lục, `sNN` để lấy một frame
+  (7.5K-17K ký tự), `--trace` để lấy route + floorplan + REQ-ID + UC + CR của frame đó.
+- **Board trên Claude Design là CHỈ ĐỌC.** Prototype đã freeze ở PB-G4; bản dùng để
+  so fidelity là clone trong repo, không phải board. Board sửa được nên không được
+  dùng làm mốc. Không bao giờ ghi lên board từ trong lượt chạy.
 - **Soạn issue** = agent đọc SRS → `new-issue.mjs` (hoặc `req-issue-scaffold.mjs` gom theo REQ-ID). KHÔNG có script sync register→issue.
 - **Đủ chưa / ở đâu** = `rtm-status.mjs` (bảng REQ-ID × register/issue/test/prototype).
 
