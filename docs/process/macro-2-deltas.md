@@ -1356,3 +1356,60 @@ trong lời giải thích (MD-39).
 định, (b) **khoanh vùng rõ ràng đâu là khai, đâu là giải thích**, (c) cắt trước mọi mệnh đề
 phủ định. Và luôn tự hỏi: *người viết tiếp theo có đoán được luật này không?* Nếu không thì
 luật sai, không phải người viết sai.
+
+---
+
+## MD-40 - năm dòng ma sát còn hở, cùng một họ: tiêu chí quy mô máy trong ngân sách người
+
+Đóng sổ ma sát cuối lượt: 19/24 dòng đã vá thành MD-20..MD-39. **Năm dòng còn lại cùng
+một gốc:**
+
+- 2.1 - gate đòi *mọi REQ-ID map >=1 thực thể*, **không có script**.
+- 2.2 - gate đòi *API contract phủ mọi REQ-ID có API surface* (601 mục), **không có script**.
+- 2.3 - playbook đòi *mỗi phase gọn trong một phiên (~10 file)* nhưng ngân sách không đủ
+  để chia 401 REQ-ID.
+- 2.3 - **vượt ngân sách lượt** thật (quy định 18, dùng nhiều hơn).
+- một phần: đối chiếu REQ-ID <-> entity (phần phase đã có `check-issue-coverage`).
+
+Tất cả là **tiêu chí ở quy mô máy giao cho gate người, trong ngân sách lượt đặt cho dự án
+nhỏ hơn nhiều**. Đây chính là điều phân bố ma sát đã chỉ từ dòng đầu: `thieu-cong-cu`
+chiếm 8/24, nhiều nhất.
+
+### Đo bằng máy lần đầu, và con số nói ngược lại điều tôi tưởng
+
+`check-reqid-artifact-coverage.mjs` (mới) đo phủ REQ-ID -> artifact:
+
+```
+mức id    ERD 6%    API contract 4%
+mức area  ERD 22%   API contract 17%
+```
+
+**Hai tài liệu đó không sai 78%** - chúng **chưa từng ghi trích dẫn REQ-ID**. Tức tiêu chí
+như đang viết **chưa bao giờ đạt được và chưa bao giờ được kiểm**; `AD-77`/`AD-78` của lượt
+chạy nói đúng sự thật khi khai là chỉ kiểm ở mức module.
+
+Bắt đủ 100% ngay ở 2.1/2.2 nghĩa là bắt viết ~130 dòng trích dẫn trong một bước 15 lượt.
+Cổng sẽ đỏ mãi rồi bị bỏ qua - **đúng bệnh MD-24 vừa vá xong ở một gate khác**.
+
+### Cách vá: đo trước, chặn sau
+
+| bước | chế độ | vì sao |
+|---|---|---|
+| 2.1, 2.2 | `--advisory` - báo cáo con số, không chặn | tài liệu chưa có trích dẫn; ép ngay là ép viết một lượt |
+| 2.6 | `--phase P<n>` - **chặn** | mở phase nào viết trích dẫn phase đó; phase cuối đóng là phủ tự đủ |
+
+Kiểm chứng: `--artifact entity --phase P1.1` -> **xanh, 4/4 REQ-ID có thực thể**. Nợ chia
+nhỏ theo phase thì trả được; gom một cục thì không.
+
+### Ngân sách lượt: nhân theo cỡ dự án
+
+Mốc `Stop after N turns` vốn đặt cho dự án **~100-150 REQ-ID**. Dự án thật có **401**, và
+2.3 vượt ngân sách - phần lớn lượt dùng để đọc dò 21 file SRS.
+
+Luật mới ghi vào đầu `STAGE_GOALS.md`: trên **200 REQ-ID** nhân ngân sách các bước đọc-nhiều
+(2.1, 2.2, 2.3) lên **×1.5**, trên **400** thì **×2**. Các bước khác giữ nguyên vì chúng đọc
+artifact đã cô đọng.
+
+Và: **vượt ngân sách không phải lỗi, GIẤU mới là lỗi** - vượt thì ghi số thật vào sổ ma sát
+để lần sau hiệu chỉnh bằng số, không bằng cảm giác. Tuyệt đối không cắt bớt việc cho vừa
+ngân sách; hạ mức kiểm thì phải ghi rõ đã hạ.
