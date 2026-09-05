@@ -19,6 +19,7 @@
 | `docs/about/HARNESS_CHANGELOG.md` | nhật ký thay đổi của chính bộ harness; dự án theo dõi thay đổi của mình ở `STAGE.md` |
 | `docs/process/macro-2-deltas.md` | sổ delta của harness - bằng chứng để sửa harness. Dự án ghi ma sát ở `docs/macro2-friction-log.md`, đó mới là đầu vào của sổ này |
 | `docs/decisions/layer-nesting-harness-outermost.md` | quyết định kiến trúc của bộ harness, không phải quyết định của sản phẩm |
+| `docs/about/not-shipped-to-projects.md` | chính danh sách này - nó nói về ranh giới harness/dự án, dự án không cần đọc. Không tự khai thì nó tự báo mình thiếu, ở mọi dự án |
 
 ## Sửa danh sách này thế nào
 

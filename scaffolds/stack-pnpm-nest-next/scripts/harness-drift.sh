@@ -129,13 +129,17 @@ hash_of() { [ -f "$1" ] && sha256sum "$1" | cut -d' ' -f1 || true; }
 # buong bang hash tho (baseline la hash tho, khong doi duoc), roi LOC bao cao.
 norm_hash() {  # hash sau khi bo dinh dang: dam/nghieng, padding bang, khoang trang
   [ -f "$1" ] || return 0
-  # Do tay tren mot du an that de biet phai bo nhung gi: prettier doi `*chu*` ->
-  # `_chu_`, can le lai o bang (`|-|-|` -> `| - | - |`), doi dau dau dong `+` -> `-`,
-  # va them dau `>` vao dong trong trong khoi trich dan. Khong cai nao la thay doi
-  # NOI DUNG. Bo het, roi bo luon nhung dong chi con dau cau.
-  sed -e 's/[*_`]//g' -e 's/-\{2,\}/-/g' -e 's/[[:space:]]\{1,\}/ /g' \
-      -e 's/ *| */|/g' -e 's/^[-+] /- /' -e 's/^ //' -e 's/ $//' "$1" \
-    | grep -vE '^[>|+ -]*$' | sha256sum | cut -d' ' -f1
+  # Do tay tren mot du an that de biet phai bo nhung gi. Prettier doi `*chu*` ->
+  # `_chu_`, can le lai bang (`|-|-|` -> `| - | - |`), doi dau dau dong `+` -> `-`,
+  # them `>` vao dong trong trong khoi trich dan, VA dinh dang lai code ben trong
+  # tai lieu - cai cuoi be `page.locator(x).filter(y)` thanh ba dong, nen so theo
+  # DONG khong bat duoc, ma so theo TU cung khong: mot tu bi tach lam ba. Nen bo
+  # het khoang trang va dau bo cuc, con lai mot chuoi ky tu.
+  #
+  # Danh doi da biet: mot thay doi chi o dau cau se bi coi la khong doi. Chap nhan
+  # duoc - cau hoi cua bao cao nay la "noi dung co doi khong", khong phai "byte co
+  # doi khong". Byte thi `git diff` tra loi roi.
+  tr -d '[:space:]' < "$1" | tr -d '*_`>|+=:' | tr -d '\-' | sha256sum | cut -d' ' -f1
 }
 
 # File cua rieng harness, khong phai cua kit. Khai o mot file doc duoc chu khong

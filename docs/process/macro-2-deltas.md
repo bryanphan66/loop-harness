@@ -1872,3 +1872,53 @@ tới lượt phase của nó thì cổng im. Regex cũng không phân biệt `B
 Giờ chỉ mã ở tiêu đề `[REQ-ID]` mới tính là phủ; tiêu đề không theo quy ước thì vẫn lùi về
 quét thân bài nhưng in ra là đã lùi. Đo lúc vá: chưa issue nào dính - vá trước khi cháy.
 
+## MD-53 - công cụ bắt lệch vẫn chạy suốt, và chưa từng nhìn thấy gì
+
+Bài học của MD-50 là *"vá harness mà không đẩy xuống thì bản vá bằng không"*. Câu hỏi tiếp
+theo phải là: **đã có công cụ nào bắt chuyện đó chưa?** Có. `harness-drift.sh`. Nó vẫn nằm
+đó, vẫn chạy được. Đi kiểm thì ra ba tầng hỏng chồng lên nhau.
+
+**Tầng 1 - nó không tìm thấy harness.** Script chỉ đoán tên `vibecode-harness`, cái tên repo
+đã đổi. Gõ trần thì in "no harness found" rồi thoát. Provenance cũng không cứu:
+`harness_source` ghi `/home/nghia/vibecode-harness` - đường dẫn trên máy của người đã cài
+kit, không phải máy đang chạy. Ba đường tìm, chết cả ba.
+
+**Tầng 2 - nó chưa từng nằm trong bộ harness.** File chỉ tồn tại trong một dự án. Dự án khác
+không hề có công cụ này. Công cụ chống drift mà bản thân nó không được phát hành.
+
+**Tầng 3 - và đây mới là tầng giết nó. Nó kêu sai quá nhiều.** Chỉ đúng đường dẫn cho nó rồi
+chạy: **83 file "cần xử lý"**. Ngồi đọc từng cái thì số lệch thật là **6**, và cả 6 đều
+không cần sửa. 77 dòng còn lại là nhiễu, từ ba nguồn:
+
+| nguồn nhiễu | số dòng | nó là gì |
+|---|---|---|
+| harness dọn lại thư mục (`docs/X.md` -> `docs/about/X.md`) | 51 | file vẫn nằm đó, ở đường dẫn cũ |
+| dự án chạy prettier trên markdown, harness thì không | 20 | `*chữ*` -> `_chữ_`, căn lề bảng, `+` -> `-`, định dạng lại code trong tài liệu |
+| tài liệu nội bộ của harness | 5 | nói về chính bộ harness, dự án không cần |
+
+**Bản báo cáo kêu sai 77 lần thì lần thứ 78 kêu đúng cũng không ai nghe.** Đó chính xác là
+chuyện đã xảy ra: công cụ chạy, in ra 83, mọi người thôi đọc - trong khi một bản vá 2.6 nằm
+im không được đẩy xuống suốt nhiều tuần, và lượt chạy thật phải trả giá hai lần.
+
+**Vá bốn thứ:**
+
+1. Tìm harness theo: tham số, `$HARNESS_REPO`, provenance nếu đường dẫn đó có thật, rồi các
+   bố cục thường gặp dưới cả hai tên. Không thấy thì **in ra đã thử những đâu** - danh sách
+   đoán chỉ có ích khi người ta nhìn được nó.
+2. Đưa script vào `scaffolds/` để dự án nào cũng có.
+3. **So theo chuỗi ký tự, bỏ hết bố cục.** So theo dòng không bắt được prettier bẻ
+   `page.locator(x).filter(y)` thành ba dòng; so theo từ cũng không, vì một từ bị tách làm
+   ba. Buồng riêng `FORMAT-ONLY`, không tính vào số phải xử lý. Đánh đổi đã biết và chấp
+   nhận: thay đổi chỉ ở dấu câu sẽ bị coi là không đổi - câu hỏi của bản báo cáo này là
+   "nội dung có đổi không", còn "byte có đổi không" thì `git diff` trả lời rồi.
+4. **Khai tài liệu nội bộ ra một file đọc được** (`docs/about/not-shipped-to-projects.md`),
+   không nhét danh sách bỏ qua vào trong script. Danh sách bỏ qua mà không ai biết nó tồn
+   tại thì lần sau lại có người đi tìm "sao file này không bao giờ báo thiếu".
+
+**83 -> 6**, cùng một dự án, cùng một thời điểm, không đồng bộ thêm file nào.
+
+**Còn hở, ghi ra chứ không giấu:** một file cổng khi dự án **điền vào** (`dor-build.md` có
+dòng "Checklist (AutoContent, filled at step 2.3)" với các ô đã tick) thì nó thành hồ sơ của
+dự án, không còn là bản mẫu. Công cụ không có cách nào biết, nên báo `BOTH` mãi. Đè lên là
+xoá hồ sơ đã ký. Cần một cách để dự án khai "file này giờ của tôi" - chưa làm.
+
