@@ -33,7 +33,7 @@ thứ vốn là lỗi SRS.
 |---|---|---|---|---|---|
 | MD-01 | autocontent, trước 2.1 | dựng môi trường, đọc `reno-ui/docs/tailwind-v4-requirement.md` | macro-2 không có bước nào kiểm tier-2 token có chạy được với thư viện UI của dự án không | thêm bước 2.0 + gate `tier2-ui-compat` + script `check-tier2-ui-compat.mjs` | **đã sửa** |
 
-| MD-02 | autocontent, trước 2.1 | luật do operator đưa 2026-09-05 | macro-2 không định nghĩa ranh giới UI custom vs UI component, và không có đường đẩy ngược component tái dùng lên thư viện gốc | luật 3 vùng + bước đẩy ngược: **đã sửa**. Gate lint theo vùng: hoãn tới 2.4 | **đã sửa một phần** |
+| MD-02 | autocontent, trước 2.1 | luật do operator đưa 2026-09-05 | macro-2 không định nghĩa ranh giới UI custom vs UI component, và không có đường đẩy ngược component tái dùng lên thư viện gốc | luật 3 vùng + bước đẩy ngược + gate `ui-region-boundary` ⚙️ ở 2.4 và 2.6 | **đã sửa** |
 
 | MD-03 | autocontent, lúc cài macro 2 | so tên playbook macro-2 gọi với file thật | `macro-2.md` cột 2.10 gọi `e2e-qa-field-by-field`, file thật tên `e2e-qa-field-by-field-verify-with-report.md` - tham chiếu treo, agent tìm không ra | sửa tên + dựng gate `dangling-refs` chặn tái phát | **đã sửa** |
 | MD-04 | autocontent, lúc cài macro 2 | 4 link tương đối gãy sau khi copy spine sang dự án | spine giả định layout `docs/process/`; dự án layout phẳng thì `STAGE_GOALS.md`, `WORKFLOW.md`, `TRACE_SPEC.md` gãy. Installer không rewrite đường dẫn | chỉnh tay lúc cài + gate `dangling-refs` bắt link gãy | **đã sửa** |
@@ -550,3 +550,38 @@ với `--dry-run` nó vẫn chạm `/dev/tty` (dòng 118), nên trong job nền 
 với `Device not configured`. `can_prompt()` có kiểm `[ -r /dev/tty ]` nhưng trên macOS
 điều kiện đó đúng trong khi mở file lại lỗi. Việc này chặn mọi ý định chạy installer
 tự động. Ghi lại, chưa xử vì không cản lượt chạy hiện tại.
+
+### MD-02 - phần còn nợ đã xong (2026-09-05): gate `ui-region-boundary`
+
+`scaffolds/stack-pnpm-nest-next/scripts/check-ui-region-boundary.mjs`, gắn vào cột
+Gate của **2.4** (lúc scaffold) và **2.6** (mỗi phase).
+
+Ba luật, đúng ba vùng:
+
+| Luật | Vùng | Chặn? |
+|---|---|---|
+| **A** không tự vẽ `<button>/<input>/<select>/<textarea>/<dialog>` | portal | ✅ chặn |
+| **B** thư mục thư viện chỉ chứa mục có thật của registry | `libraryDir` | ✅ chặn |
+| **C** quét màu cứng | public | ⚠️ chỉ cảnh báo |
+
+Luật B là chỗ đáng giá nhất mà lint màu không với tới: một file tự viết lén vào
+`components/ui/` sẽ **bị lần sync thư viện sau ghi đè mất, im lặng**. Gate đối chiếu
+tên file với `registry.json` của thư viện nên bắt được ngay.
+
+Opt-out từng dòng bằng comment `ui-ok: <lý do>` — cố ý bắt phải viết lý do, không cho
+tắt cả file.
+
+**Test trên cây giả, đủ bốn nhánh:**
+- portal có `<button>` + `<input>` -> bắt 2 lỗi, đúng số dòng
+- portal có `<button>` kèm `ui-ok:` -> bỏ qua, đúng
+- `components/ui/my-custom-thing.tsx` không có trong registry -> bắt; `button.tsx` có
+  trong registry -> bỏ qua
+- public có `#0B1942` -> **cảnh báo**, không tính là lỗi; `<button>` ở public cũng
+  không bị bắt, đúng vì public là custom 100%
+
+**Hai nhánh fail-soft, đều báo rõ lý do chứ không im lặng xanh:** chưa scaffold (chưa
+có `.tsx` nào) và chưa khai `uiRegions` trong `gate-config.json`.
+
+`gate-config.json` thêm khối `uiRegions` với `public` / `portal` / `libraryDir` /
+`registryFile` / `allowlist`, mặc định trỏ đúng cây `apps/web/src/app/(public)`,
+`(app)`, `(admin)`.
