@@ -2179,3 +2179,30 @@ adaptation hoàn toàn hợp lệ. Chép mù tạo ra hai nguồn cho một câu
 học, và nó là chỗ tôi mắc lỗi trong khi đang cẩn thận nhất. Một bản báo cáo lệch sạch sẽ
 không có nghĩa là an toàn để chép - nó chỉ nói hai bên khác nhau, không nói bên nào đúng.
 
+## MD-61 - bản nhúng của bộ khung: bản sao thứ hai của mọi cổng, không ai đồng bộ
+
+Installer nhúng cả bộ khung vào `.harness/stack-template/`, rồi dự án bung nó ra thành
+`scripts/`. Nghĩa là mỗi cổng tồn tại **hai bản trong cùng một repo**, cả hai đều chạy được -
+và từ lúc cài về sau, không ai đồng bộ bản nhúng nữa. `harness-drift.sh` sau MD-55 đã so
+`scripts/`, nhưng không hề nhìn vào bản nhúng.
+
+Đo trên dự án thật: 21/23 script khác byte, nhưng cho qua prettier thì **3 cái lệch nội dung
+thật** - và cả ba đúng là ba cái vừa vá đêm qua: `gate-lib.mjs`, `check-issue-coverage.mjs`,
+và `req-issue-scaffold.mjs`. Tức là trong repo đang nằm sẵn một bản scaffold **vẫn trả về
+đoạn SRS của yêu cầu khác** (MD-52). Ai chạy nhầm bản đó, hoặc dựng dự án mới từ nó, là lỗi
+quay về nguyên vẹn - và lần này còn khó ngờ hơn, vì bản đang dùng đã đúng.
+
+**Vá:** đồng bộ bản nhúng, và thêm lớp `EMBED-DRIFT` vào `harness-drift.sh`.
+
+**Một lỗi khi viết, đáng ghi vì nó là bài học cũ tái diễn:** lớp mới ban đầu so bằng
+`norm_hash` (chuỗi ký tự), trong khi lớp `scripts/` so bằng prettier. Prettier **thêm** dấu
+phẩy cuối, mà `norm_hash` không bỏ dấu phẩy - nên lớp mới báo lệch oan một file vừa đồng bộ
+xong. **Hai nơi trả lời cùng một câu hỏi mà mỗi nơi một kiểu** - đúng MD-12, và tôi vừa mắc
+lại nó khi thêm nơi thứ hai. Đã gộp thành một hàm `same_content` dùng chung.
+
+**Câu hỏi nên hỏi sớm hơn:** *"artifact này còn bản sao nào khác trong repo không?"* Ba lần
+trong hai ngày, câu trả lời là có, và bản sao kia là bản sai: register có `.json` và `.md`
+(MD-51), cổng có bản `scripts/` và bản nhúng (đây), tài liệu harness có bản `docs/` cũ và
+bản `docs/about/` mới (MD-53). Một artifact có hai bản mà không có gì buộc chúng khớp thì
+bản ít được nhìn tới sẽ luôn là bản sai.
+

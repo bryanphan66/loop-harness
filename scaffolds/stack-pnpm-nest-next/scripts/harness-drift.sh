@@ -224,32 +224,59 @@ report() {  # report <label> <explanation> <items...>
 # that: 21/24 script "lech", chay ca hai ben qua prettier roi so lai thi 0 cai lech
 # that. Nen dung chinh prettier cua du an lam thuoc do khi co; khong co thi lui ve
 # so chuoi ky tu va NOI RA la da lui.
+# Hai lop so script (`scripts/` va ban nhung) phai dung CHUNG mot phep so - hai
+# noi tra loi cung mot cau hoi ma moi noi mot kieu la dung con benh MD-12. Lan
+# dau viet, lop ban nhung chi dung norm_hash: khong xu duoc dau phay cuoi ma
+# prettier them vao, nen bao lech oan mot file da dong bo.
+same_content() {  # same_content <file_harness> <file_du_an>
+  cmp -s "$1" "$2" && return 0
+  if [ "${1##*.}" = "mjs" ] && [ "$have_prettier" = "1" ]; then
+    (cd "$PROJECT" && diff -q \
+        <(npx --no-install prettier --stdin-filepath x.mjs < "$1" 2>/dev/null) \
+        <(npx --no-install prettier --stdin-filepath x.mjs < "$2" 2>/dev/null)) >/dev/null 2>&1 && return 0
+  fi
+  [ "$(norm_hash "$1")" = "$(norm_hash "$2")" ]
+}
+
 HSCRIPTS=$(ls -d "$HARNESS"/scaffolds/*/scripts 2>/dev/null | head -1)
+have_prettier=0
+(cd "$PROJECT" && npx --no-install prettier --version >/dev/null 2>&1) && have_prettier=1
 script_drift=(); script_fmt=0; script_missing=()
 if [ -n "$HSCRIPTS" ] && [ -d "$PROJECT/scripts" ]; then
-  have_prettier=0
-  (cd "$PROJECT" && npx --no-install prettier --version >/dev/null 2>&1) && have_prettier=1
   for hf in "$HSCRIPTS"/*.mjs "$HSCRIPTS"/*.sh; do
     [ -f "$hf" ] || continue
     bn=$(basename "$hf"); pf="$PROJECT/scripts/$bn"
     is_internal "scripts/$bn" && continue
     [ -f "$pf" ] || { script_missing+=("scripts/$bn"); continue; }
     cmp -s "$hf" "$pf" && continue
-    if [ "$have_prettier" -eq 1 ] && [ "${bn##*.}" = "mjs" ]; then
-      if (cd "$PROJECT" && diff -q \
-            <(npx --no-install prettier --stdin-filepath x.mjs < "$hf" 2>/dev/null) \
-            <(npx --no-install prettier --stdin-filepath x.mjs < "$pf" 2>/dev/null)) >/dev/null 2>&1; then
-        script_fmt=$((script_fmt + 1)); continue
-      fi
-    elif [ "$(norm_hash "$hf")" = "$(norm_hash "$pf")" ]; then
-      script_fmt=$((script_fmt + 1)); continue
-    fi
+    if same_content "$hf" "$pf"; then script_fmt=$((script_fmt + 1)); continue; fi
     script_drift+=("scripts/$bn")
   done
   if [ "$have_prettier" -eq 0 ]; then
     echo "[drift] khong goi duoc prettier cua du an - script .mjs so bang chuoi ky tu, kem chinh xac hon."
     echo
   fi
+fi
+
+# --- ban NHUNG cua bo khung ---------------------------------------------------
+# Installer nhung ca bo khung vao `.harness/stack-template/`, roi du an bung no
+# ra thanh `scripts/`. Ket qua: HAI ban cua moi cong, ca hai deu chay duoc, va
+# tu do ve sau khong ai dong bo ban nhung nua.
+#
+# Do tren mot du an that: 3 trong 23 script o ban nhung lech NOI DUNG so voi ban
+# dang dung - va ca ba deu la ban TRUOC KHI VA, gom `req-issue-scaffold.mjs`
+# phien ban van tra ve doan SRS cua yeu cau khac (MD-52). Mot qua min nam im:
+# ai chay nham ban do, hoac dung du an moi tu no, la loi quay lai nguyen ven.
+embed_drift=()
+EMBED="$PROJECT/.harness/stack-template/scripts"
+if [ -n "$HSCRIPTS" ] && [ -d "$EMBED" ]; then
+  for hf in "$HSCRIPTS"/*.mjs "$HSCRIPTS"/*.sh; do
+    [ -f "$hf" ] || continue
+    bn=$(basename "$hf"); ef="$EMBED/$bn"
+    [ -f "$ef" ] || continue
+    same_content "$hf" "$ef" && continue
+    embed_drift+=(".harness/stack-template/scripts/$bn")
+  done
 fi
 
 # --- hai file cung xung mot ma cong ------------------------------------------
@@ -280,12 +307,13 @@ report "BOTH"    "both moved — read both sides before either wins"            
 report "LOCAL"   "this project moved and the harness did not — project content, or a fix that belongs upstream" ${local_only[@]+"${local_only[@]}"}
 report "DIFFERS" "no baseline for these, so the cause is unknown" ${unknown[@]+"${unknown[@]}"}
 report "RELOCATED?" "harness keeps these at a NEW path and a file of the same name exists elsewhere here — a directory move, not an absence" ${relocated[@]+"${relocated[@]}"}
+report "EMBED-DRIFT" "the EMBEDDED kit under .harness/stack-template still holds pre-fix copies — a dormant landmine" ${embed_drift[@]+"${embed_drift[@]}"}
 report "DUP-GATE-ID" "two files in docs/gates claim the SAME gate id — the canonical question has two answers on disk" ${dup_gate[@]+"${dup_gate[@]}"}
 report "SCRIPT-DRIFT" "GATE SCRIPTS whose behaviour differs — the enforcement layer itself is out of sync" ${script_drift[@]+"${script_drift[@]}"}
 report "SCRIPT-MISSING" "the harness ships these gate scripts and this project has none" ${script_missing[@]+"${script_missing[@]}"}
 report "FORMAT-ONLY" "byte-different, word-identical — a markdown formatter's choice is not drift" ${fmt_only[@]+"${fmt_only[@]}"}
 
-blocking=$(( ${#missing[@]} + ${#stale[@]} + ${#both[@]} + ${#script_drift[@]} + ${#script_missing[@]} + ${#dup_gate[@]} ))
+blocking=$(( ${#missing[@]} + ${#stale[@]} + ${#both[@]} + ${#script_drift[@]} + ${#script_missing[@]} + ${#dup_gate[@]} + ${#embed_drift[@]} ))
 if [ "$blocking" -eq 0 ]; then
   echo "in sync: nothing missing, nothing stale, no gate script drifted."
   echo "  ${#local_only[@]} file(s) are this project's own; ${script_fmt} gate script(s) differ only in formatting."
