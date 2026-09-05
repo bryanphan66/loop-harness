@@ -55,10 +55,10 @@ không phải delta.
 
 | Bước | Làm gì (1 câu) | Playbook (cách làm) | Gate (cổng) | Mẫu tài liệu | Script / lệnh | Xong khi |
 |---|---|---|---|---|---|---|
-| **2.0** | Kiểm sẵn sàng: tier-2 hợp thư viện UI + tài liệu không gọi tên ma + **ánh xạ component -> thư viện** | — | `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* **@một-lần**| `component-mapping-<thư-viện>.md` | `check-tier2-ui-compat.mjs`, `check-dangling-refs.mjs` | phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, 0 cú pháp đời cũ, 0 tham chiếu treo, **mọi dòng ma trận component đã phân loại trực tiếp/ghép/thiếu và mỗi cái thiếu đã có PR lên thư viện gốc** |
+| **2.0** | Kiểm sẵn sàng: tier-2 hợp thư viện UI + tài liệu không gọi tên ma + **ánh xạ component -> thư viện** | — | `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* **@một-lần**| `component-mapping-<thư-viện>.md`, `dangling-refs-allow.md` | `check-tier2-ui-compat.mjs`, `check-dangling-refs.mjs` | phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, 0 cú pháp đời cũ, 0 tham chiếu treo, **mọi dòng ma trận component đã phân loại trực tiếp/ghép/thiếu và mỗi cái thiếu đã có PR lên thư viện gốc** |
 | **2.1** | Đóng băng ERD (sơ đồ dữ liệu) | — (ck-tech-design) | ERD-frozen *(người phán)* **@một-lần**| `decision.md` | — | ERD chốt, entity ↔ REQ-ID đủ |
 | **2.1b** | Di trú dữ liệu (chỉ brownfield) | `external-integration` | ETL + dry-run *(người)* **@một-lần**| — | — | dry-run cutover pass, hoặc N/A |
-| **2.2** | Chọn stack + threat-model | — (ck-tech-design) | stack-justified *(người)* **@một-lần**| `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
+| **2.2** | Chọn stack + threat-model | `async-job-queue`, `object-storage`, `media-pipeline` *(khi stack có hàng đợi / lưu tệp / xử lý media)* | stack-justified *(người)* **@một-lần**| `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
 | **2.3** | Bản kê thi công + DoR + soạn issue | `build-manifest-compilation`, `feature-issue-ac-demo-standard`, `github-issue-standard` | `check-manifest-coverage` ⚙️ + `dor-build` **@một-lần**| `build-manifest.md`, `spec-intake.md`, `change-request-log.md` | `check-manifest-coverage.mjs` | mọi REQ-ID in-scope vào đúng 1 phase, DoR xanh |
 | **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ + `ui-region-boundary` ⚙️ **@một-lần**| `deployment-guide.md`, `config/deploy.yml` *(Kamal)* | `scaffold.sh`, `secret-scan.sh`, `pnpm lint:gates` *(đã gồm `check-ui-region-boundary.mjs`)*, seed | app boot + admin login được, P0 done, **vùng public/portal đã khai trong `gate-config.json`** |
 | **2.6** | Code từng phase (vòng lặp) | `build-execution`, `dispatch-modes`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase**| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
@@ -120,6 +120,20 @@ tại chỗ, rồi lần sync sau mất.
 
 `ui:check` nằm ngay đầu chuỗi `lint:gates`, nên manifest khai một đằng file có một nẻo là
 đỏ trước mọi gate khác. Nâng phiên bản thư viện sau này = chạy lại `pnpm ui:sync`, một lệnh.
+
+## Gate đỏ mãi là gate mù
+
+`dangling-refs` từng đỏ 15 dòng ở mọi lượt chạy vì có những tham chiếu treo hợp lệ
+(engine của macro khác, output chưa sinh, thứ đã ruled N/A). Agent viết văn giải thích
+rồi đi tiếp. Lần sau có một tham chiếu treo **mới**, nó là dòng thứ 16 trong danh sách
+đỏ 15 dòng - không ai nhận ra.
+
+Nay ngoại lệ phải **khai** ở `docs/gates/dangling-refs-allow.md`, mỗi dòng một tham
+chiếu kèm lý do và nguồn. Khai hết thì gate xanh; còn một dòng chưa khai thì đỏ. Ngoại
+lệ hết treo mà vẫn nằm trong file thì gate báo **thừa** - danh sách không phình mãi.
+
+Luật chung rút ra: **một gate không bao giờ xanh được là một gate đã hỏng.** Gặp gate
+kiểu đó thì cho nó cơ chế khai ngoại lệ, đừng dạy người đọc bỏ qua nó.
 
 ## Hai sổ theo dõi một lượt chạy
 

@@ -75,11 +75,20 @@ cú pháp đời cũ. Đỏ thì **port tier-2 ngay tại bước này**, giữ 
 cách viết, không đổi màu; giá trị màu là quyết định của Macro 1, không mở lại ở đây.
 
 Chạy `check-dangling-refs.mjs . --file docs/WORKFLOW.md --engines ~/.claude`. Mọi
-tham chiếu treo còn lại phải **giải thích được từng cái** trong ghi chép của bước, không
-được bỏ qua im lặng: engine của Macro 1/3 là ngoài phạm vi (ghi rõ), đường dẫn output
-chưa sinh là bình thường (ghi rõ), còn lại phải sửa.
+tham chiếu treo còn lại phải **khai vào `docs/gates/dangling-refs-allow.md`**, mỗi dòng
+một tham chiếu kèm lý do và nguồn - không giải thích bằng văn trong ghi chép của bước.
+Gate xanh khi khai hết; còn một dòng chưa khai thì đỏ. Ba nhóm lý do thường gặp: engine
+của Macro 1/3 (ngoài phạm vi), output của bước sau chưa sinh, và thứ đã có quyết định
+N/A ghi trước đó (trích số hiệu quyết định làm nguồn). Ngoài ba nhóm đó thì **sửa**,
+đừng khai. Bước này đóng khi gate **xanh**, không phải khi đã viết xong giải trình.
 
-Lập `docs/design/component-mapping-<thư-viện>.md`: **mỗi dòng** của Component Coverage
+Lập `docs/design/component-mapping-<thư-viện>.md`. **Dòng đầu file phải ghi nguồn đã
+đọc**: tên repo thư viện, commit, ngày. Không có dấu đó thì bảng này sẽ sai mà không ai
+biết - đã xảy ra thật: một bảng commit buổi sáng đọc registry trước khi hai PR merge,
+nên **sai ngay lúc commit**. Trước khi tin số cũ trong bảng, **đọc lại registry**, không
+chỉ đọc lại trước khi ghi số mới.
+
+**Mỗi dòng** của Component Coverage
 Matrix phân đúng một loại - `trực tiếp` (có một component thư viện làm được),
 `ghép` (dựng từ 2+ primitive), `thiếu` (thư viện chưa có), `N/A` (vùng public custom
 100%). Phân loại bằng **đọc mô tả và mở code**, không khớp tên - khớp tên cho kết quả

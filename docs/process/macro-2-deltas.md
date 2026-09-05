@@ -938,3 +938,104 @@ bảng triệu chứng -> nguyên nhân. Cắm vào cột Playbook của **2.6**
 **Luật rút ra:** kiến thức nào dự án cần lúc chạy thì phải nằm trong `docs/` mà
 `install-harness.sh` mang xuống. Để trong `CLAUDE.md` là để cho **ghế điều phối** đọc,
 không phải cho dự án - hai chỗ khác nhau, đừng nhầm.
+
+---
+
+## MD-22 - gate cho xanh giả, và công cụ đo chép cái xanh giả vào sổ bằng chứng
+
+Lượt chạy thật bắt được ở 2.3. `check-manifest-coverage.mjs` tìm REQ-ID bằng cách đọc
+dòng bảng có token `in-MVP` trong `feature-register.md`. Register của dự án viết **100%
+tiếng Việt**, dùng "Đưa vào", và **không có cột REQ-ID nào** - REQ-ID nằm ở
+`docs/requirements/srs/`. Kết quả:
+
+```
+0 REQ-ID đọc được  ->  so sánh 0 mục  ->  0 lỗi  ->  ✓ XANH
+```
+
+Rồi `measure-macro2.mjs` chép nguyên dòng đó vào `macro2-run-log.md` thành
+*"xanh: 0 in-scope REQ-ID(s) each covered by exactly one phase"*. **Công cụ dựng ra để
+làm bằng chứng lại ghi một con số giả vào sổ.** Đúng lỗi MD-12, lần thứ ba trong repo này.
+
+Đã sửa, ba lớp:
+
+1. **Đọc register JSON khi có** (`feature-register-source.json` / `feature-register.source.json`
+   - cả hai cách đặt tên đều tồn tại, đúng cái bẫy MD-12). `sections[].rows[]` là
+   in-scope, `out_of_scope` bị trừ. Cấu trúc thay cho đoán chữ.
+2. **`inScopeTokens` cấu hình được** cho register markdown viết ngôn ngữ khác.
+3. **Đọc ra 0 mục = ĐỎ, không phải xanh.** Kèm thông điệp nói rõ nó đã tìm gì ở đâu.
+   Đây là luật chung: *một gate không nhìn thấy đầu vào phải nói ra, không được đi qua.*
+
+`measure-macro2.mjs` cũng học luật đó: gate thoát 0 sau khi kiểm 0 mục thì ghi vào sổ là
+**`XANH RỖNG (kiểm 0 mục, không chứng minh gì)`**, không ghi "xanh".
+
+Kiểm chứng trên autocontent: trước `✓ 0 in-scope` -> sau `✓ 377 in-scope REQ-ID(s) (từ
+feature-register-source.json) mỗi cái đúng một phase`.
+
+## MD-23 - `--help` chạy thật và làm bẩn sổ append-only
+
+`measure-macro2.mjs --help` không có nhánh xử lý nên nó **chạy thật** và ghi một dòng
+bước `?` vào `docs/macro2-run-log.md`. Sổ là append-only nên dòng rác nằm đó vĩnh viễn.
+Script sinh ra để đo lại làm bẩn chính cái nó đo. Đã thêm nhánh `--help`/`-h` in cách
+dùng rồi thoát, kèm nhắc `--dry`.
+
+## MD-24 - gate đỏ mãi là gate mù
+
+`dangling-refs` đỏ 15 dòng ở mọi lượt chạy vì có tham chiếu treo hợp lệ: engine của
+Macro 1/3, output bước sau chưa sinh, và thứ đã ruled N/A theo `AD-61`. Agent viết văn
+giải thích từng dòng rồi đi tiếp - đúng như goal-text bảo.
+
+Hậu quả: lần sau xuất hiện một tham chiếu treo **mới**, nó là dòng thứ 16 trong một
+danh sách đỏ sẵn 15 dòng. Không ai nhận ra. Gate anh em `check-ui-region-boundary.mjs`
+có `ui-ok:` và `allowlist`; gate này không có gì.
+
+Đã thêm `docs/gates/dangling-refs-allow.md`: mỗi dòng một tham chiếu **kèm lý do và
+nguồn**. Khai hết thì xanh, còn một dòng chưa khai thì đỏ, và ngoại lệ hết treo mà vẫn
+nằm trong file thì gate báo **thừa**. Ba nhóm lý do được chấp nhận, ngoài ra thì sửa.
+Goal-text 2.0 bỏ đoạn "giải thích từng cái trong ghi chép" - bước đóng khi gate **xanh**,
+không phải khi viết xong giải trình.
+
+Thử hai chiều trên autocontent: khai đủ 15 -> XANH; thêm một ngoại lệ ma -> báo thừa.
+
+## MD-25 - manifest khai phủ theo FILE NGUỒN, và một phép đo gần như tautology
+
+Manifest thật không liệt kê 401 REQ-ID theo phase - nó khai theo quy tắc:
+*"all 68 in `assets.md`"*. Hợp lý: 401 dòng là không đọc nổi, và quy tắc mới là thứ
+người review kiểm. Gate nay bung được dạng khai đó (REQ-ID được **in đậm** trong file
+SRS là khai; trong backtick là tham chiếu chéo).
+
+**Một cái bẫy khi nới:** bản nới đầu tiên của tôi coi mọi `.md` trong khối là file được
+nhận, nên đọc mệnh đề *"dedup against ids already homed in `assets.md`"* thành "P5 nhận
+assets.md" và bịa ra hai phase trùng nhau. Đã siết: chỉ nhận dạng ``in `<file>` `` và
+cắt văn bản trước các mệnh đề `dedup|minus|cross-referenc|already homed|see`.
+
+**Ghi lại cho thẳng thắn:** script dự án tự viết (`req-id-phase-coverage.mjs`) báo
+"401/401, 0 mồ côi, 0 trùng lặp". Con số đúng, nhưng **0 trùng lặp là bảo đảm bởi cấu
+trúc** - nó map tên-file-SRS sang phase bằng một bảng hàm, mỗi file đúng một phase, nên
+không thể trùng. Nó chỉ bắt được lỗi "file SRS vắng mặt trong bảng". Giá trị chứng minh
+của "0 trùng lặp" gần bằng không. Gate đọc manifest thì bắt được trùng thật, vì manifest
+là văn bản người viết.
+
+## MD-26 - đẩy tài liệu xuống dự án phải dịch cả tên thư mục
+
+Goal-text 2.3 trỏ mẫu ở `docs/mau-tai-lieu/build-manifest.md`; dự án để mẫu ở
+`docs/templates/`. Hai nhánh harness đặt tên khác nhau, và lúc đẩy goal-text sang tôi
+bê nguyên đường dẫn của loop-harness.
+
+Tệ hơn: chính tôi tạo `docs/mau-tai-lieu/` trong dự án chỉ để chứa **một** file mẫu, nên
+dự án có hai chỗ chứa mẫu. Số liệu quyết: `docs/templates/` có 38 file được 75 chỗ trỏ
+tới, `docs/mau-tai-lieu/` có 1 file được 6 chỗ. Đã gộp về `docs/templates/` và sửa 6 chỗ
+trỏ - trong đó có mấy chỗ **vốn đã trỏ sai từ trước**, nay đúng luôn.
+
+**Luật:** propagate không phải copy. Ngoài việc chỉnh `../` cho layout phẳng, phải dịch
+tên thư mục mẫu sang tên dự án đang dùng. Kiểm bằng `check-dangling-refs.mjs` sau khi đẩy.
+
+## MD-27 - ba playbook mồ côi mà goal-text lại đi hỏi
+
+Goal-text 2.2 đòi *"names the matching playbook per capability"* cho queue/storage/media.
+`async-job-queue.md`, `object-storage.md`, `media-pipeline.md` **có** trong harness nhưng
+**không** nằm trong bảng macro-2 - tức là playbook mồ côi theo luật chống phình của chính
+harness. Dự án không có chúng, agent tìm không ra, phải trích 2 playbook gần nhất.
+
+Harness tự mâu thuẫn: **goal-text hỏi theo năng lực, bảng liệt kê theo tên file - hai
+danh sách khác nhau.** Đã cắm cả ba vào ô Playbook của bước 2.2. Kiểm: 15 playbook bảng
+macro-2 gọi tên đều có mặt ở dự án, 0 thiếu.
