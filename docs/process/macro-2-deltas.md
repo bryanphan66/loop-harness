@@ -46,6 +46,9 @@ thứ vốn là lỗi SRS.
 
 | MD-08 | autocontent, trước 2.1 | hỏi "gắn thư viện UI vào thì có đủ component không" mà không ai đo được | macro-2 không có bước nào đối chiếu ma trận component của dự án với thư viện UI. Không đo thì tới 2.6 mới vỡ ra thiếu, lúc đó đã có màn code theo cách khác | thêm ánh xạ vào bước 2.0 + mẫu bảng | **đã sửa** |
 
+| MD-09 | autocontent, chuẩn bị ingest board trên Mac | chạy `ingest-archive.sh` trên macOS | script harness viết trên Linux, dùng `find -printf` và `stat -c%s`, cả hai không có trên macOS. Không ai kiểm tính khả chuyển | vá 2 script + cần luật: script harness phải chạy được trên Linux lẫn macOS | **đã sửa ở dự án, harness còn nợ luật** |
+| MD-10 | autocontent, so gate doc với harness | đối chiếu `docs/gates/` hai bên | **PB-G3 và PB-G4 đảo nghĩa giữa harness và dự án** - không phải lỗi tên, mà đảo thứ tự tiền/thiết kế | chốt một thứ tự, sửa bên còn lại | **mở** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -348,3 +351,49 @@ Bảng của autocontent: `docs/design/component-mapping-reno-ui.md`, commit `8c
 **Ghi thêm, vì dễ tái phát:** đọc `data-grid.tsx` (288 dòng) thấy 0 dấu hiệu
 `editable`/`onCellEdit`/`isEditing`. Mô tả trong `registry.json` không nói có hay
 không. Ánh xạ chỉ đáng tin khi mở code, không phải khi đọc mô tả.
+
+## MD-09 - script harness chỉ chạy trên Linux
+
+**Lòi ra thế nào.** Operator export board rồi định chạy `ingest-archive.sh` trên Mac.
+
+```
+find "$TMP" -maxdepth 3 -name index.html -printf '%h\n'   -> macOS find không có -printf
+sz=$(stat -c%s index.html)                                -> stat: illegal option -- c
+```
+
+`prune-unreferenced-uploads.sh` dính đúng lỗi `stat -c%s`. Cả hai chạy tốt trên VPS
+suốt, nên không ai biết.
+
+**Đã sửa ở dự án** (`autocontent@5da84a2`): `dirname $(find ... | head -1)` và `wc -c`.
+Test đầu-cuối trên macOS bằng zip giả - unpack đúng, bỏ đúng bộ repo-canonical, guard
+262,144 byte vẫn chặn.
+
+**Harness còn nợ một luật:** script harness phải chạy được trên **cả Linux lẫn macOS**.
+Team đang chuyển sang Mac; mỗi script viết bằng GNU-ism là một lần vấp. Rẻ nhất là
+ghi vào `CONTRIBUTING`/`docs/about/` một dòng cấm `find -printf`, `stat -c`, `sed -i`
+không hậu tố, `date -d`, `readlink -f`.
+
+## MD-10 - PB-G3 và PB-G4 đảo nghĩa giữa harness và dự án
+
+Không phải lỗi đặt tên. **Đảo thứ tự nghiệp vụ.**
+
+| | PB-G3 | PB-G4 |
+|---|---|---|
+| **loop-harness** `macro-1.md` | 1.13 chốt prototype (khách duyệt) | 1.15 hợp đồng + đặt cọc |
+| **autocontent** `WORKFLOW.md` | 1.14 contract + deposit *(money hard line)* | 1.15 review loop -> freeze *(EXIT)* |
+
+harness ghi thẳng: *"prototype chốt TRƯỚC báo giá"*.
+autocontent ghi ngược: *"loop (1.15) starts only after PB-G3 (no unpaid deep design iteration)"* - tức **cọc trước, rồi mới lặp thiết kế sâu**.
+
+Hai câu trả lời trái nhau cho cùng một câu hỏi kinh doanh: có làm thiết kế sâu trước
+khi khách trả tiền không.
+
+**Không chặn lượt này** - autocontent đã bắn cả G3 lẫn G4 rồi. Nhưng:
+- điều kiện vào Macro 2 ghi *"Entry: PB-G3 passed and PB-G4 passed"*, người đọc không
+  biết G3 là cái nào
+- dự án sau cài harness sẽ chạy theo thứ tự ngược với autocontent
+- tên file cũng đảo: harness có `pb-g3-prototype-frozen.md` + `pb-g4-contract-deposit.md`,
+  autocontent có `pb-g3-contract-deposit.md` + `pb-g4-prototype-frozen.md`
+
+**Cần operator chốt một thứ tự.** Đây là quyết định kinh doanh, không phải kỹ thuật -
+không tự quyết được.
