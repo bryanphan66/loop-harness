@@ -12,7 +12,7 @@
 
 | Bước | Làm gì (1 câu) | Playbook (cách làm) | Gate (cổng) | Mẫu tài liệu | Script / lệnh | Xong khi |
 |---|---|---|---|---|---|---|
-| **2.0** | Kiểm sẵn sàng: tier-2 hợp thư viện UI + tài liệu không gọi tên ma | — | `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ | — | `check-tier2-ui-compat.mjs`, `check-dangling-refs.mjs` | phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, 0 cú pháp đời cũ, 0 tham chiếu treo (playbook/gate/mẫu/script/engine/link) |
+| **2.0** | Kiểm sẵn sàng: tier-2 hợp thư viện UI + tài liệu không gọi tên ma + **ánh xạ component -> thư viện** | — | `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* | `component-mapping-<thư-viện>.md` | `check-tier2-ui-compat.mjs`, `check-dangling-refs.mjs` | phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, 0 cú pháp đời cũ, 0 tham chiếu treo, **mọi dòng ma trận component đã phân loại trực tiếp/ghép/thiếu và mỗi cái thiếu đã có PR lên thư viện gốc** |
 | **2.1** | Đóng băng ERD (sơ đồ dữ liệu) | — (ck-tech-design) | ERD-frozen *(người phán)* | `decision.md` | — | ERD chốt, entity ↔ REQ-ID đủ |
 | **2.1b** | Di trú dữ liệu (chỉ brownfield) | `external-integration` | ETL + dry-run *(người)* | — | — | dry-run cutover pass, hoặc N/A |
 | **2.2** | Chọn stack + threat-model | — (ck-tech-design) | stack-justified *(người)* | `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
