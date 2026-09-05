@@ -44,6 +44,8 @@ thứ vốn là lỗi SRS.
 
 | MD-07 | autocontent, trước 2.1 | thử đọc prototype qua MCP Claude Design rồi qua clone local | macro-2 ghi "Giao diện <- prototype đã freeze" nhưng không nói đọc kiểu gì. Board 2,171,246 ký tự; agent mở cả file là vỡ context rồi bịa | luật đọc theo frame + `extract-frame.mjs` + chốt board chỉ đọc | **đã sửa** |
 
+| MD-08 | autocontent, trước 2.1 | hỏi "gắn thư viện UI vào thì có đủ component không" mà không ai đo được | macro-2 không có bước nào đối chiếu ma trận component của dự án với thư viện UI. Không đo thì tới 2.6 mới vỡ ra thiếu, lúc đó đã có màn code theo cách khác | thêm ánh xạ vào bước 2.0 + mẫu bảng | **đã sửa** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -305,3 +307,44 @@ MD-03/04/05: harness gọi tên một thứ, không nói cách tới nó, và kh
 Test thật: `--list` ra đúng 121 frame / 3 zone; `s08a --trace` trả về
 `APP · 08 · /app · Overview Page · ... · RPT.DASH.01/.02 · UC-21 · §4.4 card dashboard`;
 `18 --trace` trả về đúng 4 state của màn Campaign timeline.
+
+## MD-08 - macro-2 không đối chiếu ma trận component với thư viện UI
+
+**Lòi ra thế nào.** Operator hỏi thẳng: gắn reno-ui vào rồi thì prototype có dựng
+được không, hay thiếu component. Không ai trả lời được, vì không có bước nào đo.
+
+Thử đoán bằng khớp tên tự động: 43 khớp / 36 không. **Con số 36 đó sai.** "Toast"
+thực ra là `sonner`, "Destructive confirm" là `alert-dialog`, "Wizard" là `stepper`,
+"Filter bar / facets" là `data-grid-toolbar` + `combobox`. Khớp tên không đo được
+độ phủ - phải đọc mô tả từng component.
+
+**Đo thật, 79 dòng x 60 component:**
+
+| Loại | Số |
+|---|---|
+| trực tiếp | 31 |
+| ghép | 44 |
+| **thiếu thật** | **3** |
+| N/A (trang public custom 100%) | 1 |
+
+Ba cái thiếu ở autocontent: `File upload`, `Audio player`, `Number / quantity stepper`
+(`stepper` của reno là **chỉ báo bước wizard**, không phải ô nhập số - đọc mô tả mới
+biết, đọc tên thì nhầm).
+
+**32 component domain KHÔNG phải thiếu.** Chúng vốn là phần riêng của dự án, ghép từ
+primitive. Một thư viện dùng chung mà có `Payment panel (SePay/VietQR)` thì dự án sau
+phải mang theo nghiệp vụ của dự án này.
+
+**Vì sao phải đo ở 2.0, không phải 2.6.** Ba lỗ hổng kia nếu phát hiện lúc đang code
+phase thì màn đã dựng theo cách khác rồi, và người code sẽ tự viết component trong
+`src/components/` - lần sync thư viện sau ghi đè mất, đúng cái MD-02 cấm.
+
+**Đã sửa.** Bước 2.0 thêm việc ánh xạ + gate `component-mapping` *(người phán)*.
+"Xong khi": mọi dòng ma trận đã phân loại trực tiếp/ghép/thiếu, và **mỗi cái thiếu
+đã có PR lên thư viện gốc** - không được vá trong dự án.
+
+Bảng của autocontent: `docs/design/component-mapping-reno-ui.md`, commit `8c711b9`.
+
+**Ghi thêm, vì dễ tái phát:** đọc `data-grid.tsx` (288 dòng) thấy 0 dấu hiệu
+`editable`/`onCellEdit`/`isEditing`. Mô tả trong `registry.json` không nói có hay
+không. Ánh xạ chỉ đáng tin khi mở code, không phải khi đọc mô tả.
