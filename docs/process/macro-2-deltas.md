@@ -1513,28 +1513,48 @@ giờ là "dùng với tập rỗng". Và cổng nào lọc được thì phải
 đúng, lọc sai.
 
 ---
+## MD-43 - cổng đọc sai chỗ trong JSON rồi báo "chưa đặt trạng thái"
 
-## MD-43 - issue được tạo nhưng trạng thái chưa bao giờ được đẩy
+**Bản đầu của mục này SAI, viết lại.** Operator bác đúng: `Backlog` là trường `States`,
+không phải nhãn.
 
-Operator hỏi: 7 issue kia chỉ tạo ra thôi chứ không làm luôn à. Kiểm trường `States` của
-tổ chức: **cả 7 đều TRỐNG**. Cái chip `Backlog` nhìn thấy trên GitHub là **nhãn**, không
-phải trường trạng thái - hai thứ khác nhau, và nhìn bằng mắt thì giống hệt.
+Sự thật, lấy từ dữ liệu thô:
 
-Nguyên nhân trình tự: lượt chạy viết code P1.1 **trước**, mở issue **sau** (vì lỗ hổng
-"không bước nào giao việc tạo issue" mãi mới lộ ra). Goal-text 2.6 nói *"runner nhận việc
--> In Dev"*, nhưng lúc runner chạy thì issue chưa tồn tại. Không ai sai; **thứ tự bị đảo
-một lần và không có gì kéo nó về**.
+```json
+"issue_field_values": [
+  { "data_type": "single_select",
+    "issue_field_name": "States",
+    "single_select_option": { "name": "Backlog" } } ]
+```
 
-Cổng `check-issue-coverage --closing` **bắt được** - đỏ với *"không đọc được trạng thái"*,
-đúng tinh thần fail-closed. Nhưng thông điệp **gộp hai nguyên nhân khác hẳn nhau**:
+Khoá là **`issue_field_name` phẳng**, không phải `issue_field.name` lồng. Tôi viết truy vấn
+theo dạng lồng - **đoán hình dạng thay vì đổ dữ liệu ra xem** - nên nó trả rỗng, và tôi kết
+luận "cả 7 issue chưa được đặt trạng thái". Sai hai lần: sai về dữ liệu, và sai khi nói với
+operator rằng cái chip đó chỉ là nhãn.
 
-- gọi API hỏng -> chuyện **quyền/mạng**
-- trường trống -> **chưa ai đặt**, tức việc chưa làm
+**Hậu quả nặng hơn lời nói sai:** `check-issue-coverage.mjs` dùng đúng đường dẫn sai đó, nên
+cổng báo *"chưa đặt trạng thái"* cho những issue **đang có trạng thái**. Một cổng đọc sai
+chỗ còn tệ hơn cổng không đọc được, vì nó nói dối rất tự tin - và nó đẩy người ta đi chạy
+`issue-state.mjs` cho thứ đã đặt rồi.
 
-Người đọc câu cũ sẽ đi kiểm quyền `gh` trong khi thật ra chỉ cần chạy `issue-state.mjs`.
-Đã tách thành hai lỗi riêng, mỗi cái nói đúng việc phải làm.
+Sau khi sửa, cổng nói đúng việc thật:
 
-**Bài học chung, thứ ba trong ngày về cùng chủ đề:** một thông điệp lỗi gộp nhiều nguyên
-nhân thì cũng vô dụng như một cổng luôn xanh - nó không nói cho người ta biết phải làm gì.
-Trước đó: MD-22 (gate không nói được là nó đọc hỏng), MD-35 (gate đỏ nhưng lý do sai khiến
-người ta sửa nhầm tài liệu).
+```
+✗ 4 issue còn ở trạng thái mở đầu khi đóng P1.1:
+  #20=Backlog, #21=Backlog, #22=Backlog, #23=Backlog
+```
+
+**Phần kết luận vẫn đứng, chỉ khác lý do:** `#20`-`#23` có code và test rồi nhưng trạng thái
+vẫn `Backlog` - **chưa ai đẩy**. Trình tự bị đảo một lần: code viết trước, issue mở sau, nên
+mốc *"runner nhận việc -> In Dev"* không có ai để chạy.
+
+### Bài học, và nó là bài học tôi vừa tự viết rồi tự vi phạm
+
+MD-41 tôi vừa ghi: *"chèn nhánh vào hàm có sẵn thì đọc hình dạng giá trị trả về trước, đừng
+đoán"*. Đây là đúng lỗi đó ở mức API: **đọc một cấu trúc JSON lạ thì đổ nó ra xem trước,
+đừng suy từ tên trường.** Viết một luật không làm mình miễn nhiễm với nó.
+
+Và một luật nữa cho gate: **cổng đọc dữ liệu ngoài phải phân biệt được "đọc được, giá trị
+trống" với "đọc không ra"**. Ở đây hai ca đó gộp làm một nên cái sai của tôi không lộ - gate
+chỉ nói "chưa đặt" cho cả hai. Đã tách thành `apiFail` và `unset` riêng, và chính việc tách
+đó làm lỗi lộ ra khi operator hỏi lại.
