@@ -1470,3 +1470,44 @@ nó nằm ở kit steady-state.
 **Giới hạn của chạy khô, nói thẳng:** nó không kiểm được cổng người (2.9 bảo mật, 2.12
 nghiệm thu), không kiểm được `harness-verify-gate.sh` ở chế độ đóng bước, và không kiểm
 được 2.13 thật vì cần máy chủ. Muốn chốt nửa sau phải chạy trọn trên một dự án nhỏ.
+
+---
+
+## MD-42 - DoD đo cả register trong khi dự án phát hành làm nhiều đợt
+
+Operator muốn chốt nửa sau mà không phải xây hết 21 phase: đóng nốt P1 rồi phát hành một
+**đợt nội bộ** gồm `P0+P1`, chạy 2.8 -> 2.13 lên đúng phạm vi đó. Chặn đường: **cổng DoD/AC
+đo trên toàn bộ register** (377 REQ-ID trong phạm vi), không có khái niệm đợt nhỏ hơn.
+
+Đây không phải nhu cầu riêng của phép thử: `ROADMAP.md` § Release roadmap có **5 đợt phát
+hành**, nên DoD sẽ phải đo theo đợt dù sớm hay muộn.
+
+**Đã thêm** `acCoverage.releaseScope = { name, phases }`. Đo trên dự án thật:
+
+```
+toàn bộ        373/377 REQ-ID chưa có test
+đợt P0+P1       16/20                        <- con số hành động được
+khai sai phase  ĐỎ kèm lý do                 <- không im lặng cho qua
+```
+
+**Và một lần nữa, cùng một việc viết lại lần thứ năm.** `check-ac-coverage` có bộ đọc
+manifest RIÊNG (`manifestReqIds`), dùng **regex cũ** nên dính đúng hai lỗi đã vá ở nơi
+khác: nhãn có hậu tố `(7)` (MD-35) và nhãn trải nhiều dòng (MD-38). Đã xoá nó, dùng
+`reqIdsByPhase` của `gate-lib` - vừa hết trùng lặp vừa thừa hưởng cả bốn bản vá.
+
+Danh sách các lần: MD-12, MD-32, MD-35, MD-37, giờ MD-42. **Năm lần cùng một bài học.** Nếu
+còn script nào đọc manifest hay register mà không qua `gate-lib` thì nó đang mang lỗi cũ -
+đó là chỗ soát đầu tiên khi gặp gate cư xử lạ.
+
+### Một lỗi tôi tự dựng lại trong lúc vá, ghi để nhớ
+
+Bản đầu coi `phases: []` là **danh sách hợp lệ** thay vì "không lọc", nên chế độ toàn bộ
+lọc ra 0 mục rồi **báo XANH** - tự tay dựng lại đúng bệnh xanh giả (MD-22) mà tôi vừa vá
+hôm nay ở gate khác.
+
+Bắt được là nhờ thử **cả hai chiều** thay vì chỉ thử chiều mình đang quan tâm. Nếu chỉ thử
+chế độ theo đợt thì đã merge một cổng luôn xanh ở chế độ mặc định.
+
+**Luật:** giá trị rỗng của một tuỳ chọn phải nghĩa là "không dùng tuỳ chọn này", không bao
+giờ là "dùng với tập rỗng". Và cổng nào lọc được thì phải thử ba chiều: không lọc, lọc
+đúng, lọc sai.

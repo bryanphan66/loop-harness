@@ -33,7 +33,12 @@
       "apps/api/src",
       "apps/api/test"
     ],
-    "allowlist": []
+    "allowlist": [],
+    "releaseScope": {
+      "name": "",
+      "phases": []
+    },
+    "_doc_releaseScope": "Đợt phát hành đang đo. phases là danh sách phase THI CÔNG thuộc đợt đó (vd [\"P0\",\"P1\"] cho một bản alpha nội bộ). Để rỗng = đo toàn bộ. Lý do có khoá này: dự án phát hành làm nhiều đợt, bắt DoD của đợt đầu phủ cả 401 REQ-ID là bắt điều không ai định làm, và cổng sẽ đỏ tới tận đợt cuối rồi bị bỏ qua."
   },
   "uiRegions": {
     "_doc": "check-ui-region-boundary.mjs — hai vùng UI không cùng luật. public = custom 100% (bê từ prototype, chỉ cảnh báo màu cứng); portal = ~99% dùng component thư viện (cấm tự vẽ <button>/<input>/<select>/<textarea>/<dialog>). libraryDir chỉ được chứa mục có thật của registry — file tự viết vào đó sẽ bị lần sync sau ghi đè. registryFile trỏ apps/web/reno-registry.lock.json - bản chụp danh mục registry do `pnpm ui:sync` sinh ra, nhờ vậy gate đối chiếu tên được mà không cần mạng; thiếu file thì luật B tự tắt. allowlist là đường dẫn ngoại lệ thật; opt-out từng dòng dùng comment 'ui-ok: <lý do>'.",

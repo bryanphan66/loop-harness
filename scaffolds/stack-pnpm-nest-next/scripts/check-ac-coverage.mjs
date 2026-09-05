@@ -20,6 +20,19 @@
  * floor under Leg-1 — the behavioural check that the AC actually holds against the
  * running app stays with the verifier agent.
  *
+ * PHẠM VI ĐO = ĐỢT PHÁT HÀNH, không phải toàn bộ register.
+ *
+ * Một dự án phát hành làm nhiều đợt (roadmap thật: Phase 1..5, mỗi đợt một mốc
+ * thời gian). Bắt DoD của đợt đầu phải phủ cả 401 REQ-ID của toàn dự án là bắt
+ * một điều không ai định làm - cổng sẽ đỏ tới tận đợt cuối rồi bị bỏ qua.
+ *
+ * Khai `acCoverage.releaseScope.phases` trong gate-config.json (vd `["P0","P1"]`)
+ * thì gate chỉ đo REQ-ID của các phase đó. Không khai thì đo toàn bộ như cũ.
+ *
+ * Bộ đọc manifest dùng `reqIdsByPhase` của gate-lib, KHÔNG viết lại. Bản tự viết
+ * trước đây dùng regex cũ nên dính đúng hai lỗi đã vá ở nơi khác: nhãn có hậu tố
+ * `(7)` và nhãn trải nhiều dòng - lần thứ năm cùng một việc được viết lại.
+ *
  * Source of the in-scope REQ-ID set = the build-manifest phase blocks'
  * `**REQ-IDs covered:**` / `**REQ-IDs:**` lines (the SAME contract
  * check-manifest-coverage enforces maps to phases). Ranges/lists are expanded:
@@ -45,10 +58,10 @@
  *   node scripts/check-ac-coverage.mjs --selftest   # fixtures pass/fail/skip/allowlist/range
  */
 import { existsSync, readFileSync, writeFileSync, mkdtempSync, mkdirSync, rmSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
+import { resolve, dirname, join, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { gateRoot, loadGateConfig, walk, readSafe } from './gate-lib.mjs';
+import { gateRoot, loadGateConfig, walk, readSafe, reqIdsByPhase, inScopeReqIds } from './gate-lib.mjs';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 
@@ -93,30 +106,6 @@ export function extractReqIds(text) {
   return ids;
 }
 
-/**
- * In-scope REQ-IDs = every id on a phase block's `**REQ-IDs covered:**` /
- * `**REQ-IDs:**` line, INCLUDING wrapped continuation lines (the manifest wraps a
- * long id list onto indented follow-on lines that check-manifest-coverage misses).
- */
-function manifestReqIds(manifestText) {
-  const lines = manifestText.split('\n');
-  const ids = new Set();
-  const isMarker = (l) => /\*\*REQ-IDs?(?:\s+covered)?:\*\*/.test(l);
-  // a continuation line is an indented follow-on that does NOT open a new bullet,
-  // heading, blockquote, table row, or bold-label field.
-  const startsNewBlock = (l) => {
-    const t = l.trim();
-    return t === '' || /^[-#>|]/.test(t) || /^\*\*/.test(t) || /^\d+\.\s/.test(t);
-  };
-  for (let i = 0; i < lines.length; i++) {
-    if (!isMarker(lines[i])) continue;
-    for (const id of extractReqIds(lines[i])) ids.add(id);
-    for (let j = i + 1; j < lines.length && !startsNewBlock(lines[j]); j++) {
-      for (const id of extractReqIds(lines[j])) ids.add(id);
-    }
-  }
-  return ids;
-}
 
 /**
  * Run the gate against `root`. Pure (no process.exit) so --selftest can drive it
@@ -135,8 +124,33 @@ export function runGate(root) {
     return { code: 0, out, err };
   }
 
-  const inScope = manifestReqIds(readSafe(manifestPath));
+  const { byPhase } = reqIdsByPhase(root, manifestPath);
+  // Mảng RỖNG nghĩa là "không lọc", không phải "đợt không có phase nào". Bản đầu
+  // của tôi coi `[]` là danh sách hợp lệ nên chế độ toàn bộ lọc ra 0 mục rồi báo
+  // XANH - đúng bệnh xanh giả vừa vá ở gate khác, tự tay dựng lại.
+  const scopeCfg = cfg.releaseScope ?? {};
+  const scopePhases = Array.isArray(scopeCfg.phases) && scopeCfg.phases.length ? scopeCfg.phases : null;
+  const fromManifest = new Set();
+  for (const [phase, ids] of byPhase) {
+    if (phase.includes('.')) continue;                       // phase con đã gộp lên cha
+    if (scopePhases && !scopePhases.includes(phase)) continue;
+    for (const id of ids) fromManifest.add(id);
+  }
+  // Giao với register: bỏ luật nghiệp vụ (BR.*) và thứ ngoài phạm vi, giữ đúng
+  // những REQ-ID mà dự án đã cam kết xây.
+  const registered = inScopeReqIds(root, loadGateConfig(root).rtm ?? {});
+  const inScope = registered.size
+    ? new Set([...fromManifest].filter((id) => registered.has(id)))
+    : fromManifest;
+  const scopeLabel = scopePhases ? `đợt "${scopeCfg.name ?? scopePhases.join('+')}"` : 'toàn bộ';
   if (inScope.size === 0) {
+    // Manifest tồn tại mà lọc ra 0 REQ-ID là ĐỌC HỎNG hoặc đợt khai sai, không
+    // phải "chưa có gì". So sánh 0 mục rồi báo xanh là cách một cổng thành vô nghĩa.
+    if (existsSync(manifestPath)) {
+      err.push(`\n✗ [ac-coverage] đọc ${relative(root, manifestPath)} nhưng lọc ra 0 REQ-ID (phạm vi ${scopeLabel}) — đọc hỏng hoặc đợt phát hành khai sai phase, KHÔNG phải phạm vi trống.`);
+      return { code: 1, out, err };
+    }
+
     out.push('✓ [ac-coverage] build-manifest declares no REQ-IDs yet — skipped');
     return { code: 0, out, err };
   }
@@ -145,7 +159,7 @@ export function runGate(root) {
   const testFiles = [];
   for (const d of testDirs) testFiles.push(...walk(resolve(root, d), (n) => TEST_FILE.test(n)));
   if (testFiles.length === 0) {
-    out.push(`✓ [ac-coverage] no test files under ${testDirs.join(', ')} yet — skipped (${inScope.size} REQ-IDs pending tests)`);
+    out.push(`✓ [ac-coverage] no test files under ${testDirs.join(', ')} yet — skipped (${inScope.size} REQ-ID ${scopeLabel} pending tests)`);
     return { code: 0, out, err };
   }
   const tested = new Set();
@@ -158,7 +172,7 @@ export function runGate(root) {
   }
 
   if (uncovered.length) {
-    err.push(`\n✗ [ac-coverage] ${uncovered.length} in-scope REQ-ID(s) have NO test referencing them (coverage floor breached, of ${inScope.size} in-scope across ${testFiles.length} test files):\n`);
+    err.push(`\n✗ [ac-coverage] ${uncovered.length} in-scope REQ-ID(s) have NO test referencing them (phạm vi ${scopeLabel}, coverage floor breached, of ${inScope.size} in-scope across ${testFiles.length} test files):\n`);
     for (const req of uncovered.sort()) err.push(`  - ${req}`);
     err.push(`\n  Add a test (e2e/integration/unit) that names the REQ-ID (in a describe/comment/title)`);
     err.push(`  so the AC has a mechanical home. A REQ-ID that is verifier-only / pure-infra with no`);
@@ -167,7 +181,7 @@ export function runGate(root) {
     return { code: 1, out, err };
   }
 
-  out.push(`✓ [ac-coverage] ${inScope.size - allowlist.size} in-scope REQ-ID(s) each referenced by >=1 test (${testFiles.length} test files) — coverage floor met`);
+  out.push(`✓ [ac-coverage] ${inScope.size - allowlist.size} REQ-ID ${scopeLabel} đều có >=1 test (${testFiles.length} test files) — coverage floor met`);
   return { code: 0, out, err };
 }
 
