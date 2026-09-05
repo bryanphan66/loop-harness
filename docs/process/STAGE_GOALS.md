@@ -217,7 +217,22 @@ capture phase depends on the APP screen phases it depicts. A thin
 `plans/<YYMMDD-HHMM>-<slug>/plan.md` records ordering rationale + risks (the
 manifest is the executable source, the plan is the why). The DoR checklist
 (`docs/gates/dor-build.md`) is filled and green. In the Lite lane
-`docs/ROADMAP.md` is born here from the template. STAGE.md Current = 2.4.
+`docs/ROADMAP.md` is born here from the template.
+
+**Dựng bảng issue của repo trước khi rời bước.** Chuẩn issue
+(`docs/playbooks/github-issue-standard.md`) quy định **Phase = milestone** `Phase N` và
+**Module = nhãn cấp repo** `Module: <Tên>`. Thiếu chúng thì `gh issue create --milestone
+--label` ĐỎ, nên bước 2.6 không mở nổi issue nào. Đây là lúc **duy nhất** biết đủ hai danh
+sách: P0..PN vừa sinh trong `build-manifest.md`, M1..MN trong `docs/ROADMAP.md`.
+
+Chạy `node scripts/setup-issue-board.mjs` (mặc định **chỉ in ra**), đọc danh sách, rồi
+`--apply`. Chạy lại được, thứ đã có thì bỏ qua. Tạo nhãn và milestone là **hành động ra
+ngoài trên repo tổ chức** - phải có người duyệt, không tự bấm.
+
+Bước này **không** mở issue. Issue mở theo từng phase ở 2.6: 400 issue dựng sẵn ở đây là
+400 issue chết nằm chờ, mà phạm vi còn đổi thì sửa hàng loạt.
+
+STAGE.md Current = 2.4.
 Stop after 15 turns.
 
 ### Step 2.4 — Walking skeleton (manifest P0) + env + CI/CD + observability
@@ -341,7 +356,24 @@ then BLOCKED). PASS fills the manifest's `Accepted` cell + a TC-NNN acceptance
 row. When the phase's `Verify-by` is `both` (manifest cadence knob, default
 `per-ui-phase`), emit the gate's MANUAL_CHECKPOINT with the preview URL and
 wait for the operator's OK before the next phase. STAGE.md Current stays 2.6
-while phases remain; when the last phase closes AND is accepted, Current = 2.8. Đo lại: `node scripts/measure-macro2.mjs --step 2.6`.
+while phases remain.
+
+**Mỗi phase phải chạy qua chuỗi issue - đây là mắt xích cho theo dõi live.**
+
+1. **Mở phase:** `node scripts/new-issue.mjs` sinh issue cho các REQ-ID của phase, gắn nhãn
+   `Module: <Tên>` + milestone `Phase N` (bảng đã dựng ở 2.3), state `Ready for Dev`. Chỉ
+   issue của phase đang mở, không mở trước cho phase sau.
+2. **Runner nhận việc:** `node scripts/issue-state.mjs <n> "In Dev"`. Không có bước này thì
+   không ai nhìn được ai đang làm gì, và hai runner có thể ôm cùng một REQ-ID.
+3. **Verifier PASS:** `node scripts/issue-state.mjs <n> "Done"`.
+4. **Đóng phase:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing` phải
+   **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
+   không issue nào còn nằm ở trạng thái mở đầu.
+
+Cổng đó **không bao giờ xanh rỗng**: phase có REQ-ID mà tìm ra 0 issue là ĐỎ, và không đọc
+được trường trạng thái cũng là ĐỎ.
+
+When the last phase closes AND is accepted, Current = 2.8. Đo lại: `node scripts/measure-macro2.mjs --step 2.6`.
 Stop after 25 turns.
 
 ### Step 2.7 — Code review (6-dim) — at manifest completion (+ mid-point if >6 phases)  *(FOLDED into 2.10 — shares DoD floor rules; see macro-2.md)*

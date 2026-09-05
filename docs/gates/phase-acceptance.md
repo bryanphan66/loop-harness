@@ -543,3 +543,20 @@ the mechanic; it is not filled per project.
 > docs), 2.9 (security), 2.10 (QA/DoD) still run — but as **whole-system
 > aggregation** (cross-phase interactions, security posture, full coverage
 > proof), no longer as the first place a per-phase defect can be caught.
+
+## Điều kiện issue (máy kiểm được)
+
+Phase chỉ được tính xong khi `node scripts/check-issue-coverage.mjs --phase P<n> --closing`
+**xanh**. Ba điều nó kiểm:
+
+1. Mọi REQ-ID **trong phạm vi** của phase có **>=1 issue** nhắc tới nó.
+2. Mọi issue đó gắn **milestone `Phase <n>`**.
+3. Không issue nào còn ở trạng thái mở đầu (`Backlog`, `Ready for Dev`) khi đóng phase.
+
+Cổng này **fail-closed**: phase có REQ-ID mà tìm ra 0 issue là ĐỎ (đọc hỏng, không phải
+"phase không cần issue"), và không đọc được trường org `States` cũng là ĐỎ.
+
+Vì sao thêm: một lượt chạy thật đi hết 2.0..2.4 với **0 issue trên repo** mà không cổng nào
+đỏ - `issue%` được dựng ra để đo đúng chuỗi `REQ-ID -> issue -> test -> UAT` và đứng yên ở 0
+suốt bốn lần đo. Macro 3 chạy bằng issue-pipeline, nên phase đóng mà không có issue nghĩa là
+go-live xong không có gì để bàn giao.
