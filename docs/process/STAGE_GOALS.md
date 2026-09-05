@@ -411,7 +411,13 @@ while phases remain.
 2. **Runner nhận việc:** `node .harness/steady-state/scripts/issue-state.mjs <n> "In Dev"`. Không có bước này thì
    không ai nhìn được ai đang làm gì, và hai runner có thể ôm cùng một REQ-ID.
 3. **Verifier PASS:** `node .harness/steady-state/scripts/issue-state.mjs <n> "Done"`.
-4. **Đóng phase:** hai cổng phải **xanh**:
+4. **Bật `prototypeFidelity.required` khi phase đầu tiên có màn hình.** Đặt `true` trong
+   `scripts/gate-config.json`. Trước đó gate tự bỏ qua vì chưa có gì để đối chiếu; sau đó
+   thiếu `fidelity-map.json` (hoặc map rỗng route) là **ĐỎ** - vì lúc ấy thiếu map nghĩa là
+   **chưa làm**, không phải được miễn. Không bật thì tới 2.10 cổng `visual-fidelity` đi qua
+   trên một dự án chưa đối chiếu màn hình nào.
+
+5. **Đóng phase:** hai cổng phải **xanh**:
    - `node scripts/check-reqid-artifact-coverage.mjs --artifact entity --phase P<n>`
    - `node scripts/check-reqid-artifact-coverage.mjs --artifact api --phase P<n>`
 
@@ -419,7 +425,7 @@ while phases remain.
    REQ-ID cho phase đó vào ERD và API contract. Tới lúc phase cuối đóng, phủ tự đủ 100%
    mà không ai phải viết 130 dòng một lượt.
 
-5. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing` phải
+6. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing` phải
    **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
    không issue nào còn nằm ở trạng thái mở đầu.
 
