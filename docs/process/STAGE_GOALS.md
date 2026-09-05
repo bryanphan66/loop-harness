@@ -462,13 +462,20 @@ while phases remain.
    REQ-ID của chính các bước Macro 2: `Deploying` là lúc đưa phase lên môi trường
    test, `QC Testing` là 2.10, `UAT Testing` là 2.12, `Done` là 2.13. Nhảy nấc nghĩa là hồ sơ nói dối về
    việc đã ai kiểm cái gì.
-4. **Bật `prototypeFidelity.required` khi phase đầu tiên có màn hình.** Đặt `true` trong
+4. **Tách phase SAU khi đã mở issue thì phải dời issue theo.** Chia một phase lớn thành
+   P<n>.1/.2/... là chuyện thường ở 2.6, nhưng issue đã tạo thì thân bài của nó ghi tên
+   phase cũ và trỏ vào mục cũ của bản kê thi công. Trên một lượt chạy thật, ba issue được
+   mở dưới P1.1 rồi bị tách sang P1.4 - và thân bài vẫn tự khai "thuộc P1.1" cho tới khi có
+   người đọc kỹ. Tách xong thì **sửa lại thân bài của mọi issue bị dời**, cùng lượt, đừng để
+   sang phase sau.
+
+5. **Bật `prototypeFidelity.required` khi phase đầu tiên có màn hình.** Đặt `true` trong
    `scripts/gate-config.json`. Trước đó gate tự bỏ qua vì chưa có gì để đối chiếu; sau đó
    thiếu `fidelity-map.json` (hoặc map rỗng route) là **ĐỎ** - vì lúc ấy thiếu map nghĩa là
    **chưa làm**, không phải được miễn. Không bật thì tới 2.10 cổng `visual-fidelity` đi qua
    trên một dự án chưa đối chiếu màn hình nào.
 
-5. **Đóng phase:** hai cổng phải **xanh**:
+6. **Đóng phase:** hai cổng phải **xanh**:
    - `node scripts/check-reqid-artifact-coverage.mjs --artifact entity --phase P<n>`
    - `node scripts/check-reqid-artifact-coverage.mjs --artifact api --phase P<n>`
 
@@ -476,7 +483,7 @@ while phases remain.
    REQ-ID cho phase đó vào ERD và API contract. Tới lúc phase cuối đóng, phủ tự đủ 100%
    mà không ai phải viết 130 dòng một lượt.
 
-6. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing --expect "In Dev"`
+7. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing --expect "In Dev"`
    phải **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
    không issue nào còn nằm ở trạng thái mở đầu.
 
