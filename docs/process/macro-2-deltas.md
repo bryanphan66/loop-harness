@@ -1826,3 +1826,49 @@ một thứ dự án chưa có: bảng ánh xạ **build phase (P0..P20) -> rele
 nối chúng. Dựng bảng đó là việc của 2.3, không phải việc nhét vào một cổng. Ghi ra đây làm
 mắt xích tiếp theo chứ không im lặng bỏ qua.
 
+## MD-52 - dạng hỏng thứ ba: NGUỒN GIẢ. Công cụ đưa nhầm yêu cầu, mọi luật đều được tuân thủ
+
+`req-issue-scaffold.mjs` là thứ agent dùng để lấy đoạn SRS trước khi viết tiêu chí chấp
+nhận. Nó tìm mã trong SRS rồi trả về **mọi mục có nhắc tới mã đó** - kể cả nhắc chéo trong
+một yêu cầu khác - và **không bao giờ kiểm xem mã có được KHAI BÁO ở đó không**.
+
+Đo trên dự án thật, 15 REQ-ID của P1: **11 cái nhận về đoạn trích của yêu cầu khác.**
+`IF.JOBS.07` nhận trích từ **8 file** và không có lấy một câu `shall` của chính nó.
+
+**Đây là dạng hỏng thứ ba, và nặng nhất trong ba.**
+
+| dạng | chuyện gì xảy ra | nhìn thấy được không |
+|---|---|---|
+| xanh giả (MD-12) | cổng báo xanh trên 0 mục | không, nhưng để lại lỗ hổng |
+| đỏ giả (MD-28) | cổng báo đỏ oan, người đi sửa TÀI LIỆU cho vừa công cụ | có - ai cũng thấy màu đỏ |
+| **nguồn giả (đây)** | agent đọc nguồn trước đúng như dặn, không chép code, trích dẫn trung thực - **và viết tiêu chí chấp nhận cho một yêu cầu khác** | **không.** Mọi luật đều được tuân thủ |
+
+Hai dạng đầu còn để lại dấu vết. Dạng này không: không luật nào bị vi phạm, không cổng nào
+đỏ, sản phẩm đầu ra trông hoàn toàn hợp lệ. Nó chỉ lộ ra khi có người ngồi hỏi *"đoạn trích
+này có thật là của mã đó không"*.
+
+**Bán kính ảnh hưởng trên việc đã commit:** 13 trong 20 issue của P1 viết từ đoạn trích sai
+(P1.1 3/4, P1.4 3/3, P1.2 4/6). Đợt rà soát SRS ở `b26f219` cũng dùng chính công cụ này làm
+nguồn so sánh - các bản sửa của nó trích đúng văn bản SRS thật nên rõ ràng có đọc thẳng file,
+nhưng **các kết luận thì chưa tin được**, nhất là một kết luận *"không lệch"*. 7 issue của
+P1.3 sạch, vì agent viết chúng không tin công cụ mà tự `awk` lấy khối khai báo rồi đối chiếu
+trước khi tạo.
+
+**Vá hai thứ, không phải một:**
+
+1. Bám vào **dòng khai báo** `**<MÃ>**` ở đầu dòng, cắt tới khai báo kế tiếp hoặc heading
+   kế tiếp. File chỉ nhắc mã thì trả về như tham chiếu chéo, **không kèm nội dung**.
+2. **Không tìm thấy khai báo thì BÁO LỖI TO**, không trả đoạn gần đúng. Trả về một thứ nghe
+   hợp lý chính là cái làm lỗi này tàng hình suốt một lượt chạy. Thử đường lỗi: mã bịa đặt
+   -> từ chối; mã quy tắc nghiệp vụ `BR.DATA.12` (chỉ được nhắc, không được khai) -> từ chối
+   kèm danh sách 8 file đã nhắc nó.
+
+Đo lại sau khi vá: **20/20 REQ-ID trả đúng một khối khai báo, từ đúng một file.**
+
+**Một lỗ cùng họ, vá luôn:** `check-issue-coverage.mjs` quét REQ-ID trong cả tiêu đề lẫn
+thân issue. Thân issue trích nguyên văn SRS, mà một yêu cầu SRS thường nhắc chéo mã của yêu
+cầu khác - nên một lần trích dẫn trung thực biến thành lời khai *"mã kia đã có issue"*, và
+tới lượt phase của nó thì cổng im. Regex cũng không phân biệt `BR.PLF.01` với REQ-ID thật.
+Giờ chỉ mã ở tiêu đề `[REQ-ID]` mới tính là phủ; tiêu đề không theo quy ước thì vẫn lùi về
+quét thân bài nhưng in ra là đã lùi. Đo lúc vá: chưa issue nào dính - vá trước khi cháy.
+
