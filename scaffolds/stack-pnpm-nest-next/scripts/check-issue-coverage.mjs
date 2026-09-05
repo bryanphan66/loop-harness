@@ -107,7 +107,12 @@ if (CLOSING && phaseIssues.length) {
   let apiFail = 0;         // gọi API hỏng = vấn đề môi trường/quyền
   for (const it of phaseIssues) {
     const r = gh(['api', `repos/${REPO}/issues/${it.number}`, '--jq',
-      '[.issue_field_values[]? | select(.issue_field.name=="States") | .single_select_option.name] | first // ""']);
+      '[.issue_field_values[]? | select(.issue_field_name=="States") | .single_select_option.name] | first // ""']);
+    // Khoá là `issue_field_name` PHẲNG, không phải `issue_field.name` lồng. Bản
+    // đầu tôi đoán hình dạng thay vì đổ dữ liệu thô ra xem: truy vấn trả rỗng,
+    // và cổng báo "chưa đặt trạng thái" cho những issue ĐANG CÓ trạng thái. Một
+    // cổng đọc sai chỗ còn tệ hơn cổng không đọc, vì nó nói dối rất tự tin.
+    //
     // Hai nguyên nhân KHÁC HẲN nhau, đừng gộp một câu: gọi API hỏng là chuyện
     // quyền/mạng, còn trường trống là CHƯA AI ĐẶT - tức việc chưa làm. Gộp lại
     // thì người ta đi sửa quyền trong khi thật ra chỉ cần chạy issue-state.mjs.
