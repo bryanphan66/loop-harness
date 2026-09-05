@@ -44,7 +44,7 @@ const ROOT = docsRoot(gateRoot(dirname(fileURLToPath(import.meta.url))));
 // Quét cả `docs/about/` và các file .md ở gốc repo (CLAUDE.md, AGENTS.md,
 // README.md): lời gọi công cụ hay nằm đúng ở đó, và bỏ sót chúng thì cổng lại
 // xanh trên một lỗ thật - lần đầu chạy cổng này nó xanh đúng như vậy.
-const DOC_DIRS = ['docs/process', 'docs/gates', 'docs/playbooks', 'docs/about'];
+const DOC_DIRS = ['docs/process', 'docs/gates', 'docs/playbooks', 'docs/about', '.claude/commands'];
 const ROOT_DOCS = ['CLAUDE.md', 'AGENTS.md', 'README.md'];
 const CALL = /\b(?:node|bash)\s+([A-Za-z0-9_./-]+\.(?:mjs|sh))/g;
 
