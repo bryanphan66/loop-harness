@@ -1039,3 +1039,64 @@ harness. Dự án không có chúng, agent tìm không ra, phải trích 2 playb
 Harness tự mâu thuẫn: **goal-text hỏi theo năng lực, bảng liệt kê theo tên file - hai
 danh sách khác nhau.** Đã cắm cả ba vào ô Playbook của bước 2.2. Kiểm: 15 playbook bảng
 macro-2 gọi tên đều có mặt ở dự án, 0 thiếu.
+
+---
+
+## MD-28 - `scaffold.sh` dựng tại chỗ thì tự cắn repo
+
+Bước 2.4 chạy `scaffold.sh . <slug>` - đích là **gốc repo đang có sẵn**, đúng như
+goal-text bảo. Đó là cách dùng THẬT, và nó phá ba thứ:
+
+1. `rsync` đè `.gitignore` và `README.md` gốc repo bằng bản của template (template có
+   hai file cùng tên ở gốc). `.gitignore` mất dòng loại trừ `.harness/`.
+2. `scaffold.sh` tự chạy `git add -A` ngay sau đó -> gom ~150 file `.harness/` vào index.
+3. Phần thay `__PROJECT_SLUG__` quét cả `.harness/stack-template/` - **sửa vào chính
+   thư mục nguồn của nó**.
+
+Agent phát hiện và khôi phục trước khi commit nên repo không hỏng, nhưng script vẫn sai.
+
+**Vì sao tôi không bắt được:** tôi thử `scaffold.sh` vào một **thư mục tạm trống**. Đường
+đó luôn xanh. Cách dùng thật là dựng **tại chỗ** trong repo có sẵn - tôi chưa thử lần nào.
+Bài học chung: thử một script ở điều kiện dễ nhất rồi tuyên bố "đã kiểm chứng" là một
+dạng xanh giả khác.
+
+Đã vá: nhận diện `IN_PLACE` bằng sự tồn tại của `$TARGET_DIR/.harness`; khi dựng tại chỗ
+thì (a) `--exclude` mọi file gốc dự án đã có (`.gitignore`, `README.md`, `AGENTS.md`,
+`CLAUDE.md`), (b) `--exclude .harness`, (c) `grep --exclude-dir=.harness` khi thay slug,
+(d) **không** `git add -A` - repo có sẵn tự lo việc stage.
+
+Đã thử đúng kịch bản đó: repo giả có `.harness` + 3 file gốc -> dựng tại chỗ -> README
+nguyên, `.gitignore` còn dòng `.harness/`, `AGENTS.md` nguyên, **0 file bị stage**,
+**0 file trong `.harness` bị sửa**, `apps/` dựng đủ.
+
+## MD-29 - hai script của tôi không nhận component dạng thư mục
+
+Registry cài `chart`, `sidebar`, `data-grid`, `rich-text`, `video-player`, `code-editor`
+thành **thư mục nhiều file** (`chart/index.tsx`), và cài mục `registry:lib` / `registry:hook`
+ra `src/lib`, `src/hooks`. `ui-sync.mjs --check` và luật B của `check-ui-region-boundary.mjs`
+chỉ quét file `.tsx` **phẳng** trong `components/ui/` nên soi sai cả sáu.
+
+Agent tự sửa trong dự án ở 2.4. Đã nhấc bản đó lên harness làm chuẩn - nó là bản đã chạy
+thật với 54 mục.
+
+## MD-30 - `validate:quick` được 4 tài liệu gọi tên nhưng không tồn tại
+
+`build-manifest.md`, `STAGE_GOALS.md` §2.6/§2.10, `phase-acceptance.md`,
+`visual-fidelity.md` đều đặt tên lệnh xác minh là `pnpm validate:quick`. `package.json`
+của template chỉ có `validate` (không chạy `test`). Không có script nào tên vậy.
+
+Đã thêm vào template: `validate:quick = lint && typecheck && test`. Cùng loại lỗi với
+MD-20 (tên gọi trong tài liệu không có bản thật) - khác chỗ đây là **tên lệnh**, không
+phải tên file, nên `check-dangling-refs` không soi tới. Cần một gate soi tên lệnh trong
+tài liệu đối chiếu `package.json` - **chưa làm**, ghi lại đây.
+
+## MD-31 - "Offline boot caveat (§ below)" trỏ vào hư không
+
+Goal-text 2.4 và 2.13 đều trích *"follow the shared **Offline boot caveat** (§ below)"*.
+Grep toàn bộ `docs/`: **không có section nào tên vậy**. Hai chỗ trích, không chỗ nào có
+đích. Cả hai đoạn tự nó đã nói cách thay bằng chứng, nên caveat "chung" chưa bao giờ được
+viết ra - chỉ được nhắc tới.
+
+Đã viết `## Offline boot caveat` ở cuối `STAGE_GOALS.md` và sửa hai chỗ trỏ. Nội dung:
+không chặn cổng vì mạng, nhưng phải đủ ba việc - thay bằng chứng, ghi caveat, hẹn chỗ
+trả nợ trước go-live. Thiếu một là cổng đỏ.

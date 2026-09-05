@@ -29,21 +29,43 @@ if [[ -e "$TARGET_DIR/package.json" ]]; then
   exit 1
 fi
 
+# IN-PLACE SCAFFOLD (target = an existing repo that already embeds this template
+# under .harness/). This is the NORMAL path at step 2.4, not an edge case, and it
+# damaged the repo three ways before anyone noticed:
+#   - rsync copied the template's own .gitignore and README.md over the project's.
+#     Losing the .gitignore line that excludes .harness/ meant the `git add -A`
+#     below then staged ~150 embedded harness files.
+#   - the __PROJECT_SLUG__ rewrite walked into .harness/stack-template/ and edited
+#     the template source itself.
+# Guard: never overwrite a root file the project already has, never descend into
+# the embed, and leave staging alone in a repo this script did not create.
+IN_PLACE=0
+[[ -d "$TARGET_DIR/.harness" ]] && IN_PLACE=1
+
+KEEP_EXISTING=()
+if [[ "$IN_PLACE" == "1" ]]; then
+  for f in .gitignore README.md AGENTS.md CLAUDE.md; do
+    [[ -e "$TARGET_DIR/$f" ]] && KEEP_EXISTING+=(--exclude "$f")
+  done
+  echo "In-place scaffold detected - keeping the project's own root files, skipping the harness embed"
+fi
+
 echo "Copying template -> $TARGET_DIR"
 # Exclude template metadata and anything install/build-generated.
 rsync -a \
   --exclude 'node_modules' --exclude 'dist' --exclude '.next' --exclude 'coverage' \
   --exclude 'playwright-report' --exclude 'test-results' --exclude '.git' --exclude '*.tsbuildinfo' \
   --exclude 'pnpm-lock.yaml' --exclude 'scripts/scaffold.sh' --exclude 'TEMPLATE_VERSION' \
+  --exclude '.harness' "${KEEP_EXISTING[@]}" \
   "$TEMPLATE_DIR/" "$TARGET_DIR/"
 
 echo "Renaming __PROJECT_SLUG__ -> $SLUG"
 # BSD/GNU-portable in-place replace (template filenames contain no newlines/spaces).
-{ grep -rl --exclude-dir=.git '__PROJECT_SLUG__' "$TARGET_DIR" 2>/dev/null || true; } |
+{ grep -rl --exclude-dir=.git --exclude-dir=.harness '__PROJECT_SLUG__' "$TARGET_DIR" 2>/dev/null || true; } |
   while IFS= read -r file; do
     perl -pi -e "s/__PROJECT_SLUG__/$SLUG/g" "$file"
   done
-if grep -rq --exclude-dir=.git '__PROJECT_SLUG__' "$TARGET_DIR" 2>/dev/null; then
+if grep -rq --exclude-dir=.git --exclude-dir=.harness '__PROJECT_SLUG__' "$TARGET_DIR" 2>/dev/null; then
   echo "Error: placeholder rename incomplete — __PROJECT_SLUG__ still present." >&2
   exit 1
 fi
@@ -63,7 +85,14 @@ else
   git init -q
   echo "Initialized git repository"
 fi
-git add -A
+# Only stage in a repo this script just created. An existing project has its own
+# history and staging policy; `git add -A` there sweeps in whatever the copy
+# touched - which is how the embedded harness nearly got committed.
+if [[ "$IN_PLACE" == "1" ]]; then
+  echo "In-place scaffold - leaving staging to the project (nothing added)"
+else
+  git add -A
+fi
 
 cat <<EOF
 

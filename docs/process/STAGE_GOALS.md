@@ -246,7 +246,7 @@ locally (the CI-equivalent run); (3) `docker compose up` boots db + api + web;
 jobs; (6) `.env.example` lists every required var and no secret is committed
 (secret scan clean — gitleaks or `scripts/secret-scan.sh`). **Offline caveat:**
 if the base-image pull is network-blocked, follow the shared **Offline boot
-caveat** (§ below) — substitute cached-db / prod-command boot evidence + record
+caveat** (§ cuối file) — substitute cached-db / prod-command boot evidence + record
 the caveat; do not block the gate on the network.
 Observability is decided: structured logging on by
 default; alerting/SLO configured or recorded `N/A by decision` in the
@@ -445,7 +445,7 @@ Goal:
 The readiness checklist is green: production build variant (Dockerfiles +
 prod compose or deploy target) boots from a clean pull. **Offline caveat:** if
 the base-image pull is network-blocked locally, follow the shared **Offline boot
-caveat** (§ below) — accept prod-command boot on built artifacts + config-valid +
+caveat** (§ cuối file) — accept prod-command boot on built artifacts + config-valid +
 CI-delegated build, record the caveat, and prove the containerized boot in
 CI/deploy before the 2.13 release. Environments isolated
 with `.env.<env>.example` complete; backups configured and a restore verified;
@@ -522,3 +522,26 @@ one-time 3.1 handover / 3.2 hypercare-kickoff / 3.6 retro ceremonies still run v
 
 ---
 
+---
+
+## Offline boot caveat
+
+Hai bước trích mục này: **2.4** (walking skeleton phải boot được) và **2.13** (bản
+production phải boot từ một lần pull sạch). Trước đây cả hai ghi "(§ below)" mà **không
+có section nào tên vậy** - tham chiếu cụt, người chạy không kiểm được caveat thật sự đòi
+gì. Lượt chạy thật bắt được ở 2.4.
+
+**Nguyên tắc:** mạng chặn kéo image không phải lỗi của dự án, nên **không chặn cổng vì
+mạng**. Nhưng cũng không được nhận xanh suông - phải thay bằng bằng chứng khác và **ghi
+lại là đã thay**.
+
+Ba việc, đủ cả ba mới được đi tiếp:
+
+1. **Thay bằng chứng.** Boot bằng db đã cache, hoặc chạy thẳng lệnh production trên
+   artifact đã build, thay cho `docker compose up` từ image mới kéo.
+2. **Ghi caveat** vào ghi chép của bước: thay cái gì, vì sao.
+3. **Hẹn chỗ trả nợ.** Bước 2.4 trả ở lần CI đầu tiên có mạng; bước 2.13 phải chứng minh
+   boot trong container ở CI/deploy **trước khi phát hành**. Caveat không được sống qua
+   mốc go-live.
+
+Không đủ ba thì cổng **đỏ**, không phải "tạm chấp nhận".
