@@ -86,7 +86,10 @@ if (missing.length) {
 // Milestone dành cho PHASE PHÁT HÀNH (Phase 1..5, có hạn chót) - hai thứ khác nhau
 // và từng va tên: ROADMAP dùng "Phase 2" nghĩa kinh doanh, bảng thi công cũng có
 // "Phase 2" nghĩa gói việc thứ hai. Nhìn milestone không biết là nghĩa nào.
-const wantLabel = `Build: ${PHASE}`;
+// Nhãn ở mức phase CHA. Phase con chỉ là cách chia nhỏ để một phiên làm hết -
+// gắn nhãn cho từng phase con thì 21 phase thành 60-100 nhãn, không ai lọc nổi.
+// Vẫn soi được phase con: REQ-ID của nó lấy từ manifest, chỉ nhãn là dùng chung.
+const wantLabel = `Build: ${PHASE.split('.')[0]}`;
 const phaseIssues = [...new Set(phaseIds.flatMap((id) => covered.get(id) ?? []))];
 const noLabel = phaseIssues.filter((it) => !(it.labels ?? []).some((l) => l.name === wantLabel));
 if (noLabel.length) {

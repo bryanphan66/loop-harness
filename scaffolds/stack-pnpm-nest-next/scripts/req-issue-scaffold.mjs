@@ -64,11 +64,16 @@ function registerRow(id) {
     if (Array.isArray(o)) return o.forEach((x) => walkO(x, phase, section));
     if (o && typeof o === 'object') {
       const ph = o.phase ?? phase, sec = o.section ?? section;
+      // Khớp CHÍNH XÁC, hoặc khớp qua ký tự đại diện tường minh (`IF.JOBS.*`).
+      // Bản cũ cắt hậu tố số rồi `id.startsWith(stem)`, nên IF.JOBS.04/.05/.06/.08
+      // đều rơi vào dòng register ĐẦU TIÊN có gốc IF.JOBS và nhận nhầm tên tính
+      // năng của nó - 4/7 REQ-ID của một phase thật bị gợi ý sai tên.
       if (Array.isArray(o.reqids) && o.reqids.some((r) => {
-        const s = String(r);
-        if (s === id) return true;
-        const stem = s.replace(/\.\*+$/, '').replace(/\.\d+(-\d+)?$/, '').replace(/\*/g, '');
-        return id.startsWith(stem);
+        const spec = String(r).trim();
+        if (spec === id) return true;
+        if (!spec.includes('*')) return false;
+        const re = new RegExp(`^${spec.replace(/[.]/g, '\\.').replace(/\*/g, '[A-Z0-9]+')}$`);
+        return re.test(id);
       })) { found = { feature: o.feature, phase: ph, section: sec, scope_in: o.scope_in, scope_out: o.scope_out, goal: o.goal }; return; }
       Object.values(o).forEach((v) => walkO(v, ph, sec));
     }
@@ -76,8 +81,28 @@ function registerRow(id) {
   return found;
 }
 
-function moduleOf(section) {
-  // coarse: use the section name as the module hint (owner rule in github-issue-standard)
+/**
+ * Tên module dùng cho nhãn `Module: <Tên>`.
+ *
+ * PHẢI lấy từ bảng M1..MN trong docs/ROADMAP.md - đó là nơi `setup-issue-board.mjs`
+ * dựng nhãn thật. Bản cũ lấy tên section của register (tiếng Việt) nên gợi ý
+ * `Module: Nền tảng kỹ thuật & Nhà cung cấp AI` trong khi nhãn thật trên repo là
+ * `Module: AI provider platform` - gắn vào là gh báo không có nhãn đó.
+ *
+ * Hai danh sách khác nhau thì phải chọn MỘT làm nguồn cho nhãn, không được mỗi
+ * script đọc một nơi.
+ */
+function moduleOf(section, phase) {
+  const roadmap = resolve(ROOT, 'docs/ROADMAP.md');
+  if (existsSync(roadmap)) {
+    const n = String(phase ?? '').match(/(\d+)/)?.[1];
+    if (n) {
+      for (const line of readFileSync(roadmap, 'utf8').split('\n')) {
+        const m = line.match(/^\|\s*M(\d+)\s*\|\s*([^|]+?)\s*\|/);
+        if (m && m[1] === n) return m[2].replace(/^[^\p{L}\p{N}]+/u, '').trim();
+      }
+    }
+  }
   return (section || '').replace(/^[^A-Za-zÀ-ỹ]*/, '').trim() || '(chưa rõ Module)';
 }
 
@@ -132,7 +157,7 @@ const row = registerRow(id);
 const scaffold = {
   reqid: id,
   title_hint: row?.feature ? `[${id}] ${row.feature}` : `[${id}] (điền tên tính năng)`,
-  module: moduleOf(row?.section),
+  module: moduleOf(row?.section, row?.phase),
   phase: row?.phase ?? '(chưa gán phase trong register)',
   scope_in: row?.scope_in ?? null,
   scope_out: row?.scope_out ?? null,

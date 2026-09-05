@@ -1262,3 +1262,37 @@ Mẫu `docs/mau-tai-lieu/ROADMAP.md` thêm section đó.
 **Bài học rộng hơn:** harness mượn từ "phase" cho khái niệm của nó mà không hỏi dự án đã
 dùng từ đó chưa. Một từ có sẵn nghĩa trong ngôn ngữ của dự án thì công cụ **không được**
 chiếm. Chỗ khác cần soát cùng lý do: "module", "milestone", "release".
+
+---
+
+## MD-37 - ba lỗi trong chính bộ script issue tôi vừa viết, lộ ra khi phase con chạy thật
+
+Bốn tiếng sau khi viết, lượt chạy dùng thật và trả về ba lỗi. Cả ba đều thuộc loại "chỉ
+lộ khi có dữ liệu thật", không loại nào bắt được bằng đọc code.
+
+**1. Gate không soi được phase con (chặn đường).** `reqIdsByPhase` bắt tiêu đề bằng
+`^#{2,4}\s+(P\d+)\b`, nên `#### P1.1` đọc thành `P1` và `--phase P1.1` trả *"không có
+REQ-ID nào trong phạm vi - đọc hỏng"*. Mà P1 đã tách 3 phase con, tức cổng vô dụng đúng
+lúc cần nhất. Đã nhận `P\d+(?:\.\d+)?`, và **gộp ngược REQ-ID của phase con lên phase cha**
+để hỏi "P1 gồm gì" vẫn ra đủ 20. Kiểm: `P1=20, P1.1=7, P1.2=6, P1.3=7`.
+
+**2. Tên module lấy sai nguồn.** `req-issue-scaffold` trả `Module: Nền tảng kỹ thuật & Nhà
+cung cấp AI` (tên section tiếng Việt trong register JSON), còn nhãn THẬT trên repo do
+`setup-issue-board` dựng là `Module: AI provider platform` (từ bảng M1..MN của ROADMAP).
+Gắn vào là `gh` báo không có nhãn đó. **Hai script đọc hai nơi cho cùng một cái tên** - lại
+đúng bài học MD-12/MD-32. Đã chốt ROADMAP là nguồn của nhãn `Module:`, `req-issue-scaffold`
+tra theo phase.
+
+**3. Khớp REQ-ID bằng `startsWith` nên gợi ý sai tên cho 4/7.** `registerRow` cắt hậu tố số
+rồi so `id.startsWith(stem)`, nên `IF.JOBS.04/.05/.06/.08` đều rơi vào dòng register **đầu
+tiên** có gốc `IF.JOBS` và nhận nhầm tên tính năng của nó. Đã đổi sang khớp **chính xác**,
+ký tự đại diện phải khai tường minh (`IF.JOBS.*`). Sau khi sửa, `.05` và `.08` ra tên khác
+`.01` - đúng.
+
+**Một quyết định kèm theo:** nhãn `Build:` đặt ở mức **phase cha**, không phải phase con.
+21 phase × ~3 phase con = 60-100 nhãn thì không ai lọc nổi. Phase con vẫn soi được vì REQ-ID
+của nó đọc từ manifest; chỉ nhãn là dùng chung.
+
+**Bài học lặp lại lần thứ tư:** hai script trả lời cùng một câu hỏi thì phải dùng chung một
+nguồn. MD-12 (đường dẫn register), MD-32 (cũng đường dẫn register), MD-35 (regex nhãn
+REQ-ID), giờ MD-37 (tên module). Mỗi lần đều là "vá chỗ này quên chỗ kia".
