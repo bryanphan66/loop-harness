@@ -522,7 +522,12 @@ decision with reason + date, and the verification register has no `fail` /
 `never-run` rows. Sequencing hazard: do NOT run the production build
 (`pnpm build`) while the e2e dev server is serving — it clobbers the running
 `.next` and fakes a login regression (template README § End-to-end tests);
-build and browser-QA in separate steps. STAGE.md Current = 2.12. Stop after
+build and browser-QA in separate steps. **Khai đợt phát hành trước khi chạy DoD.** `acCoverage.releaseScope` trong
+`scripts/gate-config.json` phải trỏ đúng các phase thuộc đợt đang nghiệm thu (xem
+`docs/gates/dod-build.md` § Phạm vi đo). Không khai thì gate đo cả register - trên một dự
+án nhiều đợt, đó là đo nhầm thước và cổng sẽ đỏ tới tận đợt cuối.
+
+STAGE.md Current = 2.12. Stop after
 15 turns.
 
 ### Step 2.11 — Go-live readiness  *(FOLDED into 2.13 — part of the release contract; see macro-2.md)*

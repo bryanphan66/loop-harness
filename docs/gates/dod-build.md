@@ -69,3 +69,24 @@ Conditional toggles:               all rows above checked or N/A-by-decision
 > Only after DoD is filled does the client **ACCEPTANCE** gate (2.12, UAT +
 > sign-off) run — its clearing conditions live in the WORKFLOW Canonical Gate
 > List and the 2.12 goal block; the HANDOVER gate's in 3.1.
+
+## Phạm vi đo: một ĐỢT PHÁT HÀNH, không phải toàn bộ register
+
+Dự án phát hành làm nhiều đợt (`docs/ROADMAP.md` § Release roadmap). **DoD của một đợt đo
+đúng REQ-ID của đợt đó**, không đo cả register.
+
+Khai ở `scripts/gate-config.json`:
+
+```json
+"acCoverage": { "releaseScope": { "name": "Alpha nội bộ", "phases": ["P0", "P1"] } }
+```
+
+Để `phases` rỗng = đo toàn bộ. Khai phase không tồn tại thì gate **ĐỎ** kèm lý do, không
+im lặng cho qua.
+
+**Vì sao:** bắt DoD của đợt đầu phủ cả 401 REQ-ID là bắt một điều không ai định làm - cổng
+sẽ đỏ tới tận đợt cuối rồi bị bỏ qua, đúng bệnh "gate đỏ mãi là gate mù". Đo trên một dự án
+thật: toàn bộ **373/377 chưa có test**, đợt `P0+P1` **16/20** - con số thứ hai mới hành
+động được.
+
+**Đợt phát hành phải khai trước khi mở 2.10.** Không khai mà chạy DoD là đo nhầm thước.
