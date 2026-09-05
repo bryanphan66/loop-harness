@@ -387,6 +387,66 @@ copy_stack_template() {
   log "  scaffold (step 2.4 primary path): $STACK_TEMPLATE_TARGET_RELDIR/scripts/scaffold.sh <target-dir> <project-slug>"
 }
 
+# ---------------------------------------------------------------------------
+# Steady-state kit embed
+# ---------------------------------------------------------------------------
+# macro-2 step 2.13 calls scripts/ship-and-verify.sh, and the issue-pipeline
+# (Mode B) calls new-issue.mjs / issue-state.mjs / qc-checklist.mjs. All of them
+# live in scaffolds/steady-state/, which this installer did NOT embed until
+# 2026-09-05 — so every project it installed named those five scripts in its
+# workflow and shipped with none of them, silently. Found on autocontent
+# (loop-harness docs/process/macro-2-deltas.md MD-06).
+# Same ownership rule as the stack template: .harness/ is harness-owned and
+# wiped wholesale on every (re)install.
+STEADY_KIT_RELDIR="scaffolds/steady-state"
+STEADY_KIT_TARGET_RELDIR=".harness/steady-state"
+STEADY_KIT_EMBEDDED=0
+
+collect_steady_kit_files() {
+  [ -d "$SOURCE_ROOT/$STEADY_KIT_RELDIR" ] || return 0
+  ( cd "$SOURCE_ROOT/$STEADY_KIT_RELDIR" && find . -type f \
+      ! -path '*/node_modules/*' \
+      | sed 's|^\./||' | sort )
+}
+
+copy_steady_state_kit() {
+  if [ ! -d "$SOURCE_ROOT/$STEADY_KIT_RELDIR" ]; then
+    warn "steady-state kit not found at $SOURCE_ROOT/$STEADY_KIT_RELDIR — skipping embed (step 2.13 ship-and-verify and the Mode B issue-pipeline scripts will be missing)."
+    return 0
+  fi
+
+  local dest_root="$TARGET_DIR/$STEADY_KIT_TARGET_RELDIR"
+  local count=0 relative target
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log "Steady-state kit -> $STEADY_KIT_TARGET_RELDIR/:"
+    while IFS= read -r relative; do
+      [ -n "$relative" ] || continue
+      log "  embed    $STEADY_KIT_TARGET_RELDIR/$relative"
+      count=$((count + 1))
+    done < <(collect_steady_kit_files)
+    log "Steady-state kit (dry-run): $count files would be embedded."
+    return 0
+  fi
+
+  rm -rf "$dest_root"
+  mkdir -p "$dest_root"
+  while IFS= read -r relative; do
+    [ -n "$relative" ] || continue
+    target="$dest_root/$relative"
+    mkdir -p "$(dirname "$target")"
+    cp -p "$SOURCE_ROOT/$STEADY_KIT_RELDIR/$relative" "$target"
+    log "embedded $STEADY_KIT_TARGET_RELDIR/$relative"
+    count=$((count + 1))
+  done < <(collect_steady_kit_files)
+  chmod +x "$dest_root/scripts/"*.sh 2>/dev/null || true
+
+  STEADY_KIT_EMBEDDED=1
+  log ""
+  log "Steady-state kit embedded: $STEADY_KIT_TARGET_RELDIR/ ($count files)"
+  log "  release verify (step 2.13): $STEADY_KIT_TARGET_RELDIR/scripts/ship-and-verify.sh <issue-number>"
+}
+
 # Adds ".harness/" to the target's .gitignore (creating the file if missing)
 # so the embedded template tree is never committed into the project's own
 # repo. Idempotent — a no-op once the exact line is present.
@@ -807,6 +867,7 @@ print_design_system_banner
 # so the embed is gitignored before anything ever gets staged.
 # ---------------------------------------------------------------------------
 copy_stack_template
+copy_steady_state_kit
 ensure_harness_dir_gitignored
 
 # ---------------------------------------------------------------------------
@@ -925,6 +986,9 @@ if [ "$BOOTSTRAP" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
         && harness_source_note="$HARNESS_REPO@$HARNESS_REF"
       if [ "$STACK_TEMPLATE_EMBEDDED" -eq 1 ]; then
         harness_source_note="$harness_source_note (stack template embedded: $STACK_TEMPLATE_TARGET_RELDIR/, TEMPLATE_VERSION $STACK_TEMPLATE_VERSION)"
+      fi
+      if [ "$STEADY_KIT_EMBEDDED" -eq 1 ]; then
+        harness_source_note="$harness_source_note (steady-state kit embedded: $STEADY_KIT_TARGET_RELDIR/)"
       fi
       sed -E \
         -e 's|^- \*\*Macro-stage:\*\*.*$|- **Macro-stage:** Pre-Build|' \
