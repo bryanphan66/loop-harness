@@ -138,9 +138,23 @@ norm_hash() {  # hash sau khi bo dinh dang: dam/nghieng, padding bang, khoang tr
     | grep -vE '^[>|+ -]*$' | sha256sum | cut -d' ' -f1
 }
 
-missing=(); stale=(); local_only=(); both=(); unknown=(); fmt_only=(); relocated=()
+# File cua rieng harness, khong phai cua kit. Khai o mot file doc duoc chu khong
+# nhet cung vao script: mot danh sach bo qua ma khong ai biet no ton tai thi lan
+# sau co nguoi lai di tim xem "sao file nay khong bao gio bao thieu".
+INTERNAL_LIST="$HARNESS/docs/about/not-shipped-to-projects.md"
+internal_paths=""
+if [ -f "$INTERNAL_LIST" ]; then
+  internal_paths=$(sed -n 's/^| `\([^`]*\)` |.*/\1/p' "$INTERNAL_LIST")
+fi
+is_internal() {
+  [ -n "$internal_paths" ] || return 1
+  printf '%s\n' "$internal_paths" | grep -qxF "$1"
+}
+
+missing=(); stale=(); local_only=(); both=(); unknown=(); fmt_only=(); relocated=(); internal=()
 
 while IFS= read -r rel; do
+  if is_internal "$rel"; then internal+=("$rel"); continue; fi
   h=$(hash_of "$HARNESS/$rel")
   p=$(hash_of "$PROJECT/$rel")
   if [ -z "$p" ]; then
@@ -188,5 +202,5 @@ if [ "$blocking" -eq 0 ]; then
   exit 0
 fi
 echo "$blocking file(s) need attention. LOCAL, RELOCATED? and FORMAT-ONLY are not counted"
-echo "  (${#relocated[@]} relocated, ${#fmt_only[@]} format-only, ${#local_only[@]} local)."
+echo "  (${#relocated[@]} relocated, ${#fmt_only[@]} format-only, ${#local_only[@]} local, ${#internal[@]} harness-internal by declaration)."
 exit 1
