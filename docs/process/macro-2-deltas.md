@@ -1296,3 +1296,27 @@ của nó đọc từ manifest; chỉ nhãn là dùng chung.
 **Bài học lặp lại lần thứ tư:** hai script trả lời cùng một câu hỏi thì phải dùng chung một
 nguồn. MD-12 (đường dẫn register), MD-32 (cũng đường dẫn register), MD-35 (regex nhãn
 REQ-ID), giờ MD-37 (tên module). Mỗi lần đều là "vá chỗ này quên chỗ kia".
+
+---
+
+## MD-38 - nhãn REQ-ID trải nhiều dòng làm cả một phase vô hình
+
+Lượt chạy báo tiếp: **P20 vô hình với cổng**. Nhãn khai của nó trải **ba dòng**:
+
+```
+- **REQ-IDs covered (exact 22, no prefix ambiguity — carved out of their
+  host files by explicit ID per `.../change-request-log.md`
+  § Sign-off):**
+```
+
+Bộ đọc soi **từng dòng** và đòi thấy `:**` đóng trên cùng dòng đó, nên không dòng nào
+khớp - 22 REQ-ID biến mất **lặng lẽ**, không cảnh báo gì. Đây là MD-35 lần hai: cùng một
+regex, lần trước hỏng vì có chữ chen giữa, lần này hỏng vì xuống dòng.
+
+Đã đổi sang nhận diện bằng **đầu khối** (`/^\s*-\s*\*\*REQ-IDs?\b/`) rồi gom cho tới bullet
+kế tiếp - không cần thấy dấu đóng. Kiểm: `P20` từ **0 -> 17 REQ-ID**, `P1=20`, `P1.1=7`.
+
+**Luật rút ra, dán vào cạnh MD-35:** gate đọc tài liệu người viết thì **đừng khớp cả một
+mẫu dài**. Nhận diện bằng thứ ngắn và ổn định (đầu dòng, đầu khối), rồi mới gom nội dung.
+Mẫu càng dài càng nhiều cách viết làm nó trượt, và mỗi lần trượt là một phase biến mất
+không kèn không trống.
