@@ -158,7 +158,7 @@ export function reqIdsByPhase(root, manifestPath) {
       inBlock = null;
       continue;
     }
-    if (/\*\*REQ-IDs?\b[^*]*:\*\*/.test(line) && phase) {
+    if (/^\s*-\s*\*\*REQ-IDs?\b/.test(line) && phase) {
       absorb(text, blockPhase); text = line; inBlock = phase; blockPhase = phase;
       continue;
     }
