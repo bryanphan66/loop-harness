@@ -1995,3 +1995,36 @@ kêu sai quá nhiều) rồi MD-55 (công cụ không nhìn vào chỗ quan tr�
 câu hỏi. Bài học không phải về script drift: **khi tìm ra một lỗ, hỏi tiếp cái gì lẽ ra phải
 bắt được nó, rồi đi kiểm chính cái đó** - thứ canh gác hỏng thầm lặng nguy hơn thứ nó canh.
 
+## MD-56 - công cụ tồn tại, chạy được, phát hành được, và không bước nào bảo gọi nó
+
+Hỏi tiếp câu của MD-55 - *"cái gì lẽ ra phải bắt được?"* - lần thứ tư, và ra tầng cuối.
+
+`harness-drift.sh` sau MD-53 và MD-55 đã: tìm được harness, nằm trong kit, lọc hết nhiễu,
+so cả script cổng. Đủ tốt. Nhưng grep `harness-drift` trong toàn bộ tài liệu quy trình thì
+ra **đúng một dòng, và là văn xuôi** - không có trong `STAGE_GOALS.md`, không có trong
+`WORKFLOW.md`, không phải cổng của bước nào. **Không bước nào từng bảo ai gọi nó.**
+
+Ba tầng trước là công cụ hỏng. Tầng này công cụ tốt - chỉ là không ai được dặn chạy. Kết
+quả giống hệt: bản vá 2.6 nằm ở harness nhiều tuần, người chạy sửa tay giữa dòng hai lần cho
+một lỗi đã có sẵn bản vá cách đó một thư mục.
+
+**Vá:** `harness-drift` thành cổng cơ học của **2.0**, kèm câu "chạy lại sau MỖI lần đẩy bản
+vá harness xuống" - vì đó chính là lúc lệch sinh ra.
+
+**Và một cổng để chuyện này không tái phát:** `check-referenced-tools.mjs` quét mọi lời gọi
+`node <path>` / `bash <path>` trong tài liệu quy trình rồi đối chiếu file có thật. Tài liệu
+hứa một công cụ không tồn tại trong kit = ĐỎ.
+
+Hai cái bẫy khi viết nó, cả hai đều đã dính trước khi thoát:
+
+1. **Công cụ nằm ở BA chỗ** - gốc repo (danh sách skeleton của installer), bộ khung stack,
+   kit steady-state. Tôi chỉ nhìn `scaffolds/` rồi kết luận `measure-macro2.mjs` thiếu -
+   **sai**, nó nằm ở `scripts/` gốc và installer có chép. Suýt đi vá một lỗi không tồn tại.
+   Đúng lỗi cũ: kiểm một chỗ rồi phán.
+2. **Lần chạy đầu cổng báo XANH trên một lỗ thật** - vì nó chỉ quét `docs/process|gates|
+   playbooks`, mà lời gọi lại nằm ở `docs/about/` và các `.md` gốc repo. Nếu không thử
+   chiều đỏ - gỡ file ra xem có báo không - thì đã đóng gói một cổng mù và tin nó.
+
+Cái thứ hai đáng nhớ hơn cả delta này: **cổng mới viết ra phải thử CẢ HAI chiều trước khi
+tin.** Xanh khi đúng chưa chứng minh gì; đỏ khi sai mới là bằng chứng.
+

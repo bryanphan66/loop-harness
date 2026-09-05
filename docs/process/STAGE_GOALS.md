@@ -99,7 +99,16 @@ mức kiểm thì phải ghi rõ đã hạ (xem 2.1, 2.2).
 
 - **Inputs:** tier-2 design tokens của dự án · thư viện UI đã chọn (`registry.json` của nó) · Component Coverage Matrix trong `design-guidelines.md` · `WORKFLOW.md` + `macro-2.md` của dự án.
 - **Output path:** `docs/design/component-mapping-<thư-viện>.md` + `scripts/gate-config.json` khối `uiRegions` (nếu app đã scaffold).
-- **Gate:** `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* **@một-lần**.
+- **Gate:** `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + `harness-drift` ⚙️ + component-mapping *(người)* **@một-lần**.
+- **Kit có còn khớp harness không:** `bash scripts/harness-drift.sh` phải sạch trước khi
+  xây. Chạy lại sau MỖI lần đẩy bản vá harness xuống - đó là lúc lệch sinh ra.
+
+  **Vì sao thành một bước bắt buộc:** công cụ này đã tồn tại từ lâu, chạy được, và
+  **không bước nào từng bảo ai gọi nó**. Nó không có trong `STAGE_GOALS.md`, không có
+  trong `WORKFLOW.md`. Hệ quả đo được trên một lượt chạy thật: bản vá 2.6 nằm ở harness
+  nhiều tuần không xuống dự án, và người chạy phải sửa tay giữa dòng hai lần cho một lỗi
+  đã có sẵn bản vá cách đó một thư mục. Một công cụ không được gọi thì bằng không, y hệt
+  một bản vá không được đẩy xuống.
 - **Manual?** no.
 
 **Bước này tồn tại vì ba lỗi đã xảy ra thật, không phải phòng xa.** Trên autocontent

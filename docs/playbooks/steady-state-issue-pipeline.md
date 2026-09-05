@@ -31,11 +31,11 @@ Every bug/change = **one GitHub Issue** (source of truth). It moves through 10 s
 | CS + Tech Lead (upstream) | **BA-validate BEFORE creating the issue** — classify business risk (price/order/permission/data-integrity held for a human). The pipeline does not re-validate. |
 | PM | triage Backlog -> Ready for Dev (AC + Module + Priority present). |
 | Control session | dispatch one async coder per issue (own worktree); after code, merge, run `ship-and-verify.sh` (auto-sets Deploying + Ready for Test). **Bracket every dispatch with `run-log.mjs start` / `end`** — that log is the only evidence a harness change helped. |
-| Coder (bg) | **first action: `node scripts/issue-state.mjs <N> "In Dev" --advance`** (binds In Dev to the coder actually starting — no operator memory needed); then code to AC, run the verify gate, attach QC checklist (`qc-checklist.mjs`), open a **draft PR** to the integration branch. |
+| Coder (bg) | **first action: `node .harness/steady-state/scripts/issue-state.mjs <N> "In Dev" --advance`** (binds In Dev to the coder actually starting — no operator memory needed); then code to AC, run the verify gate, attach QC checklist (`qc-checklist.mjs`), open a **draft PR** to the integration branch. |
 | QC (hybrid) | **agent-QC does the OBJECTIVE half** — assert on staging (API/DB/RBAC 403/email via Mailpit/business-rule/status-code) + **tick DoD-13**, and **flag visual/UX for human** (never fake-tick "looks right"). Control sets `QC Testing` at QC-dispatch (bind state to the action, don't rely on the worker). pass-objective -> Ready for UAT (human does the visual/final check at UAT); AC-fail -> In Dev (golden rule); out-of-AC bug -> sub-issue (Refs parent); teardown test data. **Verify = 2 INDEPENDENT passes, 2nd ADVERSARIAL (prompt to REFUTE)** — a single pass missed ~50% false-PASS in dogfood 260902; only advance when both agree. |
 | Customer | UAT -> Done. |
 
-Set state: `node scripts/issue-state.mjs <N> "<state>"`.
+Set state: `node .harness/steady-state/scripts/issue-state.mjs <N> "<state>"`.
 
 ### States are auto-set by the action, not by memory
 The loop used to rely on the operator *remembering* to run `issue-state.mjs` at each
@@ -76,7 +76,7 @@ issue's AC returns it to `In Dev`; a failure outside its AC becomes a new issue.
 `Done` has no outgoing edge on purpose — a defect found after Done is always a
 new issue, never a reopened one (rule 3 below).
 
-Verify the table without touching GitHub: `node scripts/issue-state.mjs --self-test`
+Verify the table without touching GitHub: `node .harness/steady-state/scripts/issue-state.mjs --self-test`
 (20 transition cases + table integrity; exits non-zero on any mismatch — safe to
 wire into CI).
 
