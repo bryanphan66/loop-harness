@@ -1100,3 +1100,63 @@ viết ra - chỉ được nhắc tới.
 Đã viết `## Offline boot caveat` ở cuối `STAGE_GOALS.md` và sửa hai chỗ trỏ. Nội dung:
 không chặn cổng vì mạng, nhưng phải đủ ba việc - thay bằng chứng, ghi caveat, hẹn chỗ
 trả nợ trước go-live. Thiếu một là cổng đỏ.
+
+---
+
+## MD-32 - MD-12 quay lại, vì lần trước chỉ vá một script
+
+`req-issue-scaffold.mjs` đọc register mặc định ở `feature-register**.**source.json`
+(dấu chấm); file thật là `feature-register**-**source.json` (gạch ngang). **Lệch đúng
+một ký tự** - y hệt MD-12.
+
+Hậu quả thấy ngay khi chạy thử: mọi bản nháp issue in ra `**Module:** (chưa rõ Module)`,
+`**Phase:** (chưa gán phase trong register)`, kèm cảnh báo *"REQ-ID này KHÔNG có dòng
+register"* bắn cho **cả REQ-ID đang in-scope thật**. Ai tin cảnh báo đó sẽ đi thêm dòng
+register trùng lặp cho thứ đã có.
+
+**Vì sao quay lại:** MD-12 vá `rtm-status.mjs` bằng một vòng lặp thử hai tên file, viết
+thẳng trong file đó. `req-issue-scaffold.mjs` đọc **cùng một register** nhưng không được
+vá - không ai đi tìm xem còn script nào đọc file đó nữa. **Vá một chỗ cho một script là
+vá triệu chứng.**
+
+Đã đưa `resolveRegisterJson(root, cfg)` vào `gate-lib.mjs` - thư viện chung mà cả hai
+script vốn đã import. Cả hai nay gọi hàm đó; bản tự viết trong `rtm-status` bị bỏ. Script
+nào đọc register sau này phải gọi hàm này, cấm tự viết đường dẫn mặc định.
+
+Kiểm chứng trên autocontent: trước `Module:` và `Phase:` rỗng -> sau
+`**Module:** Nền tảng kỹ thuật & Nhà cung cấp AI | **Phase:** Phase 1`, hết cảnh báo sai.
+
+**Chỗ này lộ ra nhờ chọn chạy thử trước khi đẩy.** Nếu tạo issue thật luôn thì đã đúc ra
+một loạt issue mất phần neo phạm vi, mà số issue trên GitHub không xoá lại được.
+
+## MD-33 - không bước nào giao việc tạo issue, dù chỉ số đo đúng cái đó
+
+Operator hỏi giữa lượt chạy: sao chưa thấy issue nào trên repo. Kiểm bằng máy:
+
+```
+gh issue list --state all            -> 0
+goal-text 2.3 nhắc "issue"           -> 0 lần
+docs/gates/dor-build.md nhắc "issue" -> 0 lần
+ô Script của 2.3 có script tạo issue -> không
+bước nào trong 11 bước giao việc này -> KHÔNG BƯỚC NÀO
+```
+
+Trong khi `macro-2.md` dòng 2.3 **đặt tên bước** là *"Bản kê thi công + DoR + soạn issue"*
+và cột Playbook liệt kê `feature-issue-ac-demo-standard` + `github-issue-standard`.
+
+Chuỗi đứt: **bảng hứa -> goal-text không giao -> cổng không kiểm -> không ai làm.** Agent
+đọc goal-text để biết làm gì và đọc gate để biết khi nào đóng bước; cả hai đều im.
+
+Nặng vì `issue%` là một trong hai cột được dựng ra để chứng minh Macro 2 có tác dụng, và
+vì chuỗi neo `REQ-ID -> issue -> test -> UAT` đứt một mắt thì Macro 3 (chạy bằng
+issue-pipeline) không có gì để nhận bàn giao.
+
+**Chưa vá** - còn một quyết định phải hỏi operator: giao cho **2.3** (dựng issue cho cả
+scope một lượt) hay **2.6** (mở issue theo từng phase). Khuyến nghị: **2.6 theo phase** -
+401 issue dựng ở 2.3 là 401 issue chết nằm chờ hàng tuần, phạm vi còn đổi thì sửa hàng
+loạt; mở theo phase thì issue sống đúng lúc có người làm và khớp cách Mode B vận hành.
+
+Kèm theo khi vá: ô Script của bước đó phải có `req-issue-scaffold.mjs`, cổng
+`phase-acceptance` thêm điều kiện máy kiểm được (mọi REQ-ID của phase có >=1 issue), và
+sửa §"Nguồn nội dung issue" trong `macro-2.md` - nó đang nhắc `new-issue.mjs`, **file
+không có trong kit**.

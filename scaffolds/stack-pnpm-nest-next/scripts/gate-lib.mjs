@@ -82,3 +82,24 @@ export function readSafe(p) {
     return '';
   }
 }
+
+/**
+ * Đường dẫn tới register dạng JSON, nhận CẢ HAI cách đặt tên.
+ *
+ * `feature-register.source.json` và `feature-register-source.json` cùng tồn tại
+ * ngoài thực tế. Lệch một ký tự, và hậu quả không nhỏ: trên một dự án thật nó làm
+ * register đọc ra 0% trong khi thật là 60% (MD-12). Chỗ đó đã vá cho rtm-status,
+ * NHƯNG req-issue-scaffold đọc đúng file ấy lại không được vá - nên lỗi quay lại
+ * lần thứ hai, lần này làm mọi bản nháp issue mất phần neo phạm vi (MD-32).
+ *
+ * Vá một chỗ cho một script là vá triệu chứng. Mọi script đọc register phải gọi
+ * hàm này, đừng tự viết đường dẫn mặc định.
+ */
+export function resolveRegisterJson(root, cfg = {}) {
+  if (cfg.registerJson) return resolve(root, cfg.registerJson);
+  for (const name of ['feature-register.source.json', 'feature-register-source.json']) {
+    const p = resolve(root, 'docs/scope-baseline', name);
+    if (existsSync(p)) return p;
+  }
+  return resolve(root, 'docs/scope-baseline/feature-register.source.json');
+}
