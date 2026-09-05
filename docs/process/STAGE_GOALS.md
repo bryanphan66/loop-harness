@@ -83,6 +83,23 @@ dự án **401 REQ-ID** thì bước 2.3 quy định 15 lượt (+3 lượt vi�
 (**2.1, 2.2, 2.3**) lên **×1.5**, trên **400** thì **×2**. Các bước còn lại giữ nguyên -
 chúng đọc artifact đã cô đọng, không đọc SRS thô.
 
+**Bảng đo thật của một lượt chạy P1 trọn vẹn (20 REQ-ID, 4 nhóm nhỏ).** Ngân sách ghi 40
+lượt cho mỗi nhóm; thực tế:
+
+| việc | ngân sách | thực tế | vì sao lệch |
+|---|---|---|---|
+| 2.6 P1.2 (6 REQ-ID rời nhau) | 30 | vượt, có ghi ma sát | đọc dò SRS trước khi viết dòng đầu |
+| 2.6 rà soát theo SRS (10 mã) | 40 | **50** | 18 lượt chỉ để đọc nguồn |
+| 2.6 rà lại (10 mã) | 40 | **49** | như trên, gần như không giảm |
+| 2.6 P1.4 (3 REQ-ID **móc vào nhau**) | 40 | **~150** | ba mã phụ thuộc lẫn nhau + phụ thuộc việc đã xây ở P1.3, và **không playbook nào tả sẵn cơ chế**, nên phần lớn lượt là tự thiết kế |
+
+**Kết luận không phải "nhân ngân sách lên", mà là: ngân sách phải theo ĐỘ MÓC NỐI, không
+theo số lượng mã.** Sáu mã rời nhau tốn ~50 lượt; **ba** mã móc vào nhau tốn ~150. Đếm số
+REQ-ID để đặt ngân sách là đếm sai thứ.
+
+Khi chia nhóm ở 2.3, ghi thêm một cột: nhóm này có mã nào phụ thuộc mã khác trong cùng nhóm,
+hoặc phụ thuộc việc chưa có playbook không. Có -> **×3**, không -> giữ nguyên.
+
 **Lượt rà soát lại theo SRS: 50 lượt, không phải 40.** Đo hai lần liên tiếp trên cùng một
 dự án, cùng 10 REQ-ID: lượt đầu 50, lượt rà lại 49, trong khi ngân sách ghi 40. Phân bổ của
 lượt thứ hai: **18 lượt chỉ để đọc nguồn trước khi mở code** (10 đoạn SRS, 10 body issue,
