@@ -1728,15 +1728,25 @@ Chi tiết + AC        <- docs/requirements/srs/  (SOT thật)
 Kết quả thực tế: 10 issue của P1.1/P1.2 viết **sau** khi code. Không ai vi phạm một luật
 tường minh nào cả - vì luật chưa từng được viết đủ rõ để vi phạm.
 
-**Đã viết thành bảng bảy dòng** trong `macro-2.md`, tóm tắt một đoạn ở đầu `STAGE_GOALS.md`.
-Ba luật đi kèm:
+**Operator chỉnh lại mô hình ngay sau bản nháp đầu, và bản chỉnh đúng hơn.** Nháp đầu tôi
+xếp một hàng dọc: SRS > prototype > register. Sai. Operator nói rõ: *"feature list Register
+từ khách là SOT về phạm vi, SRS là SOT về chi tiết chức năng, prototype là SOT về giao
+diện"* - tức là **ba nguồn ngang nhau, cai quản ba miền khác nhau**, không phải một xếp
+hạng. Xếp hàng dọc thì hỏng ở chỗ: SRS mọc thêm một tính năng không có trong register, mô
+hình xếp hạng sẽ bảo "SRS thắng, cứ làm" - trong khi thực tế đó là phình phạm vi, phải quay
+lại hỏi khách. Bảng đã viết lại theo miền, và luật thứ tư sinh ra từ chính chỗ đó: **SRS
+không phán phạm vi.**
+
+Kết quả: bảng ba dòng (ba nguồn theo miền) + bảng bốn dòng (dẫn xuất, gồm code) trong
+`macro-2.md` § Ba nguồn sự thật, tóm tắt ở đầu `STAGE_GOALS.md`. Bốn luật:
 
 - **Code không bao giờ thắng.** Code lệch SRS thì sửa CODE - không sửa SRS, không sửa AC cho
   khớp code, không "ghi nhận thực tế hiện tại". Một dòng SRS bị bẻ theo code là một yêu cầu
   của khách biến mất mà không ai ký.
-- **SRS lệch prototype = CR**, không phải chỗ agent tự chọn. Cả hai đều đã đóng băng và đều
+- **Hai nguồn lệch nhau = CR**, không phải chỗ agent tự chọn. Cả hai đều đã đóng băng và đều
   có người ký.
 - **Register không phân xử chi tiết** - nó chỉ trả lời "có làm không".
+- **SRS không phân xử phạm vi** - SRS mọc thêm tính năng ngoài register là phình phạm vi.
 
 **Cổng giữ luật:** cổng cửa vào của 2.6 (MD-47). Issue phải tồn tại **trước** khi runner
 code; lúc chưa có code thì không có gì để chép, tiêu chí buộc lấy từ SRS. Đây là chỗ duy
