@@ -148,7 +148,9 @@ export function reqIdsByPhase(root, manifestPath) {
   };
 
   for (const line of readFileSync(manifestPath, 'utf8').split('\n')) {
-    const head = line.match(/^#{2,4}\s+(P\d+)\b/);
+    // Nhận cả phase con: `#### P1.1`. Regex cũ `(P\d+)\b` đọc "P1.1" thành "P1",
+    // nên gate không soi được phase con và `--phase P1.1` trả "không có REQ-ID nào".
+    const head = line.match(/^#{2,4}\s+(P\d+(?:\.\d+)?)\b/);
     if (head) {
       absorb(text, blockPhase); text = '';
       phase = head[1];
@@ -167,6 +169,16 @@ export function reqIdsByPhase(root, manifestPath) {
     if (!inBlock && text) { absorb(text, blockPhase); text = ''; }
   }
   absorb(text, blockPhase);
+
+  // Phase con gộp ngược lên phase cha: hỏi "P1 gồm gì" phải ra đủ cả P1.1..P1.n,
+  // kể cả khi manifest chỉ khai ở mức phase con.
+  for (const [id, ids] of [...byPhase]) {
+    const dot = id.indexOf('.');
+    if (dot === -1) continue;
+    const parent = id.slice(0, dot);
+    if (!byPhase.has(parent)) byPhase.set(parent, new Set());
+    for (const r of ids) byPhase.get(parent).add(r);
+  }
   return { byPhase, claimedFiles, p0Defined };
 }
 
