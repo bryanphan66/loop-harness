@@ -106,14 +106,14 @@ if (CLOSING && phaseIssues.length) {
     errors.push(`không đọc được trạng thái của ${unreadable} issue — cổng KHÔNG được xanh khi không nhìn thấy đầu vào. Kiểm quyền gh và trường org "States".`);
   }
   if (stuck.length) {
-    errors.push(`${stuck.length} issue còn ở trạng thái mở đầu khi đóng ${PHASE}: ${stuck.slice(0, 10).join(', ')} — đẩy bằng scripts/issue-state.mjs`);
+    errors.push(`${stuck.length} issue còn ở trạng thái mở đầu khi đóng ${PHASE}: ${stuck.slice(0, 10).join(', ')} — đẩy bằng .harness/steady-state/scripts/issue-state.mjs`);
   }
 }
 
 if (errors.length) {
   console.error(`\n✗ [issue-coverage] ${PHASE}: ${phaseIds.length} REQ-ID trong phạm vi, ${phaseIssues.length} issue liên quan\n`);
   for (const e of errors) console.error(`  - ${e}`);
-  console.error('\n  Mở issue bằng scripts/new-issue.mjs (chuẩn: docs/playbooks/github-issue-standard.md),');
+  console.error('\n  Mở issue bằng .harness/steady-state/scripts/new-issue.mjs (chuẩn: docs/playbooks/github-issue-standard.md),');
   console.error('  dựng nhãn + milestone trước bằng scripts/setup-issue-board.mjs --apply.\n');
   process.exit(1);
 }

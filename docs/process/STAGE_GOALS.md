@@ -360,12 +360,15 @@ while phases remain.
 
 **Mỗi phase phải chạy qua chuỗi issue - đây là mắt xích cho theo dõi live.**
 
-1. **Mở phase:** `node scripts/new-issue.mjs` sinh issue cho các REQ-ID của phase, gắn nhãn
+**Hai script issue nằm ở kit steady-state** (`.harness/steady-state/scripts/`), không ở
+`scripts/` - chúng là công cụ của Mode B, và Macro 2 dùng chung chứ không chép bản thứ hai.
+
+1. **Mở phase:** `node .harness/steady-state/scripts/new-issue.mjs` sinh issue cho các REQ-ID của phase, gắn nhãn
    `Module: <Tên>` + milestone `Phase N` (bảng đã dựng ở 2.3), state `Ready for Dev`. Chỉ
    issue của phase đang mở, không mở trước cho phase sau.
-2. **Runner nhận việc:** `node scripts/issue-state.mjs <n> "In Dev"`. Không có bước này thì
+2. **Runner nhận việc:** `node .harness/steady-state/scripts/issue-state.mjs <n> "In Dev"`. Không có bước này thì
    không ai nhìn được ai đang làm gì, và hai runner có thể ôm cùng một REQ-ID.
-3. **Verifier PASS:** `node scripts/issue-state.mjs <n> "Done"`.
+3. **Verifier PASS:** `node .harness/steady-state/scripts/issue-state.mjs <n> "Done"`.
 4. **Đóng phase:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing` phải
    **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
    không issue nào còn nằm ở trạng thái mở đầu.
