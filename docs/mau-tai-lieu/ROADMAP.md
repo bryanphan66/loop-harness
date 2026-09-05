@@ -83,3 +83,23 @@ CR-NN that moved a date, added a module, or deferred scope.
 - Scope source → frozen feature-register (`docs/scope-baseline/feature-register.md`, 1.9).
 - Module breakdown source → `docs/stories/` (Build & Go-live slicing).
 - Token chain → `docs/about/TRACE_SPEC.md`.
+
+## Release roadmap
+
+> **Milestone trên GitHub lấy từ bảng này**, không lấy từ bảng phase thi công. Đây là mốc
+> **kinh doanh**: có hạn chót, có người ngoài đội chờ. Phase thi công (`P0..PN` trong
+> `build-manifest.md`) là thứ tự làm nội bộ và nằm ở nhãn `Build: P<n>`.
+>
+> Từng va tên thật trong một dự án: file này dùng "phase 2" nghĩa đợt phát hành sau, bảng
+> thi công cũng có "Phase 2" nghĩa gói việc thứ hai - nhìn milestone không biết nghĩa nào.
+>
+> `scripts/setup-issue-board.mjs` đọc đúng bảng này. Không có bảng thì nó **dừng**, không
+> suy ra milestone từ gói việc kỹ thuật.
+
+| Đợt | Nội dung | Thời gian |
+|---|---|---|
+| Phase 1 | *(vd: phát hành MVP thị trường đầu)* | dd/mm-dd/mm |
+| Phase 2 | | dd/mm-dd/mm |
+
+**Một issue mang cả hai:** nhãn `Build: P<n>` nói nó thuộc gói việc nào, milestone nói nó
+ra mắt ở đợt nào. Thiếu milestone nghĩa là chưa ai quyết tính năng đó lên sóng lúc nào.

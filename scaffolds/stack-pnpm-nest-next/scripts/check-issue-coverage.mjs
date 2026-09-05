@@ -61,7 +61,7 @@ if (!phaseIds.length) {
 
 // --- issue đang có -------------------------------------------------------------
 const raw = gh(['issue', 'list', '--repo', REPO, '--state', 'all', '--limit', '800',
-  '--json', 'number,title,body,milestone,state']);
+  '--json', 'number,title,body,labels,milestone,state']);
 if (raw.status !== 0) {
   console.error(`\n✗ [issue-coverage] không đọc được issue của ${REPO}: ${(raw.stderr ?? '').trim().slice(0, 160)}`);
   process.exit(1);
@@ -82,12 +82,19 @@ if (missing.length) {
   errors.push(`${missing.length}/${phaseIds.length} REQ-ID của ${PHASE} chưa có issue nào: ${missing.slice(0, 12).join(', ')}${missing.length > 12 ? ` … +${missing.length - 12}` : ''}`);
 }
 
-// milestone phải là Phase <n>
-const wantMilestone = `Phase ${PHASE.slice(1)}`;
+// Phase THI CÔNG là NHÃN `Build: P<n>`, không phải milestone.
+// Milestone dành cho PHASE PHÁT HÀNH (Phase 1..5, có hạn chót) - hai thứ khác nhau
+// và từng va tên: ROADMAP dùng "Phase 2" nghĩa kinh doanh, bảng thi công cũng có
+// "Phase 2" nghĩa gói việc thứ hai. Nhìn milestone không biết là nghĩa nào.
+const wantLabel = `Build: ${PHASE}`;
 const phaseIssues = [...new Set(phaseIds.flatMap((id) => covered.get(id) ?? []))];
-const noMilestone = phaseIssues.filter((it) => (it.milestone?.title ?? '') !== wantMilestone);
+const noLabel = phaseIssues.filter((it) => !(it.labels ?? []).some((l) => l.name === wantLabel));
+if (noLabel.length) {
+  errors.push(`${noLabel.length} issue của ${PHASE} không gắn nhãn "${wantLabel}": ${noLabel.slice(0, 8).map((i) => `#${i.number}`).join(', ')}`);
+}
+const noMilestone = phaseIssues.filter((it) => !(it.milestone?.title ?? ''));
 if (noMilestone.length) {
-  errors.push(`${noMilestone.length} issue của ${PHASE} không gắn milestone "${wantMilestone}": ${noMilestone.slice(0, 8).map((i) => `#${i.number}`).join(', ')}`);
+  errors.push(`${noMilestone.length} issue của ${PHASE} chưa gắn milestone phát hành nào: ${noMilestone.slice(0, 8).map((i) => `#${i.number}`).join(', ')} — mỗi issue phải thuộc một đợt phát hành`);
 }
 
 // --- trạng thái, chỉ khi đóng phase --------------------------------------------
@@ -117,4 +124,4 @@ if (errors.length) {
   console.error('  dựng nhãn + milestone trước bằng scripts/setup-issue-board.mjs --apply.\n');
   process.exit(1);
 }
-console.log(`✓ [issue-coverage] ${PHASE}: ${phaseIds.length}/${phaseIds.length} REQ-ID có issue, milestone "${wantMilestone}" đủ${CLOSING ? ', không issue nào còn ở trạng thái mở đầu' : ''}`);
+console.log(`✓ [issue-coverage] ${PHASE}: ${phaseIds.length}/${phaseIds.length} REQ-ID có issue, nhãn "${wantLabel}" + milestone phát hành đủ${CLOSING ? ', không issue nào còn ở trạng thái mở đầu' : ''}`);

@@ -143,11 +143,17 @@ việc, dù bảng 2.3 đặt tên bước là *"soạn issue"* và `issue%` đ�
 
 | lúc nào | làm gì | bằng gì |
 |---|---|---|
-| **2.3** dựng bảng | milestone `Phase 0..N` + nhãn `Module: <Tên>` + nhãn `plane` | `setup-issue-board.mjs` (mặc định chạy thử, `--apply` mới tạo) |
-| **2.6** mở phase | issue cho REQ-ID của phase, gắn `Module:` + milestone, state `Ready for Dev` | `.harness/steady-state/scripts/new-issue.mjs` |
+| **2.3** dựng bảng | milestone = **phase phát hành** (`Phase 1..N`, có hạn chót) + nhãn `Build: P<n>` (phase thi công) + nhãn `Module: <Tên>` + `plane` | `setup-issue-board.mjs` (mặc định chạy thử, `--apply` mới tạo) |
+| **2.6** mở phase | issue cho REQ-ID của phase, gắn `Build: P<n>` + `Module:` + milestone đợt phát hành, state `Ready for Dev` | `.harness/steady-state/scripts/new-issue.mjs` |
 | **2.6** runner nhận việc | state `In Dev` - đây là mắt xích cho theo dõi **live** | `.harness/steady-state/scripts/issue-state.mjs <n> "In Dev"` |
 | **2.6** verifier PASS | state `Done` | `.harness/steady-state/scripts/issue-state.mjs <n> "Done"` |
 | **2.6** đóng phase | cổng kiểm bằng máy | `check-issue-coverage.mjs --phase P<n> --closing` |
+
+**Milestone là mốc phát hành, không phải gói việc.** Đã va tên thật: `ROADMAP.md` dùng
+"phase 2" nghĩa đợt phát hành sau, bảng thi công cũng có "Phase 2" nghĩa gói việc thứ hai.
+Milestone có hạn chót + thanh tiến độ nên nó thuộc về mốc kinh doanh; phase thi công chỉ là
+thứ tự làm nội bộ nên nó là nhãn `Build: P<n>`. Một issue mang **cả hai**: nó thuộc gói việc
+nào, và sẽ ra mắt ở đợt nào.
 
 **Vì sao 2.3 dựng bảng chứ không phải 2.6:** 2.3 là lúc **duy nhất** biết đủ danh sách phase
 (P0..P20 trong `build-manifest.md`) và module (M1..M20 trong `ROADMAP.md`). Bắt 2.6 dựng thì

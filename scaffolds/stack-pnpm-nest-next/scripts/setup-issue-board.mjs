@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Dựng bảng issue của repo: milestone `Phase N` + nhãn `Module: <Tên>` + nhãn `plane`.
+ * Dựng bảng issue của repo: milestone = PHASE PHÁT HÀNH, nhãn `Build: P<n>` = phase
+ * thi công, nhãn `Module: <Tên>`, nhãn `plane`.
  *
  * Vì sao cần: chuẩn issue (docs/playbooks/github-issue-standard.md) nói Phase là
  * MILESTONE và Module là NHÃN CẤP REPO. `gh issue create --milestone "Phase 1"
@@ -8,9 +9,18 @@
  * không bước nào của Macro 2 dựng chúng: repo chỉ có 9 nhãn mặc định của GitHub,
  * 0 milestone - nên mọi lệnh tạo issue chuẩn đều hỏng trước khi kịp chạy.
  *
- * Nguồn dữ liệu là thứ bước 2.3 vừa sinh ra, không phải khai lại:
- *   - docs/build-manifest.md  bảng phase  `| P0 | Tên | ... |`   -> milestone
- *   - docs/ROADMAP.md         bảng module `| M1 | Tên | ... |`   -> nhãn Module:
+ * MILESTONE LÀ PHASE PHÁT HÀNH, KHÔNG PHẢI PHASE THI CÔNG. Hai thứ này khác nhau và
+ * từng va tên trong một dự án thật: `ROADMAP.md` đã dùng "Phase 2" theo nghĩa kinh
+ * doanh (một tính năng bị hoãn sang đợt sau) trong khi bảng thi công cũng có "Phase 2"
+ * nghĩa là gói việc thứ hai. Nhìn milestone "Phase 2" không ai biết là nghĩa nào.
+ *
+ * Milestone GitHub có hạn chót và thanh tiến độ - đúng thứ một MỐC PHÁT HÀNH cần.
+ * Phase thi công chỉ là thứ tự làm việc nội bộ, không có hạn chót riêng, nên nó là NHÃN.
+ *
+ * Nguồn dữ liệu, không khai lại:
+ *   - docs/ROADMAP.md  § Release roadmap  `| Phase 1 | Tên | dd/mm-dd/mm |` -> milestone
+ *   - docs/build-manifest.md  bảng phase   `| P0 | Tên | ... |`  -> nhãn `Build: P0`
+ *   - docs/ROADMAP.md  bảng module         `| M1 | Tên | ... |`  -> nhãn `Module: <Tên>`
  *
  * MẶC ĐỊNH LÀ CHẠY THỬ. Đây là hành động ra ngoài trên repo tổ chức, nên phải
  * gõ `--apply` mới thật sự tạo. Chạy lại được: thứ đã có thì bỏ qua, không tạo trùng.
@@ -59,12 +69,26 @@ function rowsOf(file, re) {
   return [...out.entries()].map(([id, name]) => ({ id, name }));
 }
 
-const phases = rowsOf(MANIFEST, /^\|\s*(P\d+)\s*\|\s*([^|]+?)\s*\|/);
+const buildPhases = rowsOf(MANIFEST, /^\|\s*(P\d+)\s*\|\s*([^|]+?)\s*\|/);
 const modules = rowsOf(ROADMAP, /^\|\s*(M\d+)\s*\|\s*([^|]+?)\s*\|/);
+// Phase phát hành: `| Phase 1 | Tên | 01/09-31/09 |` trong § Release roadmap.
+const releases = [];
+if (existsSync(ROADMAP)) {
+  for (const line of readFileSync(ROADMAP, 'utf8').split('\n')) {
+    const m = line.match(/^\|\s*(Phase\s+\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|/i);
+    if (m && !/^-+$/.test(m[2])) releases.push({ title: m[1].replace(/\s+/g, ' '), desc: clean(m[2]), due: m[3].trim() });
+  }
+}
 
-if (!phases.length) {
-  console.error(`setup-issue-board: không đọc được phase nào từ ${MANIFEST}.`);
+if (!buildPhases.length) {
+  console.error(`setup-issue-board: không đọc được phase thi công nào từ ${MANIFEST}.`);
   console.error('  Mong bảng có dòng dạng: | P0 | Tên phase | ... |');
+  process.exit(1);
+}
+if (!releases.length) {
+  console.error(`setup-issue-board: không đọc được PHASE PHÁT HÀNH nào từ ${ROADMAP}.`);
+  console.error('  Mong § Release roadmap có dòng: | Phase 1 | Tên đợt | 01/09-31/09 |');
+  console.error('  Milestone là mốc phát hành, không phải gói việc - không có nó thì không dựng.');
   process.exit(1);
 }
 if (!modules.length) {
@@ -85,14 +109,18 @@ const haveMilestones = new Set(
     .split('\n').map((s) => s.trim()).filter(Boolean),
 );
 
-const wantLabels = ['plane', ...modules.map((m) => `Module: ${m.name}`)];
-const wantMilestones = phases.map((p) => ({ title: `Phase ${p.id.slice(1)}`, desc: p.name }));
+const wantLabels = [
+  'plane',
+  ...modules.map((m) => `Module: ${m.name}`),
+  ...buildPhases.map((p) => `Build: ${p.id}`),
+];
+const wantMilestones = releases.map((r) => ({ title: r.title, desc: [r.desc, r.due].filter(Boolean).join(' · ') }));
 
 const newLabels = wantLabels.filter((l) => !haveLabels.has(l));
 const newMilestones = wantMilestones.filter((m) => !haveMilestones.has(m.title));
 
 console.log(`repo ${REPO}`);
-console.log(`  đọc được ${phases.length} phase, ${modules.length} module`);
+console.log(`  đọc được ${releases.length} phase phát hành, ${buildPhases.length} phase thi công, ${modules.length} module`);
 console.log(`  nhãn:      có sẵn ${wantLabels.length - newLabels.length}/${wantLabels.length}, cần tạo ${newLabels.length}`);
 console.log(`  milestone: có sẵn ${wantMilestones.length - newMilestones.length}/${wantMilestones.length}, cần tạo ${newMilestones.length}`);
 
