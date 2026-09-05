@@ -61,7 +61,7 @@ không phải delta.
 | **2.2** | Chọn stack + threat-model | `async-job-queue`, `object-storage`, `media-pipeline` *(khi stack có hàng đợi / lưu tệp / xử lý media)* | stack-justified *(người)* **@một-lần**| `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
 | **2.3** | Bản kê thi công + DoR + soạn issue | `build-manifest-compilation`, `feature-issue-ac-demo-standard`, `github-issue-standard` | `check-manifest-coverage` ⚙️ + `dor-build` **@một-lần**| `build-manifest.md`, `spec-intake.md`, `change-request-log.md` | `check-manifest-coverage.mjs` , `setup-issue-board.mjs`| mọi REQ-ID in-scope vào đúng 1 phase, DoR xanh |
 | **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ + `ui-region-boundary` ⚙️ **@một-lần**| `deployment-guide.md`, `config/deploy.yml` *(Kamal)* | `scaffold.sh`, `secret-scan.sh`, `pnpm lint:gates` *(đã gồm `check-ui-region-boundary.mjs`)*, seed | app boot + admin login được, P0 done, **vùng public/portal đã khai trong `gate-config.json`** |
-| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `dispatch-modes`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase** + `issue-coverage` ⚙️| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` , `new-issue.mjs`, `issue-state.mjs`, `check-issue-coverage.mjs`| mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
+| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `dispatch-modes`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase** + `issue-coverage` ⚙️| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` , `.harness/steady-state/scripts/new-issue.mjs`, `.harness/steady-state/scripts/issue-state.mjs`, `check-issue-coverage.mjs`| mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
 | **2.8** | E2E từ AC + hướng dẫn dùng | `canonical-e2e-flow-playbook`, `user-guide-hdsd-standard` | `check-ac-coverage` ⚙️ **@một-lần**| `validation-report.md` | `check-ac-coverage.mjs` | mọi REQ-ID có ≥1 E2E pass + đường-lỗi + login test |
 | **2.9** | Bảo mật — VERIFY (không làm lại) | — (ck-security) | security-sign-off *(người)* **@một-lần**| — | — | 0 Critical/High; đối chiếu threat-model 2.2 + floor 2.6 |
 | **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field-verify-with-report`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` **@một-lần**| `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
@@ -83,7 +83,7 @@ không phải delta.
 - **Board trên Claude Design là CHỈ ĐỌC.** Prototype đã freeze ở PB-G4; bản dùng để
   so fidelity là clone trong repo, không phải board. Board sửa được nên không được
   dùng làm mốc. Không bao giờ ghi lên board từ trong lượt chạy.
-- **Soạn issue** = agent đọc SRS → `new-issue.mjs` (hoặc `req-issue-scaffold.mjs` gom theo REQ-ID). KHÔNG có script sync register→issue.
+- **Soạn issue** = agent đọc SRS → `.harness/steady-state/scripts/new-issue.mjs` (hoặc `req-issue-scaffold.mjs` gom theo REQ-ID). KHÔNG có script sync register→issue.
 - **Đủ chưa / ở đâu** = `rtm-status.mjs` (bảng REQ-ID × register/issue/test/prototype).
 
 ## UI: custom hay component (ranh giới theo VÙNG, không theo cảm tính từng màn)
@@ -144,9 +144,9 @@ việc, dù bảng 2.3 đặt tên bước là *"soạn issue"* và `issue%` đ�
 | lúc nào | làm gì | bằng gì |
 |---|---|---|
 | **2.3** dựng bảng | milestone `Phase 0..N` + nhãn `Module: <Tên>` + nhãn `plane` | `setup-issue-board.mjs` (mặc định chạy thử, `--apply` mới tạo) |
-| **2.6** mở phase | issue cho REQ-ID của phase, gắn `Module:` + milestone, state `Ready for Dev` | `new-issue.mjs` |
-| **2.6** runner nhận việc | state `In Dev` - đây là mắt xích cho theo dõi **live** | `issue-state.mjs <n> "In Dev"` |
-| **2.6** verifier PASS | state `Done` | `issue-state.mjs <n> "Done"` |
+| **2.6** mở phase | issue cho REQ-ID của phase, gắn `Module:` + milestone, state `Ready for Dev` | `.harness/steady-state/scripts/new-issue.mjs` |
+| **2.6** runner nhận việc | state `In Dev` - đây là mắt xích cho theo dõi **live** | `.harness/steady-state/scripts/issue-state.mjs <n> "In Dev"` |
+| **2.6** verifier PASS | state `Done` | `.harness/steady-state/scripts/issue-state.mjs <n> "Done"` |
 | **2.6** đóng phase | cổng kiểm bằng máy | `check-issue-coverage.mjs --phase P<n> --closing` |
 
 **Vì sao 2.3 dựng bảng chứ không phải 2.6:** 2.3 là lúc **duy nhất** biết đủ danh sách phase
