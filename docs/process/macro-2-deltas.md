@@ -2188,9 +2188,15 @@ và từ lúc cài về sau, không ai đồng bộ bản nhúng nữa. `harness
 
 Đo trên dự án thật: 21/23 script khác byte, nhưng cho qua prettier thì **3 cái lệch nội dung
 thật** - và cả ba đúng là ba cái vừa vá đêm qua: `gate-lib.mjs`, `check-issue-coverage.mjs`,
-và `req-issue-scaffold.mjs`. Tức là trong repo đang nằm sẵn một bản scaffold **vẫn trả về
-đoạn SRS của yêu cầu khác** (MD-52). Ai chạy nhầm bản đó, hoặc dựng dự án mới từ nó, là lỗi
-quay về nguyên vẹn - và lần này còn khó ngờ hơn, vì bản đang dùng đã đúng.
+và `req-issue-scaffold.mjs`. Tức là trên máy đang chạy nằm sẵn một bản scaffold **vẫn trả về
+đoạn SRS của yêu cầu khác** (MD-52). Ai gọi nhầm đường dẫn đó là lỗi quay về nguyên vẹn - và
+lần này còn khó ngờ hơn, vì bản đang dùng đã đúng.
+
+**Phạm vi hẹp hơn tôi tưởng lúc đầu, ghi lại cho đúng:** `.harness/` nằm trong `.gitignore`,
+nên bản nhúng KHÔNG theo repo - nó là hiện vật cài đặt cục bộ, và một lần clone + cài lại sẽ
+sinh ra bản mới. Nguy cơ là gọi nhầm đường dẫn trên máy đang làm việc, không phải phát tán
+qua git. Tôi viết bản nháp đầu là "trong repo đang nằm sẵn" rồi mới đi kiểm `git check-ignore`
+- đúng thứ tự sai: phát biểu trước, kiểm sau.
 
 **Vá:** đồng bộ bản nhúng, và thêm lớp `EMBED-DRIFT` vào `harness-drift.sh`.
 
