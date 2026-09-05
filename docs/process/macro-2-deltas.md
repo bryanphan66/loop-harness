@@ -35,6 +35,9 @@ thứ vốn là lỗi SRS.
 
 | MD-02 | autocontent, trước 2.1 | luật do operator đưa 2026-09-05 | macro-2 không định nghĩa ranh giới UI custom vs UI component, và không có đường đẩy ngược component tái dùng lên thư viện gốc | luật 3 vùng + bước đẩy ngược: **đã sửa**. Gate lint theo vùng: hoãn tới 2.4 | **đã sửa một phần** |
 
+| MD-03 | autocontent, lúc cài macro 2 | so tên playbook macro-2 gọi với file thật | `macro-2.md` cột 2.10 gọi `e2e-qa-field-by-field`, file thật tên `e2e-qa-field-by-field-verify-with-report.md` - tham chiếu treo, agent tìm không ra | sửa tên | **đã sửa** |
+| MD-04 | autocontent, lúc cài macro 2 | 4 link tương đối gãy sau khi copy spine sang dự án | spine giả định layout `docs/process/`; dự án layout phẳng thì `STAGE_GOALS.md`, `WORKFLOW.md`, `TRACE_SPEC.md` gãy. Installer không rewrite đường dẫn | chỉnh tay lúc cài + cần cách chống tái phát | **mở** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -137,3 +140,40 @@ eslint config - `autocontent/src/` mới có `components/README.md`. Dựng ở 
 cùng lúc scaffold. Yêu cầu: dự án khai đường dẫn nào là public, nào là portal;
 vùng portal cấm định nghĩa component UI mới ngoài `components/ui/`; vùng public
 chỉ cảnh báo màu cứng, không chặn.
+
+## MD-03 - tham chiếu playbook treo trong macro-2.md
+
+`macro-2.md` cột Playbook của bước 2.10 ghi `e2e-qa-field-by-field`. File thật tên
+`e2e-qa-field-by-field-verify-with-report.md`. Agent đọc bảng rồi đi tìm file sẽ
+không thấy, và im lặng bỏ qua playbook đó - không có gì báo.
+
+Lòi ra khi đối chiếu từng tên playbook macro-2 gọi với file thật trong hai repo,
+lúc chuẩn bị cài macro 2 vào autocontent.
+
+**Đã sửa.** Đổi thành tên đầy đủ.
+
+**Chống tái phát:** nên có kiểm cơ học "mọi tên file macro-2.md nhắc đều tồn tại".
+Rẻ, và cùng loại lỗi với MD-04. Chưa làm, gộp vào lần dựng gate tiếp theo.
+
+## MD-04 - copy spine sang dự án layout khác làm gãy link tương đối
+
+`macro-2.md` sống ở `docs/process/` trong harness, cạnh `STAGE_GOALS.md` và
+`WORKFLOW.md`, nên viết link tương đối trần: `STAGE_GOALS.md`, `WORKFLOW.md`,
+`TRACE_SPEC.md`.
+
+autocontent layout phẳng: hai file đó ở `docs/`, không có `docs/process/`. Copy
+spine vào `docs/process/` xong thì 4 link gãy hết. Không có gì báo - file markdown
+không ai kiểm link.
+
+**Đã xử lý ở dự án:** chỉnh tay thành `../STAGE_GOALS.md`, `../WORKFLOW.md`,
+`../TRACE_SPEC.md`, và thêm header ghi rõ SOT là bản ở harness, cấm sửa tại chỗ.
+Commit `autocontent@95892b9`.
+
+**Còn nợ ở harness.** Chỉnh tay không chống được tái phát: dự án sau cài lại là
+gãy lại. Hai hướng:
+- (a) `install-harness.sh` rewrite đường dẫn tương đối khi copy, theo layout đích
+- (b) spine dùng đường dẫn tính từ gốc `docs/` thay vì tương đối, để copy đi đâu
+  cũng đúng miễn đặt dưới `docs/`
+
+Nghiêng về (b): rẻ hơn, không phải viết logic rewrite, và làm spine đọc được ở cả
+hai layout. Chốt sau khi autocontent chạy xong phase 1, cùng lúc với MD-02.
