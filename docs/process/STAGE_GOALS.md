@@ -384,6 +384,50 @@ contract + deposit confirmed. Stop after 8 turns.
 > Same goals in both lanes. In the Lite lane, `docs/ROADMAP.md` is born at 2.3
 > (with the plan) instead of 1.15.
 
+### Step 2.0 — Kiểm sẵn sàng trước khi xây
+
+- **Inputs:** tier-2 design tokens của dự án · thư viện UI đã chọn (`registry.json` của nó) · Component Coverage Matrix trong `design-guidelines.md` · `WORKFLOW.md` + `macro-2.md` của dự án.
+- **Output path:** `docs/design/component-mapping-<thư-viện>.md` + `scripts/gate-config.json` khối `uiRegions` (nếu app đã scaffold).
+- **Gate:** `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* **@một-lần**.
+- **Manual?** no.
+
+**Bước này tồn tại vì ba lỗi đã xảy ra thật, không phải phòng xa.** Trên autocontent
+2026-09-05: tier-2 sinh ở 1.10 theo Tailwind v3 trong khi thư viện UI đòi v4 (MD-01);
+`WORKFLOW.md` gọi 22 engine mà chỉ 9 tồn tại (MD-05); ma trận 79 component chưa ai đối
+chiếu với 60 component thư viện có (MD-08). Cả ba đều **rẻ ở đây, đắt sau 2.4** - lúc
+đó mỗi màn đã bám vào một lựa chọn rồi.
+
+Goal:
+Chạy `check-tier2-ui-compat.mjs <thư-mục-thư-viện> <file-css-tier2>` và để nó **xanh**:
+phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, không còn
+cú pháp đời cũ. Đỏ thì **port tier-2 ngay tại bước này**, giữ nguyên giá trị màu - đổi
+cách viết, không đổi màu; giá trị màu là quyết định của Macro 1, không mở lại ở đây.
+
+Chạy `check-dangling-refs.mjs . --file docs/WORKFLOW.md --engines ~/.claude`. Mọi
+tham chiếu treo còn lại phải **giải thích được từng cái** trong ghi chép của bước, không
+được bỏ qua im lặng: engine của Macro 1/3 là ngoài phạm vi (ghi rõ), đường dẫn output
+chưa sinh là bình thường (ghi rõ), còn lại phải sửa.
+
+Lập `docs/design/component-mapping-<thư-viện>.md`: **mỗi dòng** của Component Coverage
+Matrix phân đúng một loại - `trực tiếp` (có một component thư viện làm được),
+`ghép` (dựng từ 2+ primitive), `thiếu` (thư viện chưa có), `N/A` (vùng public custom
+100%). Phân loại bằng **đọc mô tả và mở code**, không khớp tên - khớp tên cho kết quả
+sai (`Toast` thực ra là `sonner`, `Wizard` là `stepper`). Mỗi dòng `thiếu` phải có
+**một PR mở lên repo thư viện gốc** trước khi bước này xong; cấm vá trong dự án, vì
+lần sync thư viện sau sẽ ghi đè mất.
+
+Nếu app đã scaffold: khai `uiRegions` trong `scripts/gate-config.json` - đường dẫn nào
+là public (custom 100%), nào là portal (dùng component thư viện), `libraryDir`, và
+`registryFile` trỏ `registry.json` của thư viện.
+
+Đo **mốc gốc** trước khi rời bước: chạy `rtm-status.mjs` và ghi lại 4 con số
+(REQ-ID · register% · test% · issue% · prototype-frozen%) vào một report trong
+`plans/reports/`. Không có mốc đầu thì cuối lượt không chứng minh được cải thiện -
+và **đừng tin con số 0** cho tới khi biết nó là "chưa làm" hay "đọc sai chỗ" (MD-12:
+lệch một ký tự tên file làm register đọc ra 0% trong khi thật là 60%).
+
+STAGE.md Current = 2.1. Stop after 12 turns.
+
 ### Step 2.1 — Solution/data architecture — freeze ERD (SA)
 
 - **Inputs:** SRS(-lite) data-model + use-cases + `docs/visuals/diagrams/` (ERD draft, status-flows, screen inventory).
