@@ -1789,3 +1789,40 @@ phải trả giá bằng việc sửa tay giữa dòng cho một lỗi đã có 
 thư mục. `harness-drift.sh` báo được file lệch, nhưng không ai bắt buộc chạy nó sau khi
 merge một PR harness. Đó là mắt xích còn hở.
 
+## MD-51 - nguồn phạm vi có hai bản, và bản người đọc nói sai
+
+Register là nguồn sự thật về **phạm vi** (MD-49). Nhưng nó tồn tại ở HAI bản -
+`feature-register-source.json` (máy đọc) và `feature-register.md` (người đọc) - và
+**không script nào sinh bản này từ bản kia**, không cổng nào so chúng.
+
+Trên lượt chạy thật, bản `.json` khai `"phase": "Phase 2"` ở **cấp DÒNG** cho 8 tính năng,
+đè lên `phase` cấp section là `Phase 1`. Bản `.md` bỏ qua khoá cấp dòng, in cả 8 thành
+`Phase 1`. Một dòng còn tự nói ra trong chính tên nó: *"Kết nối và đăng video lên TikTok -
+hoãn sang giai đoạn 2"*, cột Phase vẫn ghi Phase 1.
+
+**Hậu quả đã xảy ra, không phải giả định:** `IF.PROVIDER.07` nằm trong 8 dòng đó,
+`build-manifest.md` xếp nó vào P1.2, và nó đã ship (issue `#32`). Xây một thứ khách đã hoãn.
+Chủ sản phẩm phán giữ lại và ghi nhận là giao sớm (CR-007) - nhưng không ai *phát hiện*
+được nó cho tới khi có người ngồi đếm tay vì sao GitHub có 13 issue mà phạm vi P1.1+P1.2
+chỉ 10.
+
+**Ba lớp cùng mù một chỗ:**
+
+1. Bản `.md` mất khoá cấp dòng lúc render.
+2. Không cổng nào so hai bản.
+3. `inScopeReqIds` (`gate-lib.mjs`) gom REQ-ID bằng `JSON.stringify(data.sections).match(RE)`
+   - **không đọc `phase` một lần nào**. Nên gate cũng không phân biệt được Phase 1 với Phase 2.
+
+**Đã vá lớp 1 và 2:** `check-register-phase.mjs` so từng dòng cột Phase giữa hai bản, lệch
+là ĐỎ, và nói rõ nguồn là `.json` - lệch thì sửa `.md`, đừng sửa ngược (sửa `.json` cho khớp
+bản in là bẻ khai báo phạm vi của khách). Fail-closed: parse ra 0 dòng ở bản nào cũng là ĐỎ.
+Thử cả hai chiều trên dự án thật trước khi tin: bẻ lại một dòng -> đỏ đúng dòng đó; sửa
+xong -> xanh 160 dòng. Nó cũng nêu 3 dòng CR chỉ có trong `.md` chưa ghi ngược vào `.json`.
+
+**Lớp 3 chưa vá, và nói thẳng vì sao.** Cổng đúng phải là *"REQ-ID có phase phát hành muộn
+hơn đợt đang xây thì không được nằm trong build-manifest của đợt này"*. Viết được, nhưng cần
+một thứ dự án chưa có: bảng ánh xạ **build phase (P0..P20) -> release phase (Phase 1..5)**.
+`ROADMAP.md § Release roadmap` có 5 đợt kinh doanh, build-manifest có 21 phase, không gì
+nối chúng. Dựng bảng đó là việc của 2.3, không phải việc nhét vào một cổng. Ghi ra đây làm
+mắt xích tiếp theo chứ không im lặng bỏ qua.
+
