@@ -636,9 +636,12 @@ Checklist** before declaring the release done:
    `MANUAL_CHECKPOINT` naming the target host; never auto-fire a prod deploy
    (Rule 5).
 
-**Đẩy trạng thái issue lần cuối.** Bắt đầu deploy -> `.harness/steady-state/scripts/issue-state.mjs <n>
-"Deploying"`; verify-at-source xong -> `"Done"`. `node scripts/check-issue-coverage.mjs
---expect "Done"` phải xanh **trước khi** flip sang Mode B - Macro 3 chạy bằng
+**Đẩy trạng thái issue lần cuối.** Vào bước này issue đang ở `UAT Testing` (khách ký ở
+2.12). Go-live + verify-at-source xong -> `.harness/steady-state/scripts/issue-state.mjs <n> "Done"`.
+**Không quay lại `Deploying`** - nấc đó nghĩa là đưa lên môi trường TEST và đã đi qua ở
+2.6; bảng `TRANSITIONS` không cho `UAT Testing -> Deploying`, cũng không cho
+`Deploying -> Done`, nên đi đường đó là gate chặn cứng chứ không phải chậm.
+`node scripts/check-issue-coverage.mjs --expect "Done"` phải xanh **trước khi** flip sang Mode B - Macro 3 chạy bằng
 issue-pipeline, nhận một bảng còn issue ở `In Dev` là nhận nợ không ai biết.
 
 **Then flip Mode A → Mode B (graduation — `docs/about/OPERATING-MODES.md` § The
