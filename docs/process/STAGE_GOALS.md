@@ -578,9 +578,22 @@ build and browser-QA in separate steps. **Khai đợt phát hành trước khi c
 `docs/gates/dod-build.md` § Phạm vi đo). Không khai thì gate đo cả register - trên một dự
 án nhiều đợt, đó là đo nhầm thước và cổng sẽ đỏ tới tận đợt cuối.
 
-**Đẩy trạng thái issue theo đúng việc đang làm.** Verifier độc lập bắt đầu chạy ->
-`.harness/steady-state/scripts/issue-state.mjs <n> "QC Testing"`; QA pass -> `"Ready for UAT"`. Trước khi
-đóng bước, `node scripts/check-issue-coverage.mjs --expect "Ready for UAT"` phải xanh.
+**Đẩy trạng thái issue theo đúng việc đang làm - BỐN nấc, không phải hai.** Bước này là
+chỗ bản build gặp môi trường thật, nên nó nhận cả bốn nấc còn lại của khúc giữa:
+
+1. Đưa bản build lên **môi trường test** -> `.harness/steady-state/scripts/issue-state.mjs <n> "Deploying"`.
+2. Lên xong và **xác minh đúng phiên bản tại nguồn** (không tin HTTP 200 suông) -> `"Ready for Test"`.
+3. Verifier độc lập bắt đầu chạy -> `"QC Testing"`.
+4. QA pass -> `"Ready for UAT"`.
+
+Trước khi đóng bước, `node scripts/check-issue-coverage.mjs --expect "Ready for UAT"` phải xanh.
+
+**Vì sao hai nấc đầu nằm ở ĐÂY chứ không ở 2.6:** `Deploying` nghĩa là đã lên môi trường
+test thật, mà 2.6 chỉ viết code - nó dừng ở `In Dev`, đúng. Nhưng trước bản vá này không
+bước nào nhận hai nấc đó, nên đường khai báo trong tài liệu là `In Dev -> QC Testing`, một
+nước đi **bảng `TRANSITIONS` cấm**: từ `In Dev` chỉ có `Deploying`. Làm theo tài liệu thì
+`issue-state.mjs` chặn cứng. Không ai phát hiện vì 2.10 chưa từng chạy thật.
+
 Không đẩy thì issue đứng ở `In Dev` tới hết dự án và Macro 3 nhận bàn giao một bảng sai.
 
 STAGE.md Current = 2.12. Stop after

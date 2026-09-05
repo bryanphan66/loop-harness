@@ -2028,3 +2028,37 @@ Hai cái bẫy khi viết nó, cả hai đều đã dính trước khi thoát:
 Cái thứ hai đáng nhớ hơn cả delta này: **cổng mới viết ra phải thử CẢ HAI chiều trước khi
 tin.** Xanh khi đúng chưa chứng minh gì; đỏ khi sai mới là bằng chứng.
 
+## MD-57 - khúc giữa của chuỗi trạng thái không đi được, và không ai biết vì chưa ai đi tới
+
+MD-50 vá 2.13. Nhưng chỉ vá đúng chỗ nhìn thấy. Rút cả chuỗi trạng thái mà tài liệu dặn ra
+theo thứ tự bước thì nó là:
+
+```
+2.6: In Dev  ->  2.10: QC Testing  ->  Ready for UAT  ->  2.12: UAT Testing  ->  2.13: Done
+```
+
+Nước đầu tiên đã sai. Bảng `TRANSITIONS` cho từ `In Dev` đúng ba đường: `Deploying`,
+`Ready for Dev`, `Cancelled`. **Không có `QC Testing`.** Agent làm đúng lời dặn thì
+`issue-state.mjs` chặn cứng.
+
+Nguyên nhân: hai nấc `Deploying` và `Ready for Test` **không thuộc bước nào**. 2.6 dừng ở
+`In Dev` - đúng, vì `Deploying` nghĩa là đã lên môi trường test thật mà 2.6 chỉ viết code.
+Nhưng rồi không bước nào nhận tiếp, nên khúc giữa hở.
+
+**Vá:** 2.10 nhận cả bốn nấc còn lại, vì đó chính là chỗ bản build gặp môi trường thật:
+lên môi trường test -> `Deploying`; xác minh đúng phiên bản **tại nguồn** (không tin HTTP
+200 suông) -> `Ready for Test`; verifier chạy -> `QC Testing`; QA pass -> `Ready for UAT`.
+Chuỗi đầy đủ giờ đi được từng nấc.
+
+**Và cổng để nó không gãy lại:** `check-issue-state-path.mjs` rút chuỗi trạng thái từ
+goal-text theo thứ tự bước, đọc bảng `TRANSITIONS` **thẳng từ `issue-state.mjs`** (không
+chép lại - hai nơi trả lời một câu hỏi phải dùng chung nguồn, MD-12), rồi khẳng định từng
+nước đi có trong bảng. Thử hai chiều trên đúng lỗi vừa vá: tái hiện thì đỏ và chỉ thẳng
+`In Dev -> QC Testing` cùng danh sách nước hợp lệ; sửa xong thì xanh 7 nấc.
+
+**Điều đáng nhớ:** cả hai lỗi chuỗi trạng thái (2.13 ở MD-50, khúc giữa ở đây) đều nằm ở
+**những bước chưa từng chạy thật**. Chúng không phải lỗi khó - chúng chỉ chưa được ai đi
+qua. Một quy trình có 14 bước mà mới chạy 7 thì nửa còn lại là đất chưa ai đặt chân, và
+cách duy nhất bắt lỗi ở đó trước ngày go-live là **đọc nó như thể đang chạy nó**: rút mọi
+lệnh ra xem có thật không (MD-56), rút mọi nước đi ra xem có hợp lệ không (đây).
+
