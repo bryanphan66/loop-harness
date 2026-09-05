@@ -148,7 +148,7 @@ for (const line of readSafe(MANIFEST).split('\n')) {
     continue;
   }
   // phase REQ lines: "- **REQ-IDs covered:** `X`, `Y`" (and P0's "**REQ-IDs:**")
-  if (/\*\*REQ-IDs?(?:\s+covered)?:\*\*/.test(line) && currentPhase) {
+  if (/\*\*REQ-IDs?\b[^*]*:\*\*/.test(line) && currentPhase) {
     inReqBlock = currentPhase;
     phaseOfBlock = currentPhase;
     reqBlockText = line;
