@@ -61,7 +61,7 @@ không phải delta.
 | **2.2** | Chọn stack + threat-model | — (ck-tech-design) | stack-justified *(người)* **@một-lần**| `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
 | **2.3** | Bản kê thi công + DoR + soạn issue | `build-manifest-compilation`, `feature-issue-ac-demo-standard`, `github-issue-standard` | `check-manifest-coverage` ⚙️ + `dor-build` **@một-lần**| `build-manifest.md`, `spec-intake.md`, `change-request-log.md` | `check-manifest-coverage.mjs` | mọi REQ-ID in-scope vào đúng 1 phase, DoR xanh |
 | **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ + `ui-region-boundary` ⚙️ **@một-lần**| `deployment-guide.md`, `config/deploy.yml` *(Kamal)* | `scaffold.sh`, `secret-scan.sh`, `pnpm lint:gates` *(đã gồm `check-ui-region-boundary.mjs`)*, seed | app boot + admin login được, P0 done, **vùng public/portal đã khai trong `gate-config.json`** |
-| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase**| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
+| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `dispatch-modes`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase**| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
 | **2.8** | E2E từ AC + hướng dẫn dùng | `canonical-e2e-flow-playbook`, `user-guide-hdsd-standard` | `check-ac-coverage` ⚙️ **@một-lần**| `validation-report.md` | `check-ac-coverage.mjs` | mọi REQ-ID có ≥1 E2E pass + đường-lỗi + login test |
 | **2.9** | Bảo mật — VERIFY (không làm lại) | — (ck-security) | security-sign-off *(người)* **@một-lần**| — | — | 0 Critical/High; đối chiếu threat-model 2.2 + floor 2.6 |
 | **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field-verify-with-report`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` **@một-lần**| `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
@@ -133,6 +133,22 @@ sửa Macro 2 chính là lý do chạy thật trên một dự án thật.
 
 `register%` và `prototype%` là di sản Macro 1 - Macro 2 không làm chúng tăng, đừng tính
 vào công. Hai cột phải tiến là `test%` và `issue%`.
+
+## Bung việc bằng gì
+
+`/build-phase` ở 2.6 dùng **subagent trong phiên**, không phải `claude --bg`. Nghĩa là
+2.6 chạy được **không cần** `settings.local.json` hay permission-mode - một lo lắng
+từng chặn kế hoạch, hoá ra không có thật.
+
+Bốn chế độ và khi nào dùng cái nào: `../playbooks/dispatch-modes.md`. Ba điều hay
+vấp nhất:
+
+- **`-p` không đi với `--bg`.** CLI chặn thẳng: *"--print never starts the interactive
+  session that `claude agents` attaches to"*. Prompt để ở vị trí positional.
+- **`acceptEdits` không tự duyệt lệnh bash** - worker nền không người trực sẽ treo ở
+  prompt và rơi vào `blocked`. Cần `bypassPermissions` hoặc `--allowed-tools`.
+- **Sửa song song cùng file thì phải tách worktree** (`claude -w`, hoặc subagent với
+  `isolation: worktree`). Không có cách khác.
 
 ## Triển khai: Kamal
 

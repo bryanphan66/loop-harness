@@ -29,6 +29,10 @@ gom gap → 1 pass VÁ harness (ghế này) → RE-PROPAGATE (copy/re-install) x
 - **Nghiệp vụ của repo đích** (chọn issue ưu tiên, QC pass/fail) để **bg-session repo đó tự quyết** (đúng context khách/app) — ghế harness chỉ ĐIỀU PHỐI + VÁ công cụ, không quyết nghiệp vụ hộ.
 
 ## Dispatch — cú pháp ĐÚNG (đã test)
+> Bản đầy đủ 4 chế độ (subagent · `--bg` · headless `-p` · worktree) + cách ít quyền
+> bằng `--allowed-tools`: **`docs/playbooks/dispatch-modes.md`**. Kiến thức này trước
+> nay chỉ nằm ở file vai trò này nên **không dự án nào thấy** - đã chuyển ra playbook.
+
 - `cd <repo> && claude --bg "<task>" --permission-mode bypassPermissions`
   - **Prompt để POSITIONAL. KHÔNG dùng `-p` với `--bg`** — xung đột (`-p`/`--print` không mở session để `claude agents` gắn vào). `--dangerously-skip-permissions` = alias tương đương bypass.
 - **Permission-mode = NÚT THẮT của dispatch tự động:** `acceptEdits` KHÔNG auto-duyệt bash → worker read-only vẫn TREO ở prompt xin phép (VD lệnh có pipe `a | b`), state `blocked`. Worker không-người-trực **cần** `bypassPermissions` HOẶC allowlist tool. `bypassPermissions` = tắt gate → guardrail dời sang **prompt scoped + verify-gate**, nên task PHẢI ghi rõ ràng buộc (KHÔNG push/merge/prod nếu chưa cho phép).
