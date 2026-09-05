@@ -95,7 +95,11 @@ if (rtm.found && rtm.out.trim().startsWith("{")) {
 /** Một dòng gọn: xanh / đỏ / bỏ qua kèm lý do, để đọc sổ không cần mở log gate. */
 function verdict(res) {
   if (!res.found) return "thiếu script";
-  const line = res.out.split("\n").map((l) => l.trim()).filter(Boolean).pop() ?? "";
+  // Gate in ket luan bang dong ✓/✗; canh bao ⚠ di ra stderr va co the roi xuong
+  // sau. Lay dong ket luan, khong lay dong cuoi - neu khong so ghi nham canh bao
+  // thanh ket qua.
+  const lines = res.out.split("\n").map((l) => l.trim()).filter(Boolean);
+  const line = [...lines].reverse().find((l) => /^[✓✗]/.test(l)) ?? lines.pop() ?? "";
   const short = line.replace(/^[✓✗\-\s]*/, "").slice(0, 72);
   if (/skipped|chưa có|no .* yet|not .* yet/i.test(res.out)) return `bỏ qua: ${short}`;
   // Mot gate thoat 0 sau khi kiem KHONG muc nao la "xanh rong", khong phai dat.
