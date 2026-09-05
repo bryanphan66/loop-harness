@@ -517,3 +517,36 @@ cột Engine bỏ tên gộp. Danh sách bước hai bên nay khớp hoàn toàn
 **Luật rút ra cho harness:** khi spine đổi danh sách bước, **phải re-propagate xuống
 `WORKFLOW.md` của mọi dự án đang chạy** - đó là file `/stage-next` đọc. Sửa spine mà
 không đồng bộ xuống thì thay đổi không có hiệu lực, và tệ hơn là không có gì báo.
+
+## MD-06 - đã sửa (2026-09-05): installer không nhúng bộ steady-state
+
+**Ghi ban đầu sai một chữ số.** Tưởng thiếu **1** script (`ship-and-verify.sh`), hoá
+ra thiếu **cả 5**:
+
+```
+ship-and-verify.sh   new-issue.mjs   issue-state.mjs   qc-checklist.mjs   push-retry.sh
+```
+
+Cả năm nằm trong `scaffolds/steady-state/`, mà `install-harness.sh` chỉ nhúng
+`scaffolds/stack-pnpm-nest-next`. Nghĩa là **mọi dự án installer từng cài đều gọi tên
+năm script này trong workflow và không có cái nào** - im lặng, suốt từ đầu.
+
+**Vì sao gate chỉ bắt được 1/5.** `dangling-refs` soi **cột bảng quy trình**;
+`ship-and-verify.sh` nằm ở cột Script của bước 2.13 nên bị bắt. Bốn cái kia chỉ xuất
+hiện trong **văn xuôi** (mục "Nguồn nội dung issue"), mà gate cố ý không soi văn xuôi
+- nhắc tên một thứ không phải là trỏ tới nó. Đây là giới hạn đã biết của gate, không
+phải lỗi: nới ra là quay lại 418 kết quả nhiễu. Bù bằng việc người đọc kiểm khi cài.
+
+**Đã sửa.** `install-harness.sh` thêm `copy_steady_state_kit()` đặt cạnh
+`copy_stack_template()`, cùng luật sở hữu: `.harness/` là của harness, wipe wholesale
+mỗi lần (re)install. Đích: `.harness/steady-state/`. Test riêng hàm: 7 file, script
+`.sh` có quyền thực thi.
+
+autocontent đã áp tay (không chạy lại được installer trên dự án đang chạy). Gate sau
+đó: **15 -> 14 tham chiếu treo, loại `script` biến mất hoàn toàn.**
+
+**Phát hiện phụ, chưa sửa:** `install-harness.sh` **không chạy được headless** - kể cả
+với `--dry-run` nó vẫn chạm `/dev/tty` (dòng 118), nên trong job nền hoặc CI là chết
+với `Device not configured`. `can_prompt()` có kiểm `[ -r /dev/tty ]` nhưng trên macOS
+điều kiện đó đúng trong khi mở file lại lỗi. Việc này chặn mọi ý định chạy installer
+tự động. Ghi lại, chưa xử vì không cản lượt chạy hiện tại.
