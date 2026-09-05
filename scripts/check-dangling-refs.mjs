@@ -219,11 +219,14 @@ for (const file of processFiles) {
 
 
 // --- CHIEU NGUOC: file co ma khong ai goi ---
+// CHI cho REPO HARNESS (--two-way). Du an KHONG bat: mot du an co playbook cua
+// Macro 1 ma no da dung that, khong bi bang macro-2 goi ten la dung - bat len se
+// bao oan hang chuc file.
 // Muc luc (README, KEYWORD-MAP) va changelog KHONG tinh la nguoi tieu thu - chung la
 // danh muc, khong dieu khien viec chay. Nguoi tieu thu = file quy trinh + gate doc.
 const OWNED_DIRS = ["docs/playbooks", "docs/gates", "docs/mau-tai-lieu"];
 const orphans = [];
-{
+if (argv.includes("--two-way")) {
   const consumerFiles = [
     ...processFiles,
     ...(existsSync(join(root, "docs/gates"))
@@ -258,6 +261,7 @@ const result = {
   gate: "dangling-refs",
   root,
   enginesDir,
+  twoWay: argv.includes("--two-way"),
   processFiles: processFiles.map((f) => relative(root, f)),
   dangling: rows.length,
   orphans: orphans.length,
