@@ -31,9 +31,9 @@ thứ vốn là lỗi SRS.
 
 | ID | Lượt chạy | Lòi ra ở đâu | Vấn đề | Sửa gì | Trạng thái |
 |---|---|---|---|---|---|
-| MD-01 | autocontent, trước 2.1 | dựng môi trường, đọc `reno-ui/docs/tailwind-v4-requirement.md` | macro-2 không có bước nào kiểm tier-2 token có chạy được với thư viện UI của dự án không | thêm bước kiểm tương thích trước 2.4 | mở |
+| MD-01 | autocontent, trước 2.1 | dựng môi trường, đọc `reno-ui/docs/tailwind-v4-requirement.md` | macro-2 không có bước nào kiểm tier-2 token có chạy được với thư viện UI của dự án không | thêm bước 2.0 + gate `tier2-ui-compat` + script `check-tier2-ui-compat.mjs` | **đã sửa** |
 
-| MD-02 | autocontent, trước 2.1 | luật do operator đưa 2026-09-05 | macro-2 không định nghĩa ranh giới UI custom vs UI component, và không có đường đẩy ngược component tái dùng lên thư viện gốc | thêm luật 3 vùng + gate lint theo vùng + bước đẩy ngược | mở |
+| MD-02 | autocontent, trước 2.1 | luật do operator đưa 2026-09-05 | macro-2 không định nghĩa ranh giới UI custom vs UI component, và không có đường đẩy ngược component tái dùng lên thư viện gốc | luật 3 vùng + bước đẩy ngược: **đã sửa**. Gate lint theo vùng: hoãn tới 2.4 | **đã sửa một phần** |
 
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
@@ -109,3 +109,31 @@ viết lại từ đầu, và bản nâng cấp reno-ui không mang nó theo.
 
 **Chưa quyết.** Ai phán "cái này tái dùng được" - agent tự quyết hay người. Đề nghị:
 agent đề xuất, người duyệt ở mốc đóng phase, vì đây là quyết định ảnh hưởng dự án khác.
+
+### MD-01 - đã sửa (2026-09-05)
+
+`macro-2.md` có bước **2.0** với gate cơ học `tier2-ui-compat`, script
+`scripts/check-tier2-ui-compat.mjs`. Script kiểm 3 thứ: phiên bản build tool khớp
+major, mọi token thư viện đọc đều có trong tier 2, và không còn cú pháp đời cũ.
+
+Đã test hai chiều, không chỉ đọc code:
+- bản autocontent SAU port -> **XANH**, exit 0
+- bản autocontent TRƯỚC port (`562f95c`) -> **ĐỎ**, exit 1, bắt đúng 4 lỗi:
+  thiếu `--overlay` + `--sidebar`, 76 token viết kiểu v3, 9 chỗ `hsl(var(--x))`,
+  không có khối `@theme`
+
+Lần chạy đầu script báo nhầm 3 lỗi nằm trong comment của chính file token. Đã vá
+bằng cách bỏ comment trước khi quét. Ghi lại vì đây là loại lỗi gate dễ tái phát:
+gate quét văn bản thì phải bỏ comment trước.
+
+### MD-02 - đã sửa một phần (2026-09-05)
+
+Đã vào `macro-2.md`: mục "UI: custom hay component (ranh giới theo VÙNG)" với bảng
+3 vùng, luật không sửa file trong `components/ui/` tại chỗ, và ai phán "tái dùng
+được". Cột "Xong khi" của 2.6 thêm điều kiện custom tái dùng phải mở PR ngược.
+
+**Còn nợ: gate lint theo vùng.** Chưa dựng được vì dự án chưa có app và chưa có
+eslint config - `autocontent/src/` mới có `components/README.md`. Dựng ở **2.4**
+cùng lúc scaffold. Yêu cầu: dự án khai đường dẫn nào là public, nào là portal;
+vùng portal cấm định nghĩa component UI mới ngoài `components/ui/`; vùng public
+chỉ cảnh báo màu cứng, không chặn.
