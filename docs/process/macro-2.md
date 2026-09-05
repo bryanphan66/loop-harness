@@ -192,11 +192,11 @@ nhìn từ phía một REQ-ID:
 | `Backlog` | `new-issue.mjs` lúc tạo | 2.6 mở phase |
 | `Ready for Dev` | tiêu chí chấp nhận đủ | 2.6 |
 | `In Dev` | runner nhận việc | 2.6 |
-| `Ready for Test` | code xong, chờ verifier | 2.6 đóng phase con |
+| `Deploying` | **triển khai lên môi trường TEST** - không phải go-live | 2.6 đóng phase con |
+| `Ready for Test` | đã lên môi trường, chờ QC | 2.6 -> 2.10 |
 | `QC Testing` | verifier độc lập đang chạy | **2.10** |
 | `Ready for UAT` | QA pass | **2.10** |
 | `UAT Testing` | khách đang nghiệm thu | **2.12** |
-| `Deploying` | đang go-live | **2.13** |
 | `Done` | đã lên sóng + verify-at-source | **2.13** |
 | `Cancelled` | phạm vi bị cắt | bất kỳ, kèm CR |
 
@@ -205,8 +205,14 @@ bước nào chạm tới - pipeline đứng yên tới hết dự án, và Macr
 sẽ nhận bàn giao một bảng nói dối.
 
 **Cách giữ cho hồ sơ khớp thực tế:** mỗi bước sau 2.6 kiểm bằng
-`check-issue-coverage.mjs --expect "<nấc>"`. 2.10 đòi `Ready for UAT`, 2.12 đòi
-`UAT Testing`, 2.13 đòi `Done` trước khi flip sang Mode B. Nhảy nấc là nói dối về việc **ai
+`check-issue-coverage.mjs --expect "<nấc>"`. 2.6 đóng phase con đòi `In Dev` (xa nhất mà
+`--advance` tới được hợp lệ), 2.10 đòi `Ready for UAT`, 2.12 đòi `UAT Testing`, 2.13 đòi
+`Done` trước khi flip sang Mode B.
+
+**Nguồn của thứ tự là bảng `TRANSITIONS` trong `issue-state.mjs`**, không phải tài liệu này.
+Script có TRANSITION GUARD chặn nhảy cóc và self-test đi kèm; tài liệu chép lại nó, không
+ngược lại. Tôi từng xếp `Deploying` gần `Done` theo nghĩa "go-live" và làm cổng đòi một nấc
+không tới được - lượt chạy bị chặn cho tới khi đọc bảng bên đó. Nhảy nấc là nói dối về việc **ai
 đã kiểm cái gì**, nên cổng chặn.
 
 ## Bù, đừng tua lại

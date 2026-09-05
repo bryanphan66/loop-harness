@@ -237,9 +237,17 @@ if (ADVANCE) {
     path.push(nxt);
     cur = nxt;
   }
+  // DRY: chi IN duong di, KHONG chay tung chang. Chay that o che do gia lap thi
+  // trang thai khong doi, nen chang thu hai doc lai van thay trang thai CU va
+  // chet vi "nhay coc" - vd Backlog -> In Dev. Nguoi dung --dry-run la nguoi can
+  // than nhat, khong duoc de ho nhan mot stack trace Node tho.
+  if (DRY) {
+    console.log(`[issue #${issueNumber}] --advance --dry-run: ${[fromState, ...path].join(' -> ')}`);
+    console.log(`  ${path.length} buoc, khong goi API. Bo --dry-run de chay that.`);
+    process.exit(0);
+  }
   for (const hop of path) {
     const hopArgs = [process.argv[1], issueNumber, hop, '--repo', REPO];
-    if (DRY) hopArgs.push('--dry-run');
     execFileSync(process.argv[0], hopArgs, { stdio: 'inherit' });
   }
   process.exit(0);

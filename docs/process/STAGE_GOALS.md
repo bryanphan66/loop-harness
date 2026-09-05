@@ -410,10 +410,13 @@ while phases remain.
    issue của phase đang mở, không mở trước cho phase sau.
 2. **Runner nhận việc:** `node .harness/steady-state/scripts/issue-state.mjs <n> "In Dev"`. Không có bước này thì
    không ai nhìn được ai đang làm gì, và hai runner có thể ôm cùng một REQ-ID.
-3. **Code xong, chờ verifier:** `node .harness/steady-state/scripts/issue-state.mjs <n> "Ready for Test"`.
+3. **Code xong:** dừng ở `In Dev`. Đó là nấc xa nhất `--advance` tới được hợp lệ - nấc
+   kế tiếp là `Deploying`, và trong pipeline này `Deploying` nghĩa là **đưa lên môi trường
+   test**, phải do người/`ship-and-verify` thật đặt chứ không tự nhảy. Đường hợp lệ:
+   `In Dev -> Deploying -> Ready for Test -> QC Testing`.
    **KHÔNG nhảy thẳng sang `Done`.** Pipeline có 10 nấc và chúng là bản sao theo từng
-   REQ-ID của chính các bước Macro 2: `Ready for Test` là 2.6 đóng phase, `QC Testing` là
-   2.10, `UAT Testing` là 2.12, `Deploying` là 2.13. Nhảy nấc nghĩa là hồ sơ nói dối về
+   REQ-ID của chính các bước Macro 2: `Deploying` là lúc đưa phase lên môi trường
+   test, `QC Testing` là 2.10, `UAT Testing` là 2.12, `Done` là 2.13. Nhảy nấc nghĩa là hồ sơ nói dối về
    việc đã ai kiểm cái gì.
 4. **Bật `prototypeFidelity.required` khi phase đầu tiên có màn hình.** Đặt `true` trong
    `scripts/gate-config.json`. Trước đó gate tự bỏ qua vì chưa có gì để đối chiếu; sau đó
@@ -429,7 +432,7 @@ while phases remain.
    REQ-ID cho phase đó vào ERD và API contract. Tới lúc phase cuối đóng, phủ tự đủ 100%
    mà không ai phải viết 130 dòng một lượt.
 
-6. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing --expect "Ready for Test"`
+6. **Và cổng issue:** `node scripts/check-issue-coverage.mjs --phase P<n> --closing --expect "In Dev"`
    phải **xanh** - mọi REQ-ID trong phạm vi của phase có >=1 issue, issue gắn đúng milestone, và
    không issue nào còn nằm ở trạng thái mở đầu.
 
