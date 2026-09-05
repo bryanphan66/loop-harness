@@ -2105,3 +2105,42 @@ Hai luật rút ra, và cái thứ hai quan trọng hơn:
 **không để lại dấu vết** - máy ngủ thì log chỉ có một dòng API error, agent chết watchdog
 thì không có gì cả. Một lượt chạy đêm mất 4 tiếng mà sáng ra nhìn vào không hiểu vì sao.
 
+## MD-59 - một cổng có mã, có test, có comment khai đã nối - và không chỗ nào gọi
+
+Hỏi một câu chưa ai hỏi: **có cổng nào tồn tại mà không ai gọi không?** Đối chiếu 22 file
+`check-*.mjs` với chuỗi `lint:gates` ra 5 cái không nằm trong chuỗi. Bốn trong số đó là cổng
+theo bước, gọi kèm `--phase` từ goal-text - đúng, không nên nằm trong chuỗi chung.
+
+Cái thứ năm, `check-canonical-redirect-manifest.mjs`, **không ai gọi cả**. Không chuỗi,
+không bước, không hook. Nó có mã đầy đủ, có một file test riêng, và có comment đầu file:
+
+```
+ * Runs automatically as apps/web's `postbuild`, so it fires with the same
+ * process env as `next build` in every build path (Docker image, CI, local).
+```
+
+`apps/web/package.json` không có script `postbuild` nào. **Bộ khung cũng không có** - nên
+mọi dự án dựng từ harness này đều nhận một cổng không bao giờ chạy, kèm một comment nói
+rằng nó có chạy.
+
+Đây là **ca thứ tư trong một đêm** của cùng một hình dạng (MD-54): một lời khai trỏ vào thứ
+không tồn tại. Ba ca trước là comment trỏ vào chỗ gọi không có, AC chép code thay vì SRS, và
+phép kiểm khởi động mang tên `IF.PROVIDER.07` mà không làm việc của nó. Ca này khác ở chỗ nó
+tự khai bằng văn xuôi trong chính file bị hỏng - **thứ dễ tin nhất, vì nó nằm ngay cạnh mã**.
+
+Điều nó bảo vệ không phải chuyện nhỏ: hai biến `CANONICAL_REDIRECT_*` được Next nướng vào
+`routes-manifest.json` lúc BUILD, nên đặt chúng lúc chạy là không có tác dụng gì mà cũng
+không báo lỗi. Cổng này sinh ra để cái bẫy đó không lọt nữa - và bản thân nó thì chưa từng
+chạy một lần nào.
+
+**Vá:** thêm `postbuild` vào `apps/web/package.json` ở cả bộ khung lẫn dự án, để câu comment
+thành sự thật thay vì sửa comment cho khớp cái sai.
+
+**Và khép kín cổng `check-referenced-tools` (MD-56) theo chiều còn lại.** Nó đang bắt "tài
+liệu hứa một thứ không tồn tại"; giờ bắt thêm "một thứ tồn tại mà không ai gọi". Cùng một bất
+biến, hai đầu. Thử hai chiều trên đúng ca này: gỡ `postbuild` ra thì đỏ và gọi tên đúng file;
+nối lại thì xanh.
+
+**Cổng chết tệ hơn không có cổng.** Không có cổng thì người ta biết phần đó chưa được canh.
+Có một cổng nằm im thì danh sách nhìn đầy đủ, và không ai đi kiểm phần nó lẽ ra phải canh.
+

@@ -21,7 +21,7 @@
  * file có thật. Fail-closed: quét ra 0 lời gọi cũng là ĐỎ - tài liệu không thể
  * không gọi công cụ nào, nên 0 nghĩa là regex hỏng chứ không phải sạch.
  */
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gateRoot, readSafe, walk } from './gate-lib.mjs';
@@ -102,4 +102,45 @@ if (missing.length) {
   );
   process.exit(1);
 }
+
+// --- chiều ngược lại: công cụ có thật mà KHÔNG ai gọi ------------------------
+// Vế trên bắt "tài liệu hứa một thứ không tồn tại". Vế này bắt "một thứ tồn tại
+// mà không ai gọi" - cùng một bất biến, hai đầu.
+//
+// Tìm được trên dự án thật: `check-canonical-redirect-manifest.mjs` có mã, có
+// file test riêng, có comment đầu file khai "Runs automatically as apps/web's
+// postbuild" - và `apps/web/package.json` KHÔNG có script `postbuild` nào. Cả
+// bộ khung cũng thiếu, nên mọi dự án dựng từ harness này đều nhận một cổng
+// không bao giờ chạy, kèm một comment nói rằng nó có chạy.
+//
+// Đó là lần thứ tư trong một đêm bắt được cùng một hình dạng: một lời khai trỏ
+// vào thứ không tồn tại (xem MD-54). Cổng chết còn tệ hơn không có cổng, vì
+// người đọc danh sách sẽ tưởng phần đó đã được canh.
+const CALLERS = ['package.json', 'apps/web/package.json', 'apps/api/package.json', '.githooks', '.husky'];
+const callerText = [
+  ...DOC_DIRS.map((d) => resolve(ROOT, d)),
+  ...CALLERS.map((c) => resolve(ROOT, c)),
+]
+  .filter(existsSync)
+  .flatMap((p) => (statSync(p).isDirectory() ? walk(p, () => true) : [p]))
+  .map(readSafe)
+  .join('\n');
+
+const gateDir = resolve(ROOT, 'scripts');
+const orphans = existsSync(gateDir)
+  ? readdirSync(gateDir)
+      .filter((f) => f.startsWith('check-') && f.endsWith('.mjs'))
+      .filter((f) => !callerText.includes(f))
+  : [];
+
+if (orphans.length) {
+  for (const f of orphans) console.error(`  KHÔNG AI GỌI: scripts/${f}`);
+  console.error(
+    `✗ [referenced-tools] ${orphans.length} cổng tồn tại mà không chỗ nào gọi. ` +
+      'Nối nó vào (lint:gates, postbuild, hook, hoặc goal-text của một bước), hoặc xoá đi - ' +
+      'một cổng chết làm người đọc tưởng phần đó đã được canh.',
+  );
+  process.exit(1);
+}
+
 console.log(`✓ [referenced-tools] cả ${calls.size} công cụ đều có thật trong kit`);
