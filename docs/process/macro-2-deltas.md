@@ -448,7 +448,7 @@ Mười cái kia (`ck-intake-file`, `ck-ux-design`, `ck-brand-guidelines`,
 này**. MD-05 vì vậy hẹp hơn nhiều so với lúc ghi: cần lấp 7, không phải 17. Trong đó
 `ck-tech-design` là cái duy nhất chặn cứng, vì 2.1 và 2.2 đều gọi nó.
 
-## MD-05 - đã giải quyết (2026-09-05), và bài học không phải cái ta tưởng
+## Đóng MD-05 - đã giải quyết (2026-09-05), và bài học không phải cái ta tưởng
 
 Ghi ban đầu là "17 engine treo, `ck-tech-design` chặn cứng bước 2.1". Sai ở chỗ chưa
 đọc kỹ chính cột Engine.
