@@ -1752,3 +1752,40 @@ Kết quả: bảng ba dòng (ba nguồn theo miền) + bảng bốn dòng (dẫ
 code; lúc chưa có code thì không có gì để chép, tiêu chí buộc lấy từ SRS. Đây là chỗ duy
 nhất luật này kiểm được bằng máy - phần còn lại là thứ tự làm việc, không phải thứ so sánh
 được bằng script.
+
+## MD-50 - 2.13 bảo đi một nước cờ mà bảng trạng thái cấm, và bản vá 2.6 chưa hề xuống dự án
+
+Operator hỏi vì sao GitHub có 13 issue trong khi tôi nói 10. Đếm ra: 13 = P1.1 (4, `#20`-`#23`)
++ P1.4 (3, `#24`-`#26`, tạo sớm lúc P1.1 còn ôm cả `IF.JOBS.*`) + P1.2 (6, `#27`-`#32`); P1.3
+còn 7 chưa tạo, tổng P1 = 20. Đọc `States` qua `/repos/.../issues/<n>` thì 10 cái ở `In Dev`,
+3 cái ở `Ready for Dev` - board tự nó đã tách đúng hai nhóm. Không có lỗi số liệu.
+
+Nhưng đi kiểm cái cổng đọc `States` thì lòi ra **hai lỗi khác nhau**, và cả hai đều là hậu
+quả của một bản vá cũ làm nửa vời.
+
+**Lỗi 1 - 2.13 hướng dẫn một nước đi bị `TRANSITIONS` cấm.** Văn bản 2.13 ghi: "Bắt đầu
+deploy -> `Deploying`; verify-at-source xong -> `Done`". Vào 2.13 issue đang ở `UAT Testing`,
+mà bảng cho phép từ `UAT Testing` chỉ `Done`/`In Dev`/`Cancelled` - **không có `Deploying`**;
+và từ `Deploying` cũng không có `Done`. Làm đúng lời dặn thì `issue-state.mjs` chặn cứng hai
+lần. Chưa ai phát hiện vì **2.13 chưa từng chạy**. Sửa: 2.13 đi thẳng `UAT Testing -> Done`,
+kèm câu giải thích `Deploying` là môi trường TEST và đã tiêu ở 2.6.
+
+**Lỗi 2 - bản vá 2.6 nằm ở harness nhưng chưa xuống autocontent.** Ba tháng trước operator
+bắt được chỗ tôi xếp `Deploying` gần `Done`; tôi sửa `macro-2.md` và `STAGE_GOALS.md` của
+harness, **và dừng ở đó**. Bản sao trong autocontent vẫn mang mô hình cũ: bước 3 bảo
+`In Dev -> Ready for Test` (bỏ qua `Deploying`, là nước đi bất hợp lệ), danh sách chủ sở hữu
+ghi "`Deploying` là 2.13", cổng đóng đòi `--expect "Ready for Test"`. Lượt chạy thật đâm
+đúng vào đó: phiên chạy phải tự đối chiếu `issue-state.mjs`, phát hiện `Ready for Test`
+không tới được, và sửa xuống `"In Dev"` giữa lượt.
+
+**Cùng bản sao đó còn thiếu hẳn cổng cửa vào của MD-47** (10 dòng, mục `0.`). Nên P1.2 lặp
+lại y nguyên lỗi trình tự của P1.1 - code trước, mở issue sau - và phiên chạy phải bắt tay
+giữa chừng rồi tự ghi một dòng ma sát `goal-mo-ho`. Cổng đã tồn tại, đúng chỗ, chỉ là **chưa
+bao giờ tới nơi cần dùng**.
+
+**Bài học, và nó lớn hơn hai lỗi trên:** vá harness mà không re-propagate thì bản vá bằng
+không - tệ hơn cả chưa vá, vì mình tưởng đã xong. Hai lần trong lượt chạy này người thật
+phải trả giá bằng việc sửa tay giữa dòng cho một lỗi đã có bản vá nằm sẵn cách đó một
+thư mục. `harness-drift.sh` báo được file lệch, nhưng không ai bắt buộc chạy nó sau khi
+merge một PR harness. Đó là mắt xích còn hở.
+
