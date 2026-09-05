@@ -21,7 +21,7 @@
 | **2.6** | Code từng phase (vòng lặp) | `build-execution`, `prototype-export-adoption` | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, phase-acceptance | `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
 | **2.8** | E2E từ AC + hướng dẫn dùng | `canonical-e2e-flow-playbook`, `user-guide-hdsd-standard` | `check-ac-coverage` ⚙️ | `validation-report.md` | `check-ac-coverage.mjs` | mọi REQ-ID có ≥1 E2E pass + đường-lỗi + login test |
 | **2.9** | Bảo mật — VERIFY (không làm lại) | — (ck-security) | security-sign-off *(người)* | — | — | 0 Critical/High; đối chiếu threat-model 2.2 + floor 2.6 |
-| **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` | `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
+| **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field-verify-with-report`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` | `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
 | **2.12** | Khách nghiệm thu (UAT) | — (ck-uat/signoff) | ACCEPTANCE *(khách ký)* | `delivery-closure-story/` | — | khách (hoặc chủ) ký |
 | **2.13** | Go-live + release *(gộp 2.11)* | `go-live-deploy-verify` | verify-at-source ⚙️ | `release-note.md` | `ship-and-verify.sh` | container chạy đúng commit đã release; rollback = 1 dòng |
 
