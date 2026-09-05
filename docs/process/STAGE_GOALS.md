@@ -83,6 +83,13 @@ dự án **401 REQ-ID** thì bước 2.3 quy định 15 lượt (+3 lượt vi�
 (**2.1, 2.2, 2.3**) lên **×1.5**, trên **400** thì **×2**. Các bước còn lại giữ nguyên -
 chúng đọc artifact đã cô đọng, không đọc SRS thô.
 
+**Lượt rà soát lại theo SRS: 50 lượt, không phải 40.** Đo hai lần liên tiếp trên cùng một
+dự án, cùng 10 REQ-ID: lượt đầu 50, lượt rà lại 49, trong khi ngân sách ghi 40. Phân bổ của
+lượt thứ hai: **18 lượt chỉ để đọc nguồn trước khi mở code** (10 đoạn SRS, 10 body issue,
+register, bản kê thi công), 15 lượt đọc code, 10 lượt sửa và thêm test, 6 lượt cổng và ghi
+sổ. Con số 18 kia không cắt được - nó CHÍNH LÀ luật "đọc nguồn trước, đừng chép code". Ngân
+sách phải trả tiền cho luật của chính nó, không thì luật bị bỏ vì hết lượt.
+
 **Vượt ngân sách không phải lỗi, GIẤU mới là lỗi.** Vượt thì ghi một dòng
 `docs/macro2-friction-log.md` loại `thieu-cong-cu` kèm số lượt thật, để lần sau hiệu chỉnh
 bằng số chứ không bằng cảm giác. Tuyệt đối **không cắt bớt việc** cho vừa ngân sách - hạ

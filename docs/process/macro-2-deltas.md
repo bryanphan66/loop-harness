@@ -1922,3 +1922,40 @@ dòng "Checklist (AutoContent, filled at step 2.3)" với các ô đã tick) th�
 dự án, không còn là bản mẫu. Công cụ không có cách nào biết, nên báo `BOTH` mãi. Đè lên là
 xoá hồ sơ đã ký. Cần một cách để dự án khai "file này giờ của tôi" - chưa làm.
 
+## MD-54 - phép kiểm mang tên một yêu cầu mà không làm việc của yêu cầu đó
+
+Ba lần trong cùng một tối, cùng một hình dạng:
+
+| chỗ | nó khai gì | sự thật |
+|---|---|---|
+| `outcome-classifier.ts:39-42` | "lỗi nhà cung cấp không ánh xạ được sẽ phát tín hiệu cho vận hành - chỗ phát là `console.error` trong `generate-job.ts`" | đọc hết `generate-job.ts`, không có chỗ gọi nào |
+| AC 5 của issue `#22` | job chưa ở kho lỗi mà gọi chạy lại thì trả 409 | chép đúng hành vi code lúc đó; SRS `IF.JOBS.04` đòi job **đã thành công** phải resolve `already_done`, không phải lỗi |
+| `provider-config.ts:73` + 3 test | khối mang nhãn "`IF.PROVIDER.07` boot-time validation" | chỉ khẳng định route có `primary` và `deadlineMs` dương. Nghĩa vụ thật - *"nhà cung cấp không mang nổi ràng buộc thì không được cấu hình làm dự phòng"* - **không kiểm**, và không kiểm được, vì `ProviderAdapter` chưa khai khả năng nào cả |
+
+Ba cái đều đi qua mọi cổng. `check-issue-coverage` chỉ đếm **có** issue cho mỗi REQ-ID.
+`new-issue.mjs --check` chỉ đếm đủ 5 khối và 13 mục DoD. `check-ac-coverage` chỉ hỏi có
+test nào **nhắc tên** REQ-ID không. Cả ba đều xanh với một phép kiểm sai.
+
+**Một phép kiểm yếu đeo tên của yêu cầu còn tệ hơn một ô trống**, vì ô trống thì nhìn thấy
+được. Ô trống bắt người ta đi làm; cái nhãn đúng trên việc sai bắt người ta đi tiếp.
+
+**Và cái này KHÔNG viết được thành script.** Hỏi "test này có khẳng định đúng thứ yêu cầu
+đòi không" là câu hỏi ngữ nghĩa. Viết một cổng giả vờ trả lời được nó chính là đẻ thêm một
+cái nhãn đúng trên việc sai - đúng con bệnh đang chữa.
+
+**Nên vá ở chỗ đúng: hợp đồng của verifier độc lập** (`docs/gates/phase-acceptance.md`),
+nơi vốn dĩ là *"prose contract the agent executes"*. Thêm một nghĩa vụ tường minh: với mỗi
+REQ-ID, verifier **mở dòng khai báo trong SRS ra đọc**, rồi hỏi phép kiểm mang tên đó có
+khẳng định đúng điều SRS đòi không. Yếu hơn thì là **lỗi**, không phải "làm được một phần" -
+và phải gỡ nhãn REQ-ID khỏi nó, để nó quay về là một ô trống nhìn thấy được.
+
+Cùng luật đó áp cho comment: comment tự khai một hành vi thì hành vi đó phải tồn tại, hoặc
+comment phải nói thẳng là chưa có.
+
+**Ngân sách lượt của bước rà soát - đo hai lần, sai cả hai.** Bước rà soát ghi 40 lượt;
+lượt đầu tốn 50, lượt rà lại tốn 49. Phân bổ lượt hai: 18 lượt chỉ để **đọc nguồn trước khi
+mở code** (10 đoạn SRS, 10 body issue, register, bản kê thi công), 15 lượt đọc code, 10 lượt
+sửa và thêm test, 6 lượt cổng và ghi sổ. Con số 18 kia không cắt được - nó chính là luật
+"đọc nguồn trước". Ngân sách phải trả tiền cho luật của chính nó: **50 lượt cho một lượt rà
+soát ~10 REQ-ID**, và ghi rõ 18 trong số đó là đọc nguồn.
+
