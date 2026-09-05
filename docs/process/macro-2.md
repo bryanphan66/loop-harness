@@ -17,8 +17,8 @@
 | **2.1b** | Di trú dữ liệu (chỉ brownfield) | `external-integration` | ETL + dry-run *(người)* | — | — | dry-run cutover pass, hoặc N/A |
 | **2.2** | Chọn stack + threat-model | — (ck-tech-design) | stack-justified *(người)* | `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
 | **2.3** | Bản kê thi công + DoR | `build-manifest-compilation` | `check-manifest-coverage` ⚙️ + `dor-build` | `build-manifest.md`, `spec-intake.md` | `check-manifest-coverage.mjs` | mọi REQ-ID in-scope vào đúng 1 phase, DoR xanh |
-| **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ | `deployment-guide.md` | `scaffold.sh`, `secret-scan.sh`, seed | app boot + admin login được, P0 done |
-| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `prototype-export-adoption` | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, phase-acceptance | `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
+| **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ + `ui-region-boundary` ⚙️ | `deployment-guide.md` | `scaffold.sh`, `secret-scan.sh`, `check-ui-region-boundary.mjs`, seed | app boot + admin login được, P0 done, **vùng public/portal đã khai trong `gate-config.json`** |
+| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `prototype-export-adoption` | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance | `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
 | **2.8** | E2E từ AC + hướng dẫn dùng | `canonical-e2e-flow-playbook`, `user-guide-hdsd-standard` | `check-ac-coverage` ⚙️ | `validation-report.md` | `check-ac-coverage.mjs` | mọi REQ-ID có ≥1 E2E pass + đường-lỗi + login test |
 | **2.9** | Bảo mật — VERIFY (không làm lại) | — (ck-security) | security-sign-off *(người)* | — | — | 0 Critical/High; đối chiếu threat-model 2.2 + floor 2.6 |
 | **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field-verify-with-report`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` | `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
@@ -56,8 +56,11 @@
 - Ai phán "cái này tái dùng được": agent đề xuất, **người duyệt ở mốc đóng phase**,
   vì nó ảnh hưởng dự án khác.
 - Lint chặn màu cứng (vd `no-raw-color` của reno-ui) **không** chặn được việc tự viết
-  component mới. Gate lint theo vùng dựng ở 2.4 khi đã có app + eslint config — xem
-  `macro-2-deltas.md` MD-02.
+  component mới. Gate `ui-region-boundary` ⚙️ (`check-ui-region-boundary.mjs`) lo chỗ đó:
+  vùng portal cấm tự vẽ `<button>/<input>/<select>/<textarea>/<dialog>`; thư mục thư viện
+  chỉ được chứa mục có thật của registry; vùng public chỉ **cảnh báo** màu cứng, không chặn.
+  Dự án khai vùng trong `scripts/gate-config.json` khối `uiRegions`. Chưa khai hoặc chưa
+  scaffold thì gate báo rõ lý do chứ không im lặng xanh.
 
 ## Đọc thêm (chi tiết, không lặp ở đây)
 - Mục tiêu-text từng bước cho agent: `STAGE_GOALS.md`.
