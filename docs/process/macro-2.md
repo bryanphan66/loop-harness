@@ -39,3 +39,4 @@
 - Mục tiêu-text từng bước cho agent: `STAGE_GOALS.md`.
 - Bảng mọi bước 3 macro + lane: `WORKFLOW.md`.
 - Danh sách script gate: `../gates/lint-gates-registry.md`.
+- Thay đổi harness phát hiện từ dự án thật: `macro-2-deltas.md`.
