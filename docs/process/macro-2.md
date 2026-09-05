@@ -72,6 +72,40 @@ không phải delta.
 > orchestrator/người phán. **Lỗ đã biết:** gate cơ học chỉ chạy hook local — `gh
 > merge`/web-edit bypass được (chưa có server-side).
 
+## Thứ tự nguồn sự thật - đọc trước mọi tranh cãi
+
+Khi hai tài liệu nói khác nhau, **không chọn theo cái nào tiện hơn**. Thứ tự dưới đây là cố
+định, và cái đứng trên thắng.
+
+| # | nguồn | cai quản cái gì | đóng băng ở |
+|---|---|---|---|
+| 1 | `docs/requirements/srs/` | **chi tiết hành vi + tiêu chí chấp nhận** | PB-G2 |
+| 2 | prototype đã freeze | **hình dạng màn hình**, luồng thao tác | PB-G4 |
+| 3 | `feature-register` | **phạm vi**: làm hay không làm. KHÔNG cai quản chi tiết | PB-G2 |
+| 4 | ERD, `api-contract` | dẫn xuất từ (1) ở bước 2.1/2.2 | ERD ở 2.1 |
+| 5 | `build-manifest` | **thứ tự thi công**, không phải nội dung | DoR ở 2.3 |
+| 6 | issue, AC | dẫn xuất từ (1). Là bản sao để làm việc, không phải nguồn | - |
+| 7 | **code + test** | **KHÔNG BAO GIỜ là nguồn** | - |
+
+**Ba luật đi kèm:**
+
+- **Code không bao giờ thắng.** Code lệch SRS thì **sửa code**. Không sửa SRS, không sửa AC
+  cho khớp code, không "ghi nhận thực tế hiện tại". Một dòng SRS bị bẻ theo code là một yêu
+  cầu của khách biến mất mà không ai ký.
+- **SRS lệch prototype = CR, không phải chỗ tự chọn.** Cả hai đều đã đóng băng và đều có
+  người ký. Agent gặp lệch thì **dừng, ghi, báo** - mở một `CR-NN`, đừng tự quyết bên nào
+  đúng.
+- **Register không phân xử chi tiết.** Nó chỉ trả lời "có làm không". Hỏi nó "làm thế nào"
+  là hỏi sai chỗ.
+
+**Vì sao phải viết ra:** lượt chạy thật mở issue **sau** khi code xong, nên tiêu chí chấp
+nhận có nguy cơ chép lại cái đã làm thay vì đòi cái SRS yêu cầu - và nếu code đã lệch SRS
+thì chỗ lệch được hợp thức hoá, không ai biết. Luật này trước đó chỉ nằm rải rác trong một
+gạch đầu dòng, không có bảng, không có thứ tự, không cổng nào đọc.
+
+**Cổng giữ luật này:** cổng cửa vào của 2.6 - issue phải tồn tại **trước** khi runner code.
+Lúc chưa có code thì không có gì để chép, tiêu chí buộc phải lấy từ SRS.
+
 ## Nguồn nội dung issue (neo REQ-ID)
 - **Scope** (feature nào) ← `feature-register` *(view scope đông băng PB-G2, KHÔNG phải SOT)*.
 - **Chi tiết + AC** ← `docs/requirements/srs/` *(SOT thật, sống)*.
