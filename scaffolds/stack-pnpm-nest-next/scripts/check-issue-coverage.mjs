@@ -103,17 +103,24 @@ if (noMilestone.length) {
 // --- trạng thái, chỉ khi đóng phase --------------------------------------------
 if (CLOSING && phaseIssues.length) {
   const stuck = [];
-  let unreadable = 0;
+  const unset = [];        // đọc được nhưng trường States TRỐNG = chưa ai đặt
+  let apiFail = 0;         // gọi API hỏng = vấn đề môi trường/quyền
   for (const it of phaseIssues) {
     const r = gh(['api', `repos/${REPO}/issues/${it.number}`, '--jq',
       '[.issue_field_values[]? | select(.issue_field.name=="States") | .single_select_option.name] | first // ""']);
-    if (r.status !== 0) { unreadable++; continue; }
+    // Hai nguyên nhân KHÁC HẲN nhau, đừng gộp một câu: gọi API hỏng là chuyện
+    // quyền/mạng, còn trường trống là CHƯA AI ĐẶT - tức việc chưa làm. Gộp lại
+    // thì người ta đi sửa quyền trong khi thật ra chỉ cần chạy issue-state.mjs.
+    if (r.status !== 0) { apiFail++; continue; }
     const st = (r.stdout ?? '').trim();
-    if (!st) { unreadable++; continue; }
+    if (!st) { unset.push(`#${it.number}`); continue; }
     if (START_STATES.includes(st)) stuck.push(`#${it.number}=${st}`);
   }
-  if (unreadable) {
-    errors.push(`không đọc được trạng thái của ${unreadable} issue — cổng KHÔNG được xanh khi không nhìn thấy đầu vào. Kiểm quyền gh và trường org "States".`);
+  if (apiFail) {
+    errors.push(`gọi API không lấy được trạng thái của ${apiFail} issue — cổng KHÔNG được xanh khi không nhìn thấy đầu vào. Kiểm quyền \`gh\` và trường org "States".`);
+  }
+  if (unset.length) {
+    errors.push(`${unset.length} issue CHƯA ĐƯỢC ĐẶT trạng thái: ${unset.slice(0, 10).join(', ')} — chạy \`node .harness/steady-state/scripts/issue-state.mjs <n> "<state>"\`. Đây là việc chưa làm, không phải lỗi quyền.`);
   }
   if (stuck.length) {
     errors.push(`${stuck.length} issue còn ở trạng thái mở đầu khi đóng ${PHASE}: ${stuck.slice(0, 10).join(', ')} — đẩy bằng .harness/steady-state/scripts/issue-state.mjs`);
