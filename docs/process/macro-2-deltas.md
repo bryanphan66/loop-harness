@@ -2144,3 +2144,38 @@ nối lại thì xanh.
 **Cổng chết tệ hơn không có cổng.** Không có cổng thì người ta biết phần đó chưa được canh.
 Có một cổng nằm im thì danh sách nhìn đầy đủ, và không ai đi kiểm phần nó lẽ ra phải canh.
 
+## MD-60 - tôi tự gây ra lỗi này khi đi vá lỗi kia: chép file theo TÊN, không theo VAI
+
+Đang dọn drift (MD-53), tôi thấy bản báo cáo liệt vài file kit "dự án chưa có" và chép
+chúng vào. Trong đó có `pb-g3-prototype-frozen.md` và `pb-g4-contract-deposit.md`.
+
+Dự án đã có sẵn hai cổng đó rồi - dưới **số ngược lại**: `pb-g3-contract-deposit.md` và
+`pb-g4-prototype-frozen.md`, 78 và 96 dòng, đã điền và đã ký từ lúc bootstrap. Nó đổi số có
+chủ đích: sản phẩm tự bỏ vốn, không có khách ký hợp đồng nên cổng hợp đồng thành N/A, và
+cổng đóng Pre-Build là đóng băng prototype.
+
+Sau khi tôi chép: **hai file cùng xưng PB-G3, hai file cùng xưng PB-G4.** Câu "PB-G3 là cổng
+nào" có hai câu trả lời nằm cạnh nhau trên đĩa. Tôi đi vá một lỗ và mở một lỗ khác, trong
+cùng một đêm, bằng đúng thao tác được cho là an toàn.
+
+**Bài học:** so theo TÊN FILE không đủ. Một dự án có thể sở hữu chính artifact đó dưới một
+cái tên khác, và với gate file thì **mã cổng nằm ngay trong tên**, nên "đổi số" là một dạng
+adaptation hoàn toàn hợp lệ. Chép mù tạo ra hai nguồn cho một câu hỏi có đúng một đáp án.
+
+**Hai cơ chế, vì một luật suông thì bằng không (MD-56):**
+
+1. **`DUP-GATE-ID`** trong `harness-drift.sh`: mã cổng nằm ở heading đầu file
+   (`# Gate PB-G3 — ...`), nên đọc được bằng máy. Hai file cùng mã = ĐỎ. Thử chiều đỏ bằng
+   cách dựng lại đúng tình huống: bắt được 2. *(Bản đầu của phép kiểm này dính dương tính
+   giả - regex `[A-Z0-9-]+` cắt `DoD` thành `D` ở chữ thường đầu tiên, nên hai file DoD/DoR
+   báo trùng. Lại là chuyện đọc kết quả trước khi tin nó.)*
+
+2. **`.harness-drift-ignore` phía DỰ ÁN** - đối xứng với `not-shipped-to-projects.md` phía
+   harness. Không có chỗ cho dự án khai "tôi cố ý không mang file này" thì một adaptation
+   hợp lệ sẽ báo MISSING mãi mãi, và bản báo cáo lại bắt đầu dạy người đọc bỏ qua nó - đúng
+   con bệnh MD-53 vừa chữa xong. Mỗi dòng: đường dẫn, `#`, lý do.
+
+**Điều đáng nhớ hơn cả hai cơ chế:** thao tác "đồng bộ kit xuống dự án" nghe như việc cơ
+học, và nó là chỗ tôi mắc lỗi trong khi đang cẩn thận nhất. Một bản báo cáo lệch sạch sẽ
+không có nghĩa là an toàn để chép - nó chỉ nói hai bên khác nhau, không nói bên nào đúng.
+

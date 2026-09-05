@@ -155,10 +155,30 @@ is_internal() {
   printf '%s\n' "$internal_paths" | grep -qxF "$1"
 }
 
-missing=(); stale=(); local_only=(); both=(); unknown=(); fmt_only=(); relocated=(); internal=()
+# Doi xung voi danh sach ben harness: DU AN cung phai khai duoc "toi co y khong
+# mang file nay". Khong co cho khai thi mot adaptation hop le se bao MISSING mai
+# mai, va bao cao lai bat dau day nguoi doc bo qua no - dung con benh MD-53.
+#
+# Ca that: mot du an tu bo von doi so hai cong (PB-G3 = hop dong, PB-G4 =
+# prototype) vi khong co khach de ky hop dong. Hai file kit theo so goc tro
+# thanh "thieu" vinh vien, va chep chung vao thi thanh HAI file cung xung mot
+# ma cong.
+#
+# Moi dong: mot duong dan, `#` va ly do. Khai la mot tuyen bo doc lai duoc.
+PROJ_IGNORE="$PROJECT/.harness-drift-ignore"
+project_skips=""
+[ -f "$PROJ_IGNORE" ] &&
+  project_skips=$(sed -e 's/#.*//' -e 's/[[:space:]]*$//' "$PROJ_IGNORE" | grep -v '^$')
+is_project_skip() {
+  [ -n "$project_skips" ] || return 1
+  printf '%s\n' "$project_skips" | grep -qxF "$1"
+}
+
+missing=(); stale=(); local_only=(); both=(); unknown=(); fmt_only=(); relocated=(); internal=(); declined=()
 
 while IFS= read -r rel; do
   if is_internal "$rel"; then internal+=("$rel"); continue; fi
+  if is_project_skip "$rel"; then declined+=("$rel"); continue; fi
   h=$(hash_of "$HARNESS/$rel")
   p=$(hash_of "$PROJECT/$rel")
   if [ -z "$p" ]; then
@@ -232,17 +252,40 @@ if [ -n "$HSCRIPTS" ] && [ -d "$PROJECT/scripts" ]; then
   fi
 fi
 
+# --- hai file cung xung mot ma cong ------------------------------------------
+# Chep mot file kit "con thieu" vao du an KHONG an toan khi chi so theo TEN FILE.
+# Du an co the da so huu chinh artifact do duoi mot ten khac, doi co chu dich -
+# gate file mang ma cong ngay trong ten, nen "doi so" la mot dang adaptation hop
+# le (vi du: san pham tu bo von thi cong hop dong thanh N/A va doi cho cho cong
+# dong bang prototype).
+#
+# Ca that: chep pb-g3-prototype-frozen.md + pb-g4-contract-deposit.md tu harness
+# vao mot du an von da co pb-g3-contract-deposit.md + pb-g4-prototype-frozen.md.
+# Ket qua: HAI file cung xung PB-G3 va HAI file cung xung PB-G4 nam canh nhau -
+# cau hoi "PB-G3 la cong nao" co hai cau tra loi tren dia.
+#
+# Ma cong nam o heading dau file (`# Gate PB-G3 — ...`), nen kiem duoc bang may.
+dup_gate=()
+if [ -d "$PROJECT/docs/gates" ]; then
+  while IFS= read -r gid; do
+    [ -n "$gid" ] || continue
+    dup_gate+=("$gid")
+  done < <(grep -hoE '^# Gate [A-Za-z0-9-]+' "$PROJECT"/docs/gates/*.md 2>/dev/null \
+             | sed 's/^# Gate //' | sort | uniq -d)
+fi
+
 report "MISSING" "the harness has these and this project does not — copy them in" ${missing[@]+"${missing[@]}"}
 report "STALE"   "the harness moved and this project did not — sync these down"   ${stale[@]+"${stale[@]}"}
 report "BOTH"    "both moved — read both sides before either wins"                ${both[@]+"${both[@]}"}
 report "LOCAL"   "this project moved and the harness did not — project content, or a fix that belongs upstream" ${local_only[@]+"${local_only[@]}"}
 report "DIFFERS" "no baseline for these, so the cause is unknown" ${unknown[@]+"${unknown[@]}"}
 report "RELOCATED?" "harness keeps these at a NEW path and a file of the same name exists elsewhere here — a directory move, not an absence" ${relocated[@]+"${relocated[@]}"}
+report "DUP-GATE-ID" "two files in docs/gates claim the SAME gate id — the canonical question has two answers on disk" ${dup_gate[@]+"${dup_gate[@]}"}
 report "SCRIPT-DRIFT" "GATE SCRIPTS whose behaviour differs — the enforcement layer itself is out of sync" ${script_drift[@]+"${script_drift[@]}"}
 report "SCRIPT-MISSING" "the harness ships these gate scripts and this project has none" ${script_missing[@]+"${script_missing[@]}"}
 report "FORMAT-ONLY" "byte-different, word-identical — a markdown formatter's choice is not drift" ${fmt_only[@]+"${fmt_only[@]}"}
 
-blocking=$(( ${#missing[@]} + ${#stale[@]} + ${#both[@]} + ${#script_drift[@]} + ${#script_missing[@]} ))
+blocking=$(( ${#missing[@]} + ${#stale[@]} + ${#both[@]} + ${#script_drift[@]} + ${#script_missing[@]} + ${#dup_gate[@]} ))
 if [ "$blocking" -eq 0 ]; then
   echo "in sync: nothing missing, nothing stale, no gate script drifted."
   echo "  ${#local_only[@]} file(s) are this project's own; ${script_fmt} gate script(s) differ only in formatting."
@@ -250,5 +293,5 @@ if [ "$blocking" -eq 0 ]; then
 fi
 echo "$blocking file(s) need attention. LOCAL, RELOCATED? and FORMAT-ONLY are not counted"
 echo "  (${#relocated[@]} relocated, ${#fmt_only[@]} format-only, ${#local_only[@]} local, ${#internal[@]} harness-internal by declaration,"
-echo "   ${script_fmt} gate scripts differing only in formatting)."
+echo "   ${script_fmt} gate scripts differing only in formatting, ${#declined[@]} declined by this project)."
 exit 1
