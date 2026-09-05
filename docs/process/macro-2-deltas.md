@@ -53,6 +53,8 @@ thứ vốn là lỗi SRS.
 
 | MD-12 | autocontent, đo chỉ số gốc trước khi chạy | `rtm-status` báo register 0% trong khi dự án có feature-register | lệch **một ký tự** tên file: script đọc `feature-register.source.json`, dự án có `feature-register-source.json`. Chỉ số gốc sai 60 điểm phần trăm | script nhận cả hai cách đặt tên | **đã sửa** |
 
+| MD-13 | autocontent, kiểm cơ chế cưỡng chế | so hook `.claude` với git hook | `.githooks/pre-commit` gọi `harness-verify-gate.sh`, nhưng `core.hooksPath` nằm trong `.git/config` - **không đi theo repo**. Clone mới là gate tắt câm, không gì báo | không sửa sạch được; ghi lại + kiểm ở 2.0 | **mở, không sửa được sạch** |
+
 ## MD-01 - macro-2 không kiểm tương thích tier-2 với thư viện UI
 
 **Lòi ra thế nào.** autocontent chuẩn bị dùng `RenoAI-Labs/reno-ui` cho tier 3.
@@ -622,3 +624,58 @@ của Macro 1 - đó là vùng đã đóng băng, và đổi tên file là việ
 **Chưa rõ, để lại:** `prototype-frozen 56%` nghĩa là 44% REQ-ID chưa map được sang
 phase đã freeze. Có thể đúng (Phase 1 không phủ hết scope) hoặc lại là một lệch map
 nữa. Chưa đủ dữ kiện để kết luận; ghi lại để 2.3 khi dựng build-manifest thì đối chiếu.
+
+## MD-13 - `core.hooksPath` không đi theo clone, gate tắt câm
+
+`.githooks/pre-commit` gọi `scripts/harness-verify-gate.sh` - cổng fail-closed của
+harness. Nhưng lệnh bật nó là `git config core.hooksPath .githooks`, ghi vào
+`.git/config`, mà file đó **không nằm trong repo**. Clone autocontent về Mac là mất.
+
+Đo được: `core.hooksPath` chưa set. Nghĩa là **toàn bộ commit của phiên 2026-09-05
+đều không qua gate nào**. Bật rồi chạy thử thì gate xanh (`verify` register clean ·
+`design-system` all screens classified · `identity` claimed) - nên không phải gate
+hỏng, mà là gate **không được gọi**.
+
+`install-harness.sh` có set (dòng 811-812) nhưng chỉ lúc cài. Dự án clone lại là mất.
+
+**Không sửa sạch được** - git thiết kế `.git/config` là per-clone, không có cách nào
+làm nó đi theo repo. Ba lựa chọn, đều không kín:
+- kiểm trong gate `dangling-refs` ở 2.0: chỉ bắt được nếu ai đó chạy 2.0
+- hook `SessionStart` của `~/.claude`: chỉ giúp người có dotfiles đó, đồng nghiệp
+  không có thì không thấy - và nó nhét luật dự án vào cấu hình per-máy, đúng cái
+  "cưỡng chế bung ra" mà MD-10/MD-11 đã cho thấy hậu quả
+- README: không ai đọc
+
+Chọn cách một, chấp nhận không kín. Ghi ở đây để người sau biết là đã cân nhắc, không
+phải bỏ sót.
+
+## Chuẩn hoá cấu trúc macro-2 (2026-09-05)
+
+Không phải delta - đây là hệ quả rút từ MD-03, 04, 05, 06, 10, 11. Sáu delta đó cùng
+một hình dạng: **bảng cho phép ghi một cái tên mà không ai kiểm**, hoặc **hai nơi cùng
+mô tả một thứ**.
+
+Đã làm:
+
+1. **Luật 4 ô** vào đầu `macro-2.md`: VÀO / RA / GATE / ENGINE, cả 4 máy kiểm được.
+   Cột GATE bắt buộc có **thời điểm** (`@một-lần` · `@mỗi-phase` · `@pre-commit` ·
+   `@pre-push`) - không có thời điểm thì gate nằm đó không ai gọi.
+2. **Luật bất biến**: mọi file trong `playbooks/`, `gates/`, `mau-tai-lieu/` phải được
+   bảng gọi tên. Không được gọi = không thuộc repo này.
+3. **Gate `dangling-refs` hai chiều**. Chiều xuôi đã có (tên -> file). Thêm chiều ngược
+   (file -> tên). Một chiều thì repo tích tụ đồ mồ côi mà không ai biết.
+4. **Dọn theo kết quả gate**: 24 file mồ côi -> giữ 4, xoá 20.
+   - giữ + thêm vào bảng: `feature-issue-ac-demo-standard` và `github-issue-standard`
+     (2.3, cả hai `verified` ở elearning), `payment-integration` (2.6, autocontent có
+     SePay/VietQR), `change-request-log` (2.3, CR vào lại dưới dạng phase mới)
+   - xoá: 17 file của Macro 1/3 (loop-harness không còn sở hữu sau khi cắt), 2 mẫu meta
+     (`lessons-log`, `process-annex`), 1 playbook `patch-extension-protocol` -
+     `experimental`, *"First use: TBD, Verified by: none"*, chưa ai dùng
+5. **Sửa cột Engine của `WORKFLOW.md`** giống bên autocontent: bỏ 7 tên gộp không tồn
+   tại, ghi skill thật hoặc `—`.
+
+Kết quả gate: **33 -> 2 tham chiếu treo, 0 file mồ côi.** Hai cái còn lại là
+`docs/build-manifest.md` và `docs/ROADMAP.md` - đường dẫn output của dự án, harness
+không có là đúng.
+
+**Cấm thêm cột.** Nâng cấp phải rơi vào 1 trong 4 ô, hoặc thành delta chờ.
