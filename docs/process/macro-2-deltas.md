@@ -1959,3 +1959,39 @@ sửa và thêm test, 6 lượt cổng và ghi sổ. Con số 18 kia không cắ
 "đọc nguồn trước". Ngân sách phải trả tiền cho luật của chính nó: **50 lượt cho một lượt rà
 soát ~10 REQ-ID**, và ghi rõ 18 trong số đó là đọc nguồn.
 
+## MD-55 - công cụ bắt lệch chưa từng nhìn vào chỗ quan trọng nhất
+
+Sau khi chữa xong nhiễu ở MD-53, đọc lại chính script thì thấy một dòng:
+
+```
+SCOPE=${SCOPE:-docs}
+```
+
+Nó **chỉ so thư mục `docs/`**. Chưa bao giờ so `scripts/`. Mà `scripts/` là chỗ đặt 24 cổng
+cơ học - toàn bộ phần "chặn thật" của harness. Cổng lệch mà không ai biết thì mọi thứ nằm
+dưới nó đều chưa từng được kiểm thật, và bản báo cáo vẫn in "in sync" một cách rất tự tin.
+
+Đo tay: **21 trong 24 script khác nội dung byte.** Cho cả hai bên chạy qua prettier của dự
+án rồi so lại: **0 cái lệch thật.** Toàn bộ là prettier xuống dòng và thêm dấu phẩy cuối.
+Lần này may. Nhưng "may" không phải một cơ chế.
+
+**Vá:** thêm một lớp so thứ hai cho script. Hai chỗ khó, ghi ra vì lần sau ai đọc cũng vấp:
+
+- **Hai bên để script ở hai đường dẫn khác nhau** - harness ở `scaffolds/<stack>/scripts/`,
+  dự án ở `scripts/`. Vòng lặp cũ so theo cùng-đường-dẫn nên không dùng lại được; phải ánh
+  xạ theo tên file.
+- **So code thì chuỗi ký tự không đủ** - prettier THÊM ký tự (dấu phẩy cuối), nên bỏ khoảng
+  trắng vẫn ra khác. Dùng chính prettier của dự án làm thước: chạy cả hai bên qua nó rồi so.
+  Không gọi được prettier thì lui về so chuỗi ký tự **và nói ra là đã lui** - một phép đo
+  kém chính xác mà im lặng thì tệ hơn không đo.
+
+Kết quả trên dự án thật: `SCRIPT-DRIFT (0)`, `SCRIPT-MISSING (0)` sau khi khai `scaffold.sh`
+là công cụ dựng-dự-án nên không đi xuống. Tổng còn **6 file cần xử lý**, cả 6 đều đã đọc và
+đều không cần sửa.
+
+**Chỗ này lẽ ra phải nhìn thấy từ đầu.** MD-50 kết luận "vá mà không đẩy xuống thì bằng
+không". Câu hỏi kế tiếp - *"thế cái gì đang canh chuyện đó?"* - dẫn tới MD-53 (công cụ mù vì
+kêu sai quá nhiều) rồi MD-55 (công cụ không nhìn vào chỗ quan trọng nhất). Ba delta, một
+câu hỏi. Bài học không phải về script drift: **khi tìm ra một lỗ, hỏi tiếp cái gì lẽ ra phải
+bắt được nó, rồi đi kiểm chính cái đó** - thứ canh gác hỏng thầm lặng nguy hơn thứ nó canh.
+

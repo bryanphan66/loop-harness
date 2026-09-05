@@ -20,6 +20,7 @@
 | `docs/process/macro-2-deltas.md` | sổ delta của harness - bằng chứng để sửa harness. Dự án ghi ma sát ở `docs/macro2-friction-log.md`, đó mới là đầu vào của sổ này |
 | `docs/decisions/layer-nesting-harness-outermost.md` | quyết định kiến trúc của bộ harness, không phải quyết định của sản phẩm |
 | `docs/about/not-shipped-to-projects.md` | chính danh sách này - nó nói về ranh giới harness/dự án, dự án không cần đọc. Không tự khai thì nó tự báo mình thiếu, ở mọi dự án |
+| `scripts/scaffold.sh` | công cụ DỰNG một dự án mới từ bộ khung - chạy từ ngoài vào, nằm bên trong dự án thì vô nghĩa |
 
 ## Sửa danh sách này thế nào
 

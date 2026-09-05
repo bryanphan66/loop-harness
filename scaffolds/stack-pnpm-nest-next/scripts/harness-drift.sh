@@ -192,19 +192,63 @@ report() {  # report <label> <explanation> <items...>
 # ${arr[@]+"${arr[@]}"} expands to NOTHING when the array is empty. The tempting
 # "${arr[@]:-}" expands to one empty string instead, which reports every empty bucket
 # as a bucket of size 1 — wrong, and wrong in the reassuring direction.
+# --- lop thu hai: SCRIPT CONG -------------------------------------------------
+# Cong la rang cua ca bo harness. Neu chung lech ma khong ai biet thi moi thu o
+# duoi deu chua duoc kiem that. Vay ma vong so o tren chi di qua `docs/` - do la
+# gia tri mac dinh cua SCOPE tu ngay dau, va khong ai doi lai.
+#
+# Hai ben de script o hai duong dan khac nhau (harness: scaffolds/<stack>/scripts/,
+# du an: scripts/), nen khong dung chung vong lap tren duoc - phai anh xa theo ten.
+#
+# So the nao: du an chay prettier tren .mjs, harness thi khong. Do tren mot du an
+# that: 21/24 script "lech", chay ca hai ben qua prettier roi so lai thi 0 cai lech
+# that. Nen dung chinh prettier cua du an lam thuoc do khi co; khong co thi lui ve
+# so chuoi ky tu va NOI RA la da lui.
+HSCRIPTS=$(ls -d "$HARNESS"/scaffolds/*/scripts 2>/dev/null | head -1)
+script_drift=(); script_fmt=0; script_missing=()
+if [ -n "$HSCRIPTS" ] && [ -d "$PROJECT/scripts" ]; then
+  have_prettier=0
+  (cd "$PROJECT" && npx --no-install prettier --version >/dev/null 2>&1) && have_prettier=1
+  for hf in "$HSCRIPTS"/*.mjs "$HSCRIPTS"/*.sh; do
+    [ -f "$hf" ] || continue
+    bn=$(basename "$hf"); pf="$PROJECT/scripts/$bn"
+    is_internal "scripts/$bn" && continue
+    [ -f "$pf" ] || { script_missing+=("scripts/$bn"); continue; }
+    cmp -s "$hf" "$pf" && continue
+    if [ "$have_prettier" -eq 1 ] && [ "${bn##*.}" = "mjs" ]; then
+      if (cd "$PROJECT" && diff -q \
+            <(npx --no-install prettier --stdin-filepath x.mjs < "$hf" 2>/dev/null) \
+            <(npx --no-install prettier --stdin-filepath x.mjs < "$pf" 2>/dev/null)) >/dev/null 2>&1; then
+        script_fmt=$((script_fmt + 1)); continue
+      fi
+    elif [ "$(norm_hash "$hf")" = "$(norm_hash "$pf")" ]; then
+      script_fmt=$((script_fmt + 1)); continue
+    fi
+    script_drift+=("scripts/$bn")
+  done
+  if [ "$have_prettier" -eq 0 ]; then
+    echo "[drift] khong goi duoc prettier cua du an - script .mjs so bang chuoi ky tu, kem chinh xac hon."
+    echo
+  fi
+fi
+
 report "MISSING" "the harness has these and this project does not — copy them in" ${missing[@]+"${missing[@]}"}
 report "STALE"   "the harness moved and this project did not — sync these down"   ${stale[@]+"${stale[@]}"}
 report "BOTH"    "both moved — read both sides before either wins"                ${both[@]+"${both[@]}"}
 report "LOCAL"   "this project moved and the harness did not — project content, or a fix that belongs upstream" ${local_only[@]+"${local_only[@]}"}
 report "DIFFERS" "no baseline for these, so the cause is unknown" ${unknown[@]+"${unknown[@]}"}
 report "RELOCATED?" "harness keeps these at a NEW path and a file of the same name exists elsewhere here — a directory move, not an absence" ${relocated[@]+"${relocated[@]}"}
+report "SCRIPT-DRIFT" "GATE SCRIPTS whose behaviour differs — the enforcement layer itself is out of sync" ${script_drift[@]+"${script_drift[@]}"}
+report "SCRIPT-MISSING" "the harness ships these gate scripts and this project has none" ${script_missing[@]+"${script_missing[@]}"}
 report "FORMAT-ONLY" "byte-different, word-identical — a markdown formatter's choice is not drift" ${fmt_only[@]+"${fmt_only[@]}"}
 
-blocking=$(( ${#missing[@]} + ${#stale[@]} + ${#both[@]} ))
+blocking=$(( ${#missing[@]} + ${#stale[@]} + ${#both[@]} + ${#script_drift[@]} + ${#script_missing[@]} ))
 if [ "$blocking" -eq 0 ]; then
-  echo "in sync: nothing missing, nothing stale. ${#local_only[@]} file(s) are this project's own."
+  echo "in sync: nothing missing, nothing stale, no gate script drifted."
+  echo "  ${#local_only[@]} file(s) are this project's own; ${script_fmt} gate script(s) differ only in formatting."
   exit 0
 fi
 echo "$blocking file(s) need attention. LOCAL, RELOCATED? and FORMAT-ONLY are not counted"
-echo "  (${#relocated[@]} relocated, ${#fmt_only[@]} format-only, ${#local_only[@]} local, ${#internal[@]} harness-internal by declaration)."
+echo "  (${#relocated[@]} relocated, ${#fmt_only[@]} format-only, ${#local_only[@]} local, ${#internal[@]} harness-internal by declaration,"
+echo "   ${script_fmt} gate scripts differing only in formatting)."
 exit 1
