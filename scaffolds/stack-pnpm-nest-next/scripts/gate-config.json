@@ -34,7 +34,7 @@
     "allowlist": []
   },
   "uiRegions": {
-    "_doc": "check-ui-region-boundary.mjs — hai vùng UI không cùng luật. public = custom 100% (bê từ prototype, chỉ cảnh báo màu cứng); portal = ~99% dùng component thư viện (cấm tự vẽ <button>/<input>/<select>/<textarea>/<dialog>). libraryDir chỉ được chứa mục có thật của registry — file tự viết vào đó sẽ bị lần sync sau ghi đè. registryFile trỏ registry.json của thư viện để đối chiếu tên; bỏ trống thì luật B không chạy. allowlist là đường dẫn ngoại lệ thật; opt-out từng dòng dùng comment 'ui-ok: <lý do>'.",
+    "_doc": "check-ui-region-boundary.mjs — hai vùng UI không cùng luật. public = custom 100% (bê từ prototype, chỉ cảnh báo màu cứng); portal = ~99% dùng component thư viện (cấm tự vẽ <button>/<input>/<select>/<textarea>/<dialog>). libraryDir chỉ được chứa mục có thật của registry — file tự viết vào đó sẽ bị lần sync sau ghi đè. registryFile trỏ apps/web/reno-registry.lock.json - bản chụp danh mục registry do `pnpm ui:sync` sinh ra, nhờ vậy gate đối chiếu tên được mà không cần mạng; thiếu file thì luật B tự tắt. allowlist là đường dẫn ngoại lệ thật; opt-out từng dòng dùng comment 'ui-ok: <lý do>'.",
     "public": [
       "apps/web/src/app/(public)"
     ],
@@ -43,7 +43,7 @@
       "apps/web/src/app/(admin)"
     ],
     "libraryDir": "apps/web/src/components/ui",
-    "registryFile": "",
+    "registryFile": "apps/web/reno-registry.lock.json",
     "allowlist": []
   }
 }

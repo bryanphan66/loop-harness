@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { FormField } from '@/components/ui/form-field';
+import { FormField } from '@/components/forms/form-field';
 import { Input } from '@/components/ui/input';
 
 export function CreateUserDialog({ onCreated }: { onCreated: () => void }) {

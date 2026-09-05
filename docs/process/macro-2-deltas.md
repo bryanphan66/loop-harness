@@ -786,3 +786,119 @@ quy ước tag của từng dự án. Ghi rõ trong `macro-2.md` là chép từ
 `elearning-platform/.github/workflows/deploy.yml` ở 2.4, đừng dựng lại từ đầu. Đây
 không phải né việc - đây là ranh giới giữa **chuẩn** (mô tả deploy thế nào, mang vào)
 và **pipeline cụ thể** (deploy đi đâu, để dự án quyết ở 2.4).
+
+---
+
+## MD-17 - scaffold không hề biết thư viện UI tồn tại
+
+Operator hỏi trước khi chạy: đã đảm bảo dự án dùng 100% component từ repo thư viện
+chưa. Đi soi thì câu trả lời là **chưa, và không có đường nào để làm**.
+
+```
+grep -r "reno-ui|ui.reno.ai.vn|shadcn" scaffolds/stack-pnpm-nest-next/  ->  0 kết quả
+apps/web/components.json                                               ->  không có
+gate-config.json  "registryFile": ""                                   ->  luật B TẮT
+goal-text 2.4                                                          ->  không nhắc registry
+apps/web/src/components/ui/{button,card,dialog,input,table}.tsx         ->  TỰ VIẾT
+```
+
+Chạy 2.4 như cũ thì agent dựng dự án có sẵn 5 primitive tự viết, thấy đủ dùng, và code
+tiếp trên đó. Hai tuần nữa thư viện lên v2 thì **không sync được** - đúng thứ operator
+muốn tránh.
+
+**Đã sửa - scaffold nối thẳng vào registry:**
+
+| việc | chi tiết |
+|---|---|
+| xoá 5 primitive tự viết | `button` `card` `dialog` `input` `table` - đối chiếu trước: cả 5 có trong registry, mọi symbol dùng ở scaffold (`DialogFooter`, `TableHead`, `CardAction`...) đều được export, variant `destructive`/`ghost`/`outline` đều có |
+| `form-field.tsx` chuyển ra `components/forms/` | không phải mục registry - để trong thư mục thư viện là sai ranh giới, và luật B sẽ bắt |
+| `button.test.tsx` chuyển ra `components/__tests__/` | + gate bỏ qua `*.test.tsx`/`*.spec.tsx` trong thư mục thư viện (luật B trước đó soi cả file test, stem `button.test` không phải tên registry) |
+| `apps/web/components.json` | khai namespace `@reno` |
+| `apps/web/reno-ui.manifest.json` | danh sách component dự án dùng |
+| `scripts/ui-sync.mjs` | `ui:sync` cài, `--add` thêm, `--check` soi lệch. Ghi `reno-registry.lock.json` để gate đối chiếu **offline** |
+| `gate-config.json` | `registryFile` trỏ lock -> **luật B bật** |
+| `globals.css` | 16 dòng cắm 7 màu cứng -> khung tier-2 rỗng, `ui:sync` cài `@reno/theme-base` vào đó |
+| `lint:gates` | `ui:check` đứng **đầu chuỗi** |
+| goal-text 2.4 | 3 ràng buộc + đối chiếu bảng mapping của 2.0 |
+
+**Đã thử thật, không phải viết ra rồi tin:** scaffold ra thư mục tạm, `pnpm install`,
+`pnpm ui:sync` -> shadcn kéo 6 file vào `components/ui/`, cập nhật `lib/utils.ts`, chèn
+`@theme inline` + `:root` + `.dark` vào `globals.css` (16 -> 453 dòng, 305 dòng token).
+14 gate xanh, `ui-region-boundary` XANH, `ui:check` OK.
+
+## MD-18 - registry của thư viện đang hỏng, và không ai biết
+
+Cùng lúc thử MD-17, `pnpm typecheck` đỏ: `Cannot find module 'lucide-react'`. Hai lỗi
+độc lập, cả hai chỉ lộ ra khi cài registry vào một dự án trắng:
+
+**1. 7 item ship source import package mà không khai.** `command`, `context-menu`,
+`dialog`, `dropdown-menu`, `sheet` (lucide-react), `alert`
+(class-variance-authority), `date-picker` (react-day-picker). `shadcn add` chỉ cài thứ
+item khai, nên dự án nhận source mà thiếu package rồi đỏ ngay lần typecheck đầu, trong
+file nó không viết. Script `sync-item-deps.mjs` bên đó chỉ **ghim phiên bản** cho dep
+đã khai - **chưa bao giờ đọc source**, nên không cái gì nhìn thấy được lỗ này.
+
+**2. CI thư viện đỏ từ lúc merge 3 component mới -> site kẹt.** `/r/number-input.json`,
+`/r/file-upload.json`, `/r/audio-player.json` trả **404**. Bảng mapping ở 2.0 ghi 3 dòng
+`thiếu` đó là "đã bổ sung" - đúng trong repo, sai trên site. Hai nguyên nhân: trang
+`/components` tràn ngang (mô tả item `form` có chuỗi 73 ký tự `Form/FormField/...` rộng
+hơn thẻ card 358px, kéo giãn cột lưới) và demo audio nạp URL cố tình hỏng + CDN ngoài
+(gate render đọc console error là trang lỗi).
+
+Đã sửa ở repo thư viện (PR RenoAI-Labs/reno-ui#2), **không vá trong dự án** - đúng luật
+"thiếu thì nâng ở gốc". `sync-item-deps.mjs` giờ đọc source của item và bổ sung cái nó
+import, `--check` đỏ khi còn thiếu; bỏ qua thân comment (nếu không, doc block của
+`code-editor` khai nhầm `@codemirror/lang-css`).
+
+**Bài học cho harness:** bảng mapping ở 2.0 hỏi "thư viện có component này không" nhưng
+**không hỏi "cài xuống có chạy không"**. Một registry xanh trong repo của nó vẫn có thể
+404 với người dùng. Bước 2.0 phải cài thử vào dự án trắng, không chỉ đọc `registry.json`.
+
+## MD-19 - chạy xong thì lấy gì làm bằng chứng
+
+Operator hỏi: chạy Macro 2 thì có gì để theo dõi, hay cứ thế mà chạy. Soi thì có
+`STAGE.md`, commit ranh giới bước, 16 gate - nhưng gate chỉ báo đỏ/xanh **tại lúc chạy**,
+không lưu lại; `docs/lessons-log.md` và `docs/runbooks` không tồn tại; mốc gốc 4 chỉ số
+đo bằng lệnh gõ tay, lần sau không lặp lại được.
+
+Tức là chạy hết 12 bước xong, thứ để sửa Macro 2 chỉ còn git log và trí nhớ.
+
+**Đã thêm hai sổ:**
+
+- `scripts/measure-macro2.mjs` -> `docs/macro2-run-log.md`. Chạy `rtm-status --json` và
+  3 gate phủ với `GATE_ROOT` đúng, ghi một dòng. Đo ở 2.0 / 2.4 / 2.6 / 2.13.
+  Kiểm chứng: chạy trên autocontent ra đúng mốc đã đo tay - `629 · 60% · 0% · 0% · 56%`.
+- `docs/mau-tai-lieu/macro2-friction-log.md` -> chép thành `docs/macro2-friction-log.md`.
+  Sáu loại ma sát (`goal-mo-ho`, `gate-sai`, `thieu-cong-cu`, `lam-tay`, `lap-lai`,
+  `so-lech`), ghi **ngay lúc vướng**. Cuối lượt mỗi dòng thành một `MD-NN` hoặc bị đóng
+  kèm lý do.
+
+Cả hai cắm vào goal-text: mở ở 2.0, chốt ở 2.13.
+
+## MD-20 - ba con trỏ bước trỏ vào bước đã bị gộp
+
+Soi `STAGE_GOALS.md` khi cắm chỉ số đo:
+
+```
+2.4  kết bằng "Current = 2.5"   -> 2.5 đã gộp vào 2.4
+2.6  kết bằng "Current = 2.7"   -> 2.7 đã gộp vào 2.10
+2.10 kết bằng "Current = 2.11"  -> 2.11 đã gộp vào 2.13
+```
+
+Gộp bước ở MD-10/MD-11 nhưng quên con trỏ "bước kế tiếp" nằm ở **cuối thân mỗi block**,
+không nằm trong bảng nên soát bảng không thấy. `/stage-next` đọc `STAGE.md` Current;
+agent kết bước 2.4 sẽ ghi `2.5` rồi bước kế nhảy vào một block mở đầu bằng
+*(FOLDED into 2.4)*. Đã sửa thành 2.6 / 2.8 / 2.12.
+
+**Cùng loại, cùng lần:** `install-harness.sh` chỉ chép 3 file `scripts/*` cố định, nên
+4 script mới (`measure-macro2`, `check-tier2-ui-compat`, `check-dangling-refs`,
+`extract-frame`) chỉ có mặt trong autocontent vì **tôi chép tay**. Cài harness vào dự án
+thứ hai là mất. Đã đưa cả 4 vào `SKELETON_PATHS`.
+
+**Và một chỗ nữa cùng loại:** bảng bước của `WORKFLOW.md` liệt kê `2.1 ... 2.13` -
+**không có 2.0**, trong khi `macro-2.md` và `STAGE_GOALS.md` đều có. Bước 2.0 sinh ra ở
+MD-08 nhưng chỉ cắm vào hai trong ba file. Đã bù dòng 2.0 vào `WORKFLOW.md`.
+
+**Luật rút ra:** thêm một script dự án phải chạy -> thêm vào `SKELETON_PATHS` **cùng
+commit**. Gộp/xoá/thêm một bước -> soát **cả ba** file (`macro-2.md`, `STAGE_GOALS.md`,
+`WORKFLOW.md`) và `grep "Current = "`, không chỉ soát một bảng.

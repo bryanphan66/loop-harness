@@ -105,6 +105,35 @@ không phải delta.
   Dự án khai vùng trong `scripts/gate-config.json` khối `uiRegions`. Chưa khai hoặc chưa
   scaffold thì gate báo rõ lý do chứ không im lặng xanh.
 
+### Kéo component xuống bằng gì
+
+Scaffold không kèm sẵn component nào - `apps/web/src/components/ui/` **trống** cho tới khi
+chạy `pnpm ui:sync` ở bước 2.4. Cố ý: có sẵn một bộ primitive tự viết là mời người ta sửa
+tại chỗ, rồi lần sync sau mất.
+
+| file | vai trò |
+|---|---|
+| `apps/web/reno-ui.manifest.json` | danh sách component dự án dùng - nguồn sự thật |
+| `apps/web/components.json` | khai namespace `@reno` trỏ registry |
+| `apps/web/reno-registry.lock.json` | bản chụp danh mục registry, để gate đối chiếu **offline** |
+| `scripts/ui-sync.mjs` | `pnpm ui:sync` cài, `--add <tên>` thêm, `--check` soi lệch |
+
+`ui:check` nằm ngay đầu chuỗi `lint:gates`, nên manifest khai một đằng file có một nẻo là
+đỏ trước mọi gate khác. Nâng phiên bản thư viện sau này = chạy lại `pnpm ui:sync`, một lệnh.
+
+## Hai sổ theo dõi một lượt chạy
+
+Mở ở **2.0**, chốt ở **2.13**. Không có chúng thì chạy xong không sửa được Macro 2 - và
+sửa Macro 2 chính là lý do chạy thật trên một dự án thật.
+
+| sổ | ghi lúc nào | dùng để |
+|---|---|---|
+| `docs/macro2-run-log.md` | 2.0, 2.4, 2.6, 2.13 - `node scripts/measure-macro2.mjs --step <bước>` | đo độ chênh 4 chỉ số. Một dòng lẻ không nói gì, **độ chênh** mới là bằng chứng |
+| `docs/macro2-friction-log.md` | **ngay lúc vướng**, không gom cuối bước | goal-text mơ hồ / gate bắt nhầm / phải làm tay. Cuối lượt mỗi dòng thành một `MD-NN` hoặc bị đóng kèm lý do |
+
+`register%` và `prototype%` là di sản Macro 1 - Macro 2 không làm chúng tăng, đừng tính
+vào công. Hai cột phải tiến là `test%` và `issue%`.
+
 ## Triển khai: Kamal
 
 Chuẩn triển khai của harness là **Kamal**, không phải chọn trên giấy - elearning-platform
