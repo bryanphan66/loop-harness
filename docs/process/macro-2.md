@@ -34,7 +34,9 @@ trong khi chỉ 9 tồn tại, mà gần như không bước nào bị chặn th
 > Mọi file trong `../playbooks/`, `../gates/`, `../mau-tai-lieu/` **phải được bảng này
 > gọi tên**. Không được gọi = không thuộc repo này.
 
-Gate `dangling-refs` kiểm **hai chiều**: tên trong bảng phải có file, và file phải có
+Gate `dangling-refs --two-way` kiểm **hai chiều** (cờ này chỉ bật ở **repo harness**;
+dự án không bật, vì dự án có playbook Macro 1 nó đã dùng thật, không bị bảng macro-2
+gọi tên là đúng): tên trong bảng phải có file, và file phải có
 tên trong bảng. Một chiều thì repo tích tụ được đồ mồ côi mà không ai biết - đã đo
 2026-09-05: 12/33 playbook, 4/25 mẫu tài liệu không người tiêu thụ.
 
