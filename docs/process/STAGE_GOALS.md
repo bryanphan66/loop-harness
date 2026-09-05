@@ -89,13 +89,23 @@ lần sync thư viện sau sẽ ghi đè mất.
 
 Nếu app đã scaffold: khai `uiRegions` trong `scripts/gate-config.json` - đường dẫn nào
 là public (custom 100%), nào là portal (dùng component thư viện), `libraryDir`, và
-`registryFile` trỏ `registry.json` của thư viện.
+`registryFile` trỏ bản chụp danh mục registry (`apps/web/reno-registry.lock.json`, do
+`pnpm ui:sync` sinh ra ở 2.4). Chưa scaffold thì để nguyên - bước 2.4 khai.
 
-Đo **mốc gốc** trước khi rời bước: chạy `rtm-status.mjs` và ghi lại 4 con số
-(REQ-ID · register% · test% · issue% · prototype-frozen%) vào một report trong
-`plans/reports/`. Không có mốc đầu thì cuối lượt không chứng minh được cải thiện -
-và **đừng tin con số 0** cho tới khi biết nó là "chưa làm" hay "đọc sai chỗ" (MD-12:
-lệch một ký tự tên file làm register đọc ra 0% trong khi thật là 60%).
+**Mở hai sổ theo dõi.** Cả lượt chạy này là một test case để chấm chính Macro 2, mà
+một lượt chạy không đo được thì không chứng minh được gì:
+
+- `docs/macro2-run-log.md` - chạy `node scripts/measure-macro2.mjs --step 2.0`. Script
+  ghi một dòng: REQ-ID · register% · test% · issue% · prototype% + trạng thái 3 gate
+  phủ. Đây là **mốc gốc**. Đo lại ở 2.3, 2.6, 2.13 bằng đúng lệnh đó - độ chênh giữa
+  các dòng mới là bằng chứng, một dòng lẻ không nói lên gì.
+- `docs/macro2-friction-log.md` - chép từ `docs/mau-tai-lieu/macro2-friction-log.md`.
+  Ghi **ngay lúc vướng**, không gom cuối bước: goal-text mơ hồ chỗ nào, gate bắt nhầm
+  gì, phải làm tay việc gì. Nhớ lại sau khi chạy xong là mất gần hết.
+
+**Đừng tin con số 0** cho tới khi biết nó là "chưa làm" hay "đọc sai chỗ" - MD-12:
+lệch một ký tự tên file làm register đọc ra 0% trong khi thật là 60%. Ghi mốc gốc sai
+kiểu đó thì 60 điểm phần trăm công của Macro 1 bị tính nhầm thành công của Macro 2.
 
 STAGE.md Current = 2.1. Stop after 12 turns.
 
@@ -231,7 +241,32 @@ caveat** (§ below) — substitute cached-db / prod-command boot evidence + reco
 the caveat; do not block the gate on the network.
 Observability is decided: structured logging on by
 default; alerting/SLO configured or recorded `N/A by decision` in the
-dod-build toggles. STAGE.md Current = 2.5. Stop after 25 turns.
+dod-build toggles.
+
+**UI: kéo từ thư viện, không tự code.** Ngay sau `pnpm install`, chạy
+`pnpm ui:sync`. Lệnh này đọc `apps/web/reno-ui.manifest.json`, cài theme tier-2 cùng
+mọi component khai trong đó từ registry, rồi ghi `apps/web/reno-registry.lock.json`
+(bản chụp danh mục để gate đối chiếu offline). Chưa chạy thì `pnpm build` đỏ vì
+`components/ui/` trống - đó là cố ý, thà đỏ còn hơn để ai đó tự viết vào đấy.
+
+Ba ràng buộc, gate `check-ui-region-boundary.mjs` + `ui:check` giữ:
+
+1. **`apps/web/src/components/ui/` chỉ chứa đồ của registry.** File tự viết ở đó sẽ bị
+   lần sync sau ghi đè mất. Thứ dự án tự dựng (ghép nhiều primitive, form field...)
+   để `components/forms/`, `components/<miền>/` - ngoài thư mục thư viện.
+2. **Vùng portal không tự vẽ primitive** (`<button>`, `<input>`, `<select>`,
+   `<textarea>`, `<dialog>`). Vùng public thì ngược lại - custom 100% bê từ prototype,
+   ở đó màu cứng chỉ bị cảnh báo.
+3. **Thiếu component thì nâng ở repo thư viện gốc rồi kéo xuống** (`pnpm ui:sync --add
+   <tên>`), không vá trong dự án. Thư viện là nguồn dùng chung cho nhiều dự án - vá
+   trong dự án là lần nâng phiên bản sau mất trắng.
+
+Đối chiếu `docs/design/component-mapping-<thư-viện>.md` (lập ở 2.0): mọi dòng
+`trực tiếp` phải có tên trong manifest; dòng `ghép` không được nằm trong `components/ui/`.
+
+Đo lại: `node scripts/measure-macro2.mjs --step 2.4`.
+
+STAGE.md Current = 2.6. Stop after 25 turns.
 
 ### Step 2.5 — Seed + foundation data  *(FOLDED into 2.4 — same P0 milestone; see macro-2.md)*
 
@@ -297,7 +332,7 @@ then BLOCKED). PASS fills the manifest's `Accepted` cell + a TC-NNN acceptance
 row. When the phase's `Verify-by` is `both` (manifest cadence knob, default
 `per-ui-phase`), emit the gate's MANUAL_CHECKPOINT with the preview URL and
 wait for the operator's OK before the next phase. STAGE.md Current stays 2.6
-while phases remain; when the last phase closes AND is accepted, Current = 2.7.
+while phases remain; when the last phase closes AND is accepted, Current = 2.8. Đo lại: `node scripts/measure-macro2.mjs --step 2.6`.
 Stop after 25 turns.
 
 ### Step 2.7 — Code review (6-dim) — at manifest completion (+ mid-point if >6 phases)  *(FOLDED into 2.10 — shares DoD floor rules; see macro-2.md)*
@@ -387,7 +422,7 @@ decision with reason + date, and the verification register has no `fail` /
 `never-run` rows. Sequencing hazard: do NOT run the production build
 (`pnpm build`) while the e2e dev server is serving — it clobbers the running
 `.next` and fakes a login regression (template README § End-to-end tests);
-build and browser-QA in separate steps. STAGE.md Current = 2.11. Stop after
+build and browser-QA in separate steps. STAGE.md Current = 2.12. Stop after
 15 turns.
 
 ### Step 2.11 — Go-live readiness  *(FOLDED into 2.13 — part of the release contract; see macro-2.md)*
@@ -460,7 +495,19 @@ dropped** (meaningless now) and replaced with **"Steady-state since {date}; boar
 = <issues link>"**, and it records that `/stage-next` is no longer the driver — the
 **loop (issue-pipeline)** takes over and new work enters as **issues**, not stage
 steps. A live product still naming a finite "current step" is the smell that it
-graduated but nobody flipped the mode. STAGE.md Current = Post-Build / 3.1 (the
+graduated but nobody flipped the mode.
+
+**Chốt hai sổ trước khi rời Macro 2.** Đây là lần cuối còn chạm được vào chúng:
+
+1. `node scripts/measure-macro2.mjs --step 2.13 --note "go-live"` - dòng cuối của sổ đo.
+   So với dòng `2.0`: `test%` và `issue%` phải đi từ gần 0 lên gần 100. Hai cột
+   `register`/`prototype` **không** phải công của Macro 2, đừng tính vào.
+2. `docs/macro2-friction-log.md` - làm phần "Cuối lượt" của chính sổ đó: đếm theo loại,
+   và **mỗi dòng còn `chưa` ở cột "sửa harness?" phải thành một delta `MD-NN`** trong
+   `loop-harness/docs/process/macro-2-deltas.md`, hoặc bị đóng kèm lý do. Sổ ma sát
+   không chuyển thành delta thì lượt chạy này không cải thiện được Macro 2 lần sau.
+
+STAGE.md Current = Post-Build / 3.1 (the
 one-time 3.1 handover / 3.2 hypercare-kickoff / 3.6 retro ceremonies still run via
 `/stage-next`; 3.3 + 3.5 are the continuous loop). Stop after 12 turns.
 

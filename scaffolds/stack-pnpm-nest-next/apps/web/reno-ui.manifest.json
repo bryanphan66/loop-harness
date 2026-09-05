@@ -1,0 +1,8 @@
+{
+  "_doc": "Danh sách component thư viện dự án này dùng. `pnpm ui:sync` đọc file này, kéo đúng từng cái từ registry reno-ui xuống apps/web/src/components/ui/. Thêm component thì thêm tên vào `components` rồi chạy lại ui:sync - KHÔNG tự viết file vào thư mục đó (lần sync sau ghi đè mất). Thiếu component thì nâng ở repo reno-ui gốc trước, vì đó là nguồn dùng chung cho nhiều dự án.",
+  "namespace": "@reno",
+  "url": "https://ui.reno.ai.vn/r/{name}.json",
+  "index": "https://ui.reno.ai.vn/r/registry.json",
+  "theme": "theme-base",
+  "components": ["button", "card", "dialog", "input", "label", "table"]
+}

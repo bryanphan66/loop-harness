@@ -1,16 +1,21 @@
 @import 'tailwindcss';
 
-@theme {
-  --color-background: #fafafa;
-  --color-foreground: #18181b;
-  --color-muted: #71717a;
-  --color-border: #e4e4e7;
-  --color-primary: #18181b;
-  --color-primary-foreground: #fafafa;
-  --color-destructive: #dc2626;
-}
+/* Tier-2 - token của dự án.
+ *
+ * `pnpm ui:sync` cài @reno/theme-base vào chính file này: shadcn chèn khối
+ * `@theme inline` (ánh xạ token sang tiện ích Tailwind) cùng `:root` và `.dark`
+ * (giá trị màu) ngay bên dưới. Component ở tier-3 chỉ đọc tên token, không biết
+ * giá trị - nên đổi bảng màu là đổi ở đây, không đụng component.
+ *
+ * Sau khi Macro 1 chốt bảng màu: thay GIÁ TRỊ trong `:root`/`.dark` bằng token
+ * thật của dự án (docs/design/design-tokens/globals.css). Giữ nguyên TÊN biến,
+ * đổi tên là component tier-3 mất token.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+  font-family: var(--font-sans);
 }

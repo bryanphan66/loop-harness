@@ -70,8 +70,14 @@ cat <<EOF
 Scaffolded '$SLUG' at $TARGET_DIR. Next:
   cd $TARGET_DIR
   pnpm install
+  pnpm ui:sync                 # keo component UI tu registry reno-ui (CAN mang)
   docker compose up -d db && pnpm db:migrate && pnpm db:seed
   pnpm dev
+
+UI: apps/web/src/components/ui/ do 'pnpm ui:sync' do day, khong viet tay vao do
+(lan sync sau ghi de mat). Danh sach component o apps/web/reno-ui.manifest.json;
+them thi 'pnpm ui:sync --add <ten>'. Thieu component thi nang o repo reno-ui goc.
+Chua chay ui:sync thi 'pnpm build' se do vi khong co component nao.
 
 Tip: on a slow network, pre-pull the base images early (they can take a while
 and later block the db boot / prod-image build):

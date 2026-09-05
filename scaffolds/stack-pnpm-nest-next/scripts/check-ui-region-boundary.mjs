@@ -106,6 +106,7 @@ if (!regions) {
   for (const f of files) {
     const rel = f;
     if (!matches(rel, [libDir])) continue;
+    if (/\.(test|spec)\.(tsx|jsx)$/.test(rel)) continue; // file test không phải đồ thư viện
     const stem = basename(rel).replace(/\.(tsx|jsx)$/, "");
     if (registryNames.size === 0) continue; // không có registry để đối chiếu
     if (!registryNames.has(stem) && !allow.has(rel)) {

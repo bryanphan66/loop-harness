@@ -225,7 +225,10 @@ preflight_check_engine() {
 #
 # SKELETON_PATHS: top-level paths to mirror (file or directory). Missing ones
 # are silently skipped (logged in dry-run).
-SKELETON_PATHS="AGENTS.md docs .claude .githooks scripts/harness-verify-gate.sh scripts/install-harness.sh scripts/README.md"
+# Every script a PROJECT runs must be listed here. Copying one by hand instead
+# is how a project ends up with a version the harness no longer has - the fix
+# then has to be made twice and the second one gets forgotten.
+SKELETON_PATHS="AGENTS.md docs .claude .githooks scripts/harness-verify-gate.sh scripts/install-harness.sh scripts/README.md scripts/measure-macro2.mjs scripts/check-tier2-ui-compat.mjs scripts/check-dangling-refs.mjs scripts/extract-frame.mjs"
 
 # Paths NEVER copied even if present under a skeleton dir (private/runtime).
 # Matched as path suffix anchored at the skeleton root.
