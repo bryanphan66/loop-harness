@@ -73,12 +73,33 @@ if (raw.status !== 0) {
 }
 const issues = JSON.parse(raw.stdout || '[]');
 const RE = /\b[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\b/g;
+// Mã CHỦ của một issue nằm ở tiêu đề `[REQ-ID] ...` (quy ước new-issue.mjs).
+const OWN = /^\[([A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+)\]/;
+
+// Vì sao không quét cả thân bài: thân bài trích nguyên văn SRS, mà một yêu cầu
+// SRS thường nhắc chéo mã của yêu cầu KHÁC (`IF.JOBS.07` nhắc `PUB.RETRY.07`,
+// `BIL.CREDIT.07`, `BR.DATA.12`). Quét cả thân thì một lần trích dẫn trung thực
+// biến thành lời khai "mã kia đã có issue" - và tới lượt phase của nó, cổng im.
+// Regex cũng không phân biệt được mã quy tắc nghiệp vụ `BR.PLF.01` với REQ-ID.
+// Đo lúc vá: chưa issue nào dính, tức lỗ này chưa cháy - vá trước khi cháy.
+//
+// Lùi về quét thân bài CHỈ khi tiêu đề không theo quy ước, để dự án chưa đổi
+// tên issue không bị đỏ oan - nhưng nói ra là đã lùi.
 const covered = new Map(); // REQ-ID -> [issue]
+let looseTitles = 0;
 for (const it of issues) {
-  for (const id of `${it.title}\n${it.body ?? ''}`.match(RE) ?? []) {
+  const own = (it.title.match(OWN) ?? [])[1];
+  const ids = own ? [own] : ((looseTitles++, `${it.title}\n${it.body ?? ''}`.match(RE) ?? []));
+  for (const id of ids) {
     if (!covered.has(id)) covered.set(id, []);
     covered.get(id).push(it);
   }
+}
+if (looseTitles) {
+  console.log(
+    `[issue-coverage] ${looseTitles} issue không có tiền tố \`[REQ-ID]\` ở tiêu đề - phải quét cả thân bài ` +
+      `cho chúng, và cách đó đếm nhầm mã nhắc chéo thành mã đã có issue. Đổi tiêu đề theo new-issue.mjs.`,
+  );
 }
 
 const errors = [];

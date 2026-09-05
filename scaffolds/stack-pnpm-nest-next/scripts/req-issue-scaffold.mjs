@@ -34,24 +34,51 @@ const REQ_ID_G = /\b[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\b/g;
 const args = process.argv.slice(2);
 const argOf = (f) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : null; };
 
-// ---- find the REQ-ID in the SRS, return the enclosing markdown section --------
+// ---- find the REQ-ID's OWN DECLARATION in the SRS ---------------------------
+/**
+ * Bản cũ trả về MỌI mục có nhắc tới mã - kể cả nhắc chéo trong yêu cầu khác - và
+ * không bao giờ kiểm xem mã đó có được KHAI BÁO ở đó không. Đo trên dự án thật:
+ * 11 trong 14 REQ-ID của một phase nhận về đoạn trích của yêu cầu KHÁC;
+ * `IF.JOBS.07` nhận trích từ 8 file và KHÔNG có lấy một câu `shall` của chính nó.
+ *
+ * Đây là dạng hỏng thứ ba, và nặng nhất trong ba. Xanh giả thì giấu một lỗ hổng,
+ * đỏ giả thì làm người ta sửa tài liệu cho vừa công cụ - cả hai đều NHÌN THẤY
+ * được. Cái này là NGUỒN GIẢ: agent đọc nguồn trước đúng như được dặn, không
+ * chép code, trích dẫn trung thực đoạn được đưa - và vẫn viết ra tiêu chí chấp
+ * nhận của một yêu cầu khác. Không luật nào bị vi phạm nên không gì bắt được.
+ *
+ * Nên: bám vào DÒNG KHAI BÁO `**<MÃ>**` ở đầu dòng, cắt tới khai báo kế tiếp
+ * hoặc heading kế tiếp. File chỉ NHẮC mã mà không khai báo thì trả về như tham
+ * chiếu chéo, KHÔNG kèm nội dung - đưa nội dung ra là mời người đọc nhầm.
+ *
+ * Và khi không tìm thấy khai báo: BÁO LỖI TO, đừng trả về đoạn gần đúng. Trả về
+ * một thứ nghe hợp lý chính là cái làm lỗi này tàng hình suốt một lượt chạy.
+ */
+const ANY_DECL = /^\*\*[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\*\*/;
+
 function srsExcerpt(id) {
-  const hits = [];
+  const declRe = new RegExp(`^\\*\\*${id.replace(/\./g, '\\.')}\\*\\*`);
+  const decl = [];
+  const xref = [];
   walk(SRS_DIR, (p) => p.endsWith('.md')).forEach((p) => {
     const text = readSafe(p);
     if (!text.includes(id)) return;
-    // split into heading-delimited sections; keep those mentioning the id
     const lines = text.split('\n');
-    let secStart = 0;
-    const sections = [];
-    lines.forEach((ln, i) => { if (/^#{1,6}\s/.test(ln)) { sections.push([secStart, i]); secStart = i; } });
-    sections.push([secStart, lines.length]);
-    for (const [a, b] of sections) {
-      const block = lines.slice(a, b).join('\n');
-      if (block.includes(id)) hits.push({ file: relative(ROOT, p), excerpt: block.trim().slice(0, 1200) });
+    const start = lines.findIndex((ln) => declRe.test(ln));
+    if (start === -1) {
+      xref.push(relative(ROOT, p));
+      return;
     }
+    let end = lines.length;
+    for (let i = start + 1; i < lines.length; i++) {
+      if (ANY_DECL.test(lines[i]) || /^#{1,6}\s/.test(lines[i])) {
+        end = i;
+        break;
+      }
+    }
+    decl.push({ file: relative(ROOT, p), excerpt: lines.slice(start, end).join('\n').trim() });
   });
-  return hits;
+  return { decl, xref };
 }
 
 // ---- find the register row (scope) whose reqids match the id ------------------
@@ -137,7 +164,7 @@ if (args.includes('--selftest')) {
 const checkId = argOf('--check');
 if (checkId) {
   const hits = srsExcerpt(checkId);
-  if (!hits.length) { console.error(`✗ [scaffold] REQ-ID '${checkId}' KHÔNG có trong SRS (${relative(ROOT, SRS_DIR)}) — không được tạo issue với mã này (chống bịa)`); process.exit(1); }
+  if (!hits.decl.length) { console.error(`✗ [scaffold] REQ-ID '${checkId}' KHÔNG có trong SRS (${relative(ROOT, SRS_DIR)}) — không được tạo issue với mã này (chống bịa)`); process.exit(1); }
   const ret = retirementNote(checkId);
   if (ret) { console.error(`✗ [scaffold] REQ-ID '${checkId}' đã RETIRED (${ret.file}: "${ret.line}") — không tạo issue cho mã đã khai tử (chống bịa)`); process.exit(1); }
   console.log(`✓ [scaffold] '${checkId}' có trong SRS: ${hits.map((h) => h.file).join(', ')}`);
@@ -148,8 +175,20 @@ const id = argOf('--reqid');
 if (!id) { console.error('dùng: --reqid <REQ-ID> | --check <REQ-ID> | --selftest'); process.exit(2); }
 if (!existsSync(SRS_DIR)) { console.error(`✗ không thấy SRS dir ${relative(ROOT, SRS_DIR)}`); process.exit(1); }
 
-const excerpts = srsExcerpt(id);
-if (!excerpts.length) { console.error(`✗ REQ-ID '${id}' KHÔNG có trong SRS — chống bịa, dừng.`); process.exit(1); }
+const found = srsExcerpt(id);
+const excerpts = found.decl;
+if (!excerpts.length) {
+  if (found.xref.length) {
+    console.error(
+      `✗ REQ-ID '${id}' được NHẮC ở ${found.xref.join(', ')} nhưng KHÔNG được KHAI BÁO ` +
+        `(không dòng nào bắt đầu bằng **${id}**) ở bất kỳ file SRS nào — dừng. ` +
+        `Nhắc chéo không phải yêu cầu; scaffold theo nó là viết AC cho yêu cầu khác.`,
+    );
+  } else {
+    console.error(`✗ REQ-ID '${id}' KHÔNG có trong SRS — chống bịa, dừng.`);
+  }
+  process.exit(1);
+}
 const retired = retirementNote(id);
 if (retired) { console.error(`✗ REQ-ID '${id}' đã RETIRED (${retired.file}: "${retired.line}") — không scaffold mã đã khai tử.`); process.exit(1); }
 const row = registerRow(id);
@@ -164,7 +203,8 @@ const scaffold = {
   goal_hint: row?.goal ?? null,
   srs_excerpts: excerpts,            // agent viết AC TỪ ĐÂY (bám SRS)
   links: [
-    ...excerpts.map((h) => `SRS: ${h.file} (${id})`),
+    ...excerpts.map((h) => `SRS: ${h.file} (${id}, khai báo)`),
+    ...found.xref.map((f) => `SRS tham chiếu chéo (KHÔNG phải nguồn của ${id}): ${f}`),
     row ? `Scope: ${relative(ROOT, REGISTER)} (${row.feature ?? id})` : `Scope: (REQ-ID '${id}' CHƯA có dòng register — cân nhắc bổ sung scope)`,
     `Prototype: tra màn theo ${id} (freeze theo phase ${row?.phase ?? '?'})`,
   ],
