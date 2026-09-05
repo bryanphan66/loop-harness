@@ -217,13 +217,42 @@ for (const file of processFiles) {
   }
 }
 
+
+// --- CHIEU NGUOC: file co ma khong ai goi ---
+// Muc luc (README, KEYWORD-MAP) va changelog KHONG tinh la nguoi tieu thu - chung la
+// danh muc, khong dieu khien viec chay. Nguoi tieu thu = file quy trinh + gate doc.
+const OWNED_DIRS = ["docs/playbooks", "docs/gates", "docs/mau-tai-lieu"];
+const orphans = [];
+{
+  const consumerFiles = [
+    ...processFiles,
+    ...(existsSync(join(root, "docs/gates"))
+      ? readdirSync(join(root, "docs/gates"))
+          .filter((f) => f.endsWith(".md"))
+          .map((f) => join(root, "docs/gates", f))
+      : []),
+  ].filter((f, i, a) => a.indexOf(f) === i);
+  const consumerText = consumerFiles.map((f) => readFileSync(f, "utf8")).join("\n");
+
+  for (const d of OWNED_DIRS) {
+    const dir = join(root, d);
+    if (!existsSync(dir)) continue;
+    for (const name of readdirSync(dir)) {
+      if (!name.endsWith(".md") || name === "README.md") continue;
+      const stem = name.slice(0, -3);
+      if (consumerText.includes(stem)) continue;
+      orphans.push({ kind: "mo-coi", ref: stem, file: `${d}/${name}`, note: "khong file quy trinh nao goi ten - theo luat bat bien cua macro-2.md, no khong thuoc repo nay" });
+    }
+  }
+}
+
 const grouped = new Map();
 for (const x of findings) {
   const k = `${x.kind}|${x.ref}`;
   if (!grouped.has(k)) grouped.set(k, { ...x, files: [] });
   grouped.get(k).files.push(x.file);
 }
-const rows = [...grouped.values()].sort((a, b) => a.kind.localeCompare(b.kind) || a.ref.localeCompare(b.ref));
+const rows = [...grouped.values(), ...orphans].sort((a, b) => a.kind.localeCompare(b.kind) || a.ref.localeCompare(b.ref));
 
 const result = {
   gate: "dangling-refs",
@@ -231,6 +260,7 @@ const result = {
   enginesDir,
   processFiles: processFiles.map((f) => relative(root, f)),
   dangling: rows.length,
+  orphans: orphans.length,
   rows,
   warnings,
   pass: rows.length === 0,
@@ -249,7 +279,7 @@ if (asJson) {
   }
   const wrows = [...new Map(warnings.map((w) => [`${w.kind}|${w.ref}`, w])).values()];
   for (const w of wrows) console.log(`  CANH BAO ${w.kind} \`${w.ref}\` - ${w.note} (o ${w.file})`);
-  console.log(result.pass ? "[dangling-refs] XANH" : `[dangling-refs] DO - ${rows.length} tham chieu treo`);
+  console.log(result.pass ? "[dangling-refs] XANH" : `[dangling-refs] DO - ${rows.length - orphans.length} tham chieu treo + ${orphans.length} file mo coi`);
 }
 
 process.exit(result.pass ? 0 : 1);

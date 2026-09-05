@@ -8,22 +8,63 @@
 > Neo xuyên suốt = **REQ-ID** (mã yêu cầu). Đọc `TRACE_SPEC.md`.
 > Refactor 2026-09-01: gộp 2.5→2.4, 2.7→2.10, 2.11→2.13; security 1 lần verify ở 2.9.
 
+## Luật của bảng này - đọc trước khi sửa bất cứ dòng nào
+
+Mỗi bước khai **đúng 4 ô**, cả 4 máy kiểm được:
+
+| Ô | Nghĩa | Máy kiểm gì |
+|---|---|---|
+| **VÀO** | artifact phải có trước khi chạy | file tồn tại? |
+| **RA** | artifact bước này sinh ra | file tồn tại sau khi chạy? |
+| **GATE** | script nào chặn, **và chặn LÚC NÀO** | script tồn tại + chạy được? |
+| **ENGINE** | skill có thật, hoặc `—` khi playbook đã đủ | skill có trong bộ đang cài? |
+
+**Thời điểm của GATE** là bắt buộc, không được bỏ trống. Bốn giá trị:
+`@một-lần` (chạy đúng một lần ở bước đó) · `@mỗi-phase` (2.6, lặp) ·
+`@pre-commit` · `@pre-push`. Không ghi thời điểm thì không ai biết nối gate vào đâu,
+và nó sẽ nằm đó không ai gọi.
+
+**ENGINE ghi `—` là hợp lệ.** Một bước cần **một trong ba**: script cơ học, playbook,
+hoặc skill. Skill là loại đắt nhất và ít cần nhất - `WORKFLOW.md` từng gọi 22 engine
+trong khi chỉ 9 tồn tại, mà gần như không bước nào bị chặn thật, vì playbook và gate
+đã gánh. Đừng bịa tên cho đủ cột.
+
+### Luật bất biến
+
+> Mọi file trong `../playbooks/`, `../gates/`, `../mau-tai-lieu/` **phải được bảng này
+> gọi tên**. Không được gọi = không thuộc repo này.
+
+Gate `dangling-refs` kiểm **hai chiều**: tên trong bảng phải có file, và file phải có
+tên trong bảng. Một chiều thì repo tích tụ được đồ mồ côi mà không ai biết - đã đo
+2026-09-05: 12/33 playbook, 4/25 mẫu tài liệu không người tiêu thụ.
+
+### Chống phình khi nâng cấp
+
+Mọi nâng cấp phải rơi vào **một trong 4 ô**. Không rơi vào đâu được = chưa chín, ghi
+vào `macro-2-deltas.md` chờ, đừng nhét vào bảng.
+
+**Cấm thêm cột.** Cột mới là tầng mới, tầng mới là chỗ hai nguồn bắt đầu lệch - MD-10
+(PB-G3/G4 đảo nghĩa) và MD-11 (lệch danh sách bước) đều sinh ra đúng kiểu đó.
+
+Delta phải có cột **"lòi ra ở đâu"**. Không dự án thật nào lòi ra thì đó là ý tưởng,
+không phải delta.
+
 ## Bảng bước → file
 
 | Bước | Làm gì (1 câu) | Playbook (cách làm) | Gate (cổng) | Mẫu tài liệu | Script / lệnh | Xong khi |
 |---|---|---|---|---|---|---|
-| **2.0** | Kiểm sẵn sàng: tier-2 hợp thư viện UI + tài liệu không gọi tên ma + **ánh xạ component -> thư viện** | — | `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* | `component-mapping-<thư-viện>.md` | `check-tier2-ui-compat.mjs`, `check-dangling-refs.mjs` | phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, 0 cú pháp đời cũ, 0 tham chiếu treo, **mọi dòng ma trận component đã phân loại trực tiếp/ghép/thiếu và mỗi cái thiếu đã có PR lên thư viện gốc** |
-| **2.1** | Đóng băng ERD (sơ đồ dữ liệu) | — (ck-tech-design) | ERD-frozen *(người phán)* | `decision.md` | — | ERD chốt, entity ↔ REQ-ID đủ |
-| **2.1b** | Di trú dữ liệu (chỉ brownfield) | `external-integration` | ETL + dry-run *(người)* | — | — | dry-run cutover pass, hoặc N/A |
-| **2.2** | Chọn stack + threat-model | — (ck-tech-design) | stack-justified *(người)* | `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
-| **2.3** | Bản kê thi công + DoR | `build-manifest-compilation` | `check-manifest-coverage` ⚙️ + `dor-build` | `build-manifest.md`, `spec-intake.md` | `check-manifest-coverage.mjs` | mọi REQ-ID in-scope vào đúng 1 phase, DoR xanh |
-| **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ + `ui-region-boundary` ⚙️ | `deployment-guide.md` | `scaffold.sh`, `secret-scan.sh`, `check-ui-region-boundary.mjs`, seed | app boot + admin login được, P0 done, **vùng public/portal đã khai trong `gate-config.json`** |
-| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `prototype-export-adoption` | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance | `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
-| **2.8** | E2E từ AC + hướng dẫn dùng | `canonical-e2e-flow-playbook`, `user-guide-hdsd-standard` | `check-ac-coverage` ⚙️ | `validation-report.md` | `check-ac-coverage.mjs` | mọi REQ-ID có ≥1 E2E pass + đường-lỗi + login test |
-| **2.9** | Bảo mật — VERIFY (không làm lại) | — (ck-security) | security-sign-off *(người)* | — | — | 0 Critical/High; đối chiếu threat-model 2.2 + floor 2.6 |
-| **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field-verify-with-report`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` | `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
-| **2.12** | Khách nghiệm thu (UAT) | — (ck-uat/signoff) | ACCEPTANCE *(khách ký)* | `delivery-closure-story/` | — | khách (hoặc chủ) ký |
-| **2.13** | Go-live + release *(gộp 2.11)* | `go-live-deploy-verify` | verify-at-source ⚙️ | `release-note.md` | `ship-and-verify.sh` | container chạy đúng commit đã release; rollback = 1 dòng |
+| **2.0** | Kiểm sẵn sàng: tier-2 hợp thư viện UI + tài liệu không gọi tên ma + **ánh xạ component -> thư viện** | — | `tier2-ui-compat` ⚙️ + `dangling-refs` ⚙️ + component-mapping *(người)* **@một-lần**| `component-mapping-<thư-viện>.md` | `check-tier2-ui-compat.mjs`, `check-dangling-refs.mjs` | phiên bản build tool khớp major, mọi token thư viện đọc đều có trong tier 2, 0 cú pháp đời cũ, 0 tham chiếu treo, **mọi dòng ma trận component đã phân loại trực tiếp/ghép/thiếu và mỗi cái thiếu đã có PR lên thư viện gốc** |
+| **2.1** | Đóng băng ERD (sơ đồ dữ liệu) | — (ck-tech-design) | ERD-frozen *(người phán)* **@một-lần**| `decision.md` | — | ERD chốt, entity ↔ REQ-ID đủ |
+| **2.1b** | Di trú dữ liệu (chỉ brownfield) | `external-integration` | ETL + dry-run *(người)* **@một-lần**| — | — | dry-run cutover pass, hoặc N/A |
+| **2.2** | Chọn stack + threat-model | — (ck-tech-design) | stack-justified *(người)* **@một-lần**| `decision.md`, `code-standards.md` | — | ADR stack xong, threat-model ghi (nền cho 2.9) |
+| **2.3** | Bản kê thi công + DoR + soạn issue | `build-manifest-compilation`, `feature-issue-ac-demo-standard`, `github-issue-standard` | `check-manifest-coverage` ⚙️ + `dor-build` **@một-lần**| `build-manifest.md`, `spec-intake.md`, `change-request-log.md` | `check-manifest-coverage.mjs` | mọi REQ-ID in-scope vào đúng 1 phase, DoR xanh |
+| **2.4** | Bộ xương app chạy + seed *(gộp 2.5)* | `seed-data-pattern` | walking-skeleton + secret-scan ⚙️ + `ui-region-boundary` ⚙️ **@một-lần**| `deployment-guide.md` | `scaffold.sh`, `secret-scan.sh`, `check-ui-region-boundary.mjs`, seed | app boot + admin login được, P0 done, **vùng public/portal đã khai trong `gate-config.json`** |
+| **2.6** | Code từng phase (vòng lặp) | `build-execution`, `prototype-export-adoption`, `payment-integration` *(khi phase có luồng tiền)* | fidelity ⚙️, fk-index ⚙️, ui-typography ⚙️, ac-coverage ⚙️, shared-dialog ⚙️, `ui-region-boundary` ⚙️, phase-acceptance **@mỗi-phase**| `story.md` | **`/build-phase`**, các `check-*.mjs`, `rtm-status.mjs`, `req-issue-scaffold.mjs` | mỗi phase: validate xanh + e2e smoke + fidelity pass + verifier nghiệm thu + custom tái dùng được đã mở PR ngược lên thư viện UI |
+| **2.8** | E2E từ AC + hướng dẫn dùng | `canonical-e2e-flow-playbook`, `user-guide-hdsd-standard` | `check-ac-coverage` ⚙️ **@một-lần**| `validation-report.md` | `check-ac-coverage.mjs` | mọi REQ-ID có ≥1 E2E pass + đường-lỗi + login test |
+| **2.9** | Bảo mật — VERIFY (không làm lại) | — (ck-security) | security-sign-off *(người)* **@một-lần**| — | — | 0 Critical/High; đối chiếu threat-model 2.2 + floor 2.6 |
+| **2.10** | Review cuối + QA + DoD *(gộp 2.7)* | `code-review-scoring`, `e2e-qa-field-by-field-verify-with-report`, `pre-demo-self-qa-checklist` | `dod-build`, `visual-fidelity` **@một-lần**| `validation-report.md` | `harness-verify-gate.sh` | review ≥7 + DoD gate xanh từng màn |
+| **2.12** | Khách nghiệm thu (UAT) | — (ck-uat/signoff) | ACCEPTANCE *(khách ký)* **@một-lần**| `delivery-closure-story/` | — | khách (hoặc chủ) ký |
+| **2.13** | Go-live + release *(gộp 2.11)* | `go-live-deploy-verify` | verify-at-source ⚙️ **@một-lần**| `release-note.md` | `ship-and-verify.sh` | container chạy đúng commit đã release; rollback = 1 dòng |
 
 > ⚙️ = gate CƠ HỌC (script chặn thật, chạy ở git-hook local). Còn lại *(người)* =
 > orchestrator/người phán. **Lỗ đã biết:** gate cơ học chỉ chạy hook local — `gh
