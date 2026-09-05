@@ -55,18 +55,23 @@ condition cannot loop forever.
 > Same goals in both lanes. In the Lite lane, `docs/ROADMAP.md` is born at 2.3
 > (with the plan) instead of 1.15.
 
-## Thứ tự nguồn sự thật
+## Ba nguồn sự thật
 
-Khi hai tài liệu nói khác nhau, thứ tự này cố định, cái đứng trên thắng:
+Không có một nguồn duy nhất. Có ba, mỗi cái cai quản một câu hỏi, và trong miền của nó thì
+nó thắng:
 
-**SRS** (chi tiết + tiêu chí chấp nhận) > **prototype đã freeze** (hình dạng màn hình) >
-**feature-register** (chỉ trả lời có-làm-không) > ERD/API contract (dẫn xuất) >
-build-manifest (thứ tự thi công) > issue/AC (bản sao để làm việc) > **code + test (KHÔNG
-BAO GIỜ là nguồn)**.
+- **phạm vi** (có làm không) <- `feature-register` khách chốt
+- **chi tiết chức năng + tiêu chí chấp nhận** (chạy ra sao) <- `docs/requirements/srs/`
+- **giao diện** (trông thế nào) <- prototype đã freeze
+
+ERD, api-contract, build-manifest, issue, AC là **dẫn xuất** - đọc để làm, không dùng phân
+xử. **Code + test không bao giờ là nguồn.**
 
 - **Code lệch SRS -> sửa CODE.** Không sửa SRS, không sửa AC cho khớp code.
-- **SRS lệch prototype -> mở CR, dừng lại báo.** Cả hai đều có người ký, agent không tự chọn.
-- Bảng đầy đủ kèm lý do: `macro-2.md` § Thứ tự nguồn sự thật.
+- **Hai nguồn lệch nhau -> mở CR, dừng lại báo.** Cả hai đều có người ký, agent không tự chọn.
+- **Register không phán chi tiết; SRS không phán phạm vi** (SRS mọc thêm tính năng ngoài
+  register = phình phạm vi, phải hỏi khách).
+- Bảng đầy đủ kèm lý do: `macro-2.md` § Ba nguồn sự thật.
 
 ## Ngân sách lượt - đọc trước khi tin con số "Stop after N turns"
 

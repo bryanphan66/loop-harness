@@ -72,43 +72,50 @@ không phải delta.
 > orchestrator/người phán. **Lỗ đã biết:** gate cơ học chỉ chạy hook local — `gh
 > merge`/web-edit bypass được (chưa có server-side).
 
-## Thứ tự nguồn sự thật - đọc trước mọi tranh cãi
+## Ba nguồn sự thật - đọc trước mọi tranh cãi
 
-Khi hai tài liệu nói khác nhau, **không chọn theo cái nào tiện hơn**. Thứ tự dưới đây là cố
-định, và cái đứng trên thắng.
+Không có MỘT nguồn sự thật duy nhất. Có **ba**, mỗi cái cai quản một câu hỏi khác nhau, và
+trong miền của nó thì nó thắng - thắng cả hai cái kia.
 
-| # | nguồn | cai quản cái gì | đóng băng ở |
-|---|---|---|---|
-| 1 | `docs/requirements/srs/` | **chi tiết hành vi + tiêu chí chấp nhận** | PB-G2 |
-| 2 | prototype đã freeze | **hình dạng màn hình**, luồng thao tác | PB-G4 |
-| 3 | `feature-register` | **phạm vi**: làm hay không làm. KHÔNG cai quản chi tiết | PB-G2 |
-| 4 | ERD, `api-contract` | dẫn xuất từ (1) ở bước 2.1/2.2 | ERD ở 2.1 |
-| 5 | `build-manifest` | **thứ tự thi công**, không phải nội dung | DoR ở 2.3 |
-| 6 | issue, AC | dẫn xuất từ (1). Là bản sao để làm việc, không phải nguồn | - |
-| 7 | **code + test** | **KHÔNG BAO GIỜ là nguồn** | - |
+| câu hỏi | nguồn sự thật | đóng băng ở |
+|---|---|---|
+| **Có làm cái này không?** - phạm vi | `feature-register` (danh sách tính năng khách chốt) | PB-G2 |
+| **Làm thì chạy ra sao?** - chi tiết chức năng, tiêu chí chấp nhận | `docs/requirements/srs/` | PB-G2 |
+| **Trông thế nào, bấm ra sao?** - giao diện | prototype đã freeze | PB-G4 |
 
-**Ba luật đi kèm:**
+Cãi nhau về phạm vi thì mở register, đừng mở SRS. Cãi về hành vi thì mở SRS, đừng suy từ
+prototype. Cãi về màn hình thì mở prototype, đừng suy từ SRS.
+
+Mọi thứ còn lại là **dẫn xuất** - đọc để làm việc, không được dùng để phân xử:
+
+| dẫn xuất | sinh từ | chỉ dùng để |
+|---|---|---|
+| ERD, `api-contract` | SRS, ở 2.1/2.2 | thi công |
+| `build-manifest` | register + SRS, ở 2.3 | xếp **thứ tự** làm, không phải nội dung |
+| issue, AC | SRS | giao việc; là bản sao, không phải bản gốc |
+| **code + test** | - | **KHÔNG BAO GIỜ là nguồn** |
+
+**Bốn luật:**
 
 - **Code không bao giờ thắng.** Code lệch SRS thì **sửa code**. Không sửa SRS, không sửa AC
   cho khớp code, không "ghi nhận thực tế hiện tại". Một dòng SRS bị bẻ theo code là một yêu
   cầu của khách biến mất mà không ai ký.
-- **SRS lệch prototype = CR, không phải chỗ tự chọn.** Cả hai đều đã đóng băng và đều có
-  người ký. Agent gặp lệch thì **dừng, ghi, báo** - mở một `CR-NN`, đừng tự quyết bên nào
-  đúng.
+- **Lệch giữa hai nguồn = CR, không phải chỗ agent tự chọn.** SRS tả một nút mà prototype
+  không vẽ, hay prototype vẽ một màn SRS không nhắc: cả hai đều đã đóng băng và đều có
+  người ký. Gặp lệch thì **dừng, ghi, báo** - mở `CR-NN`, đừng tự quyết bên nào đúng.
 - **Register không phân xử chi tiết.** Nó chỉ trả lời "có làm không". Hỏi nó "làm thế nào"
   là hỏi sai chỗ.
+- **SRS không phân xử phạm vi.** SRS mô tả một tính năng không có trong register thì đó là
+  phình phạm vi, phải quay lại hỏi khách - không phải cứ thấy SRS viết là làm.
 
 **Vì sao phải viết ra:** lượt chạy thật mở issue **sau** khi code xong, nên tiêu chí chấp
 nhận có nguy cơ chép lại cái đã làm thay vì đòi cái SRS yêu cầu - và nếu code đã lệch SRS
 thì chỗ lệch được hợp thức hoá, không ai biết. Luật này trước đó chỉ nằm rải rác trong một
 gạch đầu dòng, không có bảng, không có thứ tự, không cổng nào đọc.
 
-**Cổng giữ luật này:** cổng cửa vào của 2.6 - issue phải tồn tại **trước** khi runner code.
-Lúc chưa có code thì không có gì để chép, tiêu chí buộc phải lấy từ SRS.
-
 ## Nguồn nội dung issue (neo REQ-ID)
-- **Scope** (feature nào) ← `feature-register` *(view scope đông băng PB-G2, KHÔNG phải SOT)*.
-- **Chi tiết + AC** ← `docs/requirements/srs/` *(SOT thật, sống)*.
+- **Scope** (feature nào) ← `feature-register` *(nguồn sự thật về PHẠM VI, đóng băng PB-G2 - không phán chi tiết)*.
+- **Chi tiết + AC** ← `docs/requirements/srs/` *(nguồn sự thật về CHI TIẾT CHỨC NĂNG, sống - không phán phạm vi)*.
 - **Giao diện** ← prototype đã freeze. **Đọc theo TỪNG FRAME, không mở cả file.**
   Board là một file HTML rất lớn (autocontent: 2,171,246 ký tự, 121 frame, ảnh
   base64 chiếm 34%). Mở cả file là vỡ ngân sách context, mà vỡ context thì agent bịa.
