@@ -1683,3 +1683,20 @@ operator vừa hỏi, và nếu có cổng này từ đầu thì P1.2 đã khôn
 **Luật:** việc nào quy trình bắt làm **trước** một hành động thì phải có cổng chạy **trước**
 hành động đó. Cổng cuối để bắt cái **hỏng trong lúc làm**, không dùng để bắt cái **chưa
 làm** - tới lúc đó sửa đã đắt.
+
+---
+
+## MD-48 - `new-issue.mjs` không biết nhãn phase thi công
+
+Cổng cửa vào (MD-47) chạy lần đầu và bắt được ngay: 6 issue P1.2 vừa tạo đúng chuẩn nhưng
+**thiếu nhãn `Build: P1`**.
+
+Nguyên nhân: `new-issue.mjs` chỉ đặt `plane` và `Module: <Tên>` - nó có từ trước, còn nhãn
+`Build: P<n>` là quy ước tôi thêm hôm nay (MD-36). Nên mỗi issue phải gắn nhãn ở **bước tay
+thứ hai**, và bước tay là bước bị quên.
+
+Đã sửa: nhận `buildPhase` trong `issue.json` -> `--label "Build: P<n>"`, và `--check` đòi
+nhãn đó. Kiểm: `--check #27` và `#32` đều báo `label plane/Module/Build`.
+
+**Luật:** thêm một quy ước mới (nhãn, trường, tên) thì phải sửa **công cụ tạo ra nó** trong
+cùng lần, không để lại một bước gắn tay. Bước tay không có cổng nào giữ.

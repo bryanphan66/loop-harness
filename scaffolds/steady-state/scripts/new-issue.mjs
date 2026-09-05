@@ -12,7 +12,7 @@
  * Dung:
  *   # Sinh body ra stdout (agent xem/dan):
  *   node scripts/new-issue.mjs --input issue.json
- *   # Tao that tren GitHub (dat label plane + Module:, Issue Type, assignee, milestone):
+ *   # Tao that tren GitHub (dat label plane + Module: + Build:, Issue Type, assignee, milestone):
  *   node scripts/new-issue.mjs --input issue.json --create [--repo owner/name]
  *   # Kiem 1 issue da co co dung chuan khong (exit 1 neu lech):
  *   node scripts/new-issue.mjs --check <issue-number> [--repo owner/name]
@@ -23,7 +23,11 @@
  *     "module": "Learning & Certificates",     // -> nhan "Module: <...>"
  *     "type": "Bug",                            // Feature | Bug | Enhancement
  *     "assignee": "bryanphan66",                // optional
- *     "milestone": "Phase 1",                   // optional
+ *     "milestone": "Phase 1",                   // optional - DOT PHAT HANH
+ *     "buildPhase": "P1",                       // optional - PHASE THI CONG
+ *                                               //   -> nhan "Build: P1"
+ *     // Hai thu KHAC NHAU: milestone la moc phat hanh (co han chot, nguoi ngoai
+ *     // doi cho), buildPhase la thu tu thi cong noi bo. Mot issue mang CA HAI.
  *     "context": "1-3 cau hien trang + vi sao can doi...",
  *     "scopeIn":  ["muc trong pham vi 1", "..."],
  *     "scopeOut": ["muc ngoai pham vi 1", "..."],
@@ -105,6 +109,7 @@ if (has('--check')) {
   if (!/- \[[ x]\].*(Given|When|Then)/is.test(body)) problems.push('AC khong co dong checkbox Given-When-Then');
   if (!labels.includes('plane')) problems.push('thieu nhan "plane"');
   if (!labels.some((l) => /^Module: /.test(l))) problems.push('thieu nhan "Module: <Ten>"');
+  if (!labels.some((l) => /^Build: P\d/.test(l))) problems.push('thieu nhan "Build: P<n>" (phase thi cong)');
   if (labels.includes('github')) problems.push('con nhan "github" (da bo khoi chuan)');
   if (/\b(Closes|Fixes|Resolves)\s+#\d+/i.test(body)) problems.push('body dung Closes/Fixes/Resolves (phai Refs #N)');
 
@@ -113,7 +118,7 @@ if (has('--check')) {
     for (const p of problems) console.error('  - ' + p);
     process.exit(1);
   }
-  console.log(`[OK] issue #${n} dung chuan (5 khoi + DoD 13 muc + label plane/Module + khong Closes).`);
+  console.log(`[OK] issue #${n} dung chuan (5 khoi + DoD 13 muc + label plane/Module/Build + khong Closes).`);
   process.exit(0);
 }
 
@@ -131,6 +136,10 @@ if (!has('--create')) { process.stdout.write(body + '\n'); process.exit(0); }
 // --create: tao issue that + set field
 const createArgs = ['issue', 'create', '--repo', REPO, '--title', d.title, '--body', body, '--label', 'plane'];
 if (d.module) createArgs.push('--label', `Module: ${d.module}`);
+// Nhan phase thi cong. Thieu no thi cong check-issue-coverage do, va issue phai
+// gan tay o buoc hai - ma buoc tay la buoc bi quen: mot lot chay that da tao 6
+// issue dung chuan nhung thieu dung nhan nay.
+if (d.buildPhase) createArgs.push('--label', `Build: ${d.buildPhase}`);
 if (d.assignee) createArgs.push('--assignee', d.assignee);
 if (d.milestone) createArgs.push('--milestone', d.milestone);
 let url;
