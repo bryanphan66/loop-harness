@@ -2331,3 +2331,39 @@ gì phân biệt hai thứ đó, thứ rẻ hơn là thứ sẽ xuất hiện.
 kiểm*. Thêm một tầng người gác thì thêm một tầng lời khai - và tầng mới luôn là tầng chưa
 ai canh. Câu hỏi phải hỏi mỗi lần dựng một người gác mới: **cái gì kiểm lời khai của nó?**
 
+## MD-64 - để artifact tự khai điều kiện của nó, cổng đọc chính lời khai đó
+
+Cờ `prototypeFidelity.required` phải bật đúng lúc. Bật sớm thì mọi commit đỏ trong khi chưa
+có màn hình nào để đối chiếu; bật muộn thì màn hình đầu tiên lọt qua không ai kiểm.
+
+Tôi định bảo bật ngay khi P2 bắt đầu. Phiên chạy phản đối, **kèm số đo chứ không phải ý
+kiến**: `fidelity-map.json` đang có **0 route**, nên bật bây giờ là mọi commit đỏ ngay - kể
+cả commit của P2.1, mà **P2.1 không sở hữu màn hình nào** (nó là nhóm hàng đợi/cron). Nhóm
+đầu tiên có màn hình là P2.6.
+
+Nó chỉ ra đúng chỗ: **một vạch đỏ mà phase đứng trước không có cách gỡ hợp lệ** thì agent chỉ
+còn hai lối, và lượt chạy này đã học cả hai đều độc - bịa một dòng fidelity-map cho route
+chưa tồn tại, hoặc với tay tới `--no-verify`. Đó là con bệnh đỏ giả (MD-28), thứ từng làm
+một agent đi sửa bản kê cho vừa công cụ.
+
+**Nhưng "ghi một dòng nhắc trong bản kê" thì vẫn chỉ là một dòng nhắc.** Nên cơ chế:
+
+> **Artifact tự khai điều kiện của nó, và cổng đọc chính lời khai đó.**
+
+Khối P2.6 trong `build-manifest.md` viết thẳng câu ``prototypeFidelity.required` must be
+`true``. `check-prototype-fidelity` giờ đọc bản kê: phase nào **đã tick `[x]`** mà khối của
+nó có khai câu ấy, trong khi cờ vẫn `false` -> **ĐỎ**, gọi đúng tên phase. Không cần biết
+phase nào, không cần ai nhớ.
+
+Chuyển *"ai đó phải nhớ bật"* thành *"cổng không cho đóng phase"* - đúng bài học MD-47, và
+lần này không phải thêm một luật cho người đọc mà là để **tài liệu tự mang điều kiện đi theo
+mình**. Một dòng nhắc nằm trong bản kê thì trôi theo bản kê; một dòng nhắc nằm trong đầu
+người thì trôi theo ca trực.
+
+Thử hai chiều: P2.6 chưa tick -> xanh, P2.1 đi được bình thường; thêm một dòng `| P2.6 | ...
+| [x] |` -> đỏ ngay, dẫn đúng tên phase.
+
+**Ghi thêm, vì nó đáng hơn cả cơ chế:** tôi sai và phiên chạy đúng, và nó đúng vì **chạy
+cổng trước khi tranh luận**. Nó không nói "tôi nghĩ chưa nên bật", nó dán ra dòng đỏ mà việc
+bật sẽ tạo ra. Tôi thì đang định phán từ một cái luật tôi tự viết mà chưa đo hậu quả.
+

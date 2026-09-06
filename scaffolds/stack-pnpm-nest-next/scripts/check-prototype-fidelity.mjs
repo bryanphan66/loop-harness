@@ -193,11 +193,62 @@ function sectionPresent(source, key, overrides) {
  * Run the gate against `root`. Pure (no process.exit) so --selftest can drive it
  * against throwaway fixtures. Returns {code, out:[], err:[]}.
  */
+/**
+ * Cờ `prototypeFidelity.required` phải bật ĐÚNG LÚC: sớm quá thì mọi commit đỏ
+ * trong khi chưa có màn hình nào để đối chiếu - một vạch đỏ mà phase đứng trước
+ * KHÔNG có cách gỡ hợp lệ, và đó là con bệnh đỏ giả (agent sẽ đi bịa một dòng
+ * fidelity-map, hoặc với tay tới `--no-verify`). Muộn quá thì màn hình đầu tiên
+ * lọt qua không ai đối chiếu.
+ *
+ * Nên đừng bắt ai NHỚ. Bản kê thi công tự khai điều kiện của nó: khối của phase
+ * nào cần cờ bật thì viết thẳng câu `prototypeFidelity.required` must be `true`.
+ * Gate đọc chính câu đó: phase nào ĐÃ TICK `[x]` mà có khai câu ấy, trong khi cờ
+ * vẫn `false`, là ĐỎ - không cần biết nó là phase nào.
+ *
+ * Chuyển "ai đó phải nhớ" thành "gate không cho đi qua" (bài học MD-47).
+ */
+function tickedPhaseDemandsFlag(root) {
+  const mf = resolve(root, 'docs/build-manifest.md');
+  if (!existsSync(mf)) return null;
+  const lines = readFileSync(mf, 'utf8').split('\n');
+  let phase = null;
+  let ticked = false;
+  for (const ln of lines) {
+    const head = ln.match(/^#{2,4}\s+(P\d+(?:\.\d+)?)\b/);
+    if (head) {
+      phase = head[1];
+      ticked = false;
+      continue;
+    }
+    const row = ln.match(/^\|\s*(P\d+(?:\.\d+)?)\s*\|/);
+    if (row && /\[x\]/i.test(ln)) ticked = true;
+    if (!phase) continue;
+    if (/prototypeFidelity\.required`? must be `?true/i.test(ln)) {
+      const done = ticked || lines.some((l) => new RegExp(`^\\|\\s*${phase.replace('.', '\\.')}\\s*\\|.*\\[x\\]`, 'i').test(l));
+      if (done) return phase;
+    }
+  }
+  return null;
+}
+
 export function runGate(root) {
   const out = [];
   const err = [];
   const cfg = loadGateConfig(root).prototypeFidelity ?? {};
   const mapPath = resolve(root, cfg.mapFile ?? 'scripts/fidelity-map.json');
+
+  if (!cfg.required) {
+    const owed = tickedPhaseDemandsFlag(root);
+    if (owed) {
+      err.push(
+        `✗ [prototype-fidelity] phase ${owed} đã tick XONG và chính khối của nó trong ` +
+          'docs/build-manifest.md khai `prototypeFidelity.required` phải là `true` - mà cờ vẫn `false`. ' +
+          'Đóng một phase có màn hình trong khi tắt cổng đối chiếu giao diện là đi qua chỗ chưa ai kiểm. ' +
+          'Bật cờ trong scripts/gate-config.json rồi chạy lại.',
+      );
+      return { code: 1, out, err };
+    }
+  }
 
   if (!existsSync(mapPath)) {
     // Dự án khai `prototypeFidelity.required: true` (có prototype đã đóng băng)

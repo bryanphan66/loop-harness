@@ -161,8 +161,38 @@ if (args.includes('--selftest')) {
     lineRetires('MD.PROD.01', '**REVISED 2026-08-20 (CR-032): MD.PROD.01/02 are retired**') &&
     !lineRetires('MD.PROD.01', 'MD.PROD.01 — SYS shall create a product') &&
     !lineRetires('MD.PROD.01', 'MD.PROD.011 is retired');   // no false match on .011
+  // Bản đầu của selftest chỉ kiểm HÀM CÓ TỒN TẠI và luật khai tử - không bao giờ
+  // kiểm việc trích dẫn có ra kết quả. Đó là kẽ hở để một bản vá neo quá hẹp lọt
+  // qua: SRS khai mã theo hai kiểu (`**ID**` đầu dòng, và `- **ID**` sau gạch đầu
+  // dòng), bản vá chỉ nhận kiểu đầu, nên nó CHẶN SẠCH 26 mã của một phase và
+  // không ai biết cho tới khi có người đi soạn issue.
+  //
+  // Nên: mỗi file SRS có khai báo phải giải được ÍT NHẤT MỘT mã. Kiểm theo từng
+  // file chứ không theo tỉ lệ tổng - một file dùng kiểu khai lạ sẽ chìm mất trong
+  // một tỉ lệ 95%, mà nó đúng là thứ cần bắt.
+  const declAny = /^\s*(?:[-*+]\s+)?\*\*([A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+)\*\*/;
+  const perFile = [];
+  for (const f of walk(SRS_DIR, (x) => x.endsWith('.md'))) {
+    const ids = [];
+    for (const ln of readSafe(f).split('\n')) {
+      const m = ln.match(declAny);
+      if (m && !ids.includes(m[1])) ids.push(m[1]);
+      if (ids.length >= 5) break;
+    }
+    if (!ids.length) continue;
+    const solved = ids.filter((x) => srsExcerpt(x).decl.length).length;
+    if (!solved) perFile.push(`${relative(ROOT, f)} (thử ${ids.length} mã, giải được 0)`);
+  }
+  if (perFile.length) {
+    console.error('✗ [scaffold-selftest] có file SRS mà KHÔNG giải được mã nào - kiểu khai báo chưa được hỗ trợ:');
+    for (const x of perFile) console.error(`    ${x}`);
+    process.exit(1);
+  }
+
   const ok = okFns && okRetire;
-  console.log(ok ? '✓ [scaffold-selftest] fns + retired-guard OK' : '✗ FAILED');
+  console.log(
+    ok ? '✓ [scaffold-selftest] fns + retired-guard OK, mọi file SRS đều giải được mã' : '✗ FAILED',
+  );
   process.exit(ok ? 0 : 1);
 }
 
