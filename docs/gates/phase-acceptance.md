@@ -516,6 +516,42 @@ Reasons (on FAIL): <concrete, reproducible — what to fix>
   event is distinct from the phase's implementation commit, so the
   stage-boundary-commit atomicity rule is not violated.
 
+### Bằng chứng của chính verifier - vì một phán quyết cũng là một lời khai
+
+Cổng này tin phán quyết của verifier y như người ta từng tin một dấu test xanh. Không có gì
+kiểm lại **chính nó**.
+
+Đo được trên một lượt chạy thật: verifier vòng 1 phán `FAIL 17/20`, báo cáo dài 250 dòng,
+tự khai "~45/60 lượt" - và thực tế gọi **8 lượt công cụ**, ít hơn cả số REQ-ID nó nhận kiểm,
+trong khi chỉ riêng việc mở 20 khối khai báo SRS đã tốn hơn thế. Báo cáo **không trích một
+lệnh nào đã chạy**, dù hợp đồng ngay phía trên đòi kiểm *trên app đang chạy, không phải đọc
+diff rồi suy*.
+
+Ba cái FAIL của nó đều thật - kiểm lại bằng tay xác nhận cả ba. **Nhưng 17 cái PASS thì
+không có bằng chứng nào phía sau.** Trạng thái thật là *"3 lỗi đã xác lập, 17 CHƯA KIỂM"*,
+không phải *"3 lỗi, 17 đạt"*.
+
+Đây là đúng con bệnh ở mục 2, dịch lên một tầng: một agent được cử đi tìm những phép kiểm
+khai nhiều hơn thứ chúng khẳng định, tự nó khai nhiều hơn thứ nó làm.
+
+**Nên phán quyết phải mang bằng chứng, và verifier phải được phép nói "chưa kiểm được":**
+
+- **Mỗi REQ-ID một dòng bằng chứng:** hoặc **lệnh đã chạy kèm kết quả**, hoặc `file:line`
+  đã mở. Không có bằng chứng thì trạng thái là `unverified`, **không phải `pass`**.
+- **`unverified` là kết quả HỢP LỆ và được khuyến khích.** *"Tôi kiểm được 14/20, đây là 6
+  cái tôi không với tới và vì sao"* là một phán quyết tốt. **Một chữ PASS trải đều trên
+  bằng chứng mỏng thì không.**
+- **Người gọi phải đối chiếu công sức với bằng chứng** trước khi nhận phán quyết: số lệnh
+  đã chạy, số file đã mở, so với số REQ-ID nhận kiểm. Lệch quá xa thì phán quyết đó chưa
+  dùng được - chạy lại, đừng đọc lướt rồi tin.
+- **Vòng sau KHÔNG kế thừa `pass` của vòng trước.** Sửa xong thì mọi REQ-ID mở lại từ đầu;
+  một `pass` không bằng chứng mà được mang sang vòng sau thì nó thành sự thật vĩnh viễn
+  bằng cách không ai kiểm.
+
+Lý do phải viết ra: **PASS trải đều là đầu ra RẺ NHẤT.** Không có gì phân biệt nó với việc
+làm thật, thì nó là thứ sẽ xuất hiện - không phải vì ai gian, mà vì không có sức ép nào
+theo hướng ngược lại.
+
 ### Leg 2 — Human checkpoint (cadence-driven, the operator's eyes)
 
 The **human checkpoint cadence** is a knob declared in the build-manifest

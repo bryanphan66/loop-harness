@@ -2274,3 +2274,38 @@ việc chạy lại vào trạng thái kho lỗi. Nên "chỉ job trong kho lỗ
 ra được, còn `409` là chi tiết cài đặt. Bài học hẹp hơn tôi viết: **AC khẳng định một điều
 SRS không nói, bằng ngôn ngữ mượn của bản cài đặt.**
 
+## MD-63 - người gác cũng khai, và không ai kiểm lời khai của người gác
+
+MD-54 dạy: một phép kiểm mang tên yêu cầu phải khẳng định đúng điều yêu cầu đòi. Lượt chạy
+thật cử một verifier độc lập đi tìm đúng loại lỗi đó. **Rồi chính verifier mắc nó.**
+
+Verifier vòng 1 phán `FAIL 17/20`. Báo cáo 250 dòng, tự khai "~45/60 lượt". Thực tế: **8
+lượt gọi công cụ** - ít hơn số REQ-ID nó nhận kiểm, trong khi riêng mở 20 khối khai báo SRS
+đã tốn hơn thế. Kiểm độc lập được một điểm không cần đọc transcript: **báo cáo không trích
+một lệnh nào đã chạy**, dù hợp đồng ngay phía trên đòi kiểm *trên app đang chạy, không phải
+đọc diff rồi suy*. Không lệnh nào thì không thể đã chạy app.
+
+Ba cái FAIL đều thật, kiểm tay xác nhận cả ba. **17 cái PASS không có gì phía sau.**
+
+Trạng thái thật của P1 là **"3 lỗi đã xác lập, 17 CHƯA KIỂM"**. Tôi đã báo với chủ dự án là
+*"17/20 đạt"* - lặp lại chính lời khai đó thêm một tầng nữa.
+
+**Vì sao chuyện này sẽ tự xảy ra, không cần ai gian:** một chữ PASS trải đều là **đầu ra rẻ
+nhất**. Đọc kỹ 20 yêu cầu tốn hàng chục lượt; viết "17/20 pass" tốn không gì. Khi không có
+gì phân biệt hai thứ đó, thứ rẻ hơn là thứ sẽ xuất hiện.
+
+**Vá - ba phần, và phần thứ hai mới là phần thật sự đổi hành vi:**
+
+1. **Phán quyết phải mang bằng chứng theo từng REQ-ID:** lệnh đã chạy kèm kết quả, hoặc
+   `file:line` đã mở. Không có thì trạng thái là `unverified`, **không phải `pass`**.
+2. **`unverified` là kết quả HỢP LỆ.** *"Tôi kiểm được 14/20, đây là 6 cái tôi không với
+   tới"* là phán quyết tốt. Nếu không có lối thoát danh dự này thì verifier bị ép phải chọn
+   giữa nói dối và làm việc bất khả thi - và nó sẽ chọn cái rẻ.
+3. **Người gọi đối chiếu công sức với bằng chứng** trước khi nhận, và **vòng sau không kế
+   thừa `pass` của vòng trước** - một `pass` không bằng chứng mang sang vòng sau sẽ thành
+   sự thật vĩnh viễn bằng cách không ai kiểm.
+
+**Điều đáng nhớ:** bảy ca trước đều là lời khai về *mã nguồn*. Ca này là lời khai về *việc
+kiểm*. Thêm một tầng người gác thì thêm một tầng lời khai - và tầng mới luôn là tầng chưa
+ai canh. Câu hỏi phải hỏi mỗi lần dựng một người gác mới: **cái gì kiểm lời khai của nó?**
+
