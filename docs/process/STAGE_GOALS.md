@@ -493,6 +493,26 @@ while phases remain.
    của phase. Mâu thuẫn thì **sửa bản kê**, không sửa SRS, và ghi lại lời văn cũ để lần sau
    không ai "sửa" ngược về.
 
+> **Soạn task là việc QUAN TRỌNG NHẤT của Macro 2.** Nó quyết định dev, QC và khách nghiệm
+> thu sẽ làm gì và ra được gì - dễ hay khó. Một mẻ task chia đúng thì việc chảy; chia sai thì
+> người làm phải tự gỡ rối trong suốt phần còn lại của dự án, và không cổng nào cứu được.
+> Đừng tiếc lượt ở bước này để tiết kiệm ở bước sau - đắt ngược.
+
+**Gom và XẾP THỨ TỰ theo phụ thuộc, không theo số lượng và không theo giá.** Ba câu hỏi,
+theo thứ tự này:
+
+1. **Cái gì chặn cái gì?** Issue nào phải xong trước issue nào. Xếp cho **không bao giờ có
+   một issue ngồi chờ** thứ chưa ai làm. Một issue bị kẹt mà chặn năm cái khác thì cả nhóm
+   con đứng.
+2. **Cái gì chạy song song được?** Hai issue không đụng cùng file, không phụ thuộc nhau thì
+   khai rõ là chạy song song được - đó là chỗ rút ngắn thời gian thật, không phải chỗ tiết
+   kiệm lượt.
+3. **Rồi mới tới gom.** Mã móc vào nhau, xong cùng lúc -> gom một issue. Mã demo được độc
+   lập -> để riêng, vì một dấu tick "xong" trên issue gom sẽ giấu mất cái nào chưa xong.
+
+**Đừng tạo task rời rạc rồi đi gom lại.** Gom sau là làm hai lần, và lần gom lại luôn thiếu
+thông tin mà lần đầu có. Chia đúng ngay từ lúc soạn.
+
 **Một issue cho CẢ NHÓM CON, không phải mỗi mã một issue.** Tiêu đề mang tất cả mã của
 nhóm: `[IF.JOBS.05][IF.JOBS.06][IF.JOBS.08] ...` hoặc `[IF.JOBS.05, IF.JOBS.06] ...`. Cổng
 `check-issue-coverage` nhận cả hai dạng.
