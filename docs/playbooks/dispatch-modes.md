@@ -83,6 +83,28 @@ vốn có: một tập việc **biết chắc** là không đụng nhau.
    tự bắt buộc: merge → kiểm đã merge (`git branch --merged` hoặc so SHA) → rồi mới xoá. Đảo
    thứ tự là mất code, và mất im lặng.
 
+### Cạm bẫy: `.harness/` KHÔNG theo worktree
+
+`.harness/` nằm trong `.gitignore` (nó là hiện vật cài đặt, không phải mã nguồn). Nên
+`git worktree add` **không mang nó sang**. Trong worktree mới:
+
+- `check-referenced-tools` và `check-issue-state-path` **đỏ giả** - chúng tìm
+  `.harness/steady-state/scripts/*` không thấy;
+- **husky pre-commit chặn MỌI commit** trong worktree đó, vì `lint:gates` đỏ.
+
+Người gặp sẽ tưởng code mình sai. Thật ra là thiếu một thư mục mà git cố tình không chép.
+
+**Sau mỗi `git worktree add`, chép `.harness/` từ cây chính sang:**
+
+```bash
+git worktree add .claude/worktrees/<ten> -b lane/<ten>
+cp -R .harness .claude/worktrees/<ten>/          # gitignored, không vào commit
+```
+
+Đừng "sửa" bằng cách bỏ `.harness/` khỏi `.gitignore`: nó là bản NHÚNG của bộ kit, và bản
+nhúng vào git thì bắt đầu trôi khác bản đang dùng - đúng con bệnh `EMBED-DRIFT` mà
+`harness-drift.sh` sinh ra để bắt.
+
 ### Rộng bao nhiêu
 
 Đường găng trong bản đồ chạy là **sàn**: thêm luồng nữa không làm phase ngắn hơn nó. Chia
