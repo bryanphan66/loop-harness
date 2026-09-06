@@ -545,7 +545,14 @@ theo thứ tự này:
 **Đừng tạo task rời rạc rồi đi gom lại.** Gom sau là làm hai lần, và lần gom lại luôn thiếu
 thông tin mà lần đầu có. Chia đúng ngay từ lúc soạn.
 
-**Một issue cho CẢ NHÓM CON, không phải mỗi mã một issue.** Tiêu đề mang tất cả mã của
+**Một issue cho CẢ NHÓM CON, không phải mỗi mã một issue.**
+
+> **Áp từ khi nào:** luật này viết giữa lượt chạy, nên phải nói rõ mốc thay vì để người sau
+> tự đoán. Trên dự án thật: **áp từ P2.5 trở đi** (issue `#48` là issue gom đầu tiên, mang
+> bốn mã trên một tiêu đề). P1 và P2.1-P2.4 giữ 1-1, **không sửa lại** - sửa tốn hơn để yên.
+> Ghi mốc ra vì bản nháp đầu viết "từ P3" trong khi hiện vật đã gom từ P2.5; luật và hiện
+> vật lệch nhau thì người đọc sau sẽ chọn đại một bên, và một nửa số lỗi bắt được trong lượt
+> chạy này đúng là kiểu lệch âm thầm đó. Tiêu đề mang tất cả mã của
 nhóm: `[IF.JOBS.05][IF.JOBS.06][IF.JOBS.08] ...` hoặc `[IF.JOBS.05, IF.JOBS.06] ...`. Cổng
 `check-issue-coverage` nhận cả hai dạng.
 
