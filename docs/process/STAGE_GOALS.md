@@ -521,6 +521,10 @@ while phases remain.
    của phase. Mâu thuẫn thì **sửa bản kê**, không sửa SRS, và ghi lại lời văn cũ để lần sau
    không ai "sửa" ngược về.
 
+**Chạy nhiều luồng:** đọc bản đồ chạy của 2.3, mỗi luồng một worktree, dọn sau khi xác nhận
+merge. Vòng lặp đầy đủ và ba chỗ phải sửa khi mượn từ Mode B: `playbooks/dispatch-modes.md`
+§ Chạy nhiều luồng cho Macro 2.
+
 > **Soạn task là việc QUAN TRỌNG NHẤT của Macro 2.** Nó quyết định dev, QC và khách nghiệm
 > thu sẽ làm gì và ra được gì - dễ hay khó. Một mẻ task chia đúng thì việc chảy; chia sai thì
 > người làm phải tự gỡ rối trong suốt phần còn lại của dự án, và không cổng nào cứu được.

@@ -42,6 +42,53 @@ nào chẩn được gì** vì chúng chết trước khi kịp báo.
 > tới** trước khi thả con tiếp theo. Một lượt chạy tay 5 giây tìm ra thứ mà hai agent và 2,5
 > tiếng không tìm ra.
 
+## Chạy nhiều luồng cho Macro 2 - mượn nguyên vòng lặp đã chạy tốt của Mode B
+
+Mode B (sau go-live) từ lâu chạy kiểu này và chạy tốt trên VPS thật:
+
+> Control session dispatch **một worker cho một issue, mỗi worker một worktree riêng**; code
+> xong thì merge, chạy `ship-and-verify.sh`, rồi **dọn session và worktree**.
+
+Macro 2 (trước go-live) thì đến giờ vẫn chạy **một luồng nối đuôi**. Đo trên một lượt chạy
+thật: hai ngày, một worker tại một thời điểm, trong khi `P2.5` chỉ phụ thuộc `P0` - tức chạy
+song song được với cả nhánh `P2.2/P2.3/P2.4` **ngay từ đầu** mà vẫn xếp hàng chờ.
+
+**Vì sao lâu nay không mượn được, và vì sao giờ mượn được.** Mode B nhận issue rời rạc, độc
+lập sẵn - nhìn là biết cái nào chạy riêng. Macro 2 thì nhóm con nối nhau, và **không ai viết
+ra cái nào độc lập**. Không biết độc lập thì không dám tách worktree. Từ khi 2.3 đẻ ra **bản
+đồ chạy** (đồ thị chặn + luồng song song + đường găng + điểm gộp), Macro 2 có đúng thứ Mode B
+vốn có: một tập việc **biết chắc** là không đụng nhau.
+
+### Vòng lặp
+
+```
+điều phối đọc bản đồ chạy của phase
+  → mỗi luồng: dựng worktree + nhánh riêng, giao MỘT nhóm con
+  → luồng xong: merge về nhánh chính, XÁC NHẬN đã merge, rồi mới xoá worktree + session
+  → tới điểm gộp: chạy verifier độc lập, sửa STAGE.md, đóng phase
+```
+
+### Ba chỗ phải sửa khi bê từ Mode B sang, đừng bê nguyên xi
+
+1. **Đơn vị giao việc là NHÓM CON, không phải issue.** Mode B giao một issue vì mỗi issue là
+   một việc rời. Macro 2 giao một nhóm con - mà sau khi gom (`STAGE_GOALS.md` § 2.6) nhóm con
+   chính là một issue, nên hai bên khớp nhau, không phải sửa gì.
+
+2. **`STAGE.md` chỉ được sửa ở ĐIỂM GỘP.** Đây là chỗ vênh thật giữa hai mode. Macro 2 đòi mỗi
+   phase đóng bằng một commit **có advance `STAGE.md`**; ba luồng cùng sửa file đó là đụng nhau
+   ngay. Luồng chỉ commit code và issue của nó; `STAGE.md` do điểm gộp sửa, một lần.
+
+3. **Dọn dẹp CHỈ sau khi đã xác nhận merge.** `claude rm <id>` **xoá luôn worktree và nhánh**
+   của session - đã mất việc chưa merge vài lần trên dự án thật (`~/.claude/LESSONS.md`). Thứ
+   tự bắt buộc: merge → kiểm đã merge (`git branch --merged` hoặc so SHA) → rồi mới xoá. Đảo
+   thứ tự là mất code, và mất im lặng.
+
+### Rộng bao nhiêu
+
+Đường găng trong bản đồ chạy là **sàn**: thêm luồng nữa không làm phase ngắn hơn nó. Chia
+luồng theo **thư mục mỗi luồng đụng tới**, không theo số nhóm con - hai luồng cùng sửa
+`apps/api` là hai luồng đá nhau dù bản đồ nói chúng không chặn nhau.
+
 ## Chọn nhanh
 
 | Cần gì | Dùng | Vì sao |
