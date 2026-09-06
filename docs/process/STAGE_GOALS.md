@@ -493,6 +493,20 @@ while phases remain.
    của phase. Mâu thuẫn thì **sửa bản kê**, không sửa SRS, và ghi lại lời văn cũ để lần sau
    không ai "sửa" ngược về.
 
+**Một issue cho CẢ NHÓM CON, không phải mỗi mã một issue.** Tiêu đề mang tất cả mã của
+nhóm: `[IF.JOBS.05][IF.JOBS.06][IF.JOBS.08] ...` hoặc `[IF.JOBS.05, IF.JOBS.06] ...`. Cổng
+`check-issue-coverage` nhận cả hai dạng.
+
+**Vì sao không phải một-đổi-một:** cổng chỉ đòi mỗi mã có **ít nhất một** issue - nó chưa
+bao giờ bắt buộc 1-1. Đo trên một dự án thật: **401 mã yêu cầu**, soạn issue tốn ~10 lượt
+mỗi cái, tức **~4000 lượt chỉ để mở issue trước khi viết dòng code nào**. Gom theo nhóm con
+đưa xuống **~150 issue, tiết kiệm ~2500 lượt**. Nhóm con vốn đã được chia theo "làm cùng
+lúc thì hợp lý", nên nó chính là đơn vị gom đúng - không phải một ranh giới mới nghĩ ra.
+
+**Đánh đổi, biết trước:** issue gom 3 mã thì "xong" là xong cả 3, không thấy đang dở ở mã
+nào. Chấp nhận được khi một người (hoặc một agent) làm trọn nhóm con. Đội nhiều người chia
+việc trong cùng một nhóm con thì mới cần 1-1 - lúc đó khai ra là chọn 1-1 và vì sao.
+
 1. **Mở phase:** `node .harness/steady-state/scripts/new-issue.mjs` sinh issue cho các REQ-ID của phase, gắn nhãn
    `Module: <Tên>` + milestone `Phase N` (bảng đã dựng ở 2.3), state `Ready for Dev`. Chỉ
    issue của phase đang mở, không mở trước cho phase sau.

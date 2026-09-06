@@ -74,7 +74,21 @@ if (raw.status !== 0) {
 const issues = JSON.parse(raw.stdout || '[]');
 const RE = /\b[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\b/g;
 // Mã CHỦ của một issue nằm ở tiêu đề `[REQ-ID] ...` (quy ước new-issue.mjs).
-const OWN = /^\[([A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+)\]/;
+// Tiêu đề mang MỘT HOẶC NHIỀU mã, vì một issue được phép gom cả nhóm con:
+//   [IF.JOBS.05] ...                         - một mã
+//   [IF.JOBS.05][IF.JOBS.06][IF.JOBS.08] ... - gom, mỗi mã một cặp ngoặc
+//   [IF.JOBS.05, IF.JOBS.06] ...             - gom, một cặp ngoặc
+//
+// Bản đầu chỉ bắt MỘT mã. Lúc đó mọi issue đều 1-1 nên không ai thấy. Nhưng
+// khi chuyển sang gom theo nhóm con (đo được: 401 issue xuống ~150, tiết kiệm
+// ~2500 lượt), issue gom 3 mã sẽ chỉ tính 1 - hai mã kia báo thiếu, cổng đỏ,
+// phase không đóng được. Suýt giao luật gom đi kèm một cổng không đỡ nổi nó.
+const OWN_HEAD = /^((?:\s*\[[^\]]+\])+)/;
+const REQ_IN = /[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+/g;
+const ownIds = (title) => {
+  const head = (title.match(OWN_HEAD) ?? [])[1];
+  return head ? (head.match(REQ_IN) ?? []) : [];
+};
 
 // Vì sao không quét cả thân bài: thân bài trích nguyên văn SRS, mà một yêu cầu
 // SRS thường nhắc chéo mã của yêu cầu KHÁC (`IF.JOBS.07` nhắc `PUB.RETRY.07`,
@@ -88,8 +102,8 @@ const OWN = /^\[([A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+)\]/;
 const covered = new Map(); // REQ-ID -> [issue]
 let looseTitles = 0;
 for (const it of issues) {
-  const own = (it.title.match(OWN) ?? [])[1];
-  const ids = own ? [own] : ((looseTitles++, `${it.title}\n${it.body ?? ''}`.match(RE) ?? []));
+  const own = ownIds(it.title);
+  const ids = own.length ? own : ((looseTitles++, `${it.title}\n${it.body ?? ''}`.match(RE) ?? []));
   for (const id of ids) {
     if (!covered.has(id)) covered.set(id, []);
     covered.get(id).push(it);
