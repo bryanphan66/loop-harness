@@ -107,6 +107,18 @@ Mọi thứ còn lại là **dẫn xuất** - đọc để làm việc, không �
   là hỏi sai chỗ.
 - **SRS không phân xử phạm vi.** SRS mô tả một tính năng không có trong register thì đó là
   phình phạm vi, phải quay lại hỏi khách - không phải cứ thấy SRS viết là làm.
+- **Ba nguồn đều để trống thì đi xem THẾ GIỚI làm gì, đừng bắt người tự nghĩ ra số.** SRS
+  ghi `TBD` nghĩa là nó nhường cho người - nhưng nhường cho người **quyết**, không phải
+  nhường cho người **bịa**. Đi tra các hệ thống lớn đang làm gì cho đúng vấn đề đó, lấy số
+  cụ thể kèm nguồn, rồi **mở CR** với phương án đã có căn cứ. Chỉ đưa lên chủ sản phẩm khi
+  đó là quyết định kinh doanh thật (tiền, phạm vi, thứ khách nhìn thấy) mà thực tiễn ngành
+  cũng không trả lời thay được.
+
+  **Ca thật:** SRS ghi *"video và chữ chênh nhau cả chục lần"* rồi để `TBD-PLF-07` trống.
+  Tôi đem ra hỏi chủ sản phẩm xem đặt bao nhiêu. Bị chỉnh: *"SOT bảo có chênh nhau thì phải
+  tách theo loại chứ. Thế giới làm như thế nào."* Đúng - SRS đã nói CÓ chênh, việc còn lại
+  là đi **đo** xem chênh bao nhiêu, không phải đi hỏi. Tra ra Veo 3 sinh video mất 11 giây
+  đến 6 phút lúc cao điểm, model chữ tính bằng giây - đủ để đặt số và mở CR-008.
 
 **Vì sao phải viết ra:** lượt chạy thật mở issue **sau** khi code xong, nên tiêu chí chấp
 nhận có nguy cơ chép lại cái đã làm thay vì đòi cái SRS yêu cầu - và nếu code đã lệch SRS
