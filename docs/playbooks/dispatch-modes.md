@@ -99,7 +99,17 @@ Người gặp sẽ tưởng code mình sai. Thật ra là thiếu một thư m�
 ```bash
 git worktree add .claude/worktrees/<ten> -b lane/<ten>
 cp -R .harness .claude/worktrees/<ten>/          # gitignored, không vào commit
+ls .claude/worktrees/<ten>/scripts/safe-commit.sh  # có chưa? xem bẫy 2
 ```
+
+**Bẫy 2, cùng họ: script chỉ có ở ĐẦU NHÁNH.** Worktree tách từ một commit cũ hơn thì
+không có những script vừa thêm. Ca thật: giao agent dùng `scripts/safe-commit.sh` trong một
+worktree tách ra **trước** khi script đó được commit - agent tìm khắp nơi không thấy, phải
+tự xoay. **Kiểm script có tồn tại trên nhánh đó trước khi bảo agent dùng nó**, hoặc tách
+worktree từ đầu nhánh mới nhất.
+
+Cả hai bẫy cùng một hình dạng: **worktree không phải bản sao của cây làm việc, nó là bản sao
+của một COMMIT** - thiếu mọi thứ git không theo dõi, và thiếu mọi thứ commit sau nó.
 
 Đừng "sửa" bằng cách bỏ `.harness/` khỏi `.gitignore`: nó là bản NHÚNG của bộ kit, và bản
 nhúng vào git thì bắt đầu trôi khác bản đang dùng - đúng con bệnh `EMBED-DRIFT` mà
