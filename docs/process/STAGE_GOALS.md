@@ -92,10 +92,15 @@ lượt cho mỗi nhóm; thực tế:
 | 2.6 rà soát theo SRS (10 mã) | 40 | **50** | 18 lượt chỉ để đọc nguồn |
 | 2.6 rà lại (10 mã) | 40 | **49** | như trên, gần như không giảm |
 | 2.6 P1.4 (3 REQ-ID **móc vào nhau**) | 40 | **~150** | ba mã phụ thuộc lẫn nhau + phụ thuộc việc đã xây ở P1.3, và **không playbook nào tả sẵn cơ chế**, nên phần lớn lượt là tự thiết kế |
+| 2.6 chặng sửa 3 lỗi verifier | 40 | **~95-100** | ba lỗi nằm ở **ba hệ con độc lập** (job/queue, lưu trữ, khoanh theo tài khoản), nên phải đọc lại cả ba cộng SRS gốc trước khi sửa dòng đầu |
 
 **Kết luận không phải "nhân ngân sách lên", mà là: ngân sách phải theo ĐỘ MÓC NỐI, không
 theo số lượng mã.** Sáu mã rời nhau tốn ~50 lượt; **ba** mã móc vào nhau tốn ~150. Đếm số
 REQ-ID để đặt ngân sách là đếm sai thứ.
+
+Dòng cuối bảng nói cùng một điều ở dạng khác: **ba lỗi rất nhỏ nhưng nằm ở ba hệ con khác
+nhau vẫn tốn ~100 lượt**, vì cái đắt không phải sửa mà là **đọc đủ để dám sửa**. Ngân sách
+cho một chặng sửa lỗi phải đếm số HỆ CON phải mở ra đọc, không đếm số lỗi.
 
 Khi chia nhóm ở 2.3, ghi thêm một cột: nhóm này có mã nào phụ thuộc mã khác trong cùng nhóm,
 hoặc phụ thuộc việc chưa có playbook không. Có -> **×3**, không -> giữ nguyên.
