@@ -1865,6 +1865,28 @@ trước khi tạo.
 
 Đo lại sau khi vá: **20/20 REQ-ID trả đúng một khối khai báo, từ đúng một file.**
 
+**Hai lỗi trong chính bản vá này, lộ ra ở P2 và do phiên chạy trả giá:**
+
+1. **SRS khai mã theo HAI kiểu, tôi chỉ thử một.** `platform-services.md` viết `**IF.JOBS.07**
+   — ...` ở đầu dòng; `nfr.md` viết `- **PLF.PAGE.01** (B17) — ...` sau gạch đầu dòng. Neo
+   cứng `^\*\*` nên **chặn sạch cả 26 mã của P2**, và vì fail-closed nên nó chặn rất to.
+   Hành vi đúng, cái neo sai. Phiên chạy phải dừng lại đọc + sửa + kiểm lại công cụ trước khi
+   soạn được một issue nào - lượt chia phase P2 tốn 45 so với ngân sách 35, và đây là một
+   trong ba khoản ăn lượt lớn nhất.
+
+2. **`--check` ném `TypeError` trên đường CHẤP NHẬN.** Bản vá đổi `srsExcerpt` sang trả
+   `{decl, xref}`, tôi sửa chỗ đếm `.length` nhưng bỏ sót dòng in kết quả vẫn gọi
+   `hits.map(...)`. Tôi có thử `--check` với một mã bịa (đường từ chối, chạy đúng) và **chưa
+   bao giờ thử với một mã có thật**.
+
+**Bài học, và nó sắc hơn luật cũ:** "thử cả hai chiều" nghĩa là **cả hai chiều của TỪNG lối
+đi**, không phải một lối đi thử hai chiều. `--reqid` tôi thử đủ xanh-đỏ; `--check` chỉ thử
+đỏ. Và "thử trên dữ liệu thật" nghĩa là **thử trên sự ĐA DẠNG của dữ liệu thật** - một file
+SRS không đại diện cho 21 file.
+
+Quét lại toàn bộ sau khi vá hai chỗ: **624 mã khai báo trong 21 file, mẫu 90 cái ra 87 nhận
+được, 3 bị từ chối vì đã KHAI TỬ** - đúng hành vi cố ý.
+
 **Một lỗ cùng họ, vá luôn:** `check-issue-coverage.mjs` quét REQ-ID trong cả tiêu đề lẫn
 thân issue. Thân issue trích nguyên văn SRS, mà một yêu cầu SRS thường nhắc chéo mã của yêu
 cầu khác - nên một lần trích dẫn trung thực biến thành lời khai *"mã kia đã có issue"*, và

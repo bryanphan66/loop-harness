@@ -54,10 +54,16 @@ const argOf = (f) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : 
  * Và khi không tìm thấy khai báo: BÁO LỖI TO, đừng trả về đoạn gần đúng. Trả về
  * một thứ nghe hợp lý chính là cái làm lỗi này tàng hình suốt một lượt chạy.
  */
-const ANY_DECL = /^\*\*[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\*\*/;
+const ANY_DECL = /^\s*(?:[-*+]\s+)?\*\*[A-Z][A-Z0-9]*\.[A-Z][A-Z0-9]*\.\d+\*\*/;
 
 function srsExcerpt(id) {
-  const declRe = new RegExp(`^\\*\\*${id.replace(/\./g, '\\.')}\\*\\*`);
+  // SRS khai mã theo HAI kiểu, và chỉ thử một kiểu là chặn sạch file kia:
+  //   platform-services.md:  `**IF.JOBS.07** — Every job that...`   (đầu dòng)
+  //   nfr.md:                `- **PLF.PAGE.01** (B17) — Every list...` (gạch đầu dòng)
+  // Bản đầu neo cứng `^\*\*` nên từ chối TOÀN BỘ 26 mã của một phase, và vì
+  // fail-closed nên nó từ chối rất to - đúng hành vi, sai cái neo. Cho phép dấu
+  // gạch đầu dòng và khoảng trắng đứng trước.
+  const declRe = new RegExp(`^\\s*(?:[-*+]\\s+)?\\*\\*${id.replace(/\./g, '\\.')}\\*\\*`);
   const decl = [];
   const xref = [];
   walk(SRS_DIR, (p) => p.endsWith('.md')).forEach((p) => {
@@ -167,7 +173,11 @@ if (checkId) {
   if (!hits.decl.length) { console.error(`✗ [scaffold] REQ-ID '${checkId}' KHÔNG có trong SRS (${relative(ROOT, SRS_DIR)}) — không được tạo issue với mã này (chống bịa)`); process.exit(1); }
   const ret = retirementNote(checkId);
   if (ret) { console.error(`✗ [scaffold] REQ-ID '${checkId}' đã RETIRED (${ret.file}: "${ret.line}") — không tạo issue cho mã đã khai tử (chống bịa)`); process.exit(1); }
-  console.log(`✓ [scaffold] '${checkId}' có trong SRS: ${hits.map((h) => h.file).join(', ')}`);
+  // `hits` là { decl, xref } từ MD-52 - bản vá đó sửa chỗ đếm `.length` nhưng bỏ
+  // sót dòng này, nên đường CHẤP NHẬN của --check ném TypeError suốt. Thử chiều
+  // đỏ (mã bịa) thì thấy đúng; đường xanh chưa ai chạy. Cả hai chiều nghĩa là cả
+  // hai chiều của TỪNG lối đi, không phải một lối đi hai chiều.
+  console.log(`✓ [scaffold] '${checkId}' có trong SRS: ${hits.decl.map((h) => h.file).join(', ')}`);
   process.exit(0);
 }
 
