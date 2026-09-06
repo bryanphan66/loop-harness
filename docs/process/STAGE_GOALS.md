@@ -287,6 +287,34 @@ STAGE.md Current = 2.3. Stop after 15 turns.
 - **Gate:** **DoR** (`docs/gates/dor-build.md`, SoT) — incl. build-manifest complete (manifest-completeness rule).
 - **Manual?** no.
 
+> **Bước này có tên "Implementation plan" nhưng lâu nay chỉ đẻ ra bản kê thi công.** Đo trên
+> một lượt chạy thật: plan của 2.3 dài **71 dòng** và nhắc chuyện chạy song song đúng **một
+> lần**. Bản kê trả lời *"làm gì, theo thứ tự nào"*. Nó KHÔNG trả lời *"cái gì chặn cái gì,
+> cái gì chạy song song được, chia mấy luồng"* - và vì không ai viết ra, lượt chạy đó **chạy
+> một luồng nối đuôi suốt hai ngày**. Không phải nó chọn vậy; **không có gì bảo nó có thể
+> khác**. Người điều phối phải ngồi phác đồ thị phụ thuộc bằng tay cho từng phase, làm hai lần.
+
+**Vậy 2.3 phải đẻ thêm BẢN ĐỒ CHẠY, không chỉ bản kê.** Trong `plan.md`, mỗi phase một khối:
+
+1. **Đồ thị chặn.** Nhóm con nào phải xong trước nhóm con nào. Vẽ ra, đừng tả bằng văn xuôi.
+   Nguồn là dòng `Depends on:` của từng khối trong bản kê - nó đã có sẵn, chỉ chưa ai đọc
+   thành đồ thị. Ca thật: `P2.5` chỉ phụ thuộc `P0`, tức chạy song song được với cả nhánh
+   `P2.2/P2.3/P2.4` ngay từ đầu - mà nó vẫn xếp hàng chờ vì bản kê in ra một danh sách dọc.
+2. **Luồng chạy song song.** Gom các nhóm con không chặn nhau **và không đụng cùng file** vào
+   cùng một luồng. Khai rõ mỗi luồng đụng thư mục nào - đó là thứ quyết định chúng có thật sự
+   độc lập hay không. Mỗi luồng một worktree, một nhánh, gộp khi xong.
+3. **Đường găng.** Chuỗi dài nhất không rút ngắn được. Đó là sàn thời gian của cả phase; thêm
+   luồng thứ tư không làm nó ngắn hơn.
+4. **Điểm gộp.** Chỗ các luồng phải chờ nhau. Người kiểm độc lập chạy **SAU khi gộp**, không
+   phải sau từng luồng - kiểm một thứ chưa gộp là kiểm cái sẽ không tồn tại.
+
+Skill có sẵn: `ck-plan`. Prompt đã dùng thật và ra được thứ này:
+*"tạo plan để implement toàn bộ issue đó, gom nhóm và sắp xếp theo thứ tự phù hợp để không bị
+stuck, và chỉ ra những issue chạy song song được"*.
+
+**Không có bản đồ chạy thì cấm mở phase.** Đây là cổng của DoR, cùng hạng với bản kê đầy đủ -
+vì một mẻ task chia đúng nhưng xếp sai thứ tự vẫn làm người ta kẹt y như chia sai.
+
 Goal:
 `docs/build-manifest.md` exists per `docs/mau-tai-lieu/build-manifest.md`,
 compiled per `docs/playbooks/build-manifest-compilation.md`: ordered phases
