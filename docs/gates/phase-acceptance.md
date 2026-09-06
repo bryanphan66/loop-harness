@@ -544,6 +544,11 @@ khai nhiều hơn thứ chúng khẳng định, tự nó khai nhiều hơn thứ
 - **Người gọi phải đối chiếu công sức với bằng chứng** trước khi nhận phán quyết: số lệnh
   đã chạy, số file đã mở, so với số REQ-ID nhận kiểm. Lệch quá xa thì phán quyết đó chưa
   dùng được - chạy lại, đừng đọc lướt rồi tin.
+- **Issue gom nhiều REQ-ID không được gom bằng chứng.** Từ P3 một issue mang cả nhóm con
+  (`STAGE_GOALS.md` § 2.6), nên "một dòng bằng chứng cho cả nhóm" trở thành mặc định tiện
+  tay - cấu trúc issue không còn tự đẩy verifier tách ra nữa. Vẫn phải **một dòng cho từng
+  mã**. Đã thấy dấu hiệu ngay ở vòng P1 khi issue còn 1-1: năm mã lưu trữ dùng chung một
+  dòng, `IF.JOBS.06` xuất hiện đúng một lần.
 - **Vòng sau KHÔNG kế thừa `pass` của vòng trước.** Sửa xong thì mọi REQ-ID mở lại từ đầu;
   một `pass` không bằng chứng mà được mang sang vòng sau thì nó thành sự thật vĩnh viễn
   bằng cách không ai kiểm.

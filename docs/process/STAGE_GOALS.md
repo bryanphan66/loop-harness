@@ -498,14 +498,47 @@ nhóm: `[IF.JOBS.05][IF.JOBS.06][IF.JOBS.08] ...` hoặc `[IF.JOBS.05, IF.JOBS.0
 `check-issue-coverage` nhận cả hai dạng.
 
 **Vì sao không phải một-đổi-một:** cổng chỉ đòi mỗi mã có **ít nhất một** issue - nó chưa
-bao giờ bắt buộc 1-1. Đo trên một dự án thật: **401 mã yêu cầu**, soạn issue tốn ~10 lượt
-mỗi cái, tức **~4000 lượt chỉ để mở issue trước khi viết dòng code nào**. Gom theo nhóm con
-đưa xuống **~150 issue, tiết kiệm ~2500 lượt**. Nhóm con vốn đã được chia theo "làm cùng
-lúc thì hợp lý", nên nó chính là đơn vị gom đúng - không phải một ranh giới mới nghĩ ra.
+bao giờ bắt buộc 1-1.
 
-**Đánh đổi, biết trước:** issue gom 3 mã thì "xong" là xong cả 3, không thấy đang dở ở mã
-nào. Chấp nhận được khi một người (hoặc một agent) làm trọn nhóm con. Đội nhiều người chia
-việc trong cùng một nhóm con thì mới cần 1-1 - lúc đó khai ra là chọn 1-1 và vì sao.
+**Cẩn thận cách tính, vì nó dễ thổi phồng gấp ba.** Chi phí soạn issue có hai phần: một
+phần **cố định mỗi lượt dispatch** (đọc nguồn, chia nhóm, sửa công cụ) và một phần **thêm
+mỗi issue**. Đo trên bốn lượt thật:
+
+| lượt | issue | lượt tốn | mỗi issue |
+|---|---|---|---|
+| P1.3 soạn | 7 | 22 | **3,1** |
+| P1.4 viết lại AC | 3 | 20 | 6,7 |
+| P2.2+P2.3 soạn | 4 | 40 | 10,0 |
+| P2.1 chia + soạn | 4 | 45 | 11,3 |
+
+Hai dòng đắt gánh việc một-lần: P2.1 gồm chia P2 thành mười nhóm con và sửa scaffold;
+P2.2+P2.3 gồm sửa scaffold lần hai, hai lần đối chiếu bản kê với SRS, và ~12 lượt đọc nguồn
+trước dòng tiêu chí đầu tiên. Trừ phần đó ra, **thêm một issue trong cùng một lượt tốn ~3
+lượt**, đúng như P1.3.
+
+Nên với 401 mã: 1-1 gom mẻ kiểu P1.3 khoảng **1250 lượt**, gom theo nhóm con khoảng
+**550 lượt**. **Tiết kiệm ~700, không phải ~2500.** Vẫn đáng làm, nhưng bằng một phần ba
+con số nếu lấy 10 lượt/issue nhân thẳng.
+
+**Lý do khoản tiết kiệm nhỏ hơn vẻ ngoài: gom bỏ được phần CƠ HỌC, không bỏ được phần
+NGHĨ.** Ba mã gộp một issue vẫn phải đọc ba đoạn SRS và viết ba bộ tiêu chí - chỗ đó không
+đi đâu cả. Cái mất đi là dàn giáo mỗi issue: một file JSON, một lần gọi tạo, một lần
+`--check`, một lần đẩy trạng thái, một lần grep trùng mã. Phần cơ học đó chiếm khoảng một
+phần ba.
+
+**BẮT BUỘC khi gom - nếu không thì gom thành đường sinh ra đúng lỗi mà luật soạn-issue-trước
+sinh ra để chặn:** issue gom phải mang **một khối tiêu chí RIÊNG, có nhãn, cho TỪNG mã**,
+không được gộp thành một bộ chung cho "cả nhóm". Ca thật: `IF.JOBS.06` mất bốn mệnh đề đúng
+kiểu đó. Một mã một khối tiêu chí, viết từ chính khai báo SRS của nó.
+
+**Kéo theo ở cửa verifier:** gom làm "một dòng bằng chứng cho cả nhóm" thành mặc định. Nên
+luật *"mỗi REQ-ID một dòng bằng chứng, hoặc ghi `unverified`"* ở `phase-acceptance.md` phải
+siết hơn, vì cấu trúc issue không còn tự đẩy verifier theo hướng đó nữa.
+
+**Khi nào GIỮ 1-1:** khi các mã trong nhóm con **demo được độc lập với nhau**. Đó cũng là
+chỗ mà một dấu tick "xong" trên issue gom giấu nhiều nhất. Ngược lại, mã móc vào nhau (như
+ba mã vòng đời job của P1.4) thì gom không mất gì - chúng vốn xong cùng lúc. Trigger là **độ
+móc nối**, không phải "có chạy song song hay không".
 
 1. **Mở phase:** `node .harness/steady-state/scripts/new-issue.mjs` sinh issue cho các REQ-ID của phase, gắn nhãn
    `Module: <Tên>` + milestone `Phase N` (bảng đã dựng ở 2.3), state `Ready for Dev`. Chỉ
