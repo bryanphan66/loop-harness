@@ -102,8 +102,16 @@ Dòng cuối bảng nói cùng một điều ở dạng khác: **ba lỗi rất 
 nhau vẫn tốn ~100 lượt**, vì cái đắt không phải sửa mà là **đọc đủ để dám sửa**. Ngân sách
 cho một chặng sửa lỗi phải đếm số HỆ CON phải mở ra đọc, không đếm số lỗi.
 
-Khi chia nhóm ở 2.3, ghi thêm một cột: nhóm này có mã nào phụ thuộc mã khác trong cùng nhóm,
-hoặc phụ thuộc việc chưa có playbook không. Có -> **×3**, không -> giữ nguyên.
+**Cơ chế, không phải hệ số - đây mới là phần dùng được.** Đừng khớp mẫu "ba mã thì nhân ba".
+Con số dự báo được chi phí là **bao nhiêu hệ con phải mở ra và GIỮ TRONG ĐẦU CÙNG LÚC**.
+P1.4 tốn ~150 lượt không phải vì có ba mã, mà vì ba mã đó móc vào nhau, **cộng** phần móc
+ngược lên việc đã xây ở P1.3, **cộng** một bộ lập lịch chưa tồn tại - bốn thứ phải cùng đúng
+trong đầu trước khi viết dòng đầu tiên. Sáu mã của P1.2 rời nhau, mỗi lúc chỉ cần giữ một.
+
+Nên lúc chia nhóm ở 2.3, đừng đếm mã. Hỏi: **làm nhóm này phải mở ra bao nhiêu hệ con, và
+có cái nào chưa tồn tại không?** Một hệ con -> giữ ngân sách. Ba trở lên, hoặc có một cái
+phải tự thiết kế vì không playbook nào tả -> **×3**, và ghi ra là vì sao, để lần sau người
+đọc thấy cơ chế chứ không thấy một hệ số rơi từ trên trời.
 
 **Lượt rà soát lại theo SRS: 50 lượt, không phải 40.** Đo hai lần liên tiếp trên cùng một
 dự án, cùng 10 REQ-ID: lượt đầu 50, lượt rà lại 49, trong khi ngân sách ghi 40. Phân bổ của
