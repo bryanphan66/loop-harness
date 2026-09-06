@@ -130,6 +130,16 @@ app**, never by reading the diff and assuming:
 
    The same rule binds comments: a comment that claims a behaviour must point at
    a behaviour that exists, or say plainly that it does not yet.
+
+   **And it binds `docs/TEST_MATRIX.md` hardest of all**, because that table is
+   what everyone downstream reads instead of the tests. A row saying `pass` is a
+   claim about a test, not the test. On a real run a row read *"signed URL is
+   TTL-scoped and refused after expiry"*, cited a verify command, and was marked
+   `pass` - and the file that command runs contains no occurrence of `ttl`,
+   `expire` or `expiry` at all. Zero. For each row you verify: open the file the
+   verify command actually runs and confirm it asserts what the row's own
+   sentence promises. It does not, the row is a defect - rewrite the row to say
+   what the test really covers, then open the gap as its own work item.
 3. **Visual fidelity** [AUTO] (presence) + [VERIFIER] — each screen the phase
    ships has its **Playwright fidelity assertions** (element completeness +
    interaction behaviour) run GREEN and its screenshot captured for the human

@@ -2253,6 +2253,21 @@ phase thì lỗi bị phát hiện khi đã muộn. Mục nghiệm thu của pha
 chiếu với mệnh đề *Acceptance* của chính REQ-ID trong SRS **trước khi ai code**, không phải
 lúc verifier chạy. Đã thêm vào mục 0 của 2.6.
 
+**Ca thứ bảy, tìm ra ngay sau đó, và là ca có sức lan xa nhất.** `docs/TEST_MATRIX.md` dòng
+`TC-022` khai *"liên kết ký sẵn có giới hạn thời gian và bị từ chối sau khi hết hạn"* cho
+`PLF.STORAGE.02/.04`, trỏ vào một lệnh kiểm cụ thể, và cột trạng thái ghi **`pass`**. Grep
+file mà lệnh đó chạy: **không có một chữ `ttl`, `expire` hay `expiry` nào. Không một chữ.**
+
+Bảng test là thứ mọi người phía sau đọc **thay cho** việc đọc test. Một dòng ghi `pass` là
+lời khai VỀ một test, không phải test. Nên đã thêm vào hợp đồng verifier: với mỗi dòng, mở
+đúng file mà lệnh kiểm chạy ra xem nó có khẳng định điều câu văn của dòng đó hứa không.
+Không có thì **dòng đó là lỗi** - viết lại dòng cho đúng thứ test thật sự phủ, rồi mở phần
+thiếu thành một việc riêng.
+
+Không dựng cổng cho ca này, và nói rõ vì sao: hỏi "test này có khẳng định đúng thứ dòng mô
+tả hứa không" là câu hỏi ngữ nghĩa. Một cổng giả vờ trả lời được nó chính là thêm một cái
+nhãn đúng dán lên việc sai - đúng con bệnh đang chữa (MD-54).
+
 **Và sửa lại một ca tôi kể sai đêm qua.** Tôi viết AC 5 của issue `#22` là "chép hành vi 409
 của code". Phiên chạy đọc kỹ hơn: SRS **không hề phán** về mã trạng thái - nó chỉ giới hạn
 việc chạy lại vào trạng thái kho lỗi. Nên "chỉ job trong kho lỗi mới chạy lại được" là suy
